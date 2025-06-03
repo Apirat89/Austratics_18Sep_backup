@@ -1,0 +1,166 @@
+AGED CARE ANALYTICS - TASK MASTER PRD
+=======================================
+
+PROJECT OVERVIEW:
+A comprehensive aged care analytics platform with beautiful UI, enterprise-grade authentication, and AI-powered insights for healthcare providers in Australia.
+
+TECH STACK: Next.js 15.3.3, Supabase, TypeScript, Tailwind CSS, Turbopack
+
+CURRENT STATUS: 75% Complete - Authentication system, password reset, dashboard, UI/UX, and legal pages are complete.
+
+CRITICAL BLOCKING ISSUES:
+1. Domain registration and email setup required before production launch
+2. Email API configuration needed for password reset functionality
+3. End-to-end testing required for security validation
+
+HIGH PRIORITY TASKS:
+===================
+
+TASK 1: Domain Registration & DNS Setup
+- Register Australian domain name (suggestion: agedcareanalytics.com.au)
+- Set up DNS hosting with provider
+- Configure basic DNS records (A, CNAME, MX)
+- Verify domain ownership and propagation
+PRIORITY: CRITICAL - BLOCKING PRODUCTION
+ESTIMATED TIME: 1-2 days
+DEPENDENCIES: None
+STATUS: Not Started
+
+TASK 2: Email Service Configuration
+- Get Resend API key from resend.com
+- Add RESEND_API_KEY to .env.local file
+- Update email "from" address in src/lib/email.ts to use custom domain
+- Add domain to Resend dashboard
+- Configure SPF, DKIM, and DMARC DNS records for email authentication
+PRIORITY: CRITICAL - BLOCKING PASSWORD RESET
+ESTIMATED TIME: 1 day
+DEPENDENCIES: Task 1 (Domain Registration)
+STATUS: Not Started
+
+TASK 3: Email Delivery Testing
+- Test password reset email functionality end-to-end
+- Verify emails are delivered to inbox (not spam)
+- Test email rendering across different clients (Gmail, Outlook, Apple Mail)
+- Verify reset links work correctly
+- Test rate limiting (3 attempts per 15 minutes)
+PRIORITY: HIGH
+ESTIMATED TIME: 4-6 hours
+DEPENDENCIES: Task 2 (Email Configuration)
+STATUS: Not Started
+
+TASK 4: Authentication Security Testing
+- Test complete signup → signin → dashboard flow
+- Verify password strength validation works correctly
+- Test disposable email blocking functionality
+- Verify rate limiting (5 attempts per 15 minutes for login)
+- Test token expiration handling (1-hour expiry)
+- Test one-time use token validation
+PRIORITY: HIGH
+ESTIMATED TIME: 1 day
+DEPENDENCIES: Task 3 (Email Testing)
+STATUS: Not Started
+
+TASK 5: Production Environment Setup
+- Set up production Supabase project
+- Configure production environment variables
+- Update NEXT_PUBLIC_SITE_URL for production domain
+- Set up hosting platform (Vercel recommended for Next.js)
+- Configure production SSL certificates
+PRIORITY: MEDIUM
+ESTIMATED TIME: 4-6 hours
+DEPENDENCIES: Task 1 (Domain Registration)
+STATUS: Not Started
+
+TASK 6: Error Handling & Edge Cases Testing
+- Test all error scenarios (network failures, invalid tokens, expired sessions)
+- Verify graceful error handling and user feedback
+- Test mobile responsiveness across devices
+- Check accessibility compliance (WCAG 2.1)
+- Performance testing (page load times, image optimization)
+PRIORITY: MEDIUM
+ESTIMATED TIME: 1 day
+DEPENDENCIES: Task 4 (Security Testing)
+STATUS: Not Started
+
+MEDIUM PRIORITY TASKS:
+=====================
+
+TASK 7: Code Quality & Testing Infrastructure
+- Add unit tests for authentication functions
+- Implement integration tests for API routes
+- Set up code coverage reporting
+- Add TypeScript strict mode
+- Set up error monitoring (Sentry)
+PRIORITY: MEDIUM
+ESTIMATED TIME: 2-3 days
+DEPENDENCIES: Task 6 (Edge Cases Testing)
+STATUS: Not Started
+
+TASK 8: Performance Optimization
+- Optimize Australian background image loading
+- Implement caching strategies
+- Bundle size optimization
+- Set up performance monitoring
+- Replace in-memory token storage with Redis
+PRIORITY: MEDIUM
+ESTIMATED TIME: 1-2 days
+DEPENDENCIES: Task 5 (Production Setup)
+STATUS: Not Started
+
+FUTURE ENHANCEMENTS:
+===================
+
+TASK 9: AI Chat Integration
+- Integrate Gemini AI for healthcare insights
+- Create chat interface with context awareness
+- Implement conversation history
+- Add AI-powered analytics suggestions
+PRIORITY: LOW - FUTURE RELEASE
+ESTIMATED TIME: 1-2 weeks
+DEPENDENCIES: Task 8 (Performance Optimization)
+STATUS: Not Started
+
+TASK 10: Analytics Dashboard
+- Integrate MapTiler for geographic analytics
+- Create interactive charts and graphs
+- Real-time data processing
+- Export functionality (PDF, Excel)
+PRIORITY: LOW - FUTURE RELEASE
+ESTIMATED TIME: 2-3 weeks
+DEPENDENCIES: Task 9 (AI Integration)
+STATUS: Not Started
+
+COMPLETED FEATURES:
+==================
+✅ Authentication System (100% Complete)
+✅ Password Reset System (100% Complete)
+✅ Dashboard UI (100% Complete)
+✅ Legal Compliance Pages (100% Complete)
+✅ Australian-themed UI/UX (100% Complete)
+✅ Documentation & Setup Guides (100% Complete)
+
+ACCEPTANCE CRITERIA:
+===================
+- User can create account with enterprise security validation
+- User can sign in and access dashboard successfully
+- Password reset emails are sent from custom domain and work correctly
+- All security features are tested and verified
+- Mobile-responsive design works across all devices
+- Legal compliance confirmed (HIPAA, GDPR, Australian Privacy Act)
+
+LAUNCH READY DEFINITION:
+=======================
+- Domain is registered and configured
+- Email delivery is working from custom domain
+- All critical security tests pass
+- Performance meets benchmarks (< 3s page load)
+- Error handling is comprehensive
+- Production environment is configured and tested
+
+TECHNICAL CONSTRAINTS:
+=====================
+- Must maintain 4/5 star security rating
+- Must comply with healthcare data regulations
+- Must support mobile devices and accessibility standards
+- Must use existing tech stack (Next.js, Supabase, TypeScript)
+- Budget constraints: Use free tiers where possible 

@@ -1,0 +1,14 @@
+{
+	"mcpServers": {
+		"taskmaster-ai": {
+			"command": "npx",
+			"args": ["-y", "--package=task-master-ai", "task-master-ai"],
+			"env": {
+				"ANTHROPIC_API_KEY": "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",
+				"GEMINI_API_KEY": "AIzaSyDjtAraVwnlKDxpsYQ5BxG-v6bD7jnZw8c",
+				"OPENAI_API_KEY": "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",
+				"PERPLEXITY_API_KEY": "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"
+			}
+		}
+	}
+} 
