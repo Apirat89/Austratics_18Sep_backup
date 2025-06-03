@@ -28,6 +28,7 @@ interface AustralianMapProps {
     searchResult?: any;
   } | null;
   onHighlightFeature?: (feature: string | null, featureName: string | null) => void;
+  onClearSearchResult?: () => void;
 }
 
 // Expose methods to parent component
@@ -41,7 +42,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   selectedGeoLayer,
   selectedMapStyle,
   mapNavigation,
-  onHighlightFeature
+  onHighlightFeature,
+  onClearSearchResult
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
@@ -55,6 +57,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   
   // Track markers with proper cleanup
   const markersRef = useRef<maptilersdk.Marker[]>([]);
+  
+  // Track processed navigation to prevent repeated map movements
+  const lastProcessedNavigationRef = useRef<string | null>(null);
 
   // Stabilize facilityTypes to prevent unnecessary re-renders
   const stableFacilityTypes = useMemo(() => facilityTypes, [
@@ -139,11 +144,12 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     }
   }, []);
 
-  // Function to add aged care facilities markers
-  const addAgedCareFacilities = useCallback(async (types: FacilityTypes) => {
+  // Load healthcare facilities with proper coordinate handling
+  const addHealthcareFacilities = useCallback(async (types: FacilityTypes) => {
     if (!map.current) return;
 
     try {
+      console.log('🏥 Loading healthcare facilities...');
       const response = await fetch('/maps/healthcare.geojson');
       
       if (!response.ok) {
@@ -151,8 +157,12 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       }
       
       const healthcareData = await response.json();
+      console.log('🏥 Healthcare data loaded:', { 
+        totalFeatures: healthcareData.features?.length || 0
+      });
       
       if (!healthcareData.features) {
+        console.warn('❌ No features found in healthcare data');
         return;
       }
 
@@ -170,7 +180,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         retirement: '#9B59B6'   // Purple
       };
 
-      // Add markers for each enabled facility type
+      // Process each enabled facility type
       Object.entries(types).forEach(([type, enabled]) => {
         if (!enabled) return;
 
@@ -195,21 +205,37 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           return false;
         });
 
+        let validFacilities = 0;
+        let invalidCoordinates = 0;
+        let outsideBounds = 0;
+
         // Add markers for filtered facilities
-        filteredFacilities.forEach((facility: any) => {
-          const coordinates = facility.geometry?.coordinates;
+        filteredFacilities.forEach((facility: any, index: number) => {
           const properties = facility.properties;
           
-          if (!coordinates || coordinates.length !== 2) {
+          // Use separate Latitude/Longitude fields (not GeoJSON coordinates)
+          const lat = properties?.Latitude;
+          const lng = properties?.Longitude;
+          
+          // Validate coordinates exist and are numbers
+          if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+            invalidCoordinates++;
             return;
           }
-          
-          const [lng, lat] = coordinates;
           
           // Basic coordinate validation
           if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
+            invalidCoordinates++;
             return;
           }
+          
+          // Australian bounds validation (lng: 112-154, lat: -44 to -9)
+          if (lng < 112 || lng > 154 || lat < -44 || lat > -9) {
+            outsideBounds++;
+            return;
+          }
+
+          validFacilities++;
           
           // Create marker element
           const markerElement = document.createElement('div');
@@ -220,48 +246,177 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           markerElement.style.border = '2px solid white';
           markerElement.style.borderRadius = '50%';
           markerElement.style.cursor = 'pointer';
-          markerElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
-          markerElement.style.transition = 'transform 0.2s ease';
-          markerElement.style.position = 'relative';
-          markerElement.style.pointerEvents = 'auto';
+          markerElement.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
 
-          // Add hover event listeners
-          markerElement.addEventListener('mouseenter', () => {
-            handleFacilityHover(facility, markerElement, true);
-          });
-
-          markerElement.addEventListener('mouseleave', () => {
-            handleFacilityHover(facility, markerElement, false);
-          });
-
-          // Create popup with facility information
+          // Extract facility details
           const serviceName = properties?.Service_Name || 'Unknown Service';
           const address = properties?.Physical_Address || 'Address not available';
           const careType = properties?.Care_Type || 'Unknown';
-          const providerName = properties?.Provider_Name || 'Unknown Provider';
-          const residentialPlaces = properties?.Residential_Places;
-          const homePlaces = properties?.Home_Care_Places;
-          
-          let placesInfo = '';
-          if (residentialPlaces && residentialPlaces > 0) {
-            placesInfo += `<p class="text-xs text-gray-600">Residential Places: ${residentialPlaces}</p>`;
-          }
-          if (homePlaces && homePlaces > 0) {
-            placesInfo += `<p class="text-xs text-gray-600">Home Care Places: ${homePlaces}</p>`;
-          }
+          const state = properties?.Physical_State || '';
+          const postcode = properties?.Physical_Postcode || '';
+          const phone = properties?.Phone || '';
+          const email = properties?.Email || '';
+          const website = properties?.Website || '';
+          const residentialPlaces = properties?.Residential_Places || 0;
+          const homeCareMaxPlaces = properties?.Home_Care_Max_Places || 0;
 
+          // Create beautiful popup
           const popup = new maptilersdk.Popup({ 
             offset: 25,
             closeButton: true,
-            closeOnClick: false
+            closeOnClick: false,
+            className: 'custom-popup'
           })
           .setHTML(`
-            <div class="p-3 max-w-xs">
-              <h3 class="font-semibold text-sm mb-1">${serviceName}</h3>
-              <p class="text-xs text-gray-600 mb-1">${careType}</p>
-              <p class="text-xs text-gray-500 mb-2">${address}</p>
-              ${placesInfo}
-              <p class="text-xs text-gray-500 italic">${providerName}</p>
+            <div class="aged-care-popup">
+              <div class="popup-header" style="background: linear-gradient(135deg, ${typeColors[typeKey]}20, ${typeColors[typeKey]}10); border-left: 4px solid ${typeColors[typeKey]};">
+                <h3 class="popup-title">${serviceName}</h3>
+                <span class="popup-type" style="background-color: ${typeColors[typeKey]}20; color: ${typeColors[typeKey]};">${careType}</span>
+              </div>
+              
+              <div class="popup-content">
+                <div class="popup-section">
+                  <div class="popup-icon">📍</div>
+                  <div class="popup-text">
+                    <strong>${address}</strong><br>
+                    <span class="text-gray-500">${state}${postcode ? ' ' + postcode : ''}</span>
+                  </div>
+                </div>
+                
+                ${residentialPlaces > 0 ? `
+                <div class="popup-section">
+                  <div class="popup-icon">🏠</div>
+                  <div class="popup-text">
+                    <strong>${residentialPlaces}</strong> residential places
+                  </div>
+                </div>
+                ` : ''}
+                
+                ${homeCareMaxPlaces > 0 ? `
+                <div class="popup-section">
+                  <div class="popup-icon">🏥</div>
+                  <div class="popup-text">
+                    <strong>${homeCareMaxPlaces}</strong> home care places
+                  </div>
+                </div>
+                ` : ''}
+                
+                ${phone ? `
+                <div class="popup-section">
+                  <div class="popup-icon">📞</div>
+                  <div class="popup-text">
+                    <a href="tel:${phone}" class="popup-link">${phone}</a>
+                  </div>
+                </div>
+                ` : ''}
+                
+                ${email ? `
+                <div class="popup-section">
+                  <div class="popup-icon">✉️</div>
+                  <div class="popup-text">
+                    <a href="mailto:${email}" class="popup-link">${email}</a>
+                  </div>
+                </div>
+                ` : ''}
+                
+                ${website ? `
+                <div class="popup-section">
+                  <div class="popup-icon">🌐</div>
+                  <div class="popup-text">
+                    <a href="${website}" target="_blank" class="popup-link">Visit Website</a>
+                  </div>
+                </div>
+                ` : ''}
+                
+                <div class="popup-footer">
+                  <small class="coordinates">📍 ${lng.toFixed(4)}, ${lat.toFixed(4)}</small>
+                </div>
+              </div>
+
+              <style>
+                .aged-care-popup {
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+                  max-width: 280px;
+                  margin: 0;
+                }
+                
+                .popup-header {
+                  padding: 12px 16px;
+                  margin: -10px -10px 12px -10px;
+                  border-radius: 8px 8px 0 0;
+                }
+                
+                .popup-title {
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: #1a202c;
+                  margin: 0 0 4px 0;
+                  line-height: 1.3;
+                }
+                
+                .popup-type {
+                  display: inline-block;
+                  padding: 2px 8px;
+                  font-size: 11px;
+                  font-weight: 500;
+                  border-radius: 12px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                }
+                
+                .popup-content {
+                  padding: 0;
+                }
+                
+                .popup-section {
+                  display: flex;
+                  align-items: flex-start;
+                  gap: 8px;
+                  margin-bottom: 10px;
+                  padding: 2px 0;
+                }
+                
+                .popup-icon {
+                  font-size: 12px;
+                  width: 16px;
+                  flex-shrink: 0;
+                  margin-top: 1px;
+                }
+                
+                .popup-text {
+                  font-size: 12px;
+                  line-height: 1.4;
+                  color: #2d3748;
+                  flex: 1;
+                }
+                
+                .popup-link {
+                  color: #3182ce;
+                  text-decoration: none;
+                  border-bottom: 1px solid transparent;
+                  transition: border-color 0.2s;
+                }
+                
+                .popup-link:hover {
+                  border-bottom-color: #3182ce;
+                }
+                
+                .popup-footer {
+                  margin-top: 12px;
+                  padding-top: 8px;
+                  border-top: 1px solid #e2e8f0;
+                }
+                
+                .coordinates {
+                  font-size: 10px;
+                  color: #718096;
+                  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+                }
+                
+                .text-gray-500 {
+                  color: #718096;
+                }
+              </style>
             </div>
           `);
 
@@ -274,95 +429,21 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           .setPopup(popup)
           .addTo(map.current!);
 
-          // Track marker for cleanup
           markersRef.current.push(marker);
+        });
+
+        console.log(`📊 ${typeKey} facilities:`, {
+          found: filteredFacilities.length,
+          valid: validFacilities,
+          ...(invalidCoordinates > 0 && { invalidCoordinates }),
+          ...(outsideBounds > 0 && { outsideBounds })
         });
       });
 
     } catch (error) {
-      console.error('Error loading healthcare facilities:', error);
-      // Fallback to sample data if needed
-      addSampleFacilities(types);
+      console.error('❌ Error loading healthcare facilities:', error);
     }
-  }, [handleFacilityHover]);
-
-  // Fallback function with sample data
-  const addSampleFacilities = useCallback((types: FacilityTypes) => {
-    if (!map.current) return;
-
-    const sampleFacilities = {
-      residential: [
-        { name: "Sydney Residential Care", lat: -33.8688, lng: 151.2093 },
-        { name: "Melbourne Aged Care", lat: -37.8136, lng: 144.9631 },
-        { name: "Brisbane Care Center", lat: -27.4698, lng: 153.0251 }
-      ],
-      home: [
-        { name: "Perth Home Care Services", lat: -31.9505, lng: 115.8605 },
-        { name: "Adelaide Home Support", lat: -34.9285, lng: 138.6007 },
-        { name: "Darwin Community Care", lat: -12.4634, lng: 130.8456 }
-      ],
-      retirement: [
-        { name: "Canberra Retirement Village", lat: -35.2809, lng: 149.1300 },
-        { name: "Hobart Senior Living", lat: -42.8821, lng: 147.3272 },
-        { name: "Gold Coast Retirement", lat: -28.0167, lng: 153.4000 }
-      ]
-    };
-
-    const typeColors = {
-      residential: '#E53E3E',
-      home: '#2E8B57',
-      retirement: '#9B59B6'
-    };
-
-    Object.entries(types).forEach(([type, enabled]) => {
-      if (!enabled) return;
-
-      const typeKey = type as keyof typeof sampleFacilities;
-      const facilities = sampleFacilities[typeKey];
-      
-      facilities.forEach((facility) => {
-        const markerElement = document.createElement('div');
-        markerElement.className = 'aged-care-marker';
-        markerElement.style.width = '12px';
-        markerElement.style.height = '12px';
-        markerElement.style.backgroundColor = typeColors[typeKey];
-        markerElement.style.border = '2px solid white';
-        markerElement.style.borderRadius = '50%';
-        markerElement.style.cursor = 'pointer';
-        markerElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
-        markerElement.style.transition = 'transform 0.2s ease';
-        markerElement.style.position = 'relative';
-        markerElement.style.pointerEvents = 'auto';
-
-        // Add hover event listeners
-        markerElement.addEventListener('mouseenter', () => {
-          handleFacilityHover(facility, markerElement, true);
-        });
-
-        markerElement.addEventListener('mouseleave', () => {
-          handleFacilityHover(facility, markerElement, false);
-        });
-
-        const popup = new maptilersdk.Popup({ offset: 25 })
-          .setHTML(`
-            <div class="p-2">
-              <h3 class="font-semibold text-sm">${facility.name}</h3>
-              <p class="text-xs text-gray-600">${type.charAt(0).toUpperCase() + type.slice(1)} Care</p>
-            </div>
-          `);
-
-        const marker = new maptilersdk.Marker({ 
-          element: markerElement,
-          anchor: 'center'
-        })
-        .setLngLat([facility.lng, facility.lat])
-        .setPopup(popup)
-        .addTo(map.current!);
-
-        markersRef.current.push(marker);
-      });
-    });
-  }, [handleFacilityHover]);
+  }, []);
 
   // Effect to handle facility type changes
   useEffect(() => {
@@ -371,11 +452,11 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     // Clear existing markers
     clearAllMarkers();
     
-    // Add new markers based on selected types
+    // Add healthcare facilities
     if (Object.values(stableFacilityTypes).some(Boolean)) {
-      addAgedCareFacilities(stableFacilityTypes);
+      addHealthcareFacilities(stableFacilityTypes);
     }
-  }, [isLoaded, stableFacilityTypes, clearAllMarkers, addAgedCareFacilities]);
+  }, [isLoaded, stableFacilityTypes, clearAllMarkers, addHealthcareFacilities]);
 
   // Helper function to get the right property field for each layer type
   const getPropertyField = (layerType: GeoLayerType): string => {
@@ -448,6 +529,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       const featureName = getFeatureName(currentGeoLayer, properties);
       
       if (featureId) {
+        // Clear any active search result since user is manually selecting
+        onClearSearchResult?.();
+        
         // Highlight the clicked feature
         map.current.setFilter(`${currentGeoLayer}-highlight`, [
           '==',
@@ -464,7 +548,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     } else {
       clearHighlight();
     }
-  }, [clearHighlight, getPropertyField, getFeatureName, setHighlightedFeature, setHighlightedFeatureName, onHighlightFeature]);
+  }, [clearHighlight, getPropertyField, getFeatureName, setHighlightedFeature, setHighlightedFeatureName, onHighlightFeature, onClearSearchResult]);
 
   // Helper function to determine appropriate zoom level for each layer type
   const getAppropriateZoom = (layerType: GeoLayerType, currentZoom: number): number | null => {
@@ -733,7 +817,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
 
     const { center, bounds, zoom, searchResult } = mapNavigation;
 
-    // Handle search result highlighting
+    // Always handle search result highlighting (this should work every time)
     if (searchResult) {
       const highlighted = highlightMatchingBoundary(mapNavigation);
       
@@ -743,8 +827,17 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       }
     }
 
-    // Handle navigation (center, bounds, zoom)
-    if (center || bounds || zoom !== undefined) {
+    // Create a unique identifier for this navigation request (only for map movements)
+    const navigationId = JSON.stringify({ 
+      center, 
+      bounds, 
+      zoom
+    });
+
+    // Only handle navigation (center, bounds, zoom) for NEW requests
+    if ((center || bounds || zoom !== undefined) && lastProcessedNavigationRef.current !== navigationId) {
+      console.log('🗺️ Processing new navigation request:', { center, bounds, zoom });
+      
       if (bounds) {
         map.current.fitBounds([
           [bounds[0], bounds[1]], // Southwest corner
@@ -765,6 +858,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           duration: 1000
         });
       }
+
+      // Mark this navigation as processed
+      lastProcessedNavigationRef.current = navigationId;
     }
   }, [isLoaded, mapNavigation, highlightMatchingBoundary, clearHighlight]);
 

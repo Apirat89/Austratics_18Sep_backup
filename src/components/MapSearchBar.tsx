@@ -181,7 +181,8 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
         setRecentSearches([]);
       }
 
-      // Set the last search term and close dropdown
+      // Clear the search input and close dropdown
+      setSearchQuery('');
       setLastSearchTerm(searchTerm);
       setShowDropdown(false);
       inputRef.current?.blur();
@@ -189,6 +190,8 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
       console.error('Error performing search:', error);
       // Still perform basic search even if location lookup fails
       onSearch(searchTerm);
+      // Clear the search input even on error
+      setSearchQuery('');
       setLastSearchTerm(searchTerm);
     }
   };
@@ -212,6 +215,8 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
       setRecentSearches([]);
     }
 
+    // Clear the search input and close dropdown
+    setSearchQuery('');
     setLastSearchTerm(displayName);
     setShowDropdown(false);
     inputRef.current?.blur();

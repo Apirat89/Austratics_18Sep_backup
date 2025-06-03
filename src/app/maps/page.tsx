@@ -153,6 +153,11 @@ export default function MapsPage() {
     setHighlightedFeatureName(featureName);
   }, []);
 
+  const handleClearSearchResult = useCallback(() => {
+    console.log('🗺️ Clearing search result due to manual map interaction');
+    setMapNavigation(null);
+  }, []);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -299,6 +304,7 @@ export default function MapsPage() {
               selectedMapStyle={selectedMapStyle}
               mapNavigation={mapNavigation}
               onHighlightFeature={handleHighlightFeature}
+              onClearSearchResult={handleClearSearchResult}
             />
           </div>
         </main>
