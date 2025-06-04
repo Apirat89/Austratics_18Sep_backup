@@ -302,6 +302,12 @@ export default function MapsPage() {
   const handleClearCurrentlyShowing = useCallback(() => {
     shouldUpdateSearchFromHighlight.current = false; // Temporarily disable highlight updates
     setCurrentlyShowing('');
+    
+    // Clear the last search result since user is explicitly clearing the search
+    if (mapRef.current) {
+      mapRef.current.clearLastSearchResult();
+    }
+    
     // Re-enable after a brief delay
     setTimeout(() => {
       shouldUpdateSearchFromHighlight.current = true;

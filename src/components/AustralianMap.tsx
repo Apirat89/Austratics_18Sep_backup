@@ -40,7 +40,119 @@ interface AustralianMapProps {
 // Expose methods to parent component
 export interface AustralianMapRef {
   clearHighlight: () => void;
+  clearLastSearchResult: () => void;
 }
+
+// Helper function for point-in-polygon testing using ray casting algorithm
+const isPointInPolygon = (point: [number, number], polygon: number[][]): boolean => {
+  if (!polygon || polygon.length < 3) return false; // Need at least 3 points for a polygon
+  
+  const [x, y] = point;
+  let inside = false;
+  
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const pointI = polygon[i];
+    const pointJ = polygon[j];
+    
+    // Validate coordinate points
+    if (!pointI || !pointJ || pointI.length < 2 || pointJ.length < 2) continue;
+    
+    const [xi, yi] = pointI;
+    const [xj, yj] = pointJ;
+    
+    // Skip if coordinates are invalid
+    if (typeof xi !== 'number' || typeof yi !== 'number' || 
+        typeof xj !== 'number' || typeof yj !== 'number') continue;
+    
+    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+      inside = !inside;
+    }
+  }
+  
+  return inside;
+};
+
+// Helper function to calculate approximate area from geometry bounding box
+const calculateBoundingBoxArea = (geometry: any): number => {
+  try {
+    const coordinates = geometry.type === 'MultiPolygon' 
+      ? geometry.coordinates.flat(2) // Flatten all polygon rings
+      : geometry.coordinates.flat(1); // Flatten polygon rings
+    
+    if (!coordinates || coordinates.length === 0) return Infinity;
+    
+    let minLng = Infinity, maxLng = -Infinity;
+    let minLat = Infinity, maxLat = -Infinity;
+    
+    coordinates.forEach((coord: [number, number]) => {
+      if (coord && coord.length >= 2) {
+        const [lng, lat] = coord;
+        if (typeof lng === 'number' && typeof lat === 'number') {
+          minLng = Math.min(minLng, lng);
+          maxLng = Math.max(maxLng, lng);
+          minLat = Math.min(minLat, lat);
+          maxLat = Math.max(maxLat, lat);
+        }
+      }
+    });
+    
+    if (minLng === Infinity) return Infinity;
+    
+    // Calculate approximate area (width × height in degrees)
+    const area = (maxLng - minLng) * (maxLat - minLat);
+    return area;
+  } catch (error) {
+    console.warn('Error calculating bounding box area:', error);
+    return Infinity;
+  }
+};
+
+// Enhanced helper to handle both Polygon and MultiPolygon geometries
+const isPointInGeometry = (point: [number, number], geometry: any): boolean => {
+  try {
+    if (geometry.type === 'Polygon') {
+      // For Polygon: coordinates[0] is the outer ring
+      return isPointInPolygon(point, geometry.coordinates[0]);
+    } else if (geometry.type === 'MultiPolygon') {
+      // For MultiPolygon: coordinates is array of polygons
+      return geometry.coordinates.some((polygon: number[][][]) => {
+        // Each polygon's first array is the outer ring
+        return isPointInPolygon(point, polygon[0]);
+      });
+    }
+    return false;
+  } catch (error) {
+    console.warn('Error in point-in-geometry test:', error);
+    return false;
+  }
+};
+
+// Enhanced helper with tolerance for postcode boundaries
+const isPointInGeometryWithTolerance = (point: [number, number], geometry: any, tolerance: number = 0): boolean => {
+  // First try exact match
+  if (isPointInGeometry(point, geometry)) {
+    return true;
+  }
+  
+  // If tolerance is provided, try points around the original point
+  if (tolerance > 0) {
+    const [lng, lat] = point;
+    const testPoints = [
+      [lng + tolerance, lat],
+      [lng - tolerance, lat],
+      [lng, lat + tolerance],
+      [lng, lat - tolerance],
+      [lng + tolerance, lat + tolerance],
+      [lng - tolerance, lat - tolerance],
+      [lng + tolerance, lat - tolerance],
+      [lng - tolerance, lat + tolerance]
+    ];
+    
+    return testPoints.some(testPoint => isPointInGeometry(testPoint as [number, number], geometry));
+  }
+  
+  return false;
+};
 
 const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   className = "",
@@ -68,6 +180,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   
   // Track processed navigation to prevent repeated map movements
   const lastProcessedNavigationRef = useRef<string | null>(null);
+
+  // Store last search result to maintain highlighting across interactions
+  const [lastSearchResult, setLastSearchResult] = useState<any>(null);
 
   // Stabilize facilityTypes to prevent unnecessary re-renders
   const stableFacilityTypes = useMemo(() => facilityTypes, [
@@ -792,6 +907,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     
     setHighlightedFeature(null);
     setHighlightedFeatureName(null);
+    // Keep lastSearchResult so we can recognise the feature again
+    // (we'll clear it only when the user explicitly cancels the search)
     onHighlightFeature?.(null, null);
   }, [setHighlightedFeature, setHighlightedFeatureName, onHighlightFeature]);
 
@@ -799,16 +916,115 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     if (!map.current) return;
 
     const currentGeoLayer = selectedGeoLayerRef.current;
-    const features = map.current.queryRenderedFeatures(e.point, {
-      layers: [`${currentGeoLayer}-fill`]
+    
+    console.log(`🎯 Click detected at:`, {
+      x: e.point.x,
+      y: e.point.y,
+      lngLat: e.lngLat,
+      currentLayer: currentGeoLayer
+    });
+    
+    // Debug: Check what layers exist for this boundary type
+    const style = map.current.getStyle();
+    const relevantLayers = style.layers?.filter(l => l.id.includes(currentGeoLayer)) || [];
+    console.log(`📋 Available ${currentGeoLayer} layers:`, relevantLayers.map(l => l.id));
+    
+    // Debug: Check source status
+    const sourceId = `${currentGeoLayer}-source`;
+    const source = map.current.getSource(sourceId);
+    console.log(`📊 Source ${sourceId}:`, {
+      exists: !!source,
+      type: source?.type,
+      hasData: source && (source as any)._data?.features?.length || 0
+    });
+    
+    // Query features at the click point - use querySourceFeatures for large polygons
+    // queryRenderedFeatures only returns visible/rendered portions, which fails for large polygons
+    let features: any[] = [];
+    
+    try {
+      // First try querySourceFeatures which gets full geometries from source
+      const allSourceFeatures = map.current.querySourceFeatures(sourceId);
+      console.log(`📍 Source features count:`, allSourceFeatures.length);
+      
+      if (allSourceFeatures.length > 0) {
+        // Manual point-in-polygon test for the click coordinates
+        const clickLngLat = e.lngLat;
+        const clickPoint: [number, number] = [clickLngLat.lng, clickLngLat.lat];
+        
+        console.log(`🎯 Testing click point:`, clickPoint);
+        console.log(`📋 Sample geometries:`, allSourceFeatures.slice(0, 3).map(f => ({
+          type: f.geometry.type,
+          id: f.properties?.[getPropertyField(currentGeoLayer)],
+          coordinatesLength: (f.geometry as any).coordinates?.length
+        })));
+        
+        features = allSourceFeatures.filter((feature: any, index: number) => {
+          // Use appropriate tolerance based on layer type - smaller boundaries need higher tolerance
+          const tolerance = {
+            'postcode': 0.003,  // ~300m tolerance for postcodes (most precise boundaries)
+            'locality': 0.002,  // ~200m tolerance for localities  
+            'sa2': 0.001,       // ~100m tolerance for SA2
+            'sa3': 0,           // No tolerance for SA3 (larger boundaries)
+            'sa4': 0,           // No tolerance for SA4 (larger boundaries)
+            'lga': 0            // No tolerance for LGA (larger boundaries)
+          }[currentGeoLayer] || 0;
+          
+          const result = isPointInGeometryWithTolerance(clickPoint, feature.geometry, tolerance);
+          return result;
+        });
+        
+        console.log(`📍 Point-in-polygon matches:`, features.length);
+      }
+    } catch (error) {
+      console.warn('Error with querySourceFeatures, falling back to queryRenderedFeatures:', error);
+      // Fallback to original method
+      features = map.current.queryRenderedFeatures(e.point, {
+        layers: [`${currentGeoLayer}-fill`]
+      });
+    }
+    
+    console.log(`📍 Final query result:`, {
+      count: features.length,
+      featureIds: features.map(f => f.properties?.[getPropertyField(currentGeoLayer)]),
+      geometryTypes: features.map(f => f.geometry.type)
     });
 
     if (features.length > 0) {
       // If multiple features, pick the smallest one (most specific)
       const feature = features.length > 1 
         ? features.reduce((smallest, current) => {
-            const smallestArea = smallest.properties?.st_area_shape || Infinity;
-            const currentArea = current.properties?.st_area_shape || Infinity;
+            // Get primary area data first
+            const smallestShapeArea = smallest.properties?.st_area_shape || smallest.properties?.SHAPE_Area;
+            const currentShapeArea = current.properties?.st_area_shape || current.properties?.SHAPE_Area;
+            
+            // Calculate fallback areas using bounding box when shape area is missing
+            const smallestArea = smallestShapeArea || calculateBoundingBoxArea(smallest.geometry);
+            const currentArea = currentShapeArea || calculateBoundingBoxArea(current.geometry);
+            
+            // Log only when multiple features are found (useful for debugging overlaps)
+            if (features.length > 1) {
+              console.log(`🔍 Selecting from ${features.length} overlapping features:`, {
+                codes: features.map(f => f.properties?.[getPropertyField(currentGeoLayer)]),
+                winner: currentArea < smallestArea ? 
+                  current.properties?.[getPropertyField(currentGeoLayer)] : 
+                  smallest.properties?.[getPropertyField(currentGeoLayer)]
+              });
+            }
+            
+            // If both areas are still Infinity (both missing), prefer simple Polygon over MultiPolygon
+            if (smallestArea === Infinity && currentArea === Infinity) {
+              // Prefer simple Polygon over MultiPolygon for better precision
+              if (smallest.geometry.type === 'MultiPolygon' && current.geometry.type === 'Polygon') {
+                return current;
+              }
+              if (smallest.geometry.type === 'Polygon' && current.geometry.type === 'MultiPolygon') {
+                return smallest;
+              }
+              // If both same type, prefer the one that comes later (more specific)
+              return current;
+            }
+            
             return currentArea < smallestArea ? current : smallest;
           })
         : features[0];
@@ -818,9 +1034,41 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       const featureId = properties?.[propertyField];
       const featureName = getFeatureName(currentGeoLayer, properties);
       
+      console.log(`🎯 Clicked feature found:`, {
+        layer: currentGeoLayer,
+        featureId,
+        featureName,
+        selectedFrom: features.length,
+        properties: {
+          [propertyField]: featureId,
+          area: properties?.st_area_shape || properties?.SHAPE_Area,
+        }
+      });
+      
       if (featureId) {
-        // Clear any active search result since user is manually selecting
-        onClearSearchResult?.();
+        // Check if this matches the last search result
+        const isLastSearchResult = lastSearchResult && (
+          // Try exact code match first
+          (lastSearchResult.code && lastSearchResult.code.toString() === featureId.toString()) ||
+          // Try name-based matching (case insensitive, partial match)
+          (lastSearchResult.name && featureName && (
+            lastSearchResult.name.toLowerCase() === featureName.toLowerCase() ||
+            lastSearchResult.name.toLowerCase().includes(featureName.toLowerCase()) ||
+            featureName.toLowerCase().includes(lastSearchResult.name.toLowerCase())
+          )) ||
+          // For LGA, also try matching without "(Regional Council)" suffix variations
+          (currentGeoLayer === 'lga' && lastSearchResult.name && featureName && (
+            lastSearchResult.name.toLowerCase().replace(/\s*\([^)]*\)$/g, '').trim() === featureName.toLowerCase().replace(/\s*\([^)]*\)$/g, '').trim()
+          ))
+        );
+
+        if (!isLastSearchResult) {
+          // Clear any active search result since user is manually selecting a different area
+          onClearSearchResult?.();
+        } else {
+          // This is the same feature as the last search result, maintain search context
+          console.log('🔄 Clicked on same feature as last search result, maintaining search context');
+        }
         
         // Highlight the clicked feature
         map.current.setFilter(`${currentGeoLayer}-highlight`, [
@@ -833,12 +1081,14 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         setHighlightedFeatureName(featureName || `${currentGeoLayer.toUpperCase()}: ${featureId}`);
         onHighlightFeature?.(featureId as string, featureName || `${currentGeoLayer.toUpperCase()}: ${featureId}`);
       } else {
+        console.log(`⚠️ Feature found but no ${propertyField} property:`, properties);
         clearHighlight();
       }
     } else {
+      console.log(`❌ No features found at click point for layer: ${currentGeoLayer}`);
       clearHighlight();
     }
-  }, [clearHighlight, getPropertyField, getFeatureName, setHighlightedFeature, setHighlightedFeatureName, onHighlightFeature, onClearSearchResult]);
+  }, [clearHighlight, getPropertyField, getFeatureName, setHighlightedFeature, setHighlightedFeatureName, onHighlightFeature, onClearSearchResult, lastSearchResult]);
 
   // Helper function to determine appropriate zoom level for each layer type
   const getAppropriateZoom = (layerType: GeoLayerType, currentZoom: number): number | null => {
@@ -935,8 +1185,24 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       console.log(`Successfully fetched ${fileName} (${response.headers.get('content-length') ? Math.round(parseInt(response.headers.get('content-length')!) / 1024 / 1024) + 'MB' : 'unknown size'}), parsing JSON...`);
       const parseStartTime = Date.now();
       const geojsonData = await response.json();
+      
       const parseTime = Date.now() - parseStartTime;
       console.log(`Parsed ${fileName} in ${parseTime}ms, features count:`, geojsonData.features?.length || 0);
+      
+      // Additional data quality checks
+      const sampleFeature = geojsonData.features?.[0];
+      if (sampleFeature) {
+        console.log(`📋 Sample ${layerType} feature structure:`, {
+          hasGeometry: !!sampleFeature.geometry,
+          geometryType: sampleFeature.geometry?.type,
+          hasProperties: !!sampleFeature.properties,
+          propertyKeys: Object.keys(sampleFeature.properties || {}),
+          sampleProperties: {
+            [getPropertyField(layerType)]: sampleFeature.properties?.[getPropertyField(layerType)],
+            objectid: sampleFeature.properties?.objectid
+          }
+        });
+      }
       
       // Add the new source and layers
       const sourceId = `${layerType}-source`;
@@ -949,19 +1215,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       console.log(`Adding source: ${sourceId}`);
       map.current!.addSource(sourceId, {
         type: 'geojson',
-        data: geojsonData
-      });
-
-      // Add invisible fill layer for click detection
-      console.log(`Adding fill layer: ${layerType}-fill`);
-      map.current!.addLayer({
-        id: `${layerType}-fill`,
-        type: 'fill',
-        source: sourceId,
-        paint: {
-          'fill-color': 'transparent',
-          'fill-opacity': 0
-        }
+        data: geojsonData,
+        generateId: true, // Let MapLibre generate unique IDs to avoid ID conflicts
+        promoteId: getPropertyField(layerType) // Use the boundary property field as feature ID
       });
 
       // Add outline layer
@@ -977,7 +1233,19 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         }
       });
 
-      // Add highlight layer (initially hidden)
+      // Add invisible fill layer for click detection
+      console.log(`Adding fill layer: ${layerType}-fill`);
+      map.current!.addLayer({
+        id: `${layerType}-fill`,
+        type: 'fill',
+        source: sourceId,
+        paint: {
+          'fill-color': 'rgba(229, 62, 62, 0.2)', // Slightly more visible for better click detection
+          'fill-opacity': 0.2 // Increased opacity for more reliable click detection on complex polygons
+        }
+      });
+
+      // Add highlight layer (initially hidden) - this should be on top
       console.log(`Adding highlight layer: ${layerType}-highlight`);
       map.current!.addLayer({
         id: `${layerType}-highlight`,
@@ -986,7 +1254,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         filter: ['==', ['get', getPropertyField(layerType)], ''], // Initially hide all
         paint: {
           'fill-color': '#E53E3E',
-          'fill-opacity': 0.1
+          'fill-opacity': 0.15 // Slightly more visible for highlights
         }
       });
 
@@ -1107,6 +1375,11 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
 
     const { center, bounds, zoom, searchResult } = mapNavigation;
 
+    // Store the search result for later use
+    if (searchResult) {
+      setLastSearchResult(searchResult);
+    }
+
     // Always handle search result highlighting (this should work every time)
     if (searchResult) {
       const highlighted = highlightMatchingBoundary(mapNavigation);
@@ -1161,10 +1434,18 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     }
   }, [isLoaded]);
 
+  // Function to clear last search result (called when search is explicitly cancelled)
+  const clearLastSearchResult = useCallback(() => {
+    setLastSearchResult(null);
+  }, []);
+
   // Expose clearHighlight method to parent
   useImperativeHandle(ref, () => ({
     clearHighlight: () => {
       clearHighlight();
+    },
+    clearLastSearchResult: () => {
+      clearLastSearchResult();
     }
   }));
 
