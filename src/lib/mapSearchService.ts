@@ -2,11 +2,15 @@ interface SearchResult {
   id: string;
   name: string;
   code?: string;
-  type: 'lga' | 'sa2' | 'sa3' | 'sa4' | 'postcode' | 'locality';
+  type: 'lga' | 'sa2' | 'sa3' | 'sa4' | 'postcode' | 'locality' | 'facility';
   state?: string;
   bounds?: [number, number, number, number]; // [minLng, minLat, maxLng, maxLat]
   center?: [number, number]; // [lng, lat]
   score: number; // Relevance score for sorting
+  // Facility-specific properties
+  address?: string;
+  careType?: string;
+  facilityType?: 'residential' | 'home' | 'retirement';
 }
 
 interface GeoJSONFeature {
@@ -236,6 +240,111 @@ async function buildSearchIndex(type: 'lga' | 'sa2' | 'sa3' | 'sa4' | 'postcode'
   return searchResults;
 }
 
+// Build search index for healthcare facilities
+async function buildHealthcareFacilityIndex(): Promise<SearchResult[]> {
+  const cacheKey = 'healthcare';
+  
+  // Return cached index if available
+  if (searchIndexCache.has(cacheKey)) {
+    return searchIndexCache.get(cacheKey)!;
+  }
+
+  console.log('Building search index for healthcare facilities...'); // Debug log
+
+  try {
+    const response = await fetch('/maps/healthcare.geojson');
+    
+    if (!response.ok) {
+      console.error(`Failed to load healthcare data: ${response.status}`);
+      return [];
+    }
+    
+    const data: GeoJSONData = await response.json();
+    console.log(`Loaded ${data.features.length} healthcare facilities`); // Debug log
+
+    if (!data.features) {
+      console.warn('No features found in healthcare data');
+      return [];
+    }
+
+    const searchResults: SearchResult[] = [];
+
+    // Define care type mapping similar to the map component
+    const careTypeMapping = {
+      residential: ['Residential', 'Multi-Purpose Service'],
+      home: ['Home Care', 'Community Care'],
+      retirement: ['Retirement', 'Retirement Living', 'Retirement Village']
+    };
+
+    data.features.forEach((feature, index) => {
+      try {
+        const props = feature.properties;
+        const serviceName = props?.Service_Name || '';
+        const careType = props?.Care_Type || '';
+        const address = props?.Address || '';
+        const state = props?.State || '';
+        const postcode = props?.Postcode || '';
+        
+        // Extract coordinates
+        const geometry = feature.geometry;
+        if (!geometry || geometry.type !== 'Point' || !Array.isArray(geometry.coordinates)) {
+          return; // Skip features without valid point coordinates
+        }
+        
+        const [lng, lat] = geometry.coordinates;
+        
+        // Validate coordinates are within Australia bounds
+        if (lng < 112 || lng > 154 || lat < -44 || lat > -9) {
+          return; // Skip facilities outside Australia
+        }
+
+        // Determine facility type based on care type
+        let facilityType: 'residential' | 'home' | 'retirement' | null = null;
+        
+        if (careTypeMapping.residential.some(ct => careType.includes(ct))) {
+          facilityType = 'residential';
+        } else if (careTypeMapping.home.some(ct => careType.includes(ct)) || 
+                   (careType.includes('Multi-Purpose Service') && props?.Home_Care_Places > 0)) {
+          facilityType = 'home';
+        } else if (careTypeMapping.retirement.some(ct => careType.toLowerCase().includes(ct.toLowerCase())) ||
+                   serviceName.toLowerCase().includes('retirement')) {
+          facilityType = 'retirement';
+        }
+
+        if (serviceName && facilityType) {
+          const fullAddress = `${address}${state ? `, ${state}` : ''}${postcode ? ` ${postcode}` : ''}`;
+          
+          searchResults.push({
+            id: `facility-${index}`,
+            name: serviceName.trim(),
+            type: 'facility',
+            state: state.trim(),
+            center: [lng, lat],
+            bounds: [lng - 0.001, lat - 0.001, lng + 0.001, lat + 0.001], // Small bounds around the point
+            score: 1.0,
+            address: fullAddress.trim(),
+            careType: careType.trim(),
+            facilityType
+          });
+        }
+      } catch (error) {
+        console.warn(`Error processing healthcare facility ${index}:`, error);
+        // Continue processing other facilities
+      }
+    });
+
+    console.log(`Built healthcare facility search index: ${searchResults.length} entries`); // Debug log
+    
+    // Cache the search index
+    searchIndexCache.set(cacheKey, searchResults);
+    
+    return searchResults;
+  } catch (error) {
+    console.error('Error loading healthcare facilities for search:', error);
+    return [];
+  }
+}
+
 // Calculate relevance score based on search term
 function calculateRelevanceScore(searchTerm: string, result: SearchResult): number {
   const term = searchTerm.toLowerCase().trim();
@@ -243,6 +352,10 @@ function calculateRelevanceScore(searchTerm: string, result: SearchResult): numb
   const code = result.code?.toLowerCase() || '';
   
   let score = 0;
+
+  // For facilities, also check address and care type for matches
+  const address = result.address?.toLowerCase() || '';
+  const careType = result.careType?.toLowerCase() || '';
 
   // Exact matches get highest score
   if (name === term || code === term) {
@@ -260,13 +373,28 @@ function calculateRelevanceScore(searchTerm: string, result: SearchResult): numb
   else if (name.split(' ').some(word => word.startsWith(term))) {
     score = 70;
   }
+  // For facilities, also check address and care type
+  else if (result.type === 'facility') {
+    if (address.includes(term)) {
+      score = 50; // Address matches
+    } else if (careType.includes(term)) {
+      score = 45; // Care type matches
+    } else if (address.split(' ').some(word => word.startsWith(term))) {
+      score = 40; // Address word boundary match
+    }
+  }
   // Fuzzy matching for typos (simple)
   else if (calculateEditDistance(term, name) <= 2 || calculateEditDistance(term, code) <= 1) {
     score = 40;
   }
 
   // Boost score for certain boundary types and search patterns
-  if (result.type === 'locality') {
+  if (result.type === 'facility') {
+    // Boost facilities for text-based searches (people often search by facility name)
+    if (!/^\d+$/.test(term)) {
+      score += 25; // Higher boost for facility text searches
+    }
+  } else if (result.type === 'locality') {
     // Boost localities for text-based searches (people often search by suburb/town name)
     if (!/^\d+$/.test(term)) {
       score += 15; // Text searches likely looking for localities
@@ -326,14 +454,15 @@ export async function searchLocations(searchTerm: string, maxResults: number = 2
   console.log(`Searching for: "${searchTerm}"`); // Debug log
 
   try {
-    // Load search indices for all boundary types using standard GeoJSON approach
-    const [lgaResults, sa2Results, sa3Results, sa4Results, postcodeResults, localityResults] = await Promise.all([
+    // Load search indices for all boundary types and healthcare facilities
+    const [lgaResults, sa2Results, sa3Results, sa4Results, postcodeResults, localityResults, facilityResults] = await Promise.all([
       buildSearchIndex('lga'),
       buildSearchIndex('sa2'),
       buildSearchIndex('sa3'),
       buildSearchIndex('sa4'),
       buildSearchIndex('postcode'),
       buildSearchIndex('locality'),
+      buildHealthcareFacilityIndex(),
     ]);
 
     // Combine all results
@@ -344,6 +473,7 @@ export async function searchLocations(searchTerm: string, maxResults: number = 2
       ...sa4Results,
       ...postcodeResults,
       ...localityResults,
+      ...facilityResults,
     ];
 
     console.log(`Total searchable items: ${allResults.length}`); // Debug log

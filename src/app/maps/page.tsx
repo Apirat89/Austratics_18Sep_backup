@@ -34,8 +34,8 @@ export default function MapsPage() {
   // Facility types state (keeping for backwards compatibility)
   const [facilityTypes, setFacilityTypes] = useState<FacilityTypes>({
     residential: true,
-    home: false,
-    retirement: false
+    home: true,
+    retirement: true
   });
   const [selectedGeoLayer, setSelectedGeoLayer] = useState<GeoLayerType>('sa2');
   const [selectedMapStyle, setSelectedMapStyle] = useState<MapStyleType>('basic');
@@ -102,8 +102,21 @@ export default function MapsPage() {
       if (navigation.searchResult) {
         const { type } = navigation.searchResult;
         
-        // Switch to appropriate layer if not already selected
-        if (type === 'postcode' && selectedGeoLayer !== 'postcode') {
+        // Handle facility searches
+        if (type === 'facility') {
+          const { facilityType } = navigation.searchResult;
+          
+          // Enable the appropriate facility type if it's not already enabled
+          if (facilityType && facilityType in facilityTypes && !facilityTypes[facilityType as keyof FacilityTypes]) {
+            console.log(`Auto-enabling ${facilityType} facility type for facility search`);
+            setFacilityTypes(prev => ({
+              ...prev,
+              [facilityType]: true
+            }));
+          }
+        }
+        // Handle boundary searches
+        else if (type === 'postcode' && selectedGeoLayer !== 'postcode') {
           console.log('Auto-switching to postcode layer for postcode search');
           setSelectedGeoLayer('postcode');
         } else if (type === 'locality' && selectedGeoLayer !== 'locality') {
@@ -128,7 +141,7 @@ export default function MapsPage() {
       setMapNavigation({
         center: navigation.center,
         bounds: navigation.bounds,
-        zoom: navigation.bounds ? undefined : 10,
+        zoom: navigation.searchResult?.type === 'facility' ? 15 : (navigation.bounds ? undefined : 10), // Higher zoom for facilities
         searchResult: navigation.searchResult
       });
     } else {

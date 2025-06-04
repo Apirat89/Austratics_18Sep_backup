@@ -17,11 +17,15 @@ interface MapSearchBarProps {
 
 interface LocationResult {
   name: string;
-  type: 'lga' | 'sa2' | 'sa3' | 'sa4' | 'postcode' | 'locality';
+  type: 'lga' | 'sa2' | 'sa3' | 'sa4' | 'postcode' | 'locality' | 'facility';
   code?: string;
   state?: string;
   center?: [number, number];
   bounds?: [number, number, number, number];
+  // Facility-specific properties
+  address?: string;
+  careType?: string;
+  facilityType?: 'residential' | 'home' | 'retirement';
 }
 
 export default function MapSearchBar({ userId, onSearch, className = "" }: MapSearchBarProps) {
@@ -253,6 +257,7 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
       case 'sa2': return '📍';
       case 'sa3': return '📍';
       case 'sa4': return '📍';
+      case 'facility': return '🏥';
       default: return '📍';
     }
   };
@@ -265,6 +270,7 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
       case 'sa2': return 'SA2 Area';
       case 'sa3': return 'SA3 Area'; 
       case 'sa4': return 'SA4 Area';
+      case 'facility': return 'Healthcare Facility';
       default: return 'Location';
     }
   };
@@ -339,8 +345,17 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
                         )}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {getLocationTypeLabel(location.type)}
-                        {location.state && ` • ${location.state}`}
+                        {location.type === 'facility' ? (
+                          <>
+                            {location.careType}
+                            {location.address && ` • ${location.address}`}
+                          </>
+                        ) : (
+                          <>
+                            {getLocationTypeLabel(location.type)}
+                            {location.state && ` • ${location.state}`}
+                          </>
+                        )}
                       </div>
                     </div>
                     <MapPin className="h-4 w-4 text-gray-400" />
@@ -412,7 +427,7 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
             <div className="px-4 py-8 text-center">
               <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />
               <p className="text-sm text-gray-500">No locations found</p>
-              <p className="text-xs text-gray-400 mt-1">Try searching for a city, postcode, or area name</p>
+              <p className="text-xs text-gray-400 mt-1">Try searching for a city, postcode, area name, or healthcare facility</p>
             </div>
           )}
 
@@ -421,7 +436,7 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
             <div className="px-4 py-8 text-center">
               <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />
               <p className="text-sm text-gray-500">Start typing to search</p>
-              <p className="text-xs text-gray-400 mt-1">Search for cities, postcodes, or administrative areas</p>
+              <p className="text-xs text-gray-400 mt-1">Search for cities, postcodes, administrative areas, or healthcare facilities</p>
             </div>
           )}
         </div>

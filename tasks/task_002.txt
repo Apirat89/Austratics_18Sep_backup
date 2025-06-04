@@ -1,0 +1,25 @@
+# Task ID: 2
+# Title: Email Service Configuration
+# Status: pending
+# Dependencies: None
+# Priority: critical
+# Description: Configure Resend API for production email delivery with custom domain authentication.
+# Details:
+Set up email service for password reset functionality:
+
+- Get Resend API key from resend.com
+- Add RESEND_API_KEY to production environment variables
+- Update email 'from' address in src/lib/email.ts to use custom domain
+- Add domain to Resend dashboard
+- Configure SPF, DKIM, and DMARC DNS records for email authentication
+- Test email deliverability and authentication
+
+This enables the password reset functionality which is currently blocked.
+
+# Test Strategy:
+Test email configuration by:
+1. Verifying Resend API key works in dashboard
+2. Testing email sending from custom domain
+3. Checking SPF/DKIM/DMARC records via email authentication tools
+4. Sending test emails to different providers (Gmail, Outlook)
+5. Verifying emails land in inbox (not spam folder)
