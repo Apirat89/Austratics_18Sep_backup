@@ -1,6 +1,7 @@
 interface SearchResult {
-  id: string;
+  id: string;           // Stable unique identifier
   name: string;
+  area: string;         // Human-readable area description
   code?: string;
   type: 'lga' | 'sa2' | 'sa3' | 'sa4' | 'postcode' | 'locality' | 'facility';
   state?: string;
@@ -204,9 +205,14 @@ async function buildSearchIndex(type: 'lga' | 'sa2' | 'sa3' | 'sa4' | 'postcode'
         if (geometryResult) {
           const { center, bounds } = geometryResult;
           
+          // Generate stable ID and area description
+          const stableId = `${name.replace(/\s+/g, '_')}_${type.toUpperCase()}_${code || index}`;
+          const areaDescription = state ? `${name} (${state})` : name;
+          
           searchResults.push({
-            id: `${type}-${index}`,
+            id: stableId,
             name: name.trim(),
+            area: areaDescription,
             code: code.trim(),
             type,
             state: state.trim(),
@@ -314,9 +320,14 @@ async function buildHealthcareFacilityIndex(): Promise<SearchResult[]> {
         if (serviceName && facilityType) {
           const fullAddress = `${address}${state ? `, ${state}` : ''}${postcode ? ` ${postcode}` : ''}`;
           
+          // Generate stable ID and area description for facility
+          const facilityId = `${serviceName.replace(/\s+/g, '_')}_FACILITY_${index}`;
+          const facilityArea = state ? `${address ? address + ', ' : ''}${state}` : (address || 'Unknown Location');
+          
           searchResults.push({
-            id: `facility-${index}`,
+            id: facilityId,
             name: serviceName.trim(),
+            area: facilityArea.trim(),
             type: 'facility',
             state: state.trim(),
             center: [lng, lat],

@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Clock, MapPin, Trash2, MoreHorizontal } from 'lucide-react';
+import { Search, Clock, MapPin, Trash2, MoreHorizontal, Bookmark, Check } from 'lucide-react';
 import { getSearchSuggestions, saveSearchToHistory, getUserSearchHistory, clearUserSearchHistory, type SearchSuggestion } from '../lib/searchHistory';
 import { searchLocations, getLocationByName } from '../lib/mapSearchService';
+import { saveSearchToSavedSearches, isSearchSaved, deleteSavedSearch, type LocationData } from '../lib/savedSearches';
+import { createBrowserSupabaseClient } from '../lib/supabase';
 
 interface MapSearchBarProps {
   userId: string;
@@ -12,13 +14,19 @@ interface MapSearchBarProps {
     bounds?: [number, number, number, number],
     searchResult?: LocationResult
   }) => void;
+  onSavedSearchAdded?: () => void; // Callback to refresh saved searches in parent
+  onSavedSearchRemoved?: () => void; // Callback when a search is removed from saved searches
+  currentlyShowing?: string; // Allow parent to set the currently showing text
+  onClearCurrentlyShowing?: () => void; // Callback to clear currently showing in parent
   className?: string;
 }
 
 interface LocationResult {
-  name: string;
+  id: string;           // e.g. 'Kooralbyn_SA2_318011202' (stable unique identifier)
+  name: string;         // "Kooralbyn"  
+  area: string;         // "Cannon Creek (Scenic Rim - Qld)"
   type: 'lga' | 'sa2' | 'sa3' | 'sa4' | 'postcode' | 'locality' | 'facility';
-  code?: string;
+  code?: string;        // "318011202" or "SA2 318011202"
   state?: string;
   center?: [number, number];
   bounds?: [number, number, number, number];
@@ -28,18 +36,56 @@ interface LocationResult {
   facilityType?: 'residential' | 'home' | 'retirement';
 }
 
-export default function MapSearchBar({ userId, onSearch, className = "" }: MapSearchBarProps) {
+export default function MapSearchBar({ userId, onSearch, onSavedSearchAdded, onSavedSearchRemoved, currentlyShowing, onClearCurrentlyShowing, className = "" }: MapSearchBarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [lastSearchTerm, setLastSearchTerm] = useState(''); // Track the last successful search
+  const [lastSearchResult, setLastSearchResult] = useState<LocationResult | null>(null); // Track the location data
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [locationResults, setLocationResults] = useState<LocationResult[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState<SearchSuggestion[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isCurrentSearchSaved, setIsCurrentSearchSaved] = useState(false);
   
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Check if current search is saved whenever lastSearchTerm or currentlyShowing changes
+  useEffect(() => {
+    const checkIfSaved = async () => {
+      const termToCheck = currentlyShowing || lastSearchTerm;
+      if (termToCheck) {
+        const saved = await isSearchSaved(userId, termToCheck);
+        setIsCurrentSearchSaved(saved);
+      } else {
+        setIsCurrentSearchSaved(false);
+      }
+    };
+
+    checkIfSaved();
+  }, [lastSearchTerm, currentlyShowing, userId]);
+
+  // Synchronize lastSearchResult when currentlyShowing changes from parent
+  useEffect(() => {
+    if (currentlyShowing && lastSearchResult) {
+      const resultDisplayName = `${lastSearchResult.name} (${lastSearchResult.area})`;
+      const resultNameOnly = lastSearchResult.name;
+      
+      // If currentlyShowing doesn't match lastSearchResult, clear it
+      if (currentlyShowing !== resultDisplayName && 
+          currentlyShowing !== resultNameOnly &&
+          currentlyShowing !== lastSearchResult.id) {
+        console.log('🔄 Clearing lastSearchResult due to currentlyShowing mismatch:', {
+          currentlyShowing,
+          resultDisplayName,
+          resultNameOnly
+        });
+        setLastSearchResult(null);
+      }
+    }
+  }, [currentlyShowing, lastSearchResult]);
 
   // Load suggestions when search query changes
   useEffect(() => {
@@ -52,12 +98,17 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
           console.log('Search results for:', searchQuery, locationResults); // Debug log
           
           setLocationResults(locationResults.map(result => ({
+            id: result.id,
             name: result.name,
+            area: result.area,
             type: result.type,
             code: result.code,
             state: result.state,
             center: result.center,
-            bounds: result.bounds
+            bounds: result.bounds,
+            address: result.address,
+            careType: result.careType,
+            facilityType: result.facilityType
           })));
 
           // Only get default suggestions if no location results found
@@ -141,19 +192,18 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
 
     try {
       // First try to get from current location results if they exist and match
+      const normalised = searchTerm.trim().toLowerCase();
       const exactMatch = locationResults.find(location => {
-        const fullName = location.code ? `${location.name} (${location.code})` : location.name;
-        const fullNameLower = fullName.toLowerCase();
-        const searchLower = searchTerm.toLowerCase();
-        return fullNameLower === searchLower || 
-               fullNameLower.includes(searchLower) ||
-               (location.name.toLowerCase() === searchLower) ||
-               (location.code && location.code.toLowerCase() === searchLower);
+        return normalised === location.id.toLowerCase() ||           // hard key
+               normalised === location.name.toLowerCase() ||         // pure name
+               (location.code && normalised === location.code.toLowerCase()) ||
+               normalised === location.area.toLowerCase()            // area match
       });
 
       if (exactMatch && exactMatch.center) {
         console.log('Found exact match in current results:', exactMatch);
-        onSearch(searchTerm, {
+        setLastSearchResult(exactMatch);
+        onSearch(exactMatch.id, {  // Pass the ID instead of searchTerm
           center: exactMatch.center,
           bounds: exactMatch.bounds,
           searchResult: exactMatch
@@ -165,34 +215,38 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
         
         if (locationResult && locationResult.center) {
           console.log('Found location via service:', locationResult);
+          setLastSearchResult(locationResult);
           // Found a specific location - call onSearch with location data
-          onSearch(searchTerm, {
+          onSearch(locationResult.id, {  // Pass the ID instead of searchTerm
             center: locationResult.center,
             bounds: locationResult.bounds,
             searchResult: locationResult
           });
         } else {
           console.log('No location found, performing general search');
+          setLastSearchResult(null);
           // Fallback to general search
           onSearch(searchTerm);
         }
       }
 
-      // Save to search history
+      // Save to search history - use the display name for search term
       if (userId) {
-        await saveSearchToHistory(userId, searchTerm);
+        const displayTerm = exactMatch ? `${exactMatch.name} (${exactMatch.area})` : searchTerm;
+        await saveSearchToHistory(userId, displayTerm);
         // Clear recent searches cache to force reload
         setRecentSearches([]);
       }
 
       // Clear the search input and close dropdown
       setSearchQuery('');
-      setLastSearchTerm(searchTerm);
+      setLastSearchTerm(exactMatch ? `${exactMatch.name} (${exactMatch.area})` : searchTerm);
       setShowDropdown(false);
       inputRef.current?.blur();
     } catch (error) {
       console.error('Error performing search:', error);
       // Still perform basic search even if location lookup fails
+      setLastSearchResult(null);
       onSearch(searchTerm);
       // Clear the search input even on error
       setSearchQuery('');
@@ -201,27 +255,27 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
   };
 
   const handleLocationSelect = async (location: LocationResult) => {
-    const displayName = location.code ? `${location.name} (${location.code})` : location.name;
+    const displayTerm = `${location.name} (${location.area})`;
     
-    if (location.center) {
-      onSearch(displayName, {
-        center: location.center,
-        bounds: location.bounds,
-        searchResult: location
-      });
-    } else {
-      onSearch(displayName);
-    }
+    console.log('Location selected:', location);
+    
+    setLastSearchResult(location);
+    onSearch(location.id, {  // Pass the ID instead of display term
+      center: location.center!,
+      bounds: location.bounds,
+      searchResult: location
+    });
 
     // Save to search history
     if (userId) {
-      await saveSearchToHistory(userId, displayName);
+      await saveSearchToHistory(userId, displayTerm);
+      // Clear recent searches cache to force reload
       setRecentSearches([]);
     }
 
-    // Clear the search input and close dropdown
+    // Clear and close
     setSearchQuery('');
-    setLastSearchTerm(displayName);
+    setLastSearchTerm(displayTerm);
     setShowDropdown(false);
     inputRef.current?.blur();
   };
@@ -231,9 +285,8 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSearch(searchQuery);
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      handleSearch(searchQuery.trim());
     } else if (e.key === 'Escape') {
       setShowDropdown(false);
       inputRef.current?.blur();
@@ -241,11 +294,123 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
   };
 
   const clearHistory = async () => {
-    if (userId) {
-      const success = await clearUserSearchHistory(userId);
-      if (success) {
-        setRecentSearches([]);
+    try {
+      await clearUserSearchHistory(userId);
+      setRecentSearches([]);
+    } catch (error) {
+      console.error('Error clearing search history:', error);
+    }
+  };
+
+  const handleSaveSearch = async () => {
+    const termToSave = currentlyShowing || lastSearchTerm;
+    if (!termToSave || isCurrentSearchSaved) return;
+    
+    setIsSaving(true);
+    try {
+      // IMPORTANT: Only use lastSearchResult if it actually matches the term we're saving
+      // This prevents saving mixed data from different searches
+      let locationData: LocationData | undefined = undefined;
+      
+      if (lastSearchResult) {
+        // Check if the lastSearchResult matches what we're actually saving
+        const resultDisplayName = `${lastSearchResult.name} (${lastSearchResult.area})`;
+        const resultNameOnly = lastSearchResult.name;
+        
+        // Only use location data if it matches what we're trying to save
+        if (termToSave === resultDisplayName || 
+            termToSave === resultNameOnly ||
+            termToSave === lastSearchResult.id) {
+          locationData = {
+            id: lastSearchResult.id,
+            name: lastSearchResult.name,
+            area: lastSearchResult.area,
+            type: lastSearchResult.type,
+            code: lastSearchResult.code,
+            state: lastSearchResult.state,
+            center: lastSearchResult.center,
+            bounds: lastSearchResult.bounds,
+            address: lastSearchResult.address,
+            careType: lastSearchResult.careType,
+            facilityType: lastSearchResult.facilityType
+          };
+        } else {
+          // Clear mismatched lastSearchResult to prevent future confusion
+          console.log('🔄 Clearing mismatched lastSearchResult:', {
+            termToSave,
+            resultDisplayName,
+            resultNameOnly
+          });
+          setLastSearchResult(null);
+        }
       }
+
+      const result = await saveSearchToSavedSearches(
+        userId, 
+        termToSave, 
+        locationData,
+        locationData?.type === 'facility' ? 'facility' : 'location'
+      );
+      
+      if (result.success) {
+        setIsCurrentSearchSaved(true);
+        // Notify parent component to refresh saved searches
+        onSavedSearchAdded?.();
+      } else {
+        // Handle different error types
+        if (result.atLimit) {
+          alert('You have reached the maximum of 100 saved searches. Please delete some searches first.');
+        } else {
+          alert(result.error || 'Failed to save search');
+        }
+      }
+    } catch (error) {
+      console.error('Error saving search:', error);
+      alert('An error occurred while saving the search');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUnsaveSearch = async () => {
+    const termToUnsave = currentlyShowing || lastSearchTerm;
+    if (!termToUnsave || !isCurrentSearchSaved) return;
+    
+    setIsSaving(true);
+    try {
+      // First, find the saved search ID by searching for it in both search_term and search_display_name
+      const supabase = createBrowserSupabaseClient();
+      const { data: savedSearch, error: findError } = await supabase
+        .from('saved_searches')
+        .select('id')
+        .eq('user_id', userId)
+        .or(`search_term.eq.${termToUnsave},search_display_name.eq.${termToUnsave}`)
+        .limit(1)
+        .single();
+
+      if (findError || !savedSearch) {
+        console.error('Error finding saved search to delete:', findError);
+        alert('Could not find the saved search to remove');
+        return;
+      }
+
+      // Delete the saved search
+      const result = await deleteSavedSearch(userId, savedSearch.id);
+      
+      if (result.success) {
+        setIsCurrentSearchSaved(false);
+        // Notify parent component that a search was removed
+        onSavedSearchRemoved?.();
+        console.log('✅ Search removed from saved searches');
+      } else {
+        console.error('❌ Failed to remove saved search:', result.error);
+        alert('Failed to remove saved search: ' + result.error);
+      }
+    } catch (error) {
+      console.error('❌ Error removing saved search:', error);
+      alert('An error occurred while removing the saved search');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -288,27 +453,57 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
             onChange={handleInputChange}
             onFocus={handleInputFocus}
             onKeyDown={handleKeyDown}
-            placeholder={lastSearchTerm ? `Last search: ${lastSearchTerm}` : "Search map"}
+            placeholder={currentlyShowing || lastSearchTerm ? `Last search: ${currentlyShowing || lastSearchTerm}` : "Search map"}
             className="flex-1 py-3 pr-4 border-none outline-none text-gray-700 placeholder-gray-500 bg-transparent"
           />
           {isSearching && (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
           )}
+          {/* Save/Unsave Search Button */}
+          {(lastSearchTerm || currentlyShowing) && (
+            <button
+              onClick={isCurrentSearchSaved ? handleUnsaveSearch : handleSaveSearch}
+              disabled={isSaving}
+              className={`p-2 rounded-lg transition-colors mr-1 ${
+                isCurrentSearchSaved 
+                  ? 'text-green-600 bg-green-50 hover:text-red-600 hover:bg-red-50' 
+                  : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'
+              } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+              title={isCurrentSearchSaved ? 'Remove from saved searches' : 'Save this search'}
+            >
+              {isSaving ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              ) : isCurrentSearchSaved ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Bookmark className="h-4 w-4" />
+              )}
+            </button>
+          )}
         </div>
         
         {/* Last Search Indicator */}
-        {lastSearchTerm && !showDropdown && (
+        {(lastSearchTerm || currentlyShowing) && !showDropdown && (
           <div className="px-4 pb-2 border-t border-gray-100">
             <div className="flex items-center justify-between text-xs">
               <div className="flex items-center gap-2 text-gray-600">
                 <MapPin className="h-3 w-3" />
                 <span className="font-medium">Currently showing:</span>
-                <span className="text-blue-600">{lastSearchTerm}</span>
+                <span className="text-blue-600">{currentlyShowing || lastSearchTerm}</span>
+                {isCurrentSearchSaved && (
+                  <span className="text-green-600 flex items-center gap-1">
+                    <Bookmark className="h-3 w-3" />
+                    <span>Saved</span>
+                  </span>
+                )}
               </div>
               <button
                 onClick={() => {
                   setLastSearchTerm('');
+                  setLastSearchResult(null);
                   setSearchQuery('');
+                  setIsCurrentSearchSaved(false);
+                  onClearCurrentlyShowing?.();
                 }}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
                 title="Clear search"
@@ -340,20 +535,17 @@ export default function MapSearchBar({ userId, onSearch, className = "" }: MapSe
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-gray-900 truncate">
                         {location.name}
-                        {location.code && location.code !== location.name && (
-                          <span className="text-gray-500 ml-2">({location.code})</span>
-                        )}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 truncate">
                         {location.type === 'facility' ? (
                           <>
                             {location.careType}
-                            {location.address && ` • ${location.address}`}
+                            {location.address && ` • ${location.area}`}
                           </>
                         ) : (
                           <>
                             {getLocationTypeLabel(location.type)}
-                            {location.state && ` • ${location.state}`}
+                            {location.area && ` • ${location.area}`}
                           </>
                         )}
                       </div>

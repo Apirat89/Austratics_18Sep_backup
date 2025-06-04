@@ -9,6 +9,7 @@ import MapSearchBar from '../../components/MapSearchBar';
 import MapSettings from '../../components/MapSettings';
 import DataLayers from '../../components/DataLayers';
 import ActiveLayers from '../../components/ActiveLayers';
+import SavedSearches, { SavedSearchesRef } from '../../components/SavedSearches';
 import { Map, Settings, User, ChevronDown, Check, Menu } from 'lucide-react';
 
 interface UserData {
@@ -52,8 +53,15 @@ export default function MapsPage() {
     searchResult?: any;
   } | null>(null);
   
+  // Track the currently showing search
+  const [currentlyShowing, setCurrentlyShowing] = useState<string>('');
+  
+  // Flag to control when map highlights should update the search bar
+  const shouldUpdateSearchFromHighlight = useRef<boolean>(true);
+  
   // Map reference for calling map methods
   const mapRef = useRef<AustralianMapRef>(null);
+  const savedSearchesRef = useRef<SavedSearchesRef>(null);
   
   const router = useRouter();
 
@@ -95,12 +103,23 @@ export default function MapsPage() {
     bounds?: [number, number, number, number],
     searchResult?: any
   }) => {
-    console.log('Map search submitted:', searchTerm);
+    console.log('🔍 Map search submitted:', searchTerm);
+    console.log('🧭 Navigation data:', navigation);
+    
+    // Update the currently showing search term
+    setCurrentlyShowing(searchTerm);
     
     if (navigation) {
+      console.log('🎯 Setting map navigation to:', {
+        center: navigation.center,
+        bounds: navigation.bounds,
+        hasSearchResult: !!navigation.searchResult
+      });
+      
       // Auto-switch geo layer based on search result type
       if (navigation.searchResult) {
         const { type } = navigation.searchResult;
+        console.log('🗺️ Search result type:', type);
         
         // Handle facility searches
         if (type === 'facility') {
@@ -108,7 +127,7 @@ export default function MapsPage() {
           
           // Enable the appropriate facility type if it's not already enabled
           if (facilityType && facilityType in facilityTypes && !facilityTypes[facilityType as keyof FacilityTypes]) {
-            console.log(`Auto-enabling ${facilityType} facility type for facility search`);
+            console.log(`🏥 Auto-enabling ${facilityType} facility type for facility search`);
             setFacilityTypes(prev => ({
               ...prev,
               [facilityType]: true
@@ -117,22 +136,22 @@ export default function MapsPage() {
         }
         // Handle boundary searches
         else if (type === 'postcode' && selectedGeoLayer !== 'postcode') {
-          console.log('Auto-switching to postcode layer for postcode search');
+          console.log('📮 Auto-switching to postcode layer for postcode search');
           setSelectedGeoLayer('postcode');
         } else if (type === 'locality' && selectedGeoLayer !== 'locality') {
-          console.log('Auto-switching to locality layer for locality search');
+          console.log('🏘️ Auto-switching to locality layer for locality search');
           setSelectedGeoLayer('locality');
         } else if (type === 'lga' && selectedGeoLayer !== 'lga') {
-          console.log('Auto-switching to LGA layer for LGA search');
+          console.log('🏛️ Auto-switching to LGA layer for LGA search');
           setSelectedGeoLayer('lga');
         } else if (type === 'sa2' && selectedGeoLayer !== 'sa2') {
-          console.log('Auto-switching to SA2 layer for SA2 search');
+          console.log('📍 Auto-switching to SA2 layer for SA2 search');
           setSelectedGeoLayer('sa2');
         } else if (type === 'sa3' && selectedGeoLayer !== 'sa3') {
-          console.log('Auto-switching to SA3 layer for SA3 search');
+          console.log('📍 Auto-switching to SA3 layer for SA3 search');
           setSelectedGeoLayer('sa3');
         } else if (type === 'sa4' && selectedGeoLayer !== 'sa4') {
-          console.log('Auto-switching to SA4 layer for SA4 search');
+          console.log('📍 Auto-switching to SA4 layer for SA4 search');
           setSelectedGeoLayer('sa4');
         }
       }
@@ -144,7 +163,10 @@ export default function MapsPage() {
         zoom: navigation.searchResult?.type === 'facility' ? 15 : (navigation.bounds ? undefined : 10), // Higher zoom for facilities
         searchResult: navigation.searchResult
       });
+      
+      console.log('✅ Map navigation state updated');
     } else {
+      console.log('⚠️ No navigation data provided, performing general search');
       // Reset navigation state for general searches
       setMapNavigation(null);
     }
@@ -161,14 +183,129 @@ export default function MapsPage() {
     }
   }, []);
 
+  const handleSavedSearchAdded = useCallback(() => {
+    // Refresh the saved searches component when a new search is saved
+    if (savedSearchesRef.current) {
+      savedSearchesRef.current.refreshSavedSearches();
+    }
+  }, []);
+
+  const handleSavedSearchRemoved = useCallback(() => {
+    // Refresh the saved searches component when a search is removed from the search bar
+    if (savedSearchesRef.current) {
+      savedSearchesRef.current.refreshSavedSearches();
+    }
+    
+    // Also clear the current search since it was just removed from saved searches
+    // But we don't need to clear the map or anything else - just update the saved status
+  }, []);
+
+  const handleSavedSearchesChanged = useCallback(() => {
+    // This callback is only called when searches are deleted/cleared from SavedSearches
+    // We should NOT restore currentlyShowing here - let the custom event handlers manage that
+    
+    // The search bar will automatically re-check its saved status when currentlyShowing changes
+    // due to the useEffect that monitors currentlyShowing changes
+    
+    // No action needed here - the custom events (savedSearchDeleted, allSavedSearchesCleared) 
+    // handle clearing currentlyShowing appropriately
+    console.log('🔄 SavedSearches changed - letting custom events handle currentlyShowing updates');
+  }, []);
+
+  // Listen for saved search deletion events
+  useEffect(() => {
+    const handleSavedSearchDeleted = (event: CustomEvent) => {
+      const { deletedSearchTerm } = event.detail;
+      
+      console.log('🧹 Handling saved search deleted event:', deletedSearchTerm, 'currently showing:', currentlyShowing);
+      
+      // Simple exact match check - if the deleted search term exactly matches what's currently showing, clear it
+      if (currentlyShowing === deletedSearchTerm) {
+        console.log('🧹 Clearing search bar because deleted search exactly matches currently showing');
+        
+        // Prevent highlights from updating the search bar temporarily
+        shouldUpdateSearchFromHighlight.current = false;
+        
+        setCurrentlyShowing('');
+        
+        // Clear map highlights and navigation
+        if (mapRef.current) {
+          mapRef.current.clearHighlight();
+        }
+        
+        // Re-enable highlight updates after a short delay
+        setTimeout(() => {
+          shouldUpdateSearchFromHighlight.current = true;
+          console.log('🧹 Re-enabled highlight updates');
+        }, 500);
+      }
+    };
+
+    const handleAllSavedSearchesCleared = () => {
+      console.log('🧹 All saved searches cleared - clearing search bar');
+      
+      // Prevent highlights from updating the search bar temporarily
+      shouldUpdateSearchFromHighlight.current = false;
+      
+      setCurrentlyShowing('');
+      
+      // Clear map highlights and navigation
+      if (mapRef.current) {
+        mapRef.current.clearHighlight();
+      }
+      
+      // Re-enable highlight updates after a short delay
+      setTimeout(() => {
+        shouldUpdateSearchFromHighlight.current = true;
+        console.log('🧹 Re-enabled highlight updates after clear all');
+      }, 500);
+    };
+
+    // Add event listeners
+    window.addEventListener('savedSearchDeleted', handleSavedSearchDeleted as EventListener);
+    window.addEventListener('allSavedSearchesCleared', handleAllSavedSearchesCleared as EventListener);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('savedSearchDeleted', handleSavedSearchDeleted as EventListener);
+      window.removeEventListener('allSavedSearchesCleared', handleAllSavedSearchesCleared as EventListener);
+    };
+  }, [currentlyShowing]);
+
   const handleHighlightFeature = useCallback((feature: string | null, featureName: string | null) => {
     setHighlightedFeature(feature);
     setHighlightedFeatureName(featureName);
+    
+    // Always update the search bar when a map feature is clicked/highlighted
+    // The shouldUpdateSearchFromHighlight flag should only prevent automatic updates during deletion
+    if (featureName) {
+      console.log('🗺️ Updating search bar from map highlight:', featureName);
+      setCurrentlyShowing(featureName);
+      // Ensure highlight updates are re-enabled after a map interaction
+      shouldUpdateSearchFromHighlight.current = true;
+    } else {
+      console.log('🗺️ Clearing search bar from map highlight');
+      // Only clear if highlights are allowed (not during deletion)
+      if (shouldUpdateSearchFromHighlight.current) {
+        setCurrentlyShowing('');
+      }
+    }
   }, []);
 
   const handleClearSearchResult = useCallback(() => {
     console.log('🗺️ Clearing search result due to manual map interaction');
+    shouldUpdateSearchFromHighlight.current = true; // Re-enable highlight updates
     setMapNavigation(null);
+    setCurrentlyShowing('');
+  }, []);
+
+  const handleClearCurrentlyShowing = useCallback(() => {
+    shouldUpdateSearchFromHighlight.current = false; // Temporarily disable highlight updates
+    setCurrentlyShowing('');
+    // Re-enable after a brief delay
+    setTimeout(() => {
+      shouldUpdateSearchFromHighlight.current = true;
+    }, 100);
   }, []);
 
   if (isLoading) {
@@ -217,7 +354,19 @@ export default function MapsPage() {
         {!sidebarCollapsed && (
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="flex-1 overflow-y-auto">
-              {/* Map Settings */}
+              {/* Saved Searches - First */}
+              <SavedSearches
+                ref={savedSearchesRef}
+                userId={user.id}
+                onSearchSelect={handleSearch}
+                onSavedSearchesChanged={handleSavedSearchesChanged}
+                className="border-b border-gray-200"
+              />
+
+              {/* Empty row between Saved Searches and Map Settings */}
+              <div className="py-4 border-b border-gray-100"></div>
+
+              {/* Map Settings - Second */}
               <MapSettings
                 selectedMapStyle={selectedMapStyle}
                 onMapStyleChange={setSelectedMapStyle}
@@ -301,6 +450,10 @@ export default function MapsPage() {
           <MapSearchBar
             userId={user.id}
             onSearch={handleSearch}
+            onSavedSearchAdded={handleSavedSearchAdded}
+            onSavedSearchRemoved={handleSavedSearchRemoved}
+            currentlyShowing={currentlyShowing}
+            onClearCurrentlyShowing={handleClearCurrentlyShowing}
             className="absolute top-4 left-4 z-50 w-80"
           />
 
