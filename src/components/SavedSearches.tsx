@@ -54,9 +54,9 @@ const SavedSearches = forwardRef<SavedSearchesRef, SavedSearchesProps>(
       
       switch (locationData.type) {
         case 'facility':
-          return locationData.facilityType === 'residential' ? 'text-green-500' :
-                 locationData.facilityType === 'home' ? 'text-purple-500' :
-                 locationData.facilityType === 'retirement' ? 'text-orange-500' : 'text-blue-500';
+          return locationData.facilityType === 'residential' ? 'text-red-500' :   // Match map: #E53E3E
+                 locationData.facilityType === 'home' ? 'text-green-600' :        // Match map: #2E8B57
+                 locationData.facilityType === 'retirement' ? 'text-purple-600' : 'text-blue-500'; // Match map: #9B59B6
         default:
           return 'text-blue-500';
       }
@@ -132,6 +132,13 @@ const SavedSearches = forwardRef<SavedSearchesRef, SavedSearchesProps>(
               window.dispatchEvent(new CustomEvent('savedSearchDeleted', { 
                 detail: { deletedSearchTerm } 
               }));
+              
+              // Also trigger facility unsaved event if this was a facility
+              if (searchToDelete?.search_type === 'facility') {
+                window.dispatchEvent(new CustomEvent('facilityUnsaved', { 
+                  detail: { facilityName: deletedSearchTerm } 
+                }));
+              }
             }, 0);
           }
           

@@ -471,6 +471,8 @@ export default function MapsPage() {
               mapNavigation={mapNavigation}
               onHighlightFeature={handleHighlightFeature}
               onClearSearchResult={handleClearSearchResult}
+              userId={user?.id}
+              onSavedSearchAdded={handleSavedSearchAdded}
             />
           </div>
         </main>

@@ -4,6 +4,9 @@ import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef, us
 import * as maptilersdk from '@maptiler/sdk';
 import '@maptiler/sdk/dist/maptiler-sdk.css';
 
+// Add import for the save functionality
+import { saveSearchToSavedSearches, isSearchSaved, type LocationData } from '../lib/savedSearches';
+
 // MapTiler API key - you'll need to add this to your environment variables
 const MAPTILER_API_KEY = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || 'YOUR_MAPTILER_API_KEY';
 
@@ -29,6 +32,9 @@ interface AustralianMapProps {
   } | null;
   onHighlightFeature?: (feature: string | null, featureName: string | null) => void;
   onClearSearchResult?: () => void;
+  // Add new props for saving functionality
+  userId?: string;
+  onSavedSearchAdded?: () => void;
 }
 
 // Expose methods to parent component
@@ -43,7 +49,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   selectedMapStyle,
   mapNavigation,
   onHighlightFeature,
-  onClearSearchResult
+  onClearSearchResult,
+  userId,
+  onSavedSearchAdded
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
@@ -260,7 +268,198 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           const residentialPlaces = properties?.Residential_Places || 0;
           const homeCareMaxPlaces = properties?.Home_Care_Max_Places || 0;
 
-          // Create beautiful popup
+          // Create unique popup ID for this facility
+          const popupId = `facility-popup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+          // Helper function to handle facility saving
+          const handleSaveFacility = async () => {
+            if (!userId) {
+              alert('Please sign in to save facilities');
+              return;
+            }
+
+            const saveButton = document.getElementById(`save-btn-${popupId}`);
+            if (!saveButton) return;
+
+            // Check if this is a save or unsave operation
+            const isCurrentlySaved = saveButton.textContent?.includes('Remove') || saveButton.textContent?.includes('Saved');
+            
+            if (isCurrentlySaved) {
+              // Unsave operation
+              saveButton.innerHTML = '⏳ Removing...';
+              saveButton.style.pointerEvents = 'none';
+
+              try {
+                // Find the saved search ID by searching for it
+                const { createBrowserSupabaseClient } = await import('../lib/supabase');
+                const supabase = createBrowserSupabaseClient();
+                const { data: savedSearch, error: findError } = await supabase
+                  .from('saved_searches')
+                  .select('id')
+                  .eq('user_id', userId)
+                  .eq('search_term', serviceName)
+                  .limit(1)
+                  .single();
+
+                if (findError || !savedSearch) {
+                  throw new Error('Could not find saved facility to remove');
+                }
+
+                // Delete the saved search
+                const { deleteSavedSearch } = await import('../lib/savedSearches');
+                const result = await deleteSavedSearch(userId, savedSearch.id);
+                
+                if (result.success) {
+                  // Show success state
+                  saveButton.innerHTML = '📍 Save Location';
+                  saveButton.style.backgroundColor = '#3B82F6';
+                  saveButton.style.borderColor = '#3B82F6';
+                  saveButton.style.pointerEvents = 'auto';
+                  
+                  // Notify parent component
+                  onSavedSearchAdded?.();
+                  
+                  // Trigger event for other popups to update
+                  window.dispatchEvent(new CustomEvent('facilityUnsaved', { 
+                    detail: { facilityName: serviceName } 
+                  }));
+                } else {
+                  throw new Error(result.error || 'Failed to remove facility');
+                }
+              } catch (error) {
+                console.error('Error removing facility:', error);
+                saveButton.innerHTML = '❌ Error';
+                saveButton.style.backgroundColor = '#EF4444';
+                saveButton.style.borderColor = '#EF4444';
+                alert('An error occurred while removing the facility');
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                  saveButton.innerHTML = '🗑️ Remove from Saved';
+                  saveButton.style.backgroundColor = '#EF4444';
+                  saveButton.style.borderColor = '#EF4444';
+                  saveButton.style.pointerEvents = 'auto';
+                }, 3000);
+              }
+            } else {
+              // Save operation (existing code)
+              saveButton.innerHTML = '⏳ Saving...';
+              saveButton.style.pointerEvents = 'none';
+
+              try {
+                // Create location data for the facility
+                const facilityLocationData: LocationData = {
+                  id: `facility-${serviceName.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${lng}-${lat}`,
+                  name: serviceName,
+                  area: `${state}${postcode ? ' ' + postcode : ''}`,
+                  type: 'facility',
+                  state: state,
+                  center: [lng, lat],
+                  bounds: undefined, // Facilities don't have bounds
+                  address: address,
+                  careType: careType,
+                  facilityType: typeKey as 'residential' | 'home' | 'retirement'
+                };
+
+                // Save the facility
+                const result = await saveSearchToSavedSearches(
+                  userId,
+                  serviceName,
+                  facilityLocationData,
+                  'facility'
+                );
+
+                if (result.success) {
+                  // Show success state
+                  saveButton.innerHTML = '🗑️ Remove from Saved';
+                  saveButton.style.backgroundColor = '#EF4444';
+                  saveButton.style.borderColor = '#EF4444';
+                  saveButton.style.pointerEvents = 'auto';
+                  
+                  // Notify parent component
+                  onSavedSearchAdded?.();
+                  
+                  // Trigger event for other popups to update
+                  window.dispatchEvent(new CustomEvent('facilitySaved', { 
+                    detail: { facilityName: serviceName } 
+                  }));
+                } else {
+                  // Show error state
+                  saveButton.innerHTML = '❌ Error';
+                  saveButton.style.backgroundColor = '#EF4444';
+                  saveButton.style.borderColor = '#EF4444';
+                  
+                  // Show error message
+                  if (result.atLimit) {
+                    alert('You have reached the maximum of 100 saved locations. Please delete some locations first.');
+                  } else if (result.error?.includes('already saved')) {
+                    alert('This facility is already saved to your locations.');
+                    // Update button to show it's saved
+                    setTimeout(() => {
+                      saveButton.innerHTML = '🗑️ Remove from Saved';
+                      saveButton.style.backgroundColor = '#EF4444';
+                      saveButton.style.borderColor = '#EF4444';
+                      saveButton.style.pointerEvents = 'auto';
+                    }, 1000);
+                  } else {
+                    alert(result.error || 'Failed to save facility');
+                    // Reset button after 3 seconds
+                    setTimeout(() => {
+                      saveButton.innerHTML = '📍 Save Location';
+                      saveButton.style.backgroundColor = '#3B82F6';
+                      saveButton.style.borderColor = '#3B82F6';
+                      saveButton.style.pointerEvents = 'auto';
+                    }, 3000);
+                  }
+                }
+              } catch (error) {
+                console.error('Error saving facility:', error);
+                saveButton.innerHTML = '❌ Error';
+                saveButton.style.backgroundColor = '#EF4444';
+                saveButton.style.borderColor = '#EF4444';
+                alert('An error occurred while saving the facility');
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                  saveButton.innerHTML = '📍 Save Location';
+                  saveButton.style.backgroundColor = '#3B82F6';
+                  saveButton.style.borderColor = '#3B82F6';
+                  saveButton.style.pointerEvents = 'auto';
+                }, 3000);
+              }
+            }
+          };
+
+          // Helper function to check if facility is saved and update button
+          const updateSaveButtonState = async () => {
+            if (!userId) return;
+
+            const saveButton = document.getElementById(`save-btn-${popupId}`);
+            if (!saveButton) return;
+
+            try {
+              const isSaved = await isSearchSaved(userId, serviceName);
+              if (isSaved) {
+                saveButton.innerHTML = '🗑️ Remove from Saved';
+                saveButton.style.backgroundColor = '#EF4444';
+                saveButton.style.borderColor = '#EF4444';
+              } else {
+                saveButton.innerHTML = '📍 Save Location';
+                saveButton.style.backgroundColor = '#3B82F6';
+                saveButton.style.borderColor = '#3B82F6';
+              }
+              saveButton.style.pointerEvents = 'auto';
+            } catch (error) {
+              console.error('Error checking saved status:', error);
+              // Default to save state on error
+              saveButton.innerHTML = '📍 Save Location';
+              saveButton.style.backgroundColor = '#3B82F6';
+              saveButton.style.borderColor = '#3B82F6';
+              saveButton.style.pointerEvents = 'auto';
+            }
+          };
+
+          // Create beautiful popup with save button
           const popup = new maptilersdk.Popup({ 
             offset: 25,
             closeButton: true,
@@ -268,7 +467,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             className: 'custom-popup'
           })
           .setHTML(`
-            <div class="aged-care-popup">
+            <div class="aged-care-popup" id="${popupId}">
               <div class="popup-header" style="background: linear-gradient(135deg, ${typeColors[typeKey]}20, ${typeColors[typeKey]}10); border-left: 4px solid ${typeColors[typeKey]};">
                 <h3 class="popup-title">${serviceName}</h3>
                 <span class="popup-type" style="background-color: ${typeColors[typeKey]}20; color: ${typeColors[typeKey]};">${careType}</span>
@@ -325,6 +524,18 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                   <div class="popup-text">
                     <a href="${website}" target="_blank" class="popup-link">Visit Website</a>
                   </div>
+                </div>
+                ` : ''}
+                
+                ${userId ? `
+                <div class="popup-actions">
+                  <button 
+                    id="save-btn-${popupId}"
+                    class="save-facility-btn"
+                    onclick="window.saveFacility_${popupId.replace(/-/g, '_')}?.()"
+                  >
+                    ⏳ Checking...
+                  </button>
                 </div>
                 ` : ''}
                 
@@ -401,6 +612,38 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                   border-bottom-color: #3182ce;
                 }
                 
+                .popup-actions {
+                  margin: 16px 0 8px 0;
+                  padding-top: 12px;
+                  border-top: 1px solid #e2e8f0;
+                }
+                
+                .save-facility-btn {
+                  width: 100%;
+                  padding: 8px 16px;
+                  background-color: #3B82F6;
+                  color: white;
+                  border: 1px solid #3B82F6;
+                  border-radius: 6px;
+                  font-size: 12px;
+                  font-weight: 500;
+                  cursor: pointer;
+                  transition: all 0.2s ease;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 4px;
+                }
+                
+                .save-facility-btn:hover {
+                  background-color: #2563EB;
+                  border-color: #2563EB;
+                }
+                
+                .save-facility-btn:active {
+                  transform: translateY(1px);
+                }
+                
                 .popup-footer {
                   margin-top: 12px;
                   padding-top: 8px;
@@ -419,6 +662,53 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
               </style>
             </div>
           `);
+
+          // Add the save function to the global window object for this specific popup
+          if (userId) {
+            const functionName = `saveFacility_${popupId.replace(/-/g, '_')}`;
+            const updateFunctionName = `updateSaveButton_${popupId.replace(/-/g, '_')}`;
+            
+            // Add functions to window object
+            (window as any)[functionName] = handleSaveFacility;
+            (window as any)[updateFunctionName] = updateSaveButtonState;
+            
+            // Listen for save/unsave events from other sources
+            const handleFacilitySaved = (event: CustomEvent) => {
+              if (event.detail.facilityName === serviceName) {
+                updateSaveButtonState();
+              }
+            };
+            
+            const handleFacilityUnsaved = (event: CustomEvent) => {
+              if (event.detail.facilityName === serviceName) {
+                updateSaveButtonState();
+              }
+            };
+            
+            const handleSavedSearchDeleted = (event: CustomEvent) => {
+              if (event.detail.deletedSearchTerm === serviceName) {
+                updateSaveButtonState();
+              }
+            };
+            
+            window.addEventListener('facilitySaved', handleFacilitySaved as EventListener);
+            window.addEventListener('facilityUnsaved', handleFacilityUnsaved as EventListener);
+            window.addEventListener('savedSearchDeleted', handleSavedSearchDeleted as EventListener);
+            
+            // Clean up when popup is closed
+            popup.on('close', () => {
+              delete (window as any)[functionName];
+              delete (window as any)[updateFunctionName];
+              window.removeEventListener('facilitySaved', handleFacilitySaved as EventListener);
+              window.removeEventListener('facilityUnsaved', handleFacilityUnsaved as EventListener);
+              window.removeEventListener('savedSearchDeleted', handleSavedSearchDeleted as EventListener);
+            });
+            
+            // Check initial save status when popup opens
+            popup.on('open', () => {
+              setTimeout(updateSaveButtonState, 100); // Small delay to ensure DOM is ready
+            });
+          }
 
           // Create and add marker
           const marker = new maptilersdk.Marker({ 
