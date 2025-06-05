@@ -8,7 +8,8 @@ import {
   MessageSquare,
   Map,
   ClipboardCheck,
-  BarChart3
+  BarChart3,
+  Building
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser } from '../../lib/auth';
@@ -62,6 +63,11 @@ export default function MainPage() {
   ];
 
   const suggestionCards = [
+    {
+      title: "Facilities",
+      icon: Building,
+      route: "/facilities"
+    },
     {
       title: "Maps",
       icon: Map,
@@ -192,7 +198,7 @@ export default function MainPage() {
             </div>
 
             {/* Suggestion Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
               {suggestionCards.map((card, index) => (
                 <button
                   key={index}

@@ -1,0 +1,42 @@
+{
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 10
+    }
+  },
+  "firewall": {
+    "rules": [
+      {
+        "rule": "block",
+        "action": {
+          "type": "rewrite",
+          "pathname": "/api/blocked"
+        },
+        "conditions": [
+          {
+            "type": "rate_limit",
+            "config": {
+              "requests": 60,
+              "window": "1m"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "X-RateLimit-Limit",
+          "value": "60"
+        },
+        {
+          "key": "X-RateLimit-Window",
+          "value": "1m"
+        }
+      ]
+    }
+  ]
+} 

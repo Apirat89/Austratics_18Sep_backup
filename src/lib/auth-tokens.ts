@@ -6,7 +6,21 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// In-memory storage for demo (use Redis/Database in production)
+// Import Redis TokenManager for production
+let TokenManager: any = null;
+const isProduction = process.env.NODE_ENV === 'production' && 
+                    process.env.UPSTASH_REDIS_REST_URL && 
+                    process.env.UPSTASH_REDIS_REST_TOKEN;
+
+if (isProduction) {
+  try {
+    TokenManager = require('./redis').TokenManager;
+  } catch (error) {
+    console.warn('Redis not available, falling back to memory storage');
+  }
+}
+
+// Fallback in-memory storage for development
 const resetTokens = new Map<string, {
   email: string;
   userId: string;
@@ -41,57 +55,90 @@ export async function createResetToken(email: string): Promise<{ success: boolea
       return { success: true }; // Return success but don't actually create token
     }
 
-    // Generate secure token
-    const token = generateResetToken();
-    const expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
+    // Use Redis in production, memory in development
+    if (TokenManager && isProduction) {
+      const token = await TokenManager.createToken(user.id, email);
+      return { success: true, token };
+    } else {
+      // Fallback to memory storage
+      const token = generateResetToken();
+      const expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
 
-    // Store token
-    resetTokens.set(token, {
-      email,
-      userId: user.id,
-      expiresAt,
-      used: false
-    });
+      resetTokens.set(token, {
+        email,
+        userId: user.id,
+        expiresAt,
+        used: false
+      });
 
-    return { success: true, token };
+      return { success: true, token };
+    }
   } catch (error) {
     console.error('Error creating reset token:', error);
     return { success: false, error: 'Failed to create reset token' };
   }
 }
 
-export function validateResetToken(token: string): { 
+export async function validateResetToken(token: string): Promise<{ 
   valid: boolean; 
   email?: string; 
   userId?: string; 
   error?: string 
-} {
-  const tokenData = resetTokens.get(token);
-  
-  if (!tokenData) {
-    return { valid: false, error: 'Invalid token' };
-  }
+}> {
+  try {
+    // Use Redis in production
+    if (TokenManager && isProduction) {
+      const tokenData = await TokenManager.validateToken(token);
+      if (!tokenData) {
+        return { valid: false, error: 'Invalid or expired token' };
+      }
+      return { 
+        valid: true, 
+        email: tokenData.email, 
+        userId: tokenData.userId 
+      };
+    } else {
+      // Fallback to memory storage
+      const tokenData = resetTokens.get(token);
+      
+      if (!tokenData) {
+        return { valid: false, error: 'Invalid token' };
+      }
 
-  if (tokenData.used) {
-    return { valid: false, error: 'Token already used' };
-  }
+      if (tokenData.used) {
+        return { valid: false, error: 'Token already used' };
+      }
 
-  if (Date.now() > tokenData.expiresAt) {
-    resetTokens.delete(token); // Clean up expired token
-    return { valid: false, error: 'Token expired' };
-  }
+      if (Date.now() > tokenData.expiresAt) {
+        resetTokens.delete(token); // Clean up expired token
+        return { valid: false, error: 'Token expired' };
+      }
 
-  return { 
-    valid: true, 
-    email: tokenData.email, 
-    userId: tokenData.userId 
-  };
+      return { 
+        valid: true, 
+        email: tokenData.email, 
+        userId: tokenData.userId 
+      };
+    }
+  } catch (error) {
+    console.error('Error validating token:', error);
+    return { valid: false, error: 'Failed to validate token' };
+  }
 }
 
-export function markTokenAsUsed(token: string): void {
-  const tokenData = resetTokens.get(token);
-  if (tokenData) {
-    tokenData.used = true;
+export async function markTokenAsUsed(token: string): Promise<void> {
+  try {
+    if (TokenManager && isProduction) {
+      await TokenManager.markTokenUsed(token);
+    } else {
+      // Fallback to memory storage
+      const tokenData = resetTokens.get(token);
+      if (tokenData) {
+        tokenData.used = true;
+      }
+    }
+  } catch (error) {
+    console.error('Error marking token as used:', error);
   }
 }
 
@@ -113,12 +160,14 @@ export async function updateUserPassword(userId: string, newPassword: string): P
   }
 }
 
-// Clean up expired tokens (run this periodically)
+// Clean up expired tokens (only needed for memory storage)
 export function cleanupExpiredTokens(): void {
-  const now = Date.now();
-  for (const [token, data] of resetTokens.entries()) {
-    if (now > data.expiresAt) {
-      resetTokens.delete(token);
+  if (!isProduction) {
+    const now = Date.now();
+    for (const [token, data] of resetTokens.entries()) {
+      if (now > data.expiresAt) {
+        resetTokens.delete(token);
+      }
     }
   }
 } 

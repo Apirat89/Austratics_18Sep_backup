@@ -1,0 +1,24 @@
+# Task ID: 1
+# Title: Domain Registration & Email Setup
+# Status: pending
+# Dependencies: None
+# Priority: critical
+# Description: Register Australian domain and configure email service for production launch.
+# Details:
+CRITICAL PRODUCTION BLOCKER:
+
+- Register agedcareanalytics.com.au domain
+- Set up DNS hosting and records
+- Get Resend API key and configure email service
+- Update email templates to use custom domain
+- Configure SPF, DKIM, DMARC records
+- Test password reset email functionality
+
+This blocks production launch but can be done in parallel with development work.
+
+# Test Strategy:
+1. Verify domain ownership and DNS propagation
+2. Test email delivery from custom domain
+3. Verify password reset flow works end-to-end
+4. Check emails land in inbox (not spam)
+5. Test across different email providers

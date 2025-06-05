@@ -52,8 +52,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate reset token
-    const tokenValidation = validateResetToken(token);
+    // Validate reset token (now async)
+    const tokenValidation = await validateResetToken(token);
     if (!tokenValidation.valid) {
       return NextResponse.json(
         { error: tokenValidation.error || 'Invalid or expired reset token' },
@@ -70,8 +70,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Mark token as used
-    markTokenAsUsed(token);
+    // Mark token as used (now async)
+    await markTokenAsUsed(token);
 
     return NextResponse.json(
       { message: 'Password updated successfully' },

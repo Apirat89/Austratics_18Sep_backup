@@ -10,8 +10,11 @@
   },
   "dependencies": {
     "@maptiler/sdk": "^3.3.0",
+    "@sentry/nextjs": "^9.26.0",
     "@supabase/ssr": "^0.1.0",
     "@supabase/supabase-js": "^2.49.8",
+    "@upstash/redis": "^1.35.0",
+    "dotenv": "^16.5.0",
     "lucide-react": "^0.511.0",
     "next": "15.3.3",
     "react": "^19.0.0",
