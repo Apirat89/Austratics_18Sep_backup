@@ -56,6 +56,12 @@ export default function MapsPage() {
   // Track the currently showing search
   const [currentlyShowing, setCurrentlyShowing] = useState<string>('');
   
+  // Track preload state from map
+  const [preloadingData, setPreloadingData] = useState(false);
+  const [preloadProgress, setPreloadProgress] = useState({ current: 0, total: 0 });
+  const [stylesPreloaded, setStylesPreloaded] = useState(false);
+  const [stylePreloadProgress, setStylePreloadProgress] = useState({ current: 0, total: 5 });
+  
   // Flag to control when map highlights should update the search bar
   const shouldUpdateSearchFromHighlight = useRef<boolean>(true);
   
@@ -90,6 +96,24 @@ export default function MapsPage() {
 
     loadUser();
   }, [router]);
+
+  // Poll preload state from map
+  useEffect(() => {
+    const pollPreloadState = () => {
+      if (mapRef.current) {
+        const state = mapRef.current.getPreloadState();
+        setPreloadingData(state.preloadingData);
+        setPreloadProgress(state.preloadProgress);
+        setStylesPreloaded(state.stylesPreloaded);
+        setStylePreloadProgress(state.stylePreloadProgress);
+      }
+    };
+
+    // Poll every 500ms while preloading
+    const interval = setInterval(pollPreloadState, 500);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleFacilityType = useCallback((type: keyof FacilityTypes) => {
     setFacilityTypes(prev => ({
@@ -381,6 +405,10 @@ export default function MapsPage() {
                 facilityTypes={facilityTypes}
                 onToggleFacilityType={toggleFacilityType}
                 className="border-b border-gray-200"
+                preloadingData={preloadingData}
+                preloadProgress={preloadProgress}
+                stylesPreloaded={stylesPreloaded}
+                stylePreloadProgress={stylePreloadProgress}
               />
 
               {/* Data Layers - Removed from sidebar, now positioned on map */}

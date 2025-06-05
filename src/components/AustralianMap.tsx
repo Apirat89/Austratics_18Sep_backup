@@ -41,6 +41,12 @@ interface AustralianMapProps {
 export interface AustralianMapRef {
   clearHighlight: () => void;
   clearLastSearchResult: () => void;
+  getPreloadState: () => { 
+    preloadingData: boolean; 
+    preloadProgress: { current: number; total: number };
+    stylesPreloaded: boolean;
+    stylePreloadProgress: { current: number; total: number };
+  };
 }
 
 // Helper function for point-in-polygon testing using ray casting algorithm
@@ -167,6 +173,17 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
+  
+  // Style cache to avoid destructive setStyle calls
+  const styleCache = useRef<Record<MapStyleType, any>>({
+    basic: null,
+    topo: null,
+    satellite: null,
+    terrain: null,
+    streets: null
+  });
+  const [stylesPreloaded, setStylesPreloaded] = useState(false);
+  const [stylePreloadProgress, setStylePreloadProgress] = useState({ current: 0, total: 5 });
   const selectedGeoLayerRef = useRef<GeoLayerType>(selectedGeoLayer);
   const isInitialLoadRef = useRef<boolean>(true);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -174,6 +191,17 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   const [boundaryError, setBoundaryError] = useState<string | null>(null);
   const [highlightedFeature, setHighlightedFeature] = useState<string | null>(null);
   const [highlightedFeatureName, setHighlightedFeatureName] = useState<string | null>(null);
+  
+  // Add refs to prevent overlapping operations
+  const isChangingStyleRef = useRef<boolean>(false);
+  const boundaryLoadingRef = useRef<boolean>(false);
+  const currentBoundaryLoadRef = useRef<AbortController | null>(null);
+  
+  // Cache for boundary data to avoid re-downloading
+  const boundaryDataCache = useRef<Map<GeoLayerType, any>>(new Map());
+  const [preloadingData, setPreloadingData] = useState(false);
+  const [preloadProgress, setPreloadProgress] = useState({ current: 0, total: 0 });
+  const preloadCompleteRef = useRef<boolean>(false);
   
   // Track markers with proper cleanup
   const markersRef = useRef<maptilersdk.Marker[]>([]);
@@ -208,7 +236,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     }
   };
 
-  // Initialize map
+  // Initialize map (only once)
   useEffect(() => {
     if (map.current || !mapContainer.current) return;
 
@@ -234,15 +262,91 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       if (map.current) {
         map.current.on('click', handleMapClick);
       }
+      
+      // Start preloading all boundary data and styles in background
+      console.log('🗺️ Map loaded, starting data and style preloads...');
+      preloadAllBoundaryData();
+      preloadAllMapStyles();
     });
 
     return () => {
+      // Cleanup any pending operations
+      if (currentBoundaryLoadRef.current) {
+        currentBoundaryLoadRef.current.abort();
+      }
+      isChangingStyleRef.current = false;
+      boundaryLoadingRef.current = false;
+      
       if (map.current) {
         map.current.remove();
         map.current = null;
       }
     };
-  }, [selectedMapStyle]);
+  }, []); // Remove selectedMapStyle from dependencies
+
+  // Preload all map styles to avoid destructive setStyle calls
+  const preloadAllMapStyles = useCallback(async () => {
+    if (stylesPreloaded) return;
+    
+    console.log('🎨 Starting preload of ALL map styles...');
+    
+    const styleTypes: MapStyleType[] = ['basic', 'topo', 'satellite', 'terrain', 'streets'];
+    
+    for (let i = 0; i < styleTypes.length; i++) {
+      const styleType = styleTypes[i];
+      
+      try {
+        console.log(`🎨 Preloading style ${i + 1}/${styleTypes.length}: ${styleType}`);
+        setStylePreloadProgress({ current: i + 1, total: styleTypes.length });
+        
+        // Get the style spec - MapTiler styles are URLs, not objects
+        const styleSpec = getMapStyle(styleType);
+        console.log(`🔍 Style spec for ${styleType}:`, typeof styleSpec, styleSpec);
+        
+        let styleData;
+        
+        // MapTiler styles are URL strings, fetch the style JSON
+        if (typeof styleSpec === 'string' && (styleSpec as string).startsWith('http')) {
+          const styleSpecStr = styleSpec as string;
+          const styleUrl = styleSpecStr.includes('?') ? `${styleSpecStr}&key=${MAPTILER_API_KEY}` : `${styleSpecStr}?key=${MAPTILER_API_KEY}`;
+          console.log(`📥 Fetching style from: ${styleUrl}`);
+          
+          const response = await fetch(styleUrl);
+          if (response.ok) {
+            styleData = await response.json();
+            console.log(`✅ Successfully fetched ${styleType} style JSON`);
+          } else {
+            console.warn(`⚠️ Failed to fetch ${styleType} style (${response.status}):`, response.statusText);
+            styleData = styleSpec; // fallback to the URL
+          }
+        } else {
+          // Use the spec as-is (could be an object or different format)
+          styleData = styleSpec;
+          console.log(`📝 Using ${styleType} style spec as-is`);
+        }
+        
+        // Cache the style data
+        styleCache.current[styleType] = styleData;
+        console.log(`💾 Cached ${styleType} style successfully`);
+        
+        // Small delay between loads
+        if (i < styleTypes.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+      } catch (error) {
+        console.error(`❌ Failed to preload ${styleType} style:`, error);
+        // Store the original style spec as fallback
+        styleCache.current[styleType] = getMapStyle(styleType);
+      }
+    }
+    
+    setStylesPreloaded(true);
+    setStylePreloadProgress({ current: styleTypes.length, total: styleTypes.length });
+    console.log('🎉 ALL map styles preloaded successfully!');
+    console.log(`🎨 Style cache contains: ${Object.keys(styleCache.current).filter(k => styleCache.current[k as MapStyleType]).join(', ')}`);
+    
+  }, [stylesPreloaded]);
 
   // Helper function to clear all existing markers
   const clearAllMarkers = useCallback(() => {
@@ -1114,8 +1218,24 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // Simple boundary layer handler - shows only outlines by default
   const handleBoundaryLayer = useCallback(async (layerType: GeoLayerType) => {
     if (!map.current) return;
+    
+    // Prevent overlapping boundary loads
+    if (boundaryLoadingRef.current) {
+      console.log(`⚠️ Boundary loading already in progress, skipping: ${layerType}`);
+      return;
+    }
+
+    // Cancel any existing boundary load
+    if (currentBoundaryLoadRef.current) {
+      currentBoundaryLoadRef.current.abort();
+    }
+
+    // Create new abort controller for this load
+    const abortController = new AbortController();
+    currentBoundaryLoadRef.current = abortController;
 
     console.log(`Loading boundary layer: ${layerType}`);
+    boundaryLoadingRef.current = true;
     setBoundaryLoading(true);
     setBoundaryError(null);
 
@@ -1154,40 +1274,55 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       // Small delay to ensure cleanup is complete
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      // Load the new boundary data
-      const fileMap: Record<GeoLayerType, string> = {
-        'postcode': 'POA.geojson',
-        'lga': 'LGA.geojson',
-        'sa2': 'SA2.geojson',
-        'sa3': 'SA3.geojson',
-        'sa4': 'SA4.geojson',
-        'locality': 'SAL.geojson'
-      };
+      // Check cache first
+      let geojsonData = boundaryDataCache.current.get(layerType);
+      
+      if (geojsonData) {
+        console.log(`📦 Using cached boundary data for: ${layerType}`);
+      } else {
+        console.log(`📥 Loading boundary data for: ${layerType}`);
+        
+        // Load the new boundary data
+        const fileMap: Record<GeoLayerType, string> = {
+          'postcode': 'POA.geojson',
+          'lga': 'LGA.geojson',
+          'sa2': 'SA2.geojson',
+          'sa3': 'SA3.geojson',
+          'sa4': 'SA4.geojson',
+          'locality': 'SAL.geojson'
+        };
 
-      const fileName = fileMap[layerType];
-      console.log(`Fetching boundary file: /maps/${fileName}`);
-      
-      // Special handling for large files
-      if (layerType === 'sa2') {
-        console.log('⚠️  Loading SA2 boundaries - this is a large file (170MB) and may take time...');
+        const fileName = fileMap[layerType];
+        console.log(`Fetching boundary file: /maps/${fileName}`);
+        
+        // Special handling for large files
+        if (layerType === 'sa2') {
+          console.log('⚠️  Loading SA2 boundaries - this is a large file (170MB) and may take time...');
+        }
+        
+        const startTime = Date.now();
+        const response = await fetch(`/maps/${fileName}`, {
+          signal: abortController.signal
+        });
+        const fetchTime = Date.now() - startTime;
+        
+        console.log(`Fetch completed in ${fetchTime}ms for ${fileName}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        console.log(`Successfully fetched ${fileName} (${response.headers.get('content-length') ? Math.round(parseInt(response.headers.get('content-length')!) / 1024 / 1024) + 'MB' : 'unknown size'}), parsing JSON...`);
+        const parseStartTime = Date.now();
+        geojsonData = await response.json();
+        
+        const parseTime = Date.now() - parseStartTime;
+        console.log(`Parsed ${fileName} in ${parseTime}ms, features count:`, geojsonData.features?.length || 0);
+        
+        // Cache the data for future use
+        boundaryDataCache.current.set(layerType, geojsonData);
+        console.log(`💾 Cached boundary data for: ${layerType}`);
       }
-      
-      const startTime = Date.now();
-      const response = await fetch(`/maps/${fileName}`);
-      const fetchTime = Date.now() - startTime;
-      
-      console.log(`Fetch completed in ${fetchTime}ms for ${fileName}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      console.log(`Successfully fetched ${fileName} (${response.headers.get('content-length') ? Math.round(parseInt(response.headers.get('content-length')!) / 1024 / 1024) + 'MB' : 'unknown size'}), parsing JSON...`);
-      const parseStartTime = Date.now();
-      const geojsonData = await response.json();
-      
-      const parseTime = Date.now() - parseStartTime;
-      console.log(`Parsed ${fileName} in ${parseTime}ms, features count:`, geojsonData.features?.length || 0);
       
       // Additional data quality checks
       const sampleFeature = geojsonData.features?.[0];
@@ -1259,14 +1394,97 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       });
 
       console.log(`Successfully loaded ${layerType} boundary layer`);
+      boundaryLoadingRef.current = false;
       setBoundaryLoading(false);
+      currentBoundaryLoadRef.current = null;
       
     } catch (error) {
+      // Don't show error if it was aborted (user changed style rapidly)
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log(`🔄 Boundary load aborted for: ${layerType}`);
+        return;
+      }
+      
       console.error(`Error loading ${layerType} boundary data:`, error);
       setBoundaryError(`Failed to load ${layerType} boundaries: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      boundaryLoadingRef.current = false;
       setBoundaryLoading(false);
+      currentBoundaryLoadRef.current = null;
     }
   }, [setBoundaryLoading, setBoundaryError]);
+
+  // Preload all boundary data to prevent loading during style changes
+  const preloadAllBoundaryData = useCallback(async () => {
+    if (preloadCompleteRef.current) return;
+    
+    console.log('🚀 Starting preload of ALL boundary data...');
+    setPreloadingData(true);
+    
+    const allBoundaryTypes: GeoLayerType[] = ['postcode', 'lga', 'sa2', 'sa3', 'sa4', 'locality'];
+    const fileMap: Record<GeoLayerType, string> = {
+      'postcode': 'POA.geojson',
+      'lga': 'LGA.geojson', 
+      'sa2': 'SA2.geojson',
+      'sa3': 'SA3.geojson',
+      'sa4': 'SA4.geojson',
+      'locality': 'SAL.geojson'
+    };
+    
+    setPreloadProgress({ current: 0, total: allBoundaryTypes.length });
+    
+    // Load files in optimal order (smallest to largest)
+    const orderedTypes: GeoLayerType[] = ['postcode', 'lga', 'locality', 'sa4', 'sa3', 'sa2'];
+    
+    for (let i = 0; i < orderedTypes.length; i++) {
+      const layerType = orderedTypes[i];
+      const fileName = fileMap[layerType];
+      
+      try {
+        if (boundaryDataCache.current.has(layerType)) {
+          console.log(`✅ ${layerType} already cached, skipping`);
+          continue;
+        }
+        
+        console.log(`📥 Preloading ${layerType} (${i + 1}/${orderedTypes.length}): ${fileName}`);
+        setPreloadProgress({ current: i + 1, total: orderedTypes.length });
+        
+        const startTime = Date.now();
+        const response = await fetch(`/maps/${fileName}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const geojsonData = await response.json();
+        const loadTime = Date.now() - startTime;
+        const sizeInfo = response.headers.get('content-length') 
+          ? `${Math.round(parseInt(response.headers.get('content-length')!) / 1024 / 1024)}MB` 
+          : 'unknown size';
+        
+        // Cache the data
+        boundaryDataCache.current.set(layerType, geojsonData);
+        
+        console.log(`✅ Preloaded ${layerType} in ${loadTime}ms (${sizeInfo}, ${geojsonData.features?.length || 0} features)`);
+        
+        // Small delay between loads to prevent browser freeze
+        if (i < orderedTypes.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+      } catch (error) {
+        console.error(`❌ Failed to preload ${layerType}:`, error);
+        // Continue with other files even if one fails
+      }
+    }
+    
+    preloadCompleteRef.current = true;
+    setPreloadingData(false);
+    setPreloadProgress({ current: orderedTypes.length, total: orderedTypes.length });
+    console.log('🎉 ALL boundary data preloaded successfully!');
+    console.log(`📊 Cache contains: ${Array.from(boundaryDataCache.current.keys()).join(', ')}`);
+    console.log(`💾 Total cache size: ${boundaryDataCache.current.size} files`);
+    
+  }, []);
 
   // Function to highlight matching boundary based on search result
   const highlightMatchingBoundary = useCallback((navigation: any): boolean => {
@@ -1358,6 +1576,127 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     }
   }, [isLoaded, selectedGeoLayer, handleBoundaryLayer]);
 
+  // NON-DESTRUCTIVE style change handler using cached styles
+  useEffect(() => {
+    if (!map.current || !isLoaded) return;
+    
+    // Block style changes during boundary loading
+    if (boundaryLoadingRef.current) {
+      console.log('🚫 Style change blocked - boundary loading in progress');
+      return;
+    }
+    
+    // Always store current state before any style change (cached or not)
+    const currentGeoLayer = selectedGeoLayerRef.current;
+    const hadBoundaryLayer = currentGeoLayer && map.current.getSource(`${currentGeoLayer}-source`);
+    const currentMarkers = [...markersRef.current];
+    
+    // Use cached style if available, otherwise fallback to setStyle
+    const cachedStyle = styleCache.current[selectedMapStyle];
+    
+    if (cachedStyle) {
+      console.log('🎨 Using CACHED style for instant change:', selectedMapStyle);
+      
+      try {
+        // Use cached style for instant change (still destroys layers!)
+        map.current.setStyle(cachedStyle);
+        console.log('✅ Cached style applied - now restoring layers...');
+        
+        // Even cached styles destroy layers, so we need to restore them
+        const handleCachedStyleLoad = () => {
+          setTimeout(() => {
+            try {
+              // Re-add boundary layers if they existed
+              if (hadBoundaryLayer) {
+                console.log('🔄 Restoring boundary layer after cached style:', currentGeoLayer);
+                handleBoundaryLayer(currentGeoLayer);
+              }
+              
+              // Re-add facility markers if they existed
+              if (currentMarkers.length > 0) {
+                console.log('🔄 Restoring facility markers after cached style');
+                addHealthcareFacilities(stableFacilityTypes);
+              }
+              
+            } catch (error) {
+              console.error('❌ Error restoring layers after cached style:', error);
+            }
+          }, 100); // Shorter delay for cached styles
+        };
+        
+        map.current.once('styledata', handleCachedStyleLoad);
+        
+      } catch (error) {
+        console.error('❌ Error applying cached style, falling back to standard method:', error);
+        // Fallback to standard method
+        map.current.setStyle(getMapStyle(selectedMapStyle));
+      }
+    } else {
+      console.log('🎨 Cache miss, using standard style change:', selectedMapStyle);
+      
+      // Set flag to prevent rapid clicks
+      if (isChangingStyleRef.current) {
+        console.log('🚫 Style change blocked - already changing');
+        return;
+      }
+      
+      isChangingStyleRef.current = true;
+      
+      try {
+        // Apply style change
+        map.current.setStyle(getMapStyle(selectedMapStyle));
+        
+        // Handle style load completion
+        const handleStyleLoad = () => {
+          if (!map.current || !isChangingStyleRef.current) return;
+          
+          console.log('✅ Standard style loaded successfully');
+          
+          setTimeout(() => {
+            if (!isChangingStyleRef.current) return;
+            
+            try {
+              // Re-add boundary layers if they existed
+              if (hadBoundaryLayer) {
+                console.log('🔄 Restoring boundary layer:', currentGeoLayer);
+                handleBoundaryLayer(currentGeoLayer);
+              }
+              
+              // Re-add facility markers if they existed
+              if (currentMarkers.length > 0) {
+                console.log('🔄 Restoring facility markers');
+                addHealthcareFacilities(stableFacilityTypes);
+              }
+              
+            } catch (error) {
+              console.error('❌ Error restoring layers:', error);
+            } finally {
+              setTimeout(() => {
+                isChangingStyleRef.current = false;
+                console.log('🔓 Style change lock released');
+              }, 1000);
+            }
+          }, 500);
+        };
+        
+        map.current.once('styledata', handleStyleLoad);
+        
+        // Fallback timeout
+        setTimeout(() => {
+          if (isChangingStyleRef.current) {
+            console.warn('⚠️ Style change timeout, forcing unlock');
+            isChangingStyleRef.current = false;
+          }
+        }, 10000);
+        
+      } catch (error) {
+        console.error('❌ Critical error in style change:', error);
+        isChangingStyleRef.current = false;
+      }
+    }
+    
+  }, [selectedMapStyle, isLoaded, handleBoundaryLayer, addHealthcareFacilities, stableFacilityTypes]);
+
   // Effect to load default boundary layer on initial map load
   useEffect(() => {
     if (!map.current || !isLoaded || !isInitialLoadRef.current) return;
@@ -1446,7 +1785,13 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     },
     clearLastSearchResult: () => {
       clearLastSearchResult();
-    }
+    },
+    getPreloadState: () => ({
+      preloadingData,
+      preloadProgress,
+      stylesPreloaded,
+      stylePreloadProgress
+    })
   }));
 
   return (
