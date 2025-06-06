@@ -288,6 +288,28 @@ The project is a Next.js application focused on healthcare analytics for the age
 
 **Next Steps:** User should test the fixed functionality and confirm the heatmap is now displaying correctly.
 
+**✅ COMPLETED:** Facility Removal Bug Fix
+- ✅ **Problem**: Facility "Juniper Numbala Nunga" cannot be removed from saved facilities  
+- ✅ **Root Cause**: Inconsistent database search logic between checking saved status vs. removing facilities
+- ✅ **Analysis**: 
+  - `isSearchSaved()` used: `.or('search_term.eq.${searchTerm},search_display_name.eq.${searchTerm}')`
+  - `handleSaveFacility()` removal used: `.eq('search_term', serviceName)` ← Only searched one field
+- ✅ **Why This Caused Random Failures**:
+  - Some facilities found by `search_display_name` rather than `search_term`
+  - Button showed "Remove from Saved" (because `isSearchSaved` found them)
+  - But clicking remove failed (because removal logic couldn't find them)
+  - Created inconsistent state where facilities appeared saved but couldn't be removed
+- ✅ **Fix Applied**: Updated removal logic in AustralianMap.tsx line 544:
+  ```typescript
+  // OLD (broken):
+  .eq('search_term', serviceName)
+  
+  // NEW (fixed):
+  .or(`search_term.eq.${serviceName},search_display_name.eq.${serviceName}`)
+  ```
+- ✅ **Status**: FIXED - Removal logic now matches checking logic consistently
+- ✅ **Hot Reload**: Applied automatically via Next.js development server
+
 **Questions for Planning:**
 - Should we prioritize domain registration (Task 1) or security infrastructure (Task 11) first?
 - Are there any additional tasks or requirements not captured in the transfer?

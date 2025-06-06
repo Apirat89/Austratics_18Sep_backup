@@ -545,7 +545,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                   .from('saved_searches')
                   .select('id')
                   .eq('user_id', userId)
-                  .eq('search_term', serviceName)
+                  .or(`search_term.eq.${serviceName},search_display_name.eq.${serviceName}`)
                   .limit(1)
                   .single();
 
