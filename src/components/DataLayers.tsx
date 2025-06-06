@@ -13,6 +13,8 @@ interface DataLayersProps {
   selectedVariableName?: string;
   heatmapMinValue?: number;
   heatmapMaxValue?: number;
+  isExpanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
 }
 
 export default function DataLayers({
@@ -23,9 +25,13 @@ export default function DataLayers({
   heatmapVisible = false,
   selectedVariableName = "",
   heatmapMinValue,
-  heatmapMaxValue
+  heatmapMaxValue,
+  isExpanded = false,
+  onExpandedChange
 }: DataLayersProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  // Use prop if provided, otherwise use internal state for backwards compatibility
+  const [internalExpanded, setInternalExpanded] = useState(false);
+  const expanded = onExpandedChange ? isExpanded : internalExpanded;
   const [showHealthOptions, setShowHealthOptions] = useState(false);
 
   const dataCategories = [
@@ -79,7 +85,14 @@ export default function DataLayers({
       {/* Header */}
       <div className="flex items-center gap-3 p-3 w-full border-b border-gray-100">
         <button
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => {
+            const newExpanded = !expanded;
+            if (onExpandedChange) {
+              onExpandedChange(newExpanded);
+            } else {
+              setInternalExpanded(newExpanded);
+            }
+          }}
           className="flex items-center gap-3 flex-1 hover:bg-gray-50 transition-colors text-left rounded p-2"
         >
           <Database className="h-4 w-4 text-gray-600" />
@@ -88,7 +101,7 @@ export default function DataLayers({
             <span className="text-[10px] text-gray-500">[SA2 level only]</span>
           </div>
           <div className="ml-auto">
-            {isExpanded ? (
+            {expanded ? (
               <ChevronUp className="h-3 w-3 text-gray-400" />
             ) : (
               <ChevronDown className="h-3 w-3 text-gray-400" />
@@ -110,7 +123,7 @@ export default function DataLayers({
       </div>
 
       {/* Content */}
-      {isExpanded && (
+      {expanded && (
         <div className="p-3">
           <div className="space-y-2">
             {/* Heatmap Layer Display */}

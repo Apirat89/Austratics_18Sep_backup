@@ -64,17 +64,20 @@ export default function MapsPage() {
   const [stylesPreloaded, setStylesPreloaded] = useState(false);
   const [stylePreloadProgress, setStylePreloadProgress] = useState({ current: 0, total: 5 });
   
-  // Heatmap state
-  const [heatmapVisible, setHeatmapVisible] = useState(false);
-  const [heatmapCategory, setHeatmapCategory] = useState<string>('');
-  const [heatmapSubcategory, setHeatmapSubcategory] = useState<string>('');
-  const [selectedVariableName, setSelectedVariableName] = useState<string>('');
+  // Heatmap state with default selection (data preloaded but UI starts minimal)
+  const [heatmapVisible, setHeatmapVisible] = useState(false); // Default to hidden
+  const [heatmapCategory, setHeatmapCategory] = useState<string>('Commonwealth Home Support Program');
+  const [heatmapSubcategory, setHeatmapSubcategory] = useState<string>('Number of Participants');
+  const [selectedVariableName, setSelectedVariableName] = useState<string>('Commonwealth Home Support Program - Number of Participants');
   const [heatmapMinValue, setHeatmapMinValue] = useState<number | undefined>(undefined);
   const [heatmapMaxValue, setHeatmapMaxValue] = useState<number | undefined>(undefined);
   
   // Top/Bottom Panel state
   const [rankedData, setRankedData] = useState<RankedSA2Data | null>(null);
   const [topBottomPanelVisible, setTopBottomPanelVisible] = useState(false);
+  
+  // Data Layers state
+  const [dataLayersExpanded, setDataLayersExpanded] = useState(false);
   
   // Flag to control when map highlights should update the search bar
   const shouldUpdateSearchFromHighlight = useRef<boolean>(true);
@@ -271,17 +274,19 @@ export default function MapsPage() {
     console.log('📊 Maps Page: Ranked data calculated:', rankedData);
     setRankedData(rankedData);
     
-    // Auto-show panel when ranked data is available
-    if (rankedData) {
-      setTopBottomPanelVisible(true);
-    } else {
-      setTopBottomPanelVisible(false);
-    }
+    // Don't auto-show panel - let user choose when to view rankings
+    // Panel will only show when user manually toggles it or expands data layers
   }, []);
 
   const handleTopBottomPanelToggle = useCallback(() => {
-    setTopBottomPanelVisible(!topBottomPanelVisible);
-  }, [topBottomPanelVisible]);
+    const newVisible = !topBottomPanelVisible;
+    setTopBottomPanelVisible(newVisible);
+    
+    // Auto-expand DataLayers when TopBottomPanel becomes visible
+    if (newVisible && !dataLayersExpanded) {
+      setDataLayersExpanded(true);
+    }
+  }, [topBottomPanelVisible, dataLayersExpanded]);
 
   const handleSavedSearchRemoved = useCallback(() => {
     // Refresh the saved searches component when a search is removed from the search bar
@@ -572,11 +577,14 @@ export default function MapsPage() {
               selectedVariableName={selectedVariableName}
               heatmapMinValue={heatmapMinValue}
               heatmapMaxValue={heatmapMaxValue}
+              isExpanded={dataLayersExpanded}
+              onExpandedChange={setDataLayersExpanded}
             />
 
             {/* Top/Bottom Rankings Panel - Next to Data Layers */}
             <TopBottomPanel
               rankedData={rankedData}
+              isVisible={topBottomPanelVisible}
               onToggle={handleTopBottomPanelToggle}
             />
           </div>

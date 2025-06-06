@@ -230,8 +230,37 @@ export default function HeatmapBackgroundLayer({
     });
 
     if (map && !boundaryLoaded && !boundaryLoading) {
-      console.log('✅ HeatmapBackgroundLayer: Calling loadSA2Boundaries...');
-      loadSA2Boundaries();
+      // Add a small delay to ensure map is fully ready
+      const timer = setTimeout(() => {
+        console.log('✅ HeatmapBackgroundLayer: Calling loadSA2Boundaries after delay...');
+        loadSA2Boundaries();
+      }, 100); // 100ms delay
+
+      return () => clearTimeout(timer);
+    }
+  }, [map, loadSA2Boundaries, boundaryLoaded, boundaryLoading]);
+
+  // Additional trigger when map style loads
+  useEffect(() => {
+    if (map && !boundaryLoaded && !boundaryLoading) {
+      const handleStyleLoad = () => {
+        console.log('🎯 HeatmapBackgroundLayer: Map style loaded, triggering boundary load...');
+        setTimeout(() => {
+          loadSA2Boundaries();
+        }, 200); // Slightly longer delay after style load
+      };
+
+      // Check if style is already loaded
+      if (map.isStyleLoaded()) {
+        handleStyleLoad();
+      } else {
+        // Wait for style to load
+        map.once('styledata', handleStyleLoad);
+      }
+
+      return () => {
+        map.off('styledata', handleStyleLoad);
+      };
     }
   }, [map, loadSA2Boundaries, boundaryLoaded, boundaryLoading]);
 
