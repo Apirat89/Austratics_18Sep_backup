@@ -65,7 +65,7 @@ export default function MapsPage() {
   const [stylePreloadProgress, setStylePreloadProgress] = useState({ current: 0, total: 5 });
   
   // Heatmap state with default selection (data preloaded but UI starts minimal)
-  const [heatmapVisible, setHeatmapVisible] = useState(false); // Default to hidden
+  const [heatmapVisible, setHeatmapVisible] = useState(true); // Default to visible
   const [heatmapCategory, setHeatmapCategory] = useState<string>('Commonwealth Home Support Program');
   const [heatmapSubcategory, setHeatmapSubcategory] = useState<string>('Number of Participants');
   const [selectedVariableName, setSelectedVariableName] = useState<string>('Commonwealth Home Support Program - Number of Participants');
