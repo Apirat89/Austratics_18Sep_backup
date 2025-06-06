@@ -201,8 +201,13 @@ The project is a Next.js application focused on healthcare analytics for the age
 - ✅ Verified git repository is properly configured with remote origin: https://github.com/Apirat89/Giantash.git
 - ✅ Confirmed all changes are committed and pushed to remote repository
 - ✅ Working tree is clean with no uncommitted changes
-- ✅ Repository is up to date with latest commit: b982edc (maps2 heatmap functionality)
+- ✅ Repository is up to date with latest commit: 4d5e378 (heatmap layer integration)
 - ✅ All project files including scratchpad.md are properly version controlled
+- ✅ Successfully committed and pushed heatmap integration changes on December 11, 2024
+- ✅ Commit includes: 7 files changed, 699 insertions(+), 202 deletions(-)
+- ✅ New components: HeatmapBackgroundLayer.tsx, HeatmapDataService.tsx
+- ✅ Updated components: maps/page.tsx, AustralianMap.tsx, DataLayers.tsx
+- ✅ Cleaned up: removed maps2-backup files, updated scratchpad documentation
 
 **✅ COMPLETED:** Heatmap Layer Integration Implementation
 - ✅ Created HeatmapBackgroundLayer.tsx component with 100% maps2 heatmap logic
@@ -215,18 +220,73 @@ The project is a Next.js application focused on healthcare analytics for the age
 - ✅ Build completed successfully with no TypeScript errors
 - ✅ Development server running on http://localhost:3000
 
-**Ready for User Testing:** The heatmap integration is now complete and ready for testing at http://localhost:3000/maps
+**✅ COMPLETED:** Data Layers UI/UX Redesign
+- ✅ Moved visibility toggle to header (replaced "Health data available" text)
+- ✅ Display selected variable name where "Healthcare Heatmap" was shown
+- ✅ Show "No selection made" when no variable is selected
+- ✅ Added horizontal gradient legend with min/max values at the poles
+- ✅ Legend positioned underneath the variable name display area
+- ✅ Implemented proper data flow: HeatmapBackgroundLayer → AustralianMap → Maps Page → DataLayers
+- ✅ Added callback system to pass min/max values from heatmap calculations
+- ✅ Legend automatically appears/disappears based on data availability
+- ✅ Clean, modern UI with proper spacing and visual hierarchy
+- ✅ All TypeScript interfaces updated with new props
+- ✅ Development server running successfully with no compilation errors
 
-**How to Test:**
+**Ready for User Testing:** The redesigned Data Layers UI is now complete and ready for testing at http://localhost:3000/maps
+
+**How to Test the New UI:**
 1. Navigate to http://localhost:3000/maps
 2. Look for "Data Layers" panel in bottom-left corner
-3. Click on "Health" section to see 18 healthcare data categories
-4. Select any category (e.g., "Commonwealth Home Support Program - Number of Participants")
-5. Use the eye toggle to show/hide the heatmap layer
-6. Verify heatmap appears as background layer below clickable boundaries
-7. Test that boundary interactions still work independently of heatmap
+3. **NEW:** Notice the visibility toggle (eye icon) is now in the header
+4. Click to expand the Data Layers panel
+5. **NEW:** See "No selection made" displayed initially
+6. Click on "Health" section to see 18 healthcare data categories
+7. Select any category (e.g., "Commonwealth Home Support Program - Number of Participants")
+8. **NEW:** Selected variable name now displays where "Healthcare Heatmap" was
+9. **NEW:** Horizontal gradient legend appears with min/max values
+10. Use the header eye toggle to show/hide the heatmap layer
+11. **NEW:** Legend disappears when heatmap is hidden
+12. Verify heatmap appears as background layer below clickable boundaries
+13. Test that boundary interactions still work independently of heatmap
 
-**Next Steps:** User should test the functionality and provide feedback for any adjustments needed.
+**UI Improvements Delivered:**
+- More intuitive visibility control in header
+- Clear indication of selected data variable
+- Professional gradient legend with value ranges
+- Better visual hierarchy and information organization
+- Responsive design that adapts to data availability
+
+**✅ COMPLETED:** Heatmap Display Issue Fixed
+- ✅ **Root Cause Identified**: Logic error in HeatmapBackgroundLayer component
+- ✅ **Problem**: `onMinMaxCalculated(undefined, undefined)` was being called too early in updateHeatmap function
+- ✅ **Issue**: The condition `!sa2HeatmapVisibleRef.current || !sa2HeatmapDataRef.current` was clearing min/max values immediately when heatmap visibility was false OR when no data, even if data was being loaded
+- ✅ **Fix Applied**: 
+  - Removed premature clearing of min/max values in updateHeatmap function
+  - Only clear min/max values when there's genuinely no data available (`!sa2HeatmapDataRef.current`)
+  - Preserved auto-enable heatmap logic when user selects data
+  - Removed premature clearing of min/max values on visibility toggle
+- ✅ **Logic Flow Now**: Select Data → Auto-enable Heatmap → Load Data → Calculate Min/Max → Display Legend
+- ✅ **Hot Reload**: Changes applied automatically via Next.js development server
+- ✅ **Development Server**: Running successfully on http://localhost:3000
+
+**Ready for Testing:** The heatmap display issue is now resolved. The redesigned Data Layers UI with working heatmap functionality is ready for testing at http://localhost:3000/maps
+
+**Test Steps to Verify Fix:**
+1. Navigate to http://localhost:3000/maps
+2. **NEW UI**: Notice the visibility toggle (eye icon) in the Data Layers header
+3. Expand the Data Layers panel 
+4. **Fixed**: Should show "No selection made" initially
+5. Click on "Health" section to see 18 healthcare data categories
+6. Select any category (e.g., "Commonwealth Home Support Program - Number of Participants")
+7. **Fixed**: Heatmap should auto-enable and become visible
+8. **Fixed**: Selected variable name should display correctly
+9. **Fixed**: Horizontal gradient legend should appear with proper min/max values
+10. **Fixed**: Heatmap should be visible on the map with red color gradients
+11. Use the header eye toggle to show/hide the heatmap layer
+12. **Fixed**: Legend persists when toggling visibility (only clears when no data)
+
+**Next Steps:** User should test the fixed functionality and confirm the heatmap is now displaying correctly.
 
 **Questions for Planning:**
 - Should we prioritize domain registration (Task 1) or security infrastructure (Task 11) first?

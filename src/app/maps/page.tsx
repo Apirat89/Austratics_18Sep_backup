@@ -66,6 +66,9 @@ export default function MapsPage() {
   const [heatmapVisible, setHeatmapVisible] = useState(false);
   const [heatmapCategory, setHeatmapCategory] = useState<string>('');
   const [heatmapSubcategory, setHeatmapSubcategory] = useState<string>('');
+  const [selectedVariableName, setSelectedVariableName] = useState<string>('');
+  const [heatmapMinValue, setHeatmapMinValue] = useState<number | undefined>(undefined);
+  const [heatmapMaxValue, setHeatmapMaxValue] = useState<number | undefined>(undefined);
   
   // Flag to control when map highlights should update the search bar
   const shouldUpdateSearchFromHighlight = useRef<boolean>(true);
@@ -223,17 +226,36 @@ export default function MapsPage() {
   const handleHeatmapToggle = useCallback((visible: boolean) => {
     console.log('🌡️ Maps Page: Heatmap visibility toggled:', visible);
     setHeatmapVisible(visible);
+    // Don't clear min/max values when toggling visibility - let the component handle it
+    // Only clear when there's no data or layer is removed
   }, []);
 
   const handleHeatmapDataSelect = useCallback((category: string, subcategory: string) => {
     console.log('🌡️ Maps Page: Heatmap data selected:', { category, subcategory });
     setHeatmapCategory(category);
     setHeatmapSubcategory(subcategory);
+    setSelectedVariableName(`${category} - ${subcategory}`);
     // Auto-enable heatmap when data is selected
     if (!heatmapVisible) {
       setHeatmapVisible(true);
     }
   }, [heatmapVisible]);
+
+  const handleHeatmapMinMaxCalculated = useCallback((minValue: number | undefined, maxValue: number | undefined) => {
+    console.log('🌡️ Maps Page: Heatmap min/max calculated:', { minValue, maxValue });
+    setHeatmapMinValue(minValue);
+    setHeatmapMaxValue(maxValue);
+  }, []);
+
+  const handleHeatmapClear = useCallback(() => {
+    console.log('🌡️ Maps Page: Clearing heatmap selection');
+    setSelectedVariableName('');
+    setHeatmapCategory('');
+    setHeatmapSubcategory('');
+    setHeatmapVisible(false);
+    setHeatmapMinValue(undefined);
+    setHeatmapMaxValue(undefined);
+  }, []);
 
   const handleSavedSearchRemoved = useCallback(() => {
     // Refresh the saved searches component when a search is removed from the search bar
@@ -517,7 +539,11 @@ export default function MapsPage() {
             className="absolute bottom-4 left-4 z-40 w-64"
             onHeatmapToggle={handleHeatmapToggle}
             onHeatmapDataSelect={handleHeatmapDataSelect}
+            onHeatmapClear={handleHeatmapClear}
             heatmapVisible={heatmapVisible}
+            selectedVariableName={selectedVariableName}
+            heatmapMinValue={heatmapMinValue}
+            heatmapMaxValue={heatmapMaxValue}
           />
 
           {/* Map Container - Full screen now */}
@@ -536,6 +562,7 @@ export default function MapsPage() {
               heatmapVisible={heatmapVisible}
               heatmapCategory={heatmapCategory}
               heatmapSubcategory={heatmapSubcategory}
+              onHeatmapMinMaxCalculated={handleHeatmapMinMaxCalculated}
             />
           </div>
         </main>

@@ -43,6 +43,8 @@ interface AustralianMapProps {
   heatmapVisible?: boolean;
   heatmapCategory?: string;
   heatmapSubcategory?: string;
+  // Add callback for heatmap min/max values
+  onHeatmapMinMaxCalculated?: (minValue: number | undefined, maxValue: number | undefined) => void;
 }
 
 // Expose methods to parent component
@@ -180,7 +182,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   onSavedSearchAdded,
   heatmapVisible = false,
   heatmapCategory,
-  heatmapSubcategory
+  heatmapSubcategory,
+  onHeatmapMinMaxCalculated
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
@@ -1922,6 +1925,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         map={map.current}
         sa2HeatmapData={heatmapData}
         sa2HeatmapVisible={heatmapVisible}
+        onMinMaxCalculated={onHeatmapMinMaxCalculated}
       />
 
       {/* Heatmap Data Service */}

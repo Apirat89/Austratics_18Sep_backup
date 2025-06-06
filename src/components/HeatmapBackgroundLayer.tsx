@@ -12,12 +12,14 @@ interface HeatmapBackgroundLayerProps {
   sa2HeatmapData?: SA2HeatmapData | null;
   sa2HeatmapVisible?: boolean;
   className?: string;
+  onMinMaxCalculated?: (minValue: number | undefined, maxValue: number | undefined) => void;
 }
 
 export default function HeatmapBackgroundLayer({ 
   map,
   sa2HeatmapData,
-  sa2HeatmapVisible = true
+  sa2HeatmapVisible = true,
+  onMinMaxCalculated
 }: HeatmapBackgroundLayerProps) {
   const [boundaryLoaded, setBoundaryLoaded] = useState(false);
   const [boundaryLoading, setBoundaryLoading] = useState(false);
@@ -131,6 +133,7 @@ export default function HeatmapBackgroundLayer({
       
       if (dataEntries.length === 0) {
         console.log('📊 HeatmapBackgroundLayer: No heatmap data to display');
+        onMinMaxCalculated?.(undefined, undefined);
         return;
       }
 
@@ -142,6 +145,9 @@ export default function HeatmapBackgroundLayer({
 
       console.log(`🗺️ HeatmapBackgroundLayer: Rendering SA2 heatmap with ${dataEntries.length} data points`);
       console.log(`📊 HeatmapBackgroundLayer: Value range: ${minValue} - ${maxValue}`);
+
+      // Pass min/max values to parent component for legend display
+      onMinMaxCalculated?.(minValue, maxValue);
 
       // Create data-driven heatmap expression
       // Build case expression for each SA2 with data
@@ -207,6 +213,10 @@ export default function HeatmapBackgroundLayer({
       }); // No beforeLayer = adds to top of layer stack
 
       console.log('✅ HeatmapBackgroundLayer: Heatmap layer added at TOP of layer stack');
+    } else if (!sa2HeatmapDataRef.current) {
+      // Only clear min/max values when there's no data at all
+      console.log('📊 HeatmapBackgroundLayer: No data available, clearing min/max values');
+      onMinMaxCalculated?.(undefined, undefined);
     }
   }, [map, boundaryLoaded]);
 

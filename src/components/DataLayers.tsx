@@ -8,18 +8,25 @@ interface DataLayersProps {
   className?: string;
   onHeatmapToggle?: (visible: boolean) => void;
   onHeatmapDataSelect?: (category: string, subcategory: string) => void;
+  onHeatmapClear?: () => void;
   heatmapVisible?: boolean;
+  selectedVariableName?: string;
+  heatmapMinValue?: number;
+  heatmapMaxValue?: number;
 }
 
 export default function DataLayers({
   className = "",
   onHeatmapToggle,
   onHeatmapDataSelect,
-  heatmapVisible = false
+  onHeatmapClear,
+  heatmapVisible = false,
+  selectedVariableName = "",
+  heatmapMinValue,
+  heatmapMaxValue
 }: DataLayersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showHealthOptions, setShowHealthOptions] = useState(false);
-  const [selectedHealthOption, setSelectedHealthOption] = useState<string>('');
 
   const dataCategories = [
     {
@@ -57,7 +64,6 @@ export default function DataLayers({
 
   // Handle healthcare option selection
   const handleHealthcareOptionSelect = (option: any) => {
-    setSelectedHealthOption(option.label);
     setShowHealthOptions(false);
     onHeatmapDataSelect?.(option.category, option.subcategory);
   };
@@ -71,49 +77,72 @@ export default function DataLayers({
   return (
     <div className={`bg-white rounded-lg shadow-lg border border-gray-200 ${className}`}>
       {/* Header */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center gap-3 p-3 w-full hover:bg-gray-50 transition-colors text-left rounded-t-lg"
-      >
-        <Database className="h-4 w-4 text-gray-600" />
-        <span className="text-sm font-medium text-gray-900">Data Layers</span>
-        <div className="ml-auto flex items-center gap-2">
-          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-            Health data available
-          </span>
-          {isExpanded ? (
-            <ChevronUp className="h-3 w-3 text-gray-400" />
+      <div className="flex items-center gap-3 p-3 w-full border-b border-gray-100">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex items-center gap-3 flex-1 hover:bg-gray-50 transition-colors text-left rounded p-2"
+        >
+          <Database className="h-4 w-4 text-gray-600" />
+          <span className="text-sm font-medium text-gray-900">Data Layers</span>
+          <div className="ml-auto">
+            {isExpanded ? (
+              <ChevronUp className="h-3 w-3 text-gray-400" />
+            ) : (
+              <ChevronDown className="h-3 w-3 text-gray-400" />
+            )}
+          </div>
+        </button>
+        
+        {/* Visibility Toggle - separate button */}
+        <button
+          onClick={handleHeatmapToggle}
+          className="flex items-center gap-1 px-2 py-1 rounded bg-white border border-gray-300 hover:bg-gray-50 transition-colors"
+        >
+          {heatmapVisible ? (
+            <><Eye className="h-3 w-3 text-green-600" /><span className="text-xs text-green-600">Visible</span></>
           ) : (
-            <ChevronDown className="h-3 w-3 text-gray-400" />
+            <><EyeOff className="h-3 w-3 text-gray-500" /><span className="text-xs text-gray-500">Hidden</span></>
           )}
-        </div>
-      </button>
+        </button>
+      </div>
 
       {/* Content */}
       {isExpanded && (
-        <div className="p-3 border-t border-gray-100">
+        <div className="p-3">
           <div className="space-y-2">
-            {/* Heatmap Layer Toggle */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Heart className="h-4 w-4 text-purple-600" />
-                  <span className="text-sm font-medium text-gray-900">Healthcare Heatmap</span>
-                </div>
-                <button
-                  onClick={handleHeatmapToggle}
-                  className="flex items-center gap-1 px-2 py-1 rounded bg-white border border-gray-300 hover:bg-gray-50 transition-colors"
-                >
-                  {heatmapVisible ? (
-                    <><Eye className="h-3 w-3 text-green-600" /><span className="text-xs text-green-600">Visible</span></>
-                  ) : (
-                    <><EyeOff className="h-3 w-3 text-gray-500" /><span className="text-xs text-gray-500">Hidden</span></>
-                  )}
-                </button>
+            {/* Heatmap Layer Display */}
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-3">
+              <div className="flex items-center gap-2 mb-3">
+                <Heart className="h-4 w-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-900 flex-1">
+                  {selectedVariableName || "No selection made"}
+                </span>
+                {selectedVariableName && (
+                  <button
+                    onClick={() => onHeatmapClear?.()}
+                    className="w-5 h-5 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors text-xs"
+                  >
+                    ×
+                  </button>
+                )}
               </div>
-              {selectedHealthOption && (
-                <div className="text-xs text-purple-700 bg-purple-100 rounded px-2 py-1">
-                  {selectedHealthOption}
+              
+              {/* Horizontal Gradient Legend */}
+              {selectedVariableName && heatmapMinValue !== undefined && heatmapMaxValue !== undefined && (
+                <div className="space-y-2">
+                  {/* Gradient Bar */}
+                  <div className="relative h-4 rounded-full bg-gradient-to-r from-red-100 via-red-300 to-red-600 border border-gray-300">
+                  </div>
+                  
+                  {/* Min/Max Labels */}
+                  <div className="flex justify-between items-center text-xs text-gray-600">
+                    <span className="bg-white px-2 py-1 rounded border shadow-sm">
+                      Min: {heatmapMinValue.toLocaleString()}
+                    </span>
+                    <span className="bg-white px-2 py-1 rounded border shadow-sm">
+                      Max: {heatmapMaxValue.toLocaleString()}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
