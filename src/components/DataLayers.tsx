@@ -188,7 +188,7 @@ export default function DataLayers({
                     <div className="overflow-y-auto max-h-52">
                       {Object.entries(PROGRAM_TYPES).map(([category, subcategories]) => (
                         <div key={category} className="border-b border-gray-100 last:border-b-0">
-                          <div className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-700">
+                          <div className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-700 underline">
                             {category}
                           </div>
                           {subcategories.map((subcategory) => {

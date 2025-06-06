@@ -83,9 +83,9 @@ export default function HeatmapDataService({
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 HeatmapDataService: Loading DSS data from /DSS_Cleaned_2024_Compressed.json');
+      console.log('🔍 HeatmapDataService: Loading DSS data from /DSS_Cleaned_2024.json');
       
-      const response = await fetch('/DSS_Cleaned_2024_Compressed.json');
+      const response = await fetch('/DSS_Cleaned_2024.json');
       console.log('📡 HeatmapDataService: Response status:', response.status);
       
       if (!response.ok) {
