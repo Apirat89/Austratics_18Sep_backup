@@ -7,6 +7,10 @@ import '@maptiler/sdk/dist/maptiler-sdk.css';
 // Add import for the save functionality
 import { saveSearchToSavedSearches, isSearchSaved, type LocationData } from '../lib/savedSearches';
 
+// Add imports for heatmap functionality  
+import HeatmapBackgroundLayer from './HeatmapBackgroundLayer';
+import HeatmapDataService, { SA2HeatmapData } from './HeatmapDataService';
+
 // MapTiler API key - you'll need to add this to your environment variables
 const MAPTILER_API_KEY = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || 'YOUR_MAPTILER_API_KEY';
 
@@ -35,6 +39,10 @@ interface AustralianMapProps {
   // Add new props for saving functionality
   userId?: string;
   onSavedSearchAdded?: () => void;
+  // Add heatmap props
+  heatmapVisible?: boolean;
+  heatmapCategory?: string;
+  heatmapSubcategory?: string;
 }
 
 // Expose methods to parent component
@@ -169,7 +177,10 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   onHighlightFeature,
   onClearSearchResult,
   userId,
-  onSavedSearchAdded
+  onSavedSearchAdded,
+  heatmapVisible = false,
+  heatmapCategory,
+  heatmapSubcategory
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
@@ -211,6 +222,21 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
 
   // Store last search result to maintain highlighting across interactions
   const [lastSearchResult, setLastSearchResult] = useState<any>(null);
+
+  // Heatmap state management
+  const [heatmapData, setHeatmapData] = useState<SA2HeatmapData | null>(null);
+  const [selectedHeatmapOption, setSelectedHeatmapOption] = useState<string>('');
+
+  // Handle heatmap data processing
+  const handleHeatmapDataProcessed = useCallback((data: SA2HeatmapData | null, selectedOption: string) => {
+    console.log('🗺️ AustralianMap: Heatmap data processed:', {
+      hasData: !!data,
+      dataLength: data ? Object.keys(data).length : 0,
+      selectedOption
+    });
+    setHeatmapData(data);
+    setSelectedHeatmapOption(selectedOption);
+  }, []);
 
   // Stabilize facilityTypes to prevent unnecessary re-renders
   const stableFacilityTypes = useMemo(() => facilityTypes, [
@@ -1362,7 +1388,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         type: 'line',
         source: sourceId,
         paint: {
-          'line-color': '#E53E3E',
+          'line-color': '#1E3A8A',
           'line-width': 1.5,
           'line-opacity': 0.8
         }
@@ -1375,7 +1401,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         type: 'fill',
         source: sourceId,
         paint: {
-          'fill-color': 'rgba(229, 62, 62, 0.2)', // Slightly more visible for better click detection
+          'fill-color': 'rgba(30, 58, 138, 0.2)', // Deep blue for better click detection
           'fill-opacity': 0.2 // Increased opacity for more reliable click detection on complex polygons
         }
       });
@@ -1388,7 +1414,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         source: sourceId,
         filter: ['==', ['get', getPropertyField(layerType)], ''], // Initially hide all
         paint: {
-          'fill-color': '#E53E3E',
+          'fill-color': '#1E3A8A',
           'fill-opacity': 0.15 // Slightly more visible for highlights
         }
       });
@@ -1890,6 +1916,20 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           </div>
         </div>
       )}
+
+      {/* Heatmap Background Layer */}
+      <HeatmapBackgroundLayer
+        map={map.current}
+        sa2HeatmapData={heatmapData}
+        sa2HeatmapVisible={heatmapVisible}
+      />
+
+      {/* Heatmap Data Service */}
+      <HeatmapDataService
+        selectedCategory={heatmapCategory}
+        selectedSubcategory={heatmapSubcategory}
+        onDataProcessed={handleHeatmapDataProcessed}
+      />
     </div>
   );
 });

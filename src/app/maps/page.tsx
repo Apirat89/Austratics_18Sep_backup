@@ -10,7 +10,7 @@ import MapSettings from '../../components/MapSettings';
 import DataLayers from '../../components/DataLayers';
 import ActiveLayers from '../../components/ActiveLayers';
 import SavedSearches, { SavedSearchesRef } from '../../components/SavedSearches';
-import { Map, Settings, User, ChevronDown, Check, Menu } from 'lucide-react';
+import { Map, Settings, User, Menu } from 'lucide-react';
 
 interface UserData {
   email: string;
@@ -61,6 +61,11 @@ export default function MapsPage() {
   const [preloadProgress, setPreloadProgress] = useState({ current: 0, total: 0 });
   const [stylesPreloaded, setStylesPreloaded] = useState(false);
   const [stylePreloadProgress, setStylePreloadProgress] = useState({ current: 0, total: 5 });
+  
+  // Heatmap state
+  const [heatmapVisible, setHeatmapVisible] = useState(false);
+  const [heatmapCategory, setHeatmapCategory] = useState<string>('');
+  const [heatmapSubcategory, setHeatmapSubcategory] = useState<string>('');
   
   // Flag to control when map highlights should update the search bar
   const shouldUpdateSearchFromHighlight = useRef<boolean>(true);
@@ -213,6 +218,22 @@ export default function MapsPage() {
       savedSearchesRef.current.refreshSavedSearches();
     }
   }, []);
+
+  // Heatmap handlers
+  const handleHeatmapToggle = useCallback((visible: boolean) => {
+    console.log('🌡️ Maps Page: Heatmap visibility toggled:', visible);
+    setHeatmapVisible(visible);
+  }, []);
+
+  const handleHeatmapDataSelect = useCallback((category: string, subcategory: string) => {
+    console.log('🌡️ Maps Page: Heatmap data selected:', { category, subcategory });
+    setHeatmapCategory(category);
+    setHeatmapSubcategory(subcategory);
+    // Auto-enable heatmap when data is selected
+    if (!heatmapVisible) {
+      setHeatmapVisible(true);
+    }
+  }, [heatmapVisible]);
 
   const handleSavedSearchRemoved = useCallback(() => {
     // Refresh the saved searches component when a search is removed from the search bar
@@ -492,7 +513,12 @@ export default function MapsPage() {
           />
 
           {/* Data Layers Overlay - Bottom Left */}
-          <DataLayers className="absolute bottom-4 left-4 z-40 w-64" />
+          <DataLayers 
+            className="absolute bottom-4 left-4 z-40 w-64"
+            onHeatmapToggle={handleHeatmapToggle}
+            onHeatmapDataSelect={handleHeatmapDataSelect}
+            heatmapVisible={heatmapVisible}
+          />
 
           {/* Map Container - Full screen now */}
           <div className="absolute inset-0">
@@ -507,6 +533,9 @@ export default function MapsPage() {
               onClearSearchResult={handleClearSearchResult}
               userId={user?.id}
               onSavedSearchAdded={handleSavedSearchAdded}
+              heatmapVisible={heatmapVisible}
+              heatmapCategory={heatmapCategory}
+              heatmapSubcategory={heatmapSubcategory}
             />
           </div>
         </main>
