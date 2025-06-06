@@ -9,7 +9,7 @@ import { saveSearchToSavedSearches, isSearchSaved, type LocationData } from '../
 
 // Add imports for heatmap functionality  
 import HeatmapBackgroundLayer from './HeatmapBackgroundLayer';
-import HeatmapDataService, { SA2HeatmapData } from './HeatmapDataService';
+import HeatmapDataService, { SA2HeatmapData, RankedSA2Data } from './HeatmapDataService';
 
 // MapTiler API key - you'll need to add this to your environment variables
 const MAPTILER_API_KEY = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || 'YOUR_MAPTILER_API_KEY';
@@ -45,6 +45,8 @@ interface AustralianMapProps {
   heatmapSubcategory?: string;
   // Add callback for heatmap min/max values
   onHeatmapMinMaxCalculated?: (minValue: number | undefined, maxValue: number | undefined) => void;
+  // Add callback for ranked data calculation
+  onRankedDataCalculated?: (rankedData: RankedSA2Data | null) => void;
 }
 
 // Expose methods to parent component
@@ -183,7 +185,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   heatmapVisible = false,
   heatmapCategory,
   heatmapSubcategory,
-  onHeatmapMinMaxCalculated
+  onHeatmapMinMaxCalculated,
+  onRankedDataCalculated
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
@@ -1933,6 +1936,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         selectedCategory={heatmapCategory}
         selectedSubcategory={heatmapSubcategory}
         onDataProcessed={handleHeatmapDataProcessed}
+        onRankedDataCalculated={onRankedDataCalculated}
       />
     </div>
   );

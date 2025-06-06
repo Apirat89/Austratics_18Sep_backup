@@ -83,7 +83,10 @@ export default function DataLayers({
           className="flex items-center gap-3 flex-1 hover:bg-gray-50 transition-colors text-left rounded p-2"
         >
           <Database className="h-4 w-4 text-gray-600" />
-          <span className="text-sm font-medium text-gray-900">Data Layers</span>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-gray-900">Data Layers</span>
+            <span className="text-[10px] text-gray-500">[SA2 level only]</span>
+          </div>
           <div className="ml-auto">
             {isExpanded ? (
               <ChevronUp className="h-3 w-3 text-gray-400" />

@@ -51,10 +51,126 @@ The project is a Next.js application focused on healthcare analytics for the age
 11. **Predictive Analytics & Machine Learning** - Advanced features
 12. **User Management & Multi-tenancy System** - Enterprise features
 
+### 🆕 **NEW FEATURE PLAN: Top/Bottom Records Panel**
+
+**🎯 FEATURE DESCRIPTION:**
+Add a collapsible sidebar panel on the right side of the map that displays the top 3 and bottom 3 SA2 regions when a healthcare variable is selected. The panel should show region names, values, and allow for future expansion with additional analytics.
+
+**🔍 CURRENT STATE ANALYSIS:**
+- DataLayers component in bottom-left has healthcare variable selection
+- HeatmapDataService processes SA2 healthcare data into SA2HeatmapData format
+- Map shows colored heatmap based on selected healthcare variable
+- No current mechanism to show ranked data insights
+
+**📋 DETAILED IMPLEMENTATION PLAN:**
+
+**🔄 STARTING IMPLEMENTATION:** Top/Bottom Records Panel Feature
+
+**Phase 1: Data Analysis & Preparation - STARTING**
+- 🔄 Extending HeatmapDataService.tsx with ranked data calculation
+- 🔄 Adding SA2 name lookup using existing boundary cache pattern
+- 🔄 Creating RankedSA2Data interface and callback system
+- ⏳ Testing ranked data calculation with sample healthcare variables
+
+**Implementation Strategy:**
+- Following the approved 4-phase plan with SA2 ID + Name display format
+- Leveraging existing boundary cache to avoid duplicate 170MB SA2.geojson loads
+- Building non-intrusive additions that don't disrupt existing heatmap functionality
+- Focus on performance and proper error handling throughout implementation
+
+**Phase 2: Create TopBottomPanel Component**
+2. **Create src/components/TopBottomPanel.tsx:**
+   - Interface props: `rankedData`, `isVisible`, `onToggle`
+   - Positioned absolutely on right side of map container
+   - Collapsible with toggle button (ChevronLeft/ChevronRight icon)
+   - Only visible when healthcare variable is selected
+   - Clean, modern UI matching DataLayers design
+   - Show loading state when data is processing
+   - Empty state when no variable selected
+
+**Phase 3: Update Maps Page Integration**
+3. **Modify src/app/maps/page.tsx:**
+   - Add state: `rankedData`, `topBottomPanelVisible`
+   - Pass onRankedDataCalculated callback to HeatmapDataService
+   - Add TopBottomPanel component to JSX with proper positioning
+   - Handle panel visibility logic (auto-show when data available)
+
+**Phase 4: Data Flow Integration**
+4. **Update AustralianMap.tsx:**
+   - Pass through rankedData callback from maps page to HeatmapDataService
+   - Ensure proper prop threading without disrupting existing heatmap logic
+
+**🎨 UI/UX SPECIFICATIONS:**
+
+**Panel Design:**
+- Fixed position on right side, similar height to DataLayers
+- Collapsible with animated slide in/out
+- Header with healthcare variable name and collapse toggle
+- Two sections: "Highest Values" and "Lowest Values"
+- Each section shows 3 cards with SA2 name, value, and rank indicator
+- **Display Format:** Region names with SA2 ID in brackets, e.g., "Sydney - Haymarket (105021098)"
+
+**Panel States:**
+- Hidden: When no healthcare variable selected
+- Loading: When data is being processed
+- Populated: When showing top/bottom data
+- Collapsed: When user minimizes panel
+
+**Styling:**
+- Match DataLayers component color scheme and shadows
+- Use Tailwind CSS for consistency
+- Icons from lucide-react (TrendingUp, TrendingDown)
+- Values formatted with toLocaleString() for readability
+
+**🔄 DATA FLOW:**
+1. User selects healthcare variable in DataLayers
+2. HeatmapDataService processes data for heatmap
+3. Same service calculates top/bottom rankings with SA2 names
+4. Maps page receives ranked data via callback
+5. TopBottomPanel receives ranked data and displays insights
+6. Panel auto-shows when data available, hides when cleared
+
+**✅ SUCCESS CRITERIA:**
+- Panel appears only when healthcare variable is selected
+- Shows accurate top 3 and bottom 3 regions with correct values
+- Panel is collapsible and responsive
+- No interference with existing heatmap functionality
+- Clean, professional UI that matches existing design
+- Loading states and error handling
+
+**⚠️ IMPLEMENTATION RISKS:**
+- **SA2 Boundary Data Size:** SA2.geojson is 170MB - need efficient loading/caching strategy
+- Leverage existing boundary cache pattern from HeatmapBackgroundLayer to avoid duplicate loads
+- Need to fetch SA2 names (either from boundary GeoJSON or separate lookup)
+- Ensure proper cleanup when switching between variables
+- Handle edge cases (less than 3 regions with data)
+- Maintain performance when processing large datasets
+- Potential layout conflicts with existing sidebar components
+
+**🔧 TECHNICAL CONSIDERATIONS:**
+- **Shared Data Loading:** Coordinate with HeatmapBackgroundLayer to reuse SA2 boundary cache
+- **Memory Management:** Extract only SA2 ID→Name mapping from 170MB GeoJSON, don't store full boundary data twice
+- **Loading States:** Handle async SA2 name lookup gracefully with proper loading indicators
+- **Performance:** Cache SA2 name mapping separately from full boundary data for fast access
+
+**🧪 TESTING STRATEGY:**
+- Test with different healthcare variables
+- Verify rankings are mathematically correct
+- Test collapsible functionality
+- Verify no layout breaking on different screen sizes
+- Test edge cases (no data, single region, etc.)
+- Ensure proper cleanup when variable selection changes
+
 ## Project Status Board
 
 ### In Progress
 - [x] **Website Development Server** - Successfully running on http://localhost:3000
+- [x] **🆕 Top/Bottom Records Panel Implementation** - COMPLETED
+  - ✅ **Phase 1: Data Analysis & Preparation** - Extended HeatmapDataService with ranked data calculation
+  - ✅ **Phase 2: Create TopBottomPanel Component** - Built collapsible panel with proper UI/UX
+  - ✅ **Phase 3: Update Maps Page Integration** - Added state management and callbacks
+  - ✅ **Phase 4: Data Flow Integration** - Connected all components through prop threading
+  - *Status: IMPLEMENTATION COMPLETE - Ready for testing and validation*
 
 ### Completed
 - [x] **🆕 Heatmap Layer Integration Task** - COMPLETED
@@ -337,3 +453,107 @@ The project is a Next.js application focused on healthcare analytics for the age
 - Visualization engines are foundational and can be developed in parallel
 - Data integration and processing is critical for all analytics features
 - Enterprise features (multi-tenancy, advanced ML) are lower priority 
+
+**✅ COMPLETED:** Top/Bottom Records Panel Implementation
+
+**All 4 Phases Successfully Implemented:**
+
+**Phase 1: Data Analysis & Preparation - COMPLETED**
+- ✅ Extended HeatmapDataService.tsx with ranked data calculation capabilities
+- ✅ Added SA2 name lookup using existing boundary cache pattern (leverages 170MB SA2.geojson efficiently)
+- ✅ Created RankedSA2Data interface and callback system
+- ✅ Implemented ranking calculation with top 3 and bottom 3 regions
+- ✅ Added proper loading states and error handling for SA2 name loading
+
+**Phase 2: Create TopBottomPanel Component - COMPLETED**
+- ✅ Built TopBottomPanel.tsx with collapsible functionality
+- ✅ Implemented proper UI/UX matching DataLayers design
+- ✅ Added display format: "Region Name (SA2_ID)" as requested
+- ✅ Created sections for "Highest Values" and "Lowest Values"
+- ✅ Added proper loading states, empty states, and responsive design
+- ✅ Positioned panel on right side with smooth animations
+
+**Phase 3: Update Maps Page Integration - COMPLETED**
+- ✅ Added ranked data state management to maps page
+- ✅ Created handleRankedDataCalculated callback function
+- ✅ Added auto-show/hide logic for panel based on data availability
+- ✅ Integrated TopBottomPanel component into JSX with proper positioning
+- ✅ Added panel toggle functionality
+
+**Phase 4: Data Flow Integration - COMPLETED**
+- ✅ Updated AustralianMapProps interface to include onRankedDataCalculated callback
+- ✅ Added prop threading from maps page → AustralianMap → HeatmapDataService
+- ✅ Connected all components in the data flow chain
+- ✅ Ensured proper cleanup when heatmap selection is cleared
+
+**Final Quality Assurance - COMPLETED**
+- ✅ Fixed TypeScript linting errors in TopBottomPanel component
+- ✅ Verified TypeScript compilation passes with no errors
+- ✅ Restarted development server to ensure all changes are loaded
+- ✅ All components properly integrated and ready for testing
+
+**Implementation Summary:**
+- **Non-intrusive Design**: All additions work alongside existing heatmap functionality without disruption
+- **Performance Optimized**: Leverages existing SA2 boundary cache to avoid duplicate 170MB file loads
+- **User Experience**: Panel auto-appears when healthcare variable is selected, displays region names with SA2 IDs in brackets
+- **Error Handling**: Comprehensive loading states and error recovery for both DSS data and SA2 name lookup
+- **Clean Architecture**: Proper separation of concerns with callback-based data flow
+
+**🚀 READY FOR USER TESTING:** The Top/Bottom Records Panel feature is now fully implemented with improved UX positioning and ready for testing at http://localhost:3000/maps
+
+**Test Instructions:**
+1. Navigate to http://localhost:3000/maps
+2. Expand the "Data Layers" panel in bottom-left
+3. Click on "Health" section to see healthcare variables
+4. Select any healthcare variable (e.g., "Commonwealth Home Support Program - Number of Participants")
+5. **NEW FEATURE**: Top/Bottom Rankings panel should auto-appear on the right side
+6. Verify panel shows top 3 and bottom 3 regions with format "Region Name (SA2_ID)"
+7. Test collapsible functionality using the chevron button
+8. Verify panel disappears when heatmap is cleared
+9. Test with different healthcare variables to see rankings update
+
+**Next Steps:** User should test the implementation and provide feedback for any adjustments needed.
+
+**🎨 UX/UI IMPROVEMENTS - COMPLETED**
+- ✅ Repositioned TopBottomPanel from right side to next to Data Layers container
+- ✅ Updated collapsible button to point right and positioned after panel content
+- ✅ Created side-by-side layout with Data Layers and Regional Rankings
+- ✅ Improved user experience by grouping related data visualization controls
+- ✅ Maintained responsive design and smooth animations
+
+**🚀 READY FOR USER TESTING:** The Top/Bottom Records Panel feature is now fully implemented with improved UX positioning and ready for testing at http://localhost:3000/maps
+
+**🔧 USER FEEDBACK - Four Issues Identified:**
+
+**1. ✅ FIXED: UI Text and Layout Issues**
+- **Text Change**: Changed "[top-level only]" to "[SA2 level only]" ✅
+- **Text Size**: Made "[SA2 level only]" smaller (text-[10px]) to fit on one row ✅
+- **Visibility Button**: Reverted to original horizontal layout ✅  
+- **Status**: FIXED - All text and layout issues resolved
+
+**2. ✅ WORKING: Heatmap Shading** 
+- **Status**: User confirmed heatmap is working now ✅
+- **Debugging logs**: Still in place for future troubleshooting if needed
+
+**3. ✅ FIXED: Regional Rankings Panel Issues**
+- **Close Button**: Added X button in top-right corner for easy closing ✅
+- **Panel Width**: Increased from w-80 to w-96 for better content fit ✅
+- **Title Wrapping**: Fixed header text overflow with break-words ✅
+- **Content Layout**: Improved region name wrapping and layout ✅
+- **Text Wrapping**: Replaced truncate with break-words for full text visibility ✅
+- **Flex Layout**: Enhanced layout with proper flex-shrink-0 and min-w-0 classes ✅
+- **Status**: FIXED - Panel now displays all content properly with close functionality
+
+**4. ✅ COMPLETED: Preloading System** 
+- **Status**: Still working - preloading system remains functional
+
+**🎨 UI IMPROVEMENTS SUMMARY:**
+- ✅ "[SA2 level only]" now fits on one row with smaller font
+- ✅ Regional Rankings panel expanded to w-96 for better content fit  
+- ✅ Added close (X) button in top-right corner of panel
+- ✅ Fixed all text overflow issues with proper word wrapping
+- ✅ Enhanced layout with better flexbox handling
+- ✅ Maintained clean, professional appearance
+
+**🚀 ALL ISSUES RESOLVED:** 
+Ready for testing at http://localhost:3000/maps - all UI and functionality issues have been addressed! 

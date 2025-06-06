@@ -10,6 +10,8 @@ import MapSettings from '../../components/MapSettings';
 import DataLayers from '../../components/DataLayers';
 import ActiveLayers from '../../components/ActiveLayers';
 import SavedSearches, { SavedSearchesRef } from '../../components/SavedSearches';
+import TopBottomPanel from '../../components/TopBottomPanel';
+import { RankedSA2Data } from '../../components/HeatmapDataService';
 import { Map, Settings, User, Menu } from 'lucide-react';
 
 interface UserData {
@@ -69,6 +71,10 @@ export default function MapsPage() {
   const [selectedVariableName, setSelectedVariableName] = useState<string>('');
   const [heatmapMinValue, setHeatmapMinValue] = useState<number | undefined>(undefined);
   const [heatmapMaxValue, setHeatmapMaxValue] = useState<number | undefined>(undefined);
+  
+  // Top/Bottom Panel state
+  const [rankedData, setRankedData] = useState<RankedSA2Data | null>(null);
+  const [topBottomPanelVisible, setTopBottomPanelVisible] = useState(false);
   
   // Flag to control when map highlights should update the search bar
   const shouldUpdateSearchFromHighlight = useRef<boolean>(true);
@@ -255,7 +261,27 @@ export default function MapsPage() {
     setHeatmapVisible(false);
     setHeatmapMinValue(undefined);
     setHeatmapMaxValue(undefined);
+    // Clear ranked data when heatmap is cleared
+    setRankedData(null);
+    setTopBottomPanelVisible(false);
   }, []);
+
+  // Top/Bottom Panel handlers
+  const handleRankedDataCalculated = useCallback((rankedData: RankedSA2Data | null) => {
+    console.log('📊 Maps Page: Ranked data calculated:', rankedData);
+    setRankedData(rankedData);
+    
+    // Auto-show panel when ranked data is available
+    if (rankedData) {
+      setTopBottomPanelVisible(true);
+    } else {
+      setTopBottomPanelVisible(false);
+    }
+  }, []);
+
+  const handleTopBottomPanelToggle = useCallback(() => {
+    setTopBottomPanelVisible(!topBottomPanelVisible);
+  }, [topBottomPanelVisible]);
 
   const handleSavedSearchRemoved = useCallback(() => {
     // Refresh the saved searches component when a search is removed from the search bar
@@ -534,17 +560,26 @@ export default function MapsPage() {
             className="absolute top-4 left-4 z-50 w-80"
           />
 
-          {/* Data Layers Overlay - Bottom Left */}
-          <DataLayers 
-            className="absolute bottom-4 left-4 z-40 w-64"
-            onHeatmapToggle={handleHeatmapToggle}
-            onHeatmapDataSelect={handleHeatmapDataSelect}
-            onHeatmapClear={handleHeatmapClear}
-            heatmapVisible={heatmapVisible}
-            selectedVariableName={selectedVariableName}
-            heatmapMinValue={heatmapMinValue}
-            heatmapMaxValue={heatmapMaxValue}
-          />
+          {/* Data Layers and Rankings Container - Bottom Left */}
+          <div className="absolute bottom-4 left-4 z-40 flex gap-4">
+            {/* Data Layers Panel */}
+            <DataLayers 
+              className="w-64"
+              onHeatmapToggle={handleHeatmapToggle}
+              onHeatmapDataSelect={handleHeatmapDataSelect}
+              onHeatmapClear={handleHeatmapClear}
+              heatmapVisible={heatmapVisible}
+              selectedVariableName={selectedVariableName}
+              heatmapMinValue={heatmapMinValue}
+              heatmapMaxValue={heatmapMaxValue}
+            />
+
+            {/* Top/Bottom Rankings Panel - Next to Data Layers */}
+            <TopBottomPanel
+              rankedData={rankedData}
+              onToggle={handleTopBottomPanelToggle}
+            />
+          </div>
 
           {/* Map Container - Full screen now */}
           <div className="absolute inset-0">
@@ -563,6 +598,7 @@ export default function MapsPage() {
               heatmapCategory={heatmapCategory}
               heatmapSubcategory={heatmapSubcategory}
               onHeatmapMinMaxCalculated={handleHeatmapMinMaxCalculated}
+              onRankedDataCalculated={handleRankedDataCalculated}
             />
           </div>
         </main>
