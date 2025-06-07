@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Database, ChevronDown, ChevronUp, TrendingUp, Users, Heart, Eye, EyeOff, Cross } from 'lucide-react';
-import { PROGRAM_TYPES, getFlattenedHealthcareOptions, DEMOGRAPHICS_TYPES, getFlattenedDemographicsOptions } from './HeatmapDataService';
+import { Database, ChevronDown, ChevronUp, TrendingUp, Users, Heart, Eye, EyeOff, Cross, DollarSign, BarChart3 } from 'lucide-react';
+import { PROGRAM_TYPES, getFlattenedHealthcareOptions, DEMOGRAPHICS_TYPES, getFlattenedDemographicsOptions, getFlattenedEconomicOptions, getFlattenedHealthStatsOptions } from './HeatmapDataService';
 
 interface DataLayersProps {
   className?: string;
   onHeatmapToggle?: (visible: boolean) => void;
-  onHeatmapDataSelect?: (category: string, subcategory: string, dataType: 'healthcare' | 'demographics') => void;
+  onHeatmapDataSelect?: (category: string, subcategory: string, dataType: 'healthcare' | 'demographics' | 'economics' | 'health-statistics') => void;
   onHeatmapClear?: () => void;
   heatmapVisible?: boolean;
   selectedVariableName?: string;
@@ -15,7 +15,7 @@ interface DataLayersProps {
   heatmapMaxValue?: number;
   isExpanded?: boolean;
   onExpandedChange?: (expanded: boolean) => void;
-  heatmapDataType?: 'healthcare' | 'demographics';
+  heatmapDataType?: 'healthcare' | 'demographics' | 'economics' | 'health-statistics';
 }
 
 export default function DataLayers({
@@ -36,6 +36,8 @@ export default function DataLayers({
   const expanded = onExpandedChange ? isExpanded : internalExpanded;
   const [showHealthOptions, setShowHealthOptions] = useState(false);
   const [showDemographicsOptions, setShowDemographicsOptions] = useState(false);
+  const [showEconomicsOptions, setShowEconomicsOptions] = useState(false);
+  const [showHealthStatsOptions, setShowHealthStatsOptions] = useState(false);
 
   const dataCategories = [
     {
@@ -43,7 +45,7 @@ export default function DataLayers({
       label: 'Economics',
       icon: TrendingUp,
       color: 'text-green-600',
-      disabled: true
+      disabled: false // ENABLED - economic statistics data available
     },
     {
       key: 'demographics',
@@ -64,19 +66,23 @@ export default function DataLayers({
       label: 'Health Stats',
       icon: Cross,
       color: 'text-red-600',
-      disabled: true // DISABLED for now - user will provide data later
+      disabled: false // ENABLED - health statistics data available
     }
   ];
 
-  // Get flattened options for both data types
+  // Get flattened options for all data types
   const healthcareOptions = getFlattenedHealthcareOptions();
   const demographicsOptions = getFlattenedDemographicsOptions();
+  const economicsOptions = getFlattenedEconomicOptions();
+  const healthStatsOptions = getFlattenedHealthStatsOptions();
 
   // Handle health section click
   const handleHealthClick = () => {
     if (!showHealthOptions) {
       setShowHealthOptions(true);
       setShowDemographicsOptions(false); // Close demographics when opening health
+      setShowEconomicsOptions(false); // Close economics when opening health
+      setShowHealthStatsOptions(false); // Close health stats when opening health
     }
   };
 
@@ -85,6 +91,28 @@ export default function DataLayers({
     if (!showDemographicsOptions) {
       setShowDemographicsOptions(true);
       setShowHealthOptions(false); // Close health when opening demographics
+      setShowEconomicsOptions(false); // Close economics when opening demographics
+      setShowHealthStatsOptions(false); // Close health stats when opening demographics
+    }
+  };
+
+  // Handle economics section click
+  const handleEconomicsClick = () => {
+    if (!showEconomicsOptions) {
+      setShowEconomicsOptions(true);
+      setShowHealthOptions(false); // Close health when opening economics
+      setShowDemographicsOptions(false); // Close demographics when opening economics
+      setShowHealthStatsOptions(false); // Close health stats when opening economics
+    }
+  };
+
+  // Handle health statistics section click
+  const handleHealthStatsClick = () => {
+    if (!showHealthStatsOptions) {
+      setShowHealthStatsOptions(true);
+      setShowHealthOptions(false); // Close health when opening health stats
+      setShowDemographicsOptions(false); // Close demographics when opening health stats
+      setShowEconomicsOptions(false); // Close economics when opening health stats
     }
   };
 
@@ -98,6 +126,18 @@ export default function DataLayers({
   const handleDemographicsOptionSelect = (option: any) => {
     setShowDemographicsOptions(false);
     onHeatmapDataSelect?.(option.category, option.subcategory, 'demographics');
+  };
+
+  // Handle economics option selection
+  const handleEconomicsOptionSelect = (option: any) => {
+    setShowEconomicsOptions(false);
+    onHeatmapDataSelect?.(option.category, option.subcategory, 'economics');
+  };
+
+  // Handle health statistics option selection
+  const handleHealthStatsOptionSelect = (option: any) => {
+    setShowHealthStatsOptions(false);
+    onHeatmapDataSelect?.(option.category, option.subcategory, 'health-statistics');
   };
 
   // Handle heatmap visibility toggle
@@ -158,6 +198,10 @@ export default function DataLayers({
                 {/* Dynamic icon based on data type */}
                 {heatmapDataType === 'demographics' ? (
                   <Users className="h-4 w-4 text-blue-600" />
+                ) : heatmapDataType === 'economics' ? (
+                  <DollarSign className="h-4 w-4 text-green-600" />
+                ) : heatmapDataType === 'health-statistics' ? (
+                  <BarChart3 className="h-4 w-4 text-red-600" />
                 ) : (
                   <Heart className="h-4 w-4 text-purple-600" />
                 )}
@@ -212,6 +256,8 @@ export default function DataLayers({
                   onClick={
                     key === 'health' ? handleHealthClick : 
                     key === 'demographics' ? handleDemographicsClick : 
+                    key === 'economics' ? handleEconomicsClick :
+                    key === 'health-statistics' ? handleHealthStatsClick :
                     undefined
                   }
                 >
@@ -223,9 +269,13 @@ export default function DataLayers({
                   }`}></div>
                   <Icon className={`h-3 w-3 ${color}`} />
                   <span className="text-xs text-gray-600">{label}</span>
-                  {(key === 'health' || key === 'demographics') && !disabled && (
+                  {(key === 'health' || key === 'demographics' || key === 'economics' || key === 'health-statistics') && !disabled && (
                     <span className={`ml-auto text-xs font-medium ${
-                      key === 'health' ? 'text-purple-600' : 'text-blue-600'
+                      key === 'health' ? 'text-purple-600' : 
+                      key === 'demographics' ? 'text-blue-600' :
+                      key === 'economics' ? 'text-green-600' :
+                      key === 'health-statistics' ? 'text-red-600' :
+                      'text-gray-600'
                     }`}>
                       Click to select
                     </span>
@@ -279,6 +329,60 @@ export default function DataLayers({
                           className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
                         >
                           <div className="font-medium text-blue-700">{option.category}</div>
+                          <div className="text-gray-600">{option.subcategory}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Economics Options Dropdown */}
+                {key === 'economics' && showEconomicsOptions && (
+                  <div className="absolute top-[-180px] left-full ml-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-30 max-h-64 overflow-hidden">
+                    <div className="p-2 border-b border-gray-100 bg-gray-50 flex-shrink-0">
+                      <span className="text-xs font-bold text-gray-700">Economics Data Categories ({economicsOptions.length} options)</span>
+                      <button
+                        onClick={() => setShowEconomicsOptions(false)}
+                        className="float-right text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className="overflow-y-auto max-h-52">
+                      {economicsOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => handleEconomicsOptionSelect(option)}
+                          className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-green-50 border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="font-medium text-green-700">{option.category}</div>
+                          <div className="text-gray-600">{option.subcategory}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Health Statistics Options Dropdown */}
+                {key === 'health-statistics' && showHealthStatsOptions && (
+                  <div className="absolute top-[-180px] left-full ml-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-30 max-h-64 overflow-hidden">
+                    <div className="p-2 border-b border-gray-100 bg-gray-50 flex-shrink-0">
+                      <span className="text-xs font-bold text-gray-700">Health Statistics Data Categories ({healthStatsOptions.length} options)</span>
+                      <button
+                        onClick={() => setShowHealthStatsOptions(false)}
+                        className="float-right text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className="overflow-y-auto max-h-52">
+                      {healthStatsOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => handleHealthStatsOptionSelect(option)}
+                          className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-red-50 border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="font-medium text-red-700">{option.category}</div>
                           <div className="text-gray-600">{option.subcategory}</div>
                         </button>
                       ))}

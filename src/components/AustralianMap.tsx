@@ -41,7 +41,7 @@ interface AustralianMapProps {
   onSavedSearchAdded?: () => void;
   // Add heatmap props
   heatmapVisible?: boolean;
-  heatmapDataType?: 'healthcare' | 'demographics';
+  heatmapDataType?: 'healthcare' | 'demographics' | 'economics' | 'health-statistics';
   heatmapCategory?: string;
   heatmapSubcategory?: string;
   // Add callback for heatmap min/max values

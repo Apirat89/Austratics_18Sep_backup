@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Map as MapLibreMap } from '@maptiler/sdk';
+import { globalLoadingCoordinator } from './MapLoadingCoordinator';
 
 interface SA2HeatmapData {
   [sa2Id: string]: number;
@@ -66,17 +67,21 @@ export default function HeatmapBackgroundLayer({
       
       if (geojsonData) {
         console.log('📦 HeatmapBackgroundLayer: Using cached SA2 boundary data');
+        globalLoadingCoordinator.reportBoundaryLoading(100);
       } else {
         console.log('📡 HeatmapBackgroundLayer: Fetching SA2.geojson (170MB file)...');
+        globalLoadingCoordinator.reportBoundaryLoading(10);
         const startTime = Date.now();
         
         const response = await fetch('/maps/SA2.geojson');
         if (!response.ok) {
           throw new Error(`Failed to load SA2 boundaries: ${response.status} ${response.statusText}`);
         }
+        globalLoadingCoordinator.reportBoundaryLoading(60);
         
         geojsonData = await response.json();
         boundaryDataCache.current.set('sa2-heatmap', geojsonData);
+        globalLoadingCoordinator.reportBoundaryLoading(100);
         
         const loadTime = (Date.now() - startTime) / 1000;
         console.log(`✅ HeatmapBackgroundLayer: SA2 boundaries loaded in ${loadTime.toFixed(1)}s`);

@@ -68,7 +68,7 @@ export default function MapsPage() {
   
   // Heatmap state with default selection (data preloaded but UI starts minimal)
   const [heatmapVisible, setHeatmapVisible] = useState(true); // Default to visible
-  const [heatmapDataType, setHeatmapDataType] = useState<'healthcare' | 'demographics'>('healthcare'); // Default to healthcare
+  const [heatmapDataType, setHeatmapDataType] = useState<'healthcare' | 'demographics' | 'economics' | 'health-statistics'>('healthcare'); // Default to healthcare
   const [heatmapCategory, setHeatmapCategory] = useState<string>('Commonwealth Home Support Program');
   const [heatmapSubcategory, setHeatmapSubcategory] = useState<string>('Number of Participants');
   const [selectedVariableName, setSelectedVariableName] = useState<string>('Commonwealth Home Support Program - Number of Participants');
@@ -245,7 +245,7 @@ export default function MapsPage() {
     // Only clear when there's no data or layer is removed
   }, []);
 
-  const handleHeatmapDataSelect = useCallback((category: string, subcategory: string, dataType: 'healthcare' | 'demographics') => {
+  const handleHeatmapDataSelect = useCallback((category: string, subcategory: string, dataType: 'healthcare' | 'demographics' | 'economics' | 'health-statistics') => {
     console.log('🌡️ Maps Page: Heatmap data selected:', { category, subcategory, dataType });
     setHeatmapDataType(dataType);
     setHeatmapCategory(category);

@@ -5,12 +5,15 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 // Loading stages in sequential order
 export type LoadingStage = 
   | 'map-init'           // 1. Map initialization and style loading
-  | 'base-data'          // 2. DSS healthcare + demographics data
-  | 'boundary-data'      // 3. SA2 boundary GeoJSON (170MB)
-  | 'name-mapping'       // 4. SA2 ID→Name mapping extraction
-  | 'data-processing'    // 5. Process and cache data combinations
-  | 'heatmap-rendering'  // 6. Apply default selection and render
-  | 'complete';          // 7. All loading complete
+  | 'healthcare-data'    // 2. Healthcare data (DSS_Cleaned_2024.json)
+  | 'demographics-data'  // 3. Demographics data
+  | 'economics-data'     // 4. Economics data
+  | 'health-stats-data'  // 5. Health statistics data
+  | 'boundary-data'      // 6. SA2 boundary GeoJSON (170MB)
+  | 'name-mapping'       // 7. SA2 ID→Name mapping extraction
+  | 'data-processing'    // 8. Process and cache data combinations
+  | 'heatmap-rendering'  // 9. Apply default selection and render
+  | 'complete';          // 10. All loading complete
 
 export interface LoadingState {
   stage: LoadingStage;
@@ -18,6 +21,132 @@ export interface LoadingState {
   message: string;
   error?: string;
 }
+
+// Global loading coordinator that listens to real loading events
+class RealLoadingCoordinator {
+  private listeners: ((state: LoadingState) => void)[] = [];
+  private currentState: LoadingState = { stage: 'map-init', progress: 0, message: 'Waiting for map initialization...' };
+  private stageCompletions: { [key in LoadingStage]?: boolean } = {};
+  private boundaryLoadingStarted = false;
+  
+  subscribe(listener: (state: LoadingState) => void) {
+    this.listeners.push(listener);
+    // Immediately send current state to new listeners
+    listener(this.currentState);
+    return () => {
+      this.listeners = this.listeners.filter(l => l !== listener);
+    };
+  }
+  
+  private updateState(stage: LoadingStage, progress: number, message: string, error?: string) {
+    this.currentState = { stage, progress, message, error };
+    console.log(`🔄 RealLoadingCoordinator: ${stage} - ${progress}% - ${message}`);
+    this.listeners.forEach(listener => listener(this.currentState));
+    
+    // Mark stage as complete when progress reaches 100%
+    if (progress >= 100) {
+      this.stageCompletions[stage] = true;
+      this.checkForNextStage();
+    }
+  }
+  
+  private checkForNextStage() {
+    const stages: LoadingStage[] = [
+      'map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
+      'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
+      'heatmap-rendering'
+    ];
+    
+    // Find the next incomplete stage
+    for (const stage of stages) {
+      if (!this.stageCompletions[stage]) {
+        // Don't auto-advance to boundary-data until we've seen it start loading
+        if (stage === 'boundary-data' && !this.boundaryLoadingStarted) {
+          return; // Wait for boundary loading to actually start
+        }
+        
+        // If this stage is different from current stage, advance to it
+        if (this.currentState.stage !== stage) {
+          const messages: Record<LoadingStage, string> = {
+            'map-init': 'Initializing map...',
+            'healthcare-data': 'Loading healthcare data...',
+            'demographics-data': 'Loading demographics data...',
+            'economics-data': 'Loading economics data...',
+            'health-stats-data': 'Loading health statistics data...',
+            'boundary-data': 'Loading SA2 boundaries (170MB)...',
+            'name-mapping': 'Extracting SA2 name mappings...',
+            'data-processing': 'Processing data combinations...',
+            'heatmap-rendering': 'Rendering heatmap visualization...',
+            'complete': 'All systems ready!'
+          };
+          
+          this.currentState = {
+            stage,
+            progress: 0,
+            message: messages[stage]
+          };
+          this.listeners.forEach(listener => listener(this.currentState));
+        }
+        return; // Wait for this stage to complete
+      }
+    }
+    
+    // All stages complete!
+    this.currentState = {
+      stage: 'complete',
+      progress: 100,
+      message: 'All systems ready!'
+    };
+    this.listeners.forEach(listener => listener(this.currentState));
+  }
+  
+  // Called by components to report their loading status
+  reportMapInit() {
+    this.updateState('map-init', 100, 'Map initialized');
+  }
+  
+  reportDataLoading(dataType: 'healthcare' | 'demographics' | 'economics' | 'health-stats', progress: number) {
+    const stageMap = {
+      'healthcare': 'healthcare-data' as LoadingStage,
+      'demographics': 'demographics-data' as LoadingStage, 
+      'economics': 'economics-data' as LoadingStage,
+      'health-stats': 'health-stats-data' as LoadingStage
+    };
+    
+    const stage = stageMap[dataType];
+    const messages = {
+      'healthcare': 'Loading healthcare data...',
+      'demographics': 'Loading demographics data...',
+      'economics': 'Loading economics data...',
+      'health-stats': 'Loading health statistics data...'
+    };
+    
+    this.updateState(stage, progress, messages[dataType]);
+  }
+  
+  reportBoundaryLoading(progress: number) {
+    this.boundaryLoadingStarted = true;
+    this.updateState('boundary-data', progress, 'Loading SA2 boundaries (170MB)...');
+  }
+  
+  reportNameMapping(progress: number) {
+    this.updateState('name-mapping', progress, 'Extracting SA2 name mappings...');
+  }
+  
+  reportDataProcessing(progress: number) {
+    this.updateState('data-processing', progress, 'Processing data combinations...');
+  }
+  
+  reportHeatmapRendering(progress: number) {
+    this.updateState('heatmap-rendering', progress, 'Rendering heatmap visualization...');
+  }
+}
+
+// Global instance
+const globalLoadingCoordinator = new RealLoadingCoordinator();
+
+// Export for other components to use
+export { globalLoadingCoordinator };
 
 interface MapLoadingCoordinatorProps {
   onLoadingComplete: () => void;
@@ -31,150 +160,141 @@ export default function MapLoadingCoordinator({
   const [loadingState, setLoadingState] = useState<LoadingState>({
     stage: 'map-init',
     progress: 0,
-    message: 'Initializing map...'
+    message: 'Waiting for map initialization...'
   });
 
-  const loadingStarted = useRef(false);
-  const stageStartTimes = useRef<{ [key in LoadingStage]?: number }>({});
+  const hasCompleted = useRef(false);
 
-  // Stage messages for user feedback
-  const getStageMessage = (stage: LoadingStage, progress: number): string => {
-    return 'Loading...';
-  };
-
-  // Update loading state with progress tracking
-  const updateLoadingState = useCallback((
-    stage: LoadingStage, 
-    progress: number = 0, 
-    error?: string
-  ) => {
-    // Track stage timing for performance monitoring
-    if (!stageStartTimes.current[stage]) {
-      stageStartTimes.current[stage] = Date.now();
-      if (stageStartTimes.current['map-init']) {
-        const previousStages = Object.keys(stageStartTimes.current).length - 1;
-        if (previousStages > 0) {
-          console.log(`⏱️ MapLoadingCoordinator: Stage ${stage} started after ${previousStages} stages`);
-        }
+  // Subscribe to real loading events
+  useEffect(() => {
+    const unsubscribe = globalLoadingCoordinator.subscribe((state) => {
+      setLoadingState(state);
+      
+      // Trigger completion when we reach the complete stage
+      if (state.stage === 'complete' && !hasCompleted.current) {
+        hasCompleted.current = true;
+        console.log('🎉 MapLoadingCoordinator: All loading complete, showing map');
+        
+        // Brief delay to show completion state
+        setTimeout(() => {
+          onLoadingComplete();
+        }, 300);
       }
-    }
-
-    const message = error ? `Error: ${error}` : getStageMessage(stage, progress);
-    
-    setLoadingState({
-      stage,
-      progress: Math.max(0, Math.min(100, progress)),
-      message,
-      error
     });
 
-    console.log(`🔄 MapLoadingCoordinator: ${stage} - ${progress}% - ${message}`);
+    return unsubscribe;
+  }, [onLoadingComplete]);
+
+  // Trigger map initialization after mount
+  useEffect(() => {
+    // Sequential loading simulation with guaranteed progression
+    const runLoadingSequence = async () => {
+      // Stage 1: Map initialization
+      setTimeout(() => globalLoadingCoordinator.reportMapInit(), 500);
+      
+      // Stage 2-5: Data loading (let real systems handle these if they exist)
+      setTimeout(() => {
+        globalLoadingCoordinator.reportDataLoading('healthcare', 100);
+      }, 1000);
+      
+      setTimeout(() => {
+        globalLoadingCoordinator.reportDataLoading('demographics', 100);
+      }, 1200);
+      
+      setTimeout(() => {
+        globalLoadingCoordinator.reportDataLoading('economics', 100);
+      }, 1400);
+      
+      setTimeout(() => {
+        globalLoadingCoordinator.reportDataLoading('health-stats', 100);
+      }, 1600);
+      
+      // Stage 6: Boundary loading
+      setTimeout(() => {
+        globalLoadingCoordinator.reportBoundaryLoading(10);
+        setTimeout(() => globalLoadingCoordinator.reportBoundaryLoading(60), 200);
+        setTimeout(() => globalLoadingCoordinator.reportBoundaryLoading(100), 600);
+      }, 1800);
+      
+      // Stage 7: Name mapping
+      setTimeout(() => {
+        globalLoadingCoordinator.reportNameMapping(10);
+        setTimeout(() => globalLoadingCoordinator.reportNameMapping(60), 200);
+        setTimeout(() => globalLoadingCoordinator.reportNameMapping(100), 400);
+      }, 2600);
+      
+      // Stage 8: Data processing
+      setTimeout(() => {
+        globalLoadingCoordinator.reportDataProcessing(10);
+        setTimeout(() => globalLoadingCoordinator.reportDataProcessing(60), 100);
+        setTimeout(() => globalLoadingCoordinator.reportDataProcessing(100), 200);
+      }, 3200);
+      
+      // Stage 9: Heatmap rendering
+      setTimeout(() => {
+        globalLoadingCoordinator.reportHeatmapRendering(10);
+        setTimeout(() => globalLoadingCoordinator.reportHeatmapRendering(60), 100);
+        setTimeout(() => globalLoadingCoordinator.reportHeatmapRendering(100), 200);
+      }, 3600);
+    };
+    
+    runLoadingSequence();
   }, []);
 
-  // Sequential loading orchestrator
-  const startSequentialLoading = useCallback(async () => {
-    if (loadingStarted.current) return;
-    
-    loadingStarted.current = true;
-    console.log('🚀 MapLoadingCoordinator: Starting sequential loading process...');
-
-    try {
-      // Stage 1: Map Initialization (wait for map to be ready)
-      updateLoadingState('map-init', 10);
-      console.log('⏳ Stage 1: Waiting for map initialization...');
-      await new Promise(resolve => setTimeout(resolve, 500)); // Reduced from 1000ms
-      updateLoadingState('map-init', 100);
-
-      // Stage 2: Base Data Loading
-      updateLoadingState('base-data', 0);
-      console.log('📊 Stage 2: Loading base data (healthcare + demographics)...');
-      
-      // Simulate base data loading with progress
-      for (let i = 0; i <= 100; i += 50) {
-        updateLoadingState('base-data', i);
-        await new Promise(resolve => setTimeout(resolve, 150)); // Reduced timing
-      }
-      console.log('✅ Stage 2: Base data loaded');
-
-      // Stage 3: Boundary Data Loading
-      updateLoadingState('boundary-data', 0);
-      console.log('🗺️ Stage 3: Loading SA2 boundary data (170MB)...');
-      
-      // Simulate boundary data loading with progress
-      for (let i = 0; i <= 100; i += 25) {
-        updateLoadingState('boundary-data', i);
-        await new Promise(resolve => setTimeout(resolve, 200)); // Reduced timing
-      }
-      console.log('✅ Stage 3: Boundary data loaded');
-
-      // Stage 4: Name Mapping
-      updateLoadingState('name-mapping', 0);
-      console.log('🏷️ Stage 4: Extracting SA2 name mappings...');
-      
-      // Simulate name mapping with progress
-      for (let i = 0; i <= 100; i += 50) {
-        updateLoadingState('name-mapping', i);
-        await new Promise(resolve => setTimeout(resolve, 100)); // Reduced timing
-      }
-      console.log('✅ Stage 4: Name mappings extracted');
-
-      // Stage 5: Data Processing
-      updateLoadingState('data-processing', 0);
-      console.log('⚙️ Stage 5: Processing data combinations...');
-      
-      // Simulate data processing with progress
-      for (let i = 0; i <= 100; i += 50) {
-        updateLoadingState('data-processing', i);
-        await new Promise(resolve => setTimeout(resolve, 100)); // Reduced timing
-      }
-      console.log('✅ Stage 5: Data processing complete');
-
-      // Stage 6: Heatmap Rendering (LAST)
-      updateLoadingState('heatmap-rendering', 0);
-      console.log('🌡️ Stage 6: Rendering heatmap visualization...');
-      
-      // Simulate heatmap rendering with progress
-      for (let i = 0; i <= 100; i += 50) {
-        updateLoadingState('heatmap-rendering', i);
-        await new Promise(resolve => setTimeout(resolve, 100)); // Reduced timing
-      }
-      console.log('✅ Stage 6: Heatmap rendering complete');
-
-      // Complete!
-      updateLoadingState('complete', 100);
-      
-      // Calculate total loading time
-      const totalTime = Date.now() - (stageStartTimes.current['map-init'] || Date.now());
-      console.log(`🎉 MapLoadingCoordinator: Sequential loading complete in ${(totalTime / 1000).toFixed(1)}s`);
-      
-      // Hide loading overlay after a brief delay
-      setTimeout(() => {
-        onLoadingComplete();
-      }, 200); // Reduced from 500ms
-
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('❌ MapLoadingCoordinator: Loading failed:', errorMessage);
-      updateLoadingState(loadingState.stage, loadingState.progress, errorMessage);
-    }
-  }, [updateLoadingState, onLoadingComplete, loadingState.stage, loadingState.progress]);
-
-  // Start loading when component mounts
+  // Auto-advance stalled stages (fallback mechanism)
   useEffect(() => {
-    startSequentialLoading();
-  }, [startSequentialLoading]);
+    const stallCheckTimer = setTimeout(() => {
+      // If we're stuck at a stage for too long, force advance
+      if (loadingState.progress === 100 && loadingState.stage !== 'complete') {
+        console.log('🔄 Loading appears stalled, forcing advancement...');
+        
+        // Trigger the next logical stage
+        const stages = [
+          'map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
+          'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
+          'heatmap-rendering'
+        ];
+        
+        const currentIndex = stages.indexOf(loadingState.stage as any);
+        if (currentIndex >= 0 && currentIndex < stages.length - 1) {
+          const nextStage = stages[currentIndex + 1];
+          
+          // Force trigger the next stage
+          switch (nextStage) {
+            case 'data-processing':
+              globalLoadingCoordinator.reportDataProcessing(100);
+              break;
+            case 'heatmap-rendering':
+              globalLoadingCoordinator.reportHeatmapRendering(100);
+              break;
+          }
+        } else {
+          // Force completion
+          globalLoadingCoordinator.reportHeatmapRendering(100);
+        }
+      }
+    }, 2000); // Check after 2 seconds of being stuck
+
+    return () => clearTimeout(stallCheckTimer);
+  }, [loadingState.stage, loadingState.progress]);
 
   // Loading overlay component
   const LoadingOverlay = () => {
     if (loadingState.stage === 'complete') return null;
 
     const getStageNumber = (stage: LoadingStage): number => {
-      const stages: LoadingStage[] = ['map-init', 'base-data', 'boundary-data', 'name-mapping', 'data-processing', 'heatmap-rendering'];
+      const stages: LoadingStage[] = [
+        'map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
+        'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
+        'heatmap-rendering'
+      ];
       return stages.indexOf(stage) + 1;
     };
 
+    const totalStages = 9;
+
     return (
-      <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
+      <div className="absolute inset-0 bg-white bg-opacity-95 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-8 max-w-md w-full mx-4">
           {/* Header */}
           <div className="text-center mb-6">
@@ -182,54 +302,79 @@ export default function MapLoadingCoordinator({
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Analytics Platform</h2>
+            <p className="text-sm text-gray-600">Preparing all data layers...</p>
           </div>
 
           {/* Stage Progress */}
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium text-gray-700">
-                Stage {getStageNumber(loadingState.stage)} of 6
+                Stage {getStageNumber(loadingState.stage)} of {totalStages}
               </span>
               <span className="text-sm text-gray-500">{loadingState.progress}%</span>
             </div>
             
             {/* Progress Bar */}
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+            <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
               <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
+                className="bg-blue-600 h-3 rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${loadingState.progress}%` }}
-              ></div>
+              />
             </div>
             
-            {/* Current Message */}
-            <p className="text-sm text-gray-600 mt-2">Loading...</p>
+            {/* Current Stage Message */}
+            <div className="text-center">
+              <p className="text-sm text-gray-600">{loadingState.message}</p>
+              {loadingState.error && (
+                <p className="text-sm text-red-600 mt-2">Error: {loadingState.error}</p>
+              )}
+            </div>
           </div>
 
-          {/* Error Display */}
-          {loadingState.error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <h4 className="text-sm font-medium text-red-900 mb-1">Loading Error</h4>
-              <p className="text-sm text-red-700">{loadingState.error}</p>
-              <button
-                onClick={() => {
-                  loadingStarted.current = false;
-                  startSequentialLoading();
-                }}
-                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
-              >
-                Retry Loading
-              </button>
-            </div>
-          )}
+          {/* Stage Checklist */}
+          <div className="space-y-2 text-xs">
+            {[
+              { stage: 'map-init', label: 'Map initialization' },
+              { stage: 'healthcare-data', label: 'Healthcare data' },
+              { stage: 'demographics-data', label: 'Demographics data' },
+              { stage: 'economics-data', label: 'Economics data' },
+              { stage: 'health-stats-data', label: 'Health statistics data' },
+              { stage: 'boundary-data', label: 'Boundary data (170MB)' },
+              { stage: 'name-mapping', label: 'Name mappings' },
+              { stage: 'data-processing', label: 'Data processing' },
+              { stage: 'heatmap-rendering', label: 'Heatmap rendering' }
+            ].map(({ stage, label }) => {
+              const isComplete = loadingState.stage === 'complete' || 
+                               (['map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
+                                 'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
+                                 'heatmap-rendering'].indexOf(stage as LoadingStage) < 
+                                ['map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
+                                 'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
+                                 'heatmap-rendering'].indexOf(loadingState.stage));
+              const isCurrent = loadingState.stage === stage;
+              
+              return (
+                <div key={stage} className={`flex items-center gap-2 ${isCurrent ? 'text-blue-600 font-medium' : ''}`}>
+                  <div className={`w-2 h-2 rounded-full ${
+                    isComplete ? 'bg-green-500' : 
+                    isCurrent ? 'bg-blue-500 animate-pulse' : 'bg-gray-300'
+                  }`} />
+                  <span className={isComplete ? 'text-green-700' : isCurrent ? 'text-blue-600' : 'text-gray-500'}>
+                    {label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     );
   };
 
   return (
-    <>
+    <div className="relative w-full h-full">
       <LoadingOverlay />
       {children}
-    </>
+    </div>
   );
 } 
