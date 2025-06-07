@@ -14,6 +14,7 @@ import TopBottomPanel from '../../components/TopBottomPanel';
 import { RankedSA2Data } from '../../components/HeatmapDataService';
 import { getLocationByName } from '../../lib/mapSearchService';
 import { Map, Settings, User, Menu } from 'lucide-react';
+import MapLoadingCoordinator from '../../components/MapLoadingCoordinator';
 
 interface UserData {
   email: string;
@@ -83,6 +84,9 @@ export default function MapsPage() {
   
   // Flag to control when map highlights should update the search bar
   const shouldUpdateSearchFromHighlight = useRef<boolean>(true);
+  
+  // Loading completion state
+  const [loadingComplete, setLoadingComplete] = useState(false);
   
   // Map reference for calling map methods
   const mapRef = useRef<AustralianMapRef>(null);
@@ -469,6 +473,12 @@ export default function MapsPage() {
     }
   }, [selectedGeoLayer, handleSearch]);
 
+  // Handle loading completion
+  const handleLoadingComplete = useCallback(() => {
+    console.log('🎉 Maps Page: Loading sequence completed, enabling interactive features');
+    setLoadingComplete(true);
+  }, []);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -594,21 +604,6 @@ export default function MapsPage() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Map className="h-6 w-6 text-blue-600" />
-              <h1 className="text-xl font-semibold text-gray-900">Interactive Australian Map</h1>
-            </div>
-            <div className="text-sm text-gray-500">
-              <p className="text-xs text-gray-500">
-                {Object.values(facilityTypes).filter(Boolean).length} facility type(s) • 1 boundary layer • {selectedMapStyle} style
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Main Map Area */}
         <main className="flex-1 relative overflow-hidden">
           {/* Search Bar - Top Left */}
@@ -636,6 +631,7 @@ export default function MapsPage() {
               heatmapMaxValue={heatmapMaxValue}
               isExpanded={dataLayersExpanded}
               onExpandedChange={setDataLayersExpanded}
+              heatmapDataType={heatmapDataType}
             />
 
             {/* Top/Bottom Rankings Panel - Next to Data Layers */}
@@ -649,24 +645,28 @@ export default function MapsPage() {
 
           {/* Map Container - Full screen now */}
           <div className="absolute inset-0">
-            <AustralianMap
-              ref={mapRef}
-              className="w-full h-full"
-              facilityTypes={facilityTypes}
-              selectedGeoLayer={selectedGeoLayer}
-              selectedMapStyle={selectedMapStyle}
-              mapNavigation={mapNavigation}
-              onHighlightFeature={handleHighlightFeature}
-              onClearSearchResult={handleClearSearchResult}
-              userId={user?.id}
-              onSavedSearchAdded={handleSavedSearchAdded}
-              heatmapVisible={heatmapVisible}
-              heatmapDataType={heatmapDataType}
-              heatmapCategory={heatmapCategory}
-              heatmapSubcategory={heatmapSubcategory}
-              onHeatmapMinMaxCalculated={handleHeatmapMinMaxCalculated}
-              onRankedDataCalculated={handleRankedDataCalculated}
-            />
+            <MapLoadingCoordinator 
+              onLoadingComplete={handleLoadingComplete}
+            >
+              <AustralianMap
+                ref={mapRef}
+                className="w-full h-full"
+                facilityTypes={facilityTypes}
+                selectedGeoLayer={selectedGeoLayer}
+                selectedMapStyle={selectedMapStyle}
+                mapNavigation={mapNavigation}
+                onHighlightFeature={handleHighlightFeature}
+                onClearSearchResult={handleClearSearchResult}
+                userId={user?.id}
+                onSavedSearchAdded={handleSavedSearchAdded}
+                heatmapVisible={heatmapVisible}
+                heatmapDataType={heatmapDataType}
+                heatmapCategory={heatmapCategory}
+                heatmapSubcategory={heatmapSubcategory}
+                onHeatmapMinMaxCalculated={handleHeatmapMinMaxCalculated}
+                onRankedDataCalculated={handleRankedDataCalculated}
+              />
+            </MapLoadingCoordinator>
           </div>
         </main>
       </div>

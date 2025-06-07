@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Database, ChevronDown, ChevronUp, TrendingUp, Users, Heart, Eye, EyeOff } from 'lucide-react';
+import { Database, ChevronDown, ChevronUp, TrendingUp, Users, Heart, Eye, EyeOff, Cross } from 'lucide-react';
 import { PROGRAM_TYPES, getFlattenedHealthcareOptions, DEMOGRAPHICS_TYPES, getFlattenedDemographicsOptions } from './HeatmapDataService';
 
 interface DataLayersProps {
@@ -15,6 +15,7 @@ interface DataLayersProps {
   heatmapMaxValue?: number;
   isExpanded?: boolean;
   onExpandedChange?: (expanded: boolean) => void;
+  heatmapDataType?: 'healthcare' | 'demographics';
 }
 
 export default function DataLayers({
@@ -27,7 +28,8 @@ export default function DataLayers({
   heatmapMinValue,
   heatmapMaxValue,
   isExpanded = false,
-  onExpandedChange
+  onExpandedChange,
+  heatmapDataType = 'healthcare'
 }: DataLayersProps) {
   // Use prop if provided, otherwise use internal state for backwards compatibility
   const [internalExpanded, setInternalExpanded] = useState(false);
@@ -52,10 +54,17 @@ export default function DataLayers({
     },
     {
       key: 'health',
-      label: 'Health',
+      label: 'Health Sector',
       icon: Heart,
       color: 'text-purple-600',
       disabled: false
+    },
+    {
+      key: 'health-statistics',
+      label: 'Health Stats',
+      icon: Cross,
+      color: 'text-red-600',
+      disabled: true // DISABLED for now - user will provide data later
     }
   ];
 
@@ -146,7 +155,12 @@ export default function DataLayers({
             {/* Heatmap Layer Display */}
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-3">
               <div className="flex items-center gap-2 mb-3">
-                <Heart className="h-4 w-4 text-gray-600" />
+                {/* Dynamic icon based on data type */}
+                {heatmapDataType === 'demographics' ? (
+                  <Users className="h-4 w-4 text-blue-600" />
+                ) : (
+                  <Heart className="h-4 w-4 text-purple-600" />
+                )}
                 <span className="text-sm font-medium text-gray-900 flex-1">
                   {selectedVariableName || "No selection made"}
                 </span>
@@ -189,9 +203,11 @@ export default function DataLayers({
                       ? 'bg-purple-50 hover:bg-purple-100 border border-purple-200' 
                       : key === 'demographics'
                         ? 'bg-blue-50 hover:bg-blue-100 border border-blue-200'
-                        : disabled 
-                          ? 'bg-gray-50 opacity-60 cursor-not-allowed' 
-                          : 'bg-gray-50 hover:bg-gray-100'
+                        : key === 'health-statistics'
+                          ? 'bg-red-50 hover:bg-red-100 border border-red-200'
+                          : disabled 
+                            ? 'bg-gray-50 opacity-60 cursor-not-allowed' 
+                            : 'bg-gray-50 hover:bg-gray-100'
                   }`}
                   onClick={
                     key === 'health' ? handleHealthClick : 
@@ -202,6 +218,7 @@ export default function DataLayers({
                   <div className={`w-3 h-3 border border-gray-300 rounded ${
                     key === 'health' && !disabled ? 'bg-purple-200' : 
                     key === 'demographics' && !disabled ? 'bg-blue-200' :
+                    key === 'health-statistics' && !disabled ? 'bg-red-200' :
                     ''
                   }`}></div>
                   <Icon className={`h-3 w-3 ${color}`} />

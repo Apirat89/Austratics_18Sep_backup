@@ -231,20 +231,32 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // Store last search result to maintain highlighting across interactions
   const [lastSearchResult, setLastSearchResult] = useState<any>(null);
 
-  // Heatmap state management
+  // Track data loading states
   const [heatmapData, setHeatmapData] = useState<SA2HeatmapData | null>(null);
   const [selectedHeatmapOption, setSelectedHeatmapOption] = useState<string>('');
+  const [heatmapDataReady, setHeatmapDataReady] = useState<boolean>(false);
 
-  // Handle heatmap data processing
+  // Handle heatmap data processing with coordination
   const handleHeatmapDataProcessed = useCallback((data: SA2HeatmapData | null, selectedOption: string) => {
     console.log('🗺️ AustralianMap: Heatmap data processed:', {
       hasData: !!data,
       dataLength: data ? Object.keys(data).length : 0,
-      selectedOption
+      selectedOption,
+      mapLoaded: isLoaded
     });
+    
     setHeatmapData(data);
     setSelectedHeatmapOption(selectedOption);
-  }, []);
+    setHeatmapDataReady(!!data && Object.keys(data || {}).length > 0);
+    
+    // Log data readiness for debugging
+    if (data && Object.keys(data).length > 0) {
+      console.log('✅ AustralianMap: Heatmap data is ready for rendering');
+      console.log('🎯 Sample data:', Object.entries(data).slice(0, 3));
+    } else {
+      console.log('❌ AustralianMap: No heatmap data available');
+    }
+  }, [isLoaded]);
 
   // Stabilize facilityTypes to prevent unnecessary re-renders
   const stableFacilityTypes = useMemo(() => facilityTypes, [
@@ -1930,6 +1942,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         map={map.current}
         sa2HeatmapData={heatmapData}
         sa2HeatmapVisible={heatmapVisible}
+        dataReady={heatmapDataReady}
+        mapLoaded={isLoaded}
         onMinMaxCalculated={onHeatmapMinMaxCalculated}
       />
 

@@ -11,6 +11,8 @@ interface HeatmapBackgroundLayerProps {
   map: MapLibreMap | null;
   sa2HeatmapData?: SA2HeatmapData | null;
   sa2HeatmapVisible?: boolean;
+  dataReady?: boolean;
+  mapLoaded?: boolean;
   className?: string;
   onMinMaxCalculated?: (minValue: number | undefined, maxValue: number | undefined) => void;
 }
@@ -19,6 +21,8 @@ export default function HeatmapBackgroundLayer({
   map,
   sa2HeatmapData,
   sa2HeatmapVisible = true,
+  dataReady = false,
+  mapLoaded = false,
   onMinMaxCalculated
 }: HeatmapBackgroundLayerProps) {
   const [boundaryLoaded, setBoundaryLoaded] = useState(false);
@@ -101,56 +105,70 @@ export default function HeatmapBackgroundLayer({
     }
   }, [map, boundaryLoading, boundaryLoaded]);
 
-  // Load boundaries when map is ready
+  // Load SA2 boundaries when map becomes available
   useEffect(() => {
-    console.log('🎯 HeatmapBackgroundLayer: useEffect triggered:', {
+    console.log('🗺️ HeatmapBackgroundLayer: Map readiness check:', {
       mapExists: !!map,
+      mapLoaded,
+      dataReady,
       boundaryLoaded,
       boundaryLoading,
       mapStyleLoaded: map ? map.isStyleLoaded() : 'no map'
     });
 
-    if (map && !boundaryLoaded && !boundaryLoading) {
-      console.log('🚀 HeatmapBackgroundLayer: Starting boundary loading sequence...');
+    // CRITICAL FIX: Only start boundary loading when both map AND data conditions are right
+    const shouldLoadBoundaries = map && mapLoaded && !boundaryLoaded && !boundaryLoading && 
+                                (dataReady || sa2HeatmapVisibleRef.current);
+
+    if (shouldLoadBoundaries) {
+      console.log('🚀 HeatmapBackgroundLayer: Starting coordinated boundary loading sequence...');
       
-      // First attempt: Check if style is already loaded
+      // Simplified, reliable loading strategy
+      const loadBoundaries = () => {
+        if (map.isStyleLoaded() && !boundaryLoaded && !boundaryLoading) {
+          console.log('✅ HeatmapBackgroundLayer: Map style ready, loading boundaries now');
+          loadSA2Boundaries();
+        }
+      };
+      
+      // Try immediate load if style is ready
       if (map.isStyleLoaded()) {
         console.log('✅ HeatmapBackgroundLayer: Map style already loaded, loading boundaries immediately');
-        setTimeout(() => loadSA2Boundaries(), 100);
+        setTimeout(loadBoundaries, 50); // Short delay for stability
       } else {
-        console.log('⏳ HeatmapBackgroundLayer: Map style not ready yet, setting up listeners...');
+        console.log('⏳ HeatmapBackgroundLayer: Waiting for map style to load...');
         
-        // Set up a timer for delayed loading attempt
-        const delayedTimer = setTimeout(() => {
-          if (map && map.isStyleLoaded() && !boundaryLoaded && !boundaryLoading) {
-            console.log('⏰ HeatmapBackgroundLayer: Timer triggered - loading boundaries now');
-            loadSA2Boundaries();
-          }
-        }, 200);
-        
-        // Also listen for style load event
-        const onStyleData = () => {
-          console.log('🎨 HeatmapBackgroundLayer: Style loaded event - loading boundaries now');
-          if (!boundaryLoaded && !boundaryLoading) {
-            setTimeout(() => loadSA2Boundaries(), 100);
-          }
+        // Single listener for style load event  
+        const onStyleLoad = () => {
+          console.log('🎨 HeatmapBackgroundLayer: Style loaded event received');
+          setTimeout(loadBoundaries, 50); // Short delay after style load
         };
         
-        map.once('styledata', onStyleData);
+        map.once('styledata', onStyleLoad);
         
         // Cleanup function
         return () => {
-          clearTimeout(delayedTimer);
-          map.off('styledata', onStyleData);
+          map.off('styledata', onStyleLoad);
         };
       }
+    } else {
+      console.log('⏸️ HeatmapBackgroundLayer: Conditions not met for boundary loading:', {
+        mapExists: !!map,
+        mapLoaded,
+        dataReady,
+        boundaryLoaded,
+        boundaryLoading,
+        heatmapVisible: sa2HeatmapVisibleRef.current
+      });
     }
-  }, [map, loadSA2Boundaries, boundaryLoaded, boundaryLoading]);
+  }, [map, mapLoaded, dataReady, loadSA2Boundaries, boundaryLoaded, boundaryLoading]);
 
-  // Update heatmap when data or visibility changes
+  // Update heatmap when data or visibility changes - with data readiness check
   const updateHeatmap = useCallback(() => {
     console.log('🔧 HeatmapBackgroundLayer: UpdateHeatmap called:', {
       mapExists: !!map,
+      mapLoaded,
+      dataReady,
       boundaryLoaded,
       visible: sa2HeatmapVisibleRef.current,
       hasData: !!sa2HeatmapDataRef.current,
@@ -158,8 +176,24 @@ export default function HeatmapBackgroundLayer({
       sampleData: sa2HeatmapDataRef.current ? Object.entries(sa2HeatmapDataRef.current).slice(0, 3) : []
     });
 
-    if (!map || !boundaryLoaded) {
-      console.log('❌ HeatmapBackgroundLayer: Map not ready or boundaries not loaded');
+    // ENHANCED READINESS CHECK: Map + boundaries + data must all be ready
+    if (!map || !mapLoaded || !boundaryLoaded) {
+      console.log('❌ HeatmapBackgroundLayer: Map not ready or boundaries not loaded:', {
+        mapExists: !!map,
+        mapLoaded,
+        boundaryLoaded
+      });
+      return;
+    }
+
+    // CRITICAL FIX: Only proceed if we have actual data to display AND data is confirmed ready
+    if (!dataReady || !sa2HeatmapDataRef.current || Object.keys(sa2HeatmapDataRef.current).length === 0) {
+      console.log('📊 HeatmapBackgroundLayer: Data not ready or no heatmap data available:', {
+        dataReady,
+        hasData: !!sa2HeatmapDataRef.current,
+        dataKeys: sa2HeatmapDataRef.current ? Object.keys(sa2HeatmapDataRef.current).length : 0
+      });
+      onMinMaxCalculated?.(undefined, undefined);
       return;
     }
 
@@ -264,12 +298,12 @@ export default function HeatmapBackgroundLayer({
       console.log('📊 HeatmapBackgroundLayer: No data available, clearing min/max values');
       onMinMaxCalculated?.(undefined, undefined);
     }
-  }, [map, boundaryLoaded]);
+  }, [map, mapLoaded, dataReady, boundaryLoaded, onMinMaxCalculated]);
 
   // Update heatmap when data or visibility changes
   useEffect(() => {
     updateHeatmap();
-  }, [sa2HeatmapData, sa2HeatmapVisible, updateHeatmap]);
+  }, [sa2HeatmapData, sa2HeatmapVisible, dataReady, mapLoaded, updateHeatmap]);
 
   // Return status info
   return (

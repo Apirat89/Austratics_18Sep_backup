@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TrendingUp, TrendingDown, ChevronRight, BarChart3, X } from 'lucide-react';
+import { TrendingUp, TrendingDown, ChevronRight, X } from 'lucide-react';
 import { RankedSA2Data } from './HeatmapDataService';
 
 interface TopBottomPanelProps {
@@ -70,7 +70,16 @@ export default function TopBottomPanel({
     <div className={`relative bg-white rounded-lg shadow-lg border border-gray-200 w-96 ${className}`}>
       {/* Header */}
       <div className="flex items-center gap-3 p-3 border-b border-gray-100 bg-gray-50">
-        <BarChart3 className="h-4 w-4 text-gray-600 flex-shrink-0" />
+        {/* Collapsible Button - replaces BarChart3 icon */}
+        <button
+          onClick={handleToggleCollapse}
+          className="p-1 hover:bg-gray-200 rounded transition-colors"
+          title="Collapse Regional Rankings"
+        >
+          <ChevronRight className={`h-4 w-4 text-gray-600 transition-transform duration-200 ${
+            isCollapsed ? '' : 'rotate-90'
+          }`} />
+        </button>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium text-gray-900">
             Regional Rankings
@@ -166,17 +175,6 @@ export default function TopBottomPanel({
             )}
           </div>
         </div>
-      </div>
-
-      {/* Collapsible Arrow Button - Bottom Left */}
-      <div className="absolute bottom-2 left-2">
-        <button
-          onClick={handleToggleCollapse}
-          className="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-50 transition-colors"
-          title="Collapse Regional Rankings"
-        >
-          <ChevronRight className="h-4 w-4 text-gray-600 transition-transform duration-200 rotate-180" />
-        </button>
       </div>
     </div>
   );
