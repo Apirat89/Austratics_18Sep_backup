@@ -41,6 +41,7 @@ interface AustralianMapProps {
   onSavedSearchAdded?: () => void;
   // Add heatmap props
   heatmapVisible?: boolean;
+  heatmapDataType?: 'healthcare' | 'demographics';
   heatmapCategory?: string;
   heatmapSubcategory?: string;
   // Add callback for heatmap min/max values
@@ -183,6 +184,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   userId,
   onSavedSearchAdded,
   heatmapVisible = false,
+  heatmapDataType = 'healthcare',
   heatmapCategory,
   heatmapSubcategory,
   onHeatmapMinMaxCalculated,
@@ -1935,6 +1937,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       <HeatmapDataService
         selectedCategory={heatmapCategory}
         selectedSubcategory={heatmapSubcategory}
+        dataType={heatmapDataType}
         onDataProcessed={handleHeatmapDataProcessed}
         onRankedDataCalculated={onRankedDataCalculated}
       />

@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react';
 import { Database, ChevronDown, ChevronUp, TrendingUp, Users, Heart, Eye, EyeOff } from 'lucide-react';
-import { PROGRAM_TYPES, getFlattenedOptions } from './HeatmapDataService';
+import { PROGRAM_TYPES, getFlattenedHealthcareOptions, DEMOGRAPHICS_TYPES, getFlattenedDemographicsOptions } from './HeatmapDataService';
 
 interface DataLayersProps {
   className?: string;
   onHeatmapToggle?: (visible: boolean) => void;
-  onHeatmapDataSelect?: (category: string, subcategory: string) => void;
+  onHeatmapDataSelect?: (category: string, subcategory: string, dataType: 'healthcare' | 'demographics') => void;
   onHeatmapClear?: () => void;
   heatmapVisible?: boolean;
   selectedVariableName?: string;
@@ -33,6 +33,7 @@ export default function DataLayers({
   const [internalExpanded, setInternalExpanded] = useState(false);
   const expanded = onExpandedChange ? isExpanded : internalExpanded;
   const [showHealthOptions, setShowHealthOptions] = useState(false);
+  const [showDemographicsOptions, setShowDemographicsOptions] = useState(false);
 
   const dataCategories = [
     {
@@ -47,7 +48,7 @@ export default function DataLayers({
       label: 'Demographics', 
       icon: Users,
       color: 'text-blue-600',
-      disabled: true
+      disabled: false // ENABLED demographics
     },
     {
       key: 'health',
@@ -58,20 +59,36 @@ export default function DataLayers({
     }
   ];
 
-  // Get flattened healthcare options
-  const healthcareOptions = getFlattenedOptions();
+  // Get flattened options for both data types
+  const healthcareOptions = getFlattenedHealthcareOptions();
+  const demographicsOptions = getFlattenedDemographicsOptions();
 
-  // Handle health section double-click
-  const handleHealthDoubleClick = () => {
+  // Handle health section click
+  const handleHealthClick = () => {
     if (!showHealthOptions) {
       setShowHealthOptions(true);
+      setShowDemographicsOptions(false); // Close demographics when opening health
+    }
+  };
+
+  // Handle demographics section click
+  const handleDemographicsClick = () => {
+    if (!showDemographicsOptions) {
+      setShowDemographicsOptions(true);
+      setShowHealthOptions(false); // Close health when opening demographics
     }
   };
 
   // Handle healthcare option selection
   const handleHealthcareOptionSelect = (option: any) => {
     setShowHealthOptions(false);
-    onHeatmapDataSelect?.(option.category, option.subcategory);
+    onHeatmapDataSelect?.(option.category, option.subcategory, 'healthcare');
+  };
+
+  // Handle demographics option selection
+  const handleDemographicsOptionSelect = (option: any) => {
+    setShowDemographicsOptions(false);
+    onHeatmapDataSelect?.(option.category, option.subcategory, 'demographics');
   };
 
   // Handle heatmap visibility toggle
@@ -170,20 +187,29 @@ export default function DataLayers({
                   className={`flex items-center gap-3 p-2 rounded cursor-pointer transition-colors ${
                     key === 'health' 
                       ? 'bg-purple-50 hover:bg-purple-100 border border-purple-200' 
-                      : disabled 
-                        ? 'bg-gray-50 opacity-60 cursor-not-allowed' 
-                        : 'bg-gray-50 hover:bg-gray-100'
+                      : key === 'demographics'
+                        ? 'bg-blue-50 hover:bg-blue-100 border border-blue-200'
+                        : disabled 
+                          ? 'bg-gray-50 opacity-60 cursor-not-allowed' 
+                          : 'bg-gray-50 hover:bg-gray-100'
                   }`}
-                  onDoubleClick={key === 'health' ? handleHealthDoubleClick : undefined}
-                  onClick={key === 'health' ? handleHealthDoubleClick : undefined}
+                  onClick={
+                    key === 'health' ? handleHealthClick : 
+                    key === 'demographics' ? handleDemographicsClick : 
+                    undefined
+                  }
                 >
                   <div className={`w-3 h-3 border border-gray-300 rounded ${
-                    key === 'health' && !disabled ? 'bg-purple-200' : ''
+                    key === 'health' && !disabled ? 'bg-purple-200' : 
+                    key === 'demographics' && !disabled ? 'bg-blue-200' :
+                    ''
                   }`}></div>
                   <Icon className={`h-3 w-3 ${color}`} />
                   <span className="text-xs text-gray-600">{label}</span>
-                  {key === 'health' && (
-                    <span className="ml-auto text-xs text-purple-600 font-medium">
+                  {(key === 'health' || key === 'demographics') && !disabled && (
+                    <span className={`ml-auto text-xs font-medium ${
+                      key === 'health' ? 'text-purple-600' : 'text-blue-600'
+                    }`}>
                       Click to select
                     </span>
                   )}
@@ -193,57 +219,59 @@ export default function DataLayers({
                 {key === 'health' && showHealthOptions && (
                   <div className="absolute top-[-180px] left-full ml-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-30 max-h-64 overflow-hidden">
                     <div className="p-2 border-b border-gray-100 bg-gray-50 flex-shrink-0">
-                      <span className="text-xs font-bold text-gray-700">Healthcare Data Categories (18 options)</span>
+                      <span className="text-xs font-bold text-gray-700">Healthcare Data Categories ({healthcareOptions.length} options)</span>
                       <button
                         onClick={() => setShowHealthOptions(false)}
                         className="float-right text-xs text-gray-500 hover:text-gray-700"
                       >
-                        ✕
+                        ×
                       </button>
                     </div>
                     <div className="overflow-y-auto max-h-52">
-                      {Object.entries(PROGRAM_TYPES).map(([category, subcategories]) => (
-                        <div key={category} className="border-b border-gray-100 last:border-b-0">
-                          <div className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-700 underline">
-                            {category}
-                          </div>
-                          {subcategories.map((subcategory) => {
-                            const option = healthcareOptions.find(opt => 
-                              opt.category === category && opt.subcategory === subcategory
-                            );
-                            return (
-                              <button
-                                key={subcategory}
-                                onClick={() => option && handleHealthcareOptionSelect(option)}
-                                className="w-full text-left px-4 py-2 text-xs text-gray-600 hover:bg-purple-50 hover:text-purple-700 transition-colors"
-                              >
-                                {subcategory}
-                              </button>
-                            );
-                          })}
-                        </div>
+                      {healthcareOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => handleHealthcareOptionSelect(option)}
+                          className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-purple-50 border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="font-medium text-purple-700">{option.category}</div>
+                          <div className="text-gray-600">{option.subcategory}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Demographics Options Dropdown */}
+                {key === 'demographics' && showDemographicsOptions && (
+                  <div className="absolute top-[-180px] left-full ml-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-30 max-h-64 overflow-hidden">
+                    <div className="p-2 border-b border-gray-100 bg-gray-50 flex-shrink-0">
+                      <span className="text-xs font-bold text-gray-700">Demographics Data Categories ({demographicsOptions.length} options)</span>
+                      <button
+                        onClick={() => setShowDemographicsOptions(false)}
+                        className="float-right text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className="overflow-y-auto max-h-52">
+                      {demographicsOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => handleDemographicsOptionSelect(option)}
+                          className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="font-medium text-blue-700">{option.category}</div>
+                          <div className="text-gray-600">{option.subcategory}</div>
+                        </button>
                       ))}
                     </div>
                   </div>
                 )}
               </div>
             ))}
-            
-            <div className="mt-3 pt-2 border-t border-gray-200">
-              <p className="text-xs text-gray-500 italic">
-                Economics and Demographics layers coming in future updates
-              </p>
-            </div>
           </div>
         </div>
-      )}
-      
-      {/* Click outside handler */}
-      {showHealthOptions && (
-        <div 
-          className="fixed inset-0 z-20" 
-          onClick={() => setShowHealthOptions(false)}
-        />
       )}
     </div>
   );

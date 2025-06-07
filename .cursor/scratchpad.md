@@ -908,3 +908,46 @@ Ready for testing at http://localhost:3000/maps - all UI and functionality issue
 - ✅ **Performance**: Maintained efficiency while restoring reliability
 
 **Ready for Re-Testing:** Both the module import fix and heatmap loading restoration are ready for testing at http://localhost:3000/maps 
+
+**✅ COMPLETED:** Demographics Data Integration
+- ✅ **Extended HeatmapDataService.tsx**: Added support for both healthcare and demographics data types
+  - Added DemographicsData interface for Demographics_2023.json structure
+  - Created DEMOGRAPHICS_TYPES with 9 demographic categories (Population, Age Groups, Working Age)
+  - Added loadDemographicsData() function to fetch demographics data
+  - Added processDemographicsData() function to handle demographics data processing
+  - Updated preloading system to support both data types
+  - Added getFlattenedDemographicsOptions() for UI integration
+- ✅ **Updated DataLayers.tsx**: Enabled demographics section with proper UI
+  - Enabled demographics section (was previously disabled)
+  - Added demographics dropdown with 9 options
+  - Added blue color scheme for demographics (vs purple for healthcare)
+  - Added proper click handlers for demographics selection
+  - Updated onHeatmapDataSelect to include dataType parameter
+- ✅ **Updated Maps Page**: Added dataType state management
+  - Added heatmapDataType state with 'healthcare' | 'demographics' types
+  - Updated handleHeatmapDataSelect to handle dataType parameter
+  - Updated handleHeatmapClear to reset dataType to default
+  - Passed dataType to AustralianMap component
+- ✅ **Updated AustralianMap.tsx**: Added dataType prop support
+  - Added heatmapDataType prop to AustralianMapProps interface
+  - Updated component signature to accept dataType parameter
+  - Passed dataType to HeatmapDataService component
+- ✅ **Data File Setup**: Copied Demographics_2023.json to public directory
+  - Created public/Maps_ABS_CSV/ directory
+  - Copied Demographics_2023.json for frontend access
+- ✅ **TypeScript Compilation**: All new interfaces and types compile successfully
+
+**🎯 DEMOGRAPHICS CATEGORIES AVAILABLE:**
+- **Population** (2 options): Estimated resident population, Population density
+- **Age Groups** (5 options): Median age, 55-64 years (% and count), 65+ years (% and count)  
+- **Working Age** (2 options): Working age population 15-64 years (% and count)
+
+**🚀 FEATURE STATUS:**
+- ✅ **Healthcare Heatmaps**: 18 options available (existing functionality preserved)
+- ✅ **Demographics Heatmaps**: 9 options now available (NEW FEATURE)
+- ✅ **Data Type Switching**: Users can switch between healthcare and demographics
+- ✅ **Unified UI**: Same heatmap visualization system for both data types
+- ✅ **Regional Rankings**: Top/bottom panels work for both data types
+- ✅ **Preloading System**: Optimized loading for both healthcare and demographics
+
+**Ready for Testing:** Demographics integration is complete and ready for testing at http://localhost:3000/maps

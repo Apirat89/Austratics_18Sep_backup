@@ -2,13 +2,21 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-// Define the structure of our DSS data
+// Define the structure of our DSS data (healthcare)
 interface DSSData {
   'SA2 Name': string;
   'SA2 ID': string;
   'Category': string;
   'Type': string;
   'Amount': number | string;
+}
+
+// Define the structure of demographics data
+interface DemographicsData {
+  'SA2 Name': string;
+  'SA2 ID': number;
+  'Description': string;
+  'Amount': number;
 }
 
 // Define the structure for processed SA2 data
@@ -28,11 +36,12 @@ export interface RankedSA2Data {
 interface HeatmapDataServiceProps {
   selectedCategory?: string;
   selectedSubcategory?: string;
+  dataType?: 'healthcare' | 'demographics'; // NEW: Data type selector
   onDataProcessed: (data: SA2HeatmapData | null, selectedOption: string) => void;
   onRankedDataCalculated?: (rankedData: RankedSA2Data | null) => void;
 }
 
-// Define program types and their data categories (18 total options)
+// Define healthcare program types and their data categories (18 total options)
 export const PROGRAM_TYPES = {
   'Commonwealth Home Support Program': [
     'Number of Participants',
@@ -60,8 +69,27 @@ export const PROGRAM_TYPES = {
   ],
 };
 
-// Create flattened options list for easy access
-export const getFlattenedOptions = () => {
+// Define demographics categories (9 total options)
+export const DEMOGRAPHICS_TYPES = {
+  'Population': [
+    'Estimated resident population (no.)',
+    'Population density (persons/km2)'
+  ],
+  'Age Groups': [
+    'Median age - persons (years)',
+    'Persons - 55-64 years (%)',
+    'Persons - 55-64 years (no.)',
+    'Persons - 65 years and over (%)',
+    'Persons - 65 years and over (no.)'
+  ],
+  'Working Age': [
+    'Working age population (aged 15-64 years) (%)',
+    'Working age population (aged 15-64 years) (no.)'
+  ]
+};
+
+// Create flattened options list for healthcare
+export const getFlattenedHealthcareOptions = () => {
   const options: Array<{ value: string; label: string; category: string; subcategory: string }> = [];
   
   Object.entries(PROGRAM_TYPES).forEach(([category, subcategories]) => {
@@ -78,13 +106,38 @@ export const getFlattenedOptions = () => {
   return options;
 };
 
+// Create flattened options list for demographics
+export const getFlattenedDemographicsOptions = () => {
+  const options: Array<{ value: string; label: string; category: string; subcategory: string }> = [];
+  
+  Object.entries(DEMOGRAPHICS_TYPES).forEach(([category, subcategories]) => {
+    subcategories.forEach(subcategory => {
+      options.push({
+        value: `${category}|||${subcategory}`,
+        label: `${category} - ${subcategory}`,
+        category,
+        subcategory
+      });
+    });
+  });
+  
+  return options;
+};
+
+// Legacy function for backward compatibility
+export const getFlattenedOptions = () => {
+  return getFlattenedHealthcareOptions();
+};
+
 export default function HeatmapDataService({ 
   selectedCategory,
   selectedSubcategory,
+  dataType = 'healthcare', // Default to healthcare for backward compatibility
   onDataProcessed,
   onRankedDataCalculated
 }: HeatmapDataServiceProps) {
   const [dssData, setDssData] = useState<DSSData[]>([]);
+  const [demographicsData, setDemographicsData] = useState<DemographicsData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -100,12 +153,12 @@ export default function HeatmapDataService({
   // Cache for boundary data to avoid multiple 170MB loads
   const boundaryDataCache = useRef<Map<string, any>>(new Map());
 
-  // Load DSS data
+  // Load DSS healthcare data
   const loadDSSData = async () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 HeatmapDataService: Loading DSS data from /DSS_Cleaned_2024.json');
+      console.log('🔍 HeatmapDataService: Loading DSS healthcare data from /DSS_Cleaned_2024.json');
       
       const response = await fetch('/DSS_Cleaned_2024.json');
       console.log('📡 HeatmapDataService: Response status:', response.status);
@@ -115,28 +168,56 @@ export default function HeatmapDataService({
       }
       
       const data = await response.json();
-      console.log('✅ HeatmapDataService: DSS data loaded successfully:', data.length, 'records');
+      console.log('✅ HeatmapDataService: DSS healthcare data loaded successfully:', data.length, 'records');
       console.log('✅ HeatmapDataService: Sample DSS record:', data[0]);
       
       setDssData(data);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      console.error('❌ HeatmapDataService: Error loading DSS data:', errorMessage);
-      setError(`Failed to load DSS data: ${errorMessage}`);
+      console.error('❌ HeatmapDataService: Error loading DSS healthcare data:', errorMessage);
+      setError(`Failed to load DSS healthcare data: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
   };
 
-  // Process data for selected category and subcategory
-  const processData = (category: string, subcategory: string): SA2HeatmapData => {
-    console.log('🔄 HeatmapDataService: Processing data for:', category, '-', subcategory);
+  // Load Demographics data
+  const loadDemographicsData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('🔍 HeatmapDataService: Loading demographics data from /Maps_ABS_CSV/Demographics_2023.json');
+      
+      const response = await fetch('/Maps_ABS_CSV/Demographics_2023.json');
+      console.log('📡 HeatmapDataService: Response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ HeatmapDataService: Demographics data loaded successfully:', data.length, 'records');
+      console.log('✅ HeatmapDataService: Sample demographics record:', data[0]);
+      
+      setDemographicsData(data);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      console.error('❌ HeatmapDataService: Error loading demographics data:', errorMessage);
+      setError(`Failed to load demographics data: ${errorMessage}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Process healthcare data for selected category and subcategory
+  const processHealthcareData = useCallback((category: string, subcategory: string): SA2HeatmapData => {
+    console.log('🔄 HeatmapDataService: Processing healthcare data for:', category, '-', subcategory);
     
     const filteredData = dssData.filter(item => 
       item.Type === category && item.Category === subcategory
     );
     
-    console.log('📊 HeatmapDataService: Filtered data:', filteredData.length, 'records');
+    console.log('📊 HeatmapDataService: Filtered healthcare data:', filteredData.length, 'records');
     
     const result: SA2HeatmapData = {};
     filteredData.forEach(item => {
@@ -152,65 +233,102 @@ export default function HeatmapDataService({
       }
     });
     
-    console.log('✅ HeatmapDataService: Processed SA2 data:', Object.keys(result).length, 'regions with data');
-    console.log('🎯 HeatmapDataService: SA2 105021098 in result:', result['105021098'] || 'NOT FOUND');
-    console.log('📋 HeatmapDataService: Sample processed data:', Object.entries(result).slice(0, 5));
+    console.log('✅ HeatmapDataService: Processed healthcare SA2 data:', Object.keys(result).length, 'regions with data');
     return result;
-  };
+  }, [dssData]);
 
-  // Preload all healthcare variable combinations for faster access
+  // Process demographics data for selected category and subcategory  
+  const processDemographicsData = useCallback((category: string, subcategory: string): SA2HeatmapData => {
+    console.log('🔄 HeatmapDataService: Processing demographics data for:', category, '-', subcategory);
+    
+    const filteredData = demographicsData.filter(item => 
+      item.Description === subcategory
+    );
+    
+    console.log('📊 HeatmapDataService: Filtered demographics data:', filteredData.length, 'records');
+    
+    const result: SA2HeatmapData = {};
+    filteredData.forEach(item => {
+      if (item['SA2 ID'] && item.Amount !== undefined && item.Amount !== null) {
+        const sa2Id = item['SA2 ID'].toString(); // Convert number to string for consistency
+        result[sa2Id] = item.Amount;
+      }
+    });
+    
+    console.log('✅ HeatmapDataService: Processed demographics SA2 data:', Object.keys(result).length, 'regions with data');
+    return result;
+  }, [demographicsData]);
+
+  // Unified process data function that handles both data types
+  const processData = useCallback((category: string, subcategory: string, type: 'healthcare' | 'demographics' = dataType): SA2HeatmapData => {
+    if (type === 'demographics') {
+      return processDemographicsData(category, subcategory);
+    } else {
+      return processHealthcareData(category, subcategory);
+    }
+  }, [dataType, processHealthcareData, processDemographicsData]);
+
+  // Preload all variable combinations for faster access
   const preloadAllHeatmapData = useCallback(async () => {
-    if (dssData.length === 0 || preloadingHeatmaps) return;
+    if ((dataType === 'healthcare' && dssData.length === 0) || 
+        (dataType === 'demographics' && demographicsData.length === 0) || 
+        preloadingHeatmaps) return;
 
-    console.log('⚡ HeatmapDataService: Starting preload of all healthcare variable combinations...');
+    console.log(`⚡ HeatmapDataService: Starting preload of all ${dataType} variable combinations...`);
     setPreloadingHeatmaps(true);
 
     try {
       const startTime = Date.now();
       const preloadedData: { [key: string]: SA2HeatmapData } = {};
       
-      // Get all available options from the flattened list
-      const allOptions = getFlattenedOptions();
+      // Get all available options based on data type
+      const allOptions = dataType === 'demographics' 
+        ? getFlattenedDemographicsOptions()
+        : getFlattenedHealthcareOptions();
       
       // Process each option and cache the result
       for (const option of allOptions) {
-        const cacheKey = `${option.category}-${option.subcategory}`;
-        const processedData = processData(option.category, option.subcategory);
+        const cacheKey = `${dataType}-${option.category}-${option.subcategory}`;
+        const processedData = processData(option.category, option.subcategory, dataType);
         preloadedData[cacheKey] = processedData;
       }
       
       setPreloadedHeatmapData(preloadedData);
       
       const loadTime = (Date.now() - startTime) / 1000;
-      console.log(`⚡ HeatmapDataService: Preloaded ${allOptions.length} healthcare variables in ${loadTime.toFixed(1)}s`);
+      console.log(`⚡ HeatmapDataService: Preloaded ${allOptions.length} ${dataType} variables in ${loadTime.toFixed(1)}s`);
       console.log('🎯 HeatmapDataService: Preload cache keys:', Object.keys(preloadedData));
       
     } catch (err) {
-      console.error('❌ HeatmapDataService: Error during heatmap preloading:', err);
+      console.error(`❌ HeatmapDataService: Error during ${dataType} heatmap preloading:`, err);
     } finally {
       setPreloadingHeatmaps(false);
     }
-  }, [dssData, preloadingHeatmaps]);
+  }, [dssData, demographicsData, dataType, preloadingHeatmaps]);
 
   // Get processed data from cache or process on demand
   const getProcessedData = useCallback((category: string, subcategory: string): SA2HeatmapData => {
-    const cacheKey = `${category}-${subcategory}`;
+    const cacheKey = `${dataType}-${category}-${subcategory}`;
     
     // Try to get from preloaded cache first
     if (preloadedHeatmapData[cacheKey]) {
-      console.log('⚡ HeatmapDataService: Using preloaded data for:', cacheKey);
+      console.log(`⚡ HeatmapDataService: Using preloaded ${dataType} data for:`, category, '-', subcategory);
       return preloadedHeatmapData[cacheKey];
     }
     
-    // Fallback to processing on demand
-    console.log('🔄 HeatmapDataService: Processing on demand for:', cacheKey);
-    return processData(category, subcategory);
-  }, [preloadedHeatmapData]);
+    // If not in cache, process on demand
+    console.log(`🔄 HeatmapDataService: Processing ${dataType} data on demand for:`, category, '-', subcategory);
+    return processData(category, subcategory, dataType);
+  }, [preloadedHeatmapData, dataType, processData]);
 
-  // Load data on component mount
+  // Load data on component mount based on data type
   useEffect(() => {
-    loadDSSData();
-  }, []);
+    if (dataType === 'healthcare') {
+      loadDSSData();
+    } else if (dataType === 'demographics') {
+      loadDemographicsData();
+    }
+  }, [dataType]);
 
   // Load SA2 names from boundary data for ranking display
   const loadSA2Names = useCallback(async () => {
@@ -273,16 +391,17 @@ export default function HeatmapDataService({
   // Load SA2 names when component mounts
   useEffect(() => {
     loadSA2Names();
-  }, [loadSA2Names]);
+  }, []);
 
-  // Load and preload data when DSS data becomes available
+  // Load and preload data when data becomes available
   useEffect(() => {
-    if (dssData.length > 0) {
-      console.log('✅ HeatmapDataService: DSS data loaded, starting preload operations...');
+    if ((dataType === 'healthcare' && dssData.length > 0) || 
+        (dataType === 'demographics' && demographicsData.length > 0)) {
+      console.log(`✅ HeatmapDataService: ${dataType} data loaded, starting preload operations...`);
       // Preload all heatmap data combinations
       preloadAllHeatmapData();
     }
-  }, [dssData, preloadAllHeatmapData]);
+  }, [dssData, demographicsData, dataType]);
 
   // Calculate ranked data from SA2 heatmap data
   const calculateRankedData = useCallback((
@@ -333,12 +452,17 @@ export default function HeatmapDataService({
     console.log('🔄 HeatmapDataService: useEffect triggered:', {
       selectedCategory,
       selectedSubcategory,
+      dataType,
       dssDataLength: dssData.length,
+      demographicsDataLength: demographicsData.length,
       hasOnDataProcessed: !!onDataProcessed,
       hasOnRankedDataCalculated: !!onRankedDataCalculated
     });
 
-    if (selectedCategory && selectedSubcategory && dssData.length > 0) {
+    const hasDataForType = (dataType === 'healthcare' && dssData.length > 0) || 
+                          (dataType === 'demographics' && demographicsData.length > 0);
+
+    if (selectedCategory && selectedSubcategory && hasDataForType) {
       console.log('✅ HeatmapDataService: All conditions met, processing data...');
       const processedData = getProcessedData(selectedCategory, selectedSubcategory);
       const label = `${selectedCategory} - ${selectedSubcategory}`;
@@ -363,7 +487,9 @@ export default function HeatmapDataService({
       console.log('❌ HeatmapDataService: Conditions not met, clearing data:', {
         selectedCategory,
         selectedSubcategory,
-        dssDataLength: dssData.length
+        dataType,
+        dssDataLength: dssData.length,
+        demographicsDataLength: demographicsData.length
       });
       // Clear both callbacks when no selection
       onDataProcessed(null, '');
@@ -371,13 +497,13 @@ export default function HeatmapDataService({
         onRankedDataCalculated(null);
       }
     }
-  }, [selectedCategory, selectedSubcategory, dssData, onDataProcessed, onRankedDataCalculated, calculateRankedData, getProcessedData]);
+  }, [selectedCategory, selectedSubcategory, dataType, dssData, demographicsData, onDataProcessed, onRankedDataCalculated]);
 
   // Combined loading state for user feedback
   const isPreloading = loading || loadingSA2Names || preloadingHeatmaps;
-  const preloadStatus = loading ? 'Loading healthcare data...' : 
+  const preloadStatus = loading ? `Loading ${dataType} data...` : 
                        loadingSA2Names ? 'Loading region names...' : 
-                       preloadingHeatmaps ? 'Preloading heatmap data...' : 
+                       preloadingHeatmaps ? `Preloading ${dataType} heatmap data...` : 
                        'Ready';
 
   // Return loading/error state

@@ -67,6 +67,7 @@ export default function MapsPage() {
   
   // Heatmap state with default selection (data preloaded but UI starts minimal)
   const [heatmapVisible, setHeatmapVisible] = useState(true); // Default to visible
+  const [heatmapDataType, setHeatmapDataType] = useState<'healthcare' | 'demographics'>('healthcare'); // Default to healthcare
   const [heatmapCategory, setHeatmapCategory] = useState<string>('Commonwealth Home Support Program');
   const [heatmapSubcategory, setHeatmapSubcategory] = useState<string>('Number of Participants');
   const [selectedVariableName, setSelectedVariableName] = useState<string>('Commonwealth Home Support Program - Number of Participants');
@@ -240,8 +241,9 @@ export default function MapsPage() {
     // Only clear when there's no data or layer is removed
   }, []);
 
-  const handleHeatmapDataSelect = useCallback((category: string, subcategory: string) => {
-    console.log('🌡️ Maps Page: Heatmap data selected:', { category, subcategory });
+  const handleHeatmapDataSelect = useCallback((category: string, subcategory: string, dataType: 'healthcare' | 'demographics') => {
+    console.log('🌡️ Maps Page: Heatmap data selected:', { category, subcategory, dataType });
+    setHeatmapDataType(dataType);
     setHeatmapCategory(category);
     setHeatmapSubcategory(subcategory);
     setSelectedVariableName(`${category} - ${subcategory}`);
@@ -260,6 +262,7 @@ export default function MapsPage() {
   const handleHeatmapClear = useCallback(() => {
     console.log('🌡️ Maps Page: Clearing heatmap selection');
     setSelectedVariableName('');
+    setHeatmapDataType('healthcare'); // Reset to default
     setHeatmapCategory('');
     setHeatmapSubcategory('');
     setHeatmapVisible(false);
@@ -658,6 +661,7 @@ export default function MapsPage() {
               userId={user?.id}
               onSavedSearchAdded={handleSavedSearchAdded}
               heatmapVisible={heatmapVisible}
+              heatmapDataType={heatmapDataType}
               heatmapCategory={heatmapCategory}
               heatmapSubcategory={heatmapSubcategory}
               onHeatmapMinMaxCalculated={handleHeatmapMinMaxCalculated}
