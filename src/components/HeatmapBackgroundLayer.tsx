@@ -101,6 +101,52 @@ export default function HeatmapBackgroundLayer({
     }
   }, [map, boundaryLoading, boundaryLoaded]);
 
+  // Load boundaries when map is ready
+  useEffect(() => {
+    console.log('🎯 HeatmapBackgroundLayer: useEffect triggered:', {
+      mapExists: !!map,
+      boundaryLoaded,
+      boundaryLoading,
+      mapStyleLoaded: map ? map.isStyleLoaded() : 'no map'
+    });
+
+    if (map && !boundaryLoaded && !boundaryLoading) {
+      console.log('🚀 HeatmapBackgroundLayer: Starting boundary loading sequence...');
+      
+      // First attempt: Check if style is already loaded
+      if (map.isStyleLoaded()) {
+        console.log('✅ HeatmapBackgroundLayer: Map style already loaded, loading boundaries immediately');
+        setTimeout(() => loadSA2Boundaries(), 100);
+      } else {
+        console.log('⏳ HeatmapBackgroundLayer: Map style not ready yet, setting up listeners...');
+        
+        // Set up a timer for delayed loading attempt
+        const delayedTimer = setTimeout(() => {
+          if (map && map.isStyleLoaded() && !boundaryLoaded && !boundaryLoading) {
+            console.log('⏰ HeatmapBackgroundLayer: Timer triggered - loading boundaries now');
+            loadSA2Boundaries();
+          }
+        }, 200);
+        
+        // Also listen for style load event
+        const onStyleData = () => {
+          console.log('🎨 HeatmapBackgroundLayer: Style loaded event - loading boundaries now');
+          if (!boundaryLoaded && !boundaryLoading) {
+            setTimeout(() => loadSA2Boundaries(), 100);
+          }
+        };
+        
+        map.once('styledata', onStyleData);
+        
+        // Cleanup function
+        return () => {
+          clearTimeout(delayedTimer);
+          map.off('styledata', onStyleData);
+        };
+      }
+    }
+  }, [map, loadSA2Boundaries, boundaryLoaded, boundaryLoading]);
+
   // Update heatmap when data or visibility changes
   const updateHeatmap = useCallback(() => {
     console.log('🔧 HeatmapBackgroundLayer: UpdateHeatmap called:', {
@@ -219,50 +265,6 @@ export default function HeatmapBackgroundLayer({
       onMinMaxCalculated?.(undefined, undefined);
     }
   }, [map, boundaryLoaded]);
-
-  // Load boundaries when map is ready
-  useEffect(() => {
-    console.log('🎯 HeatmapBackgroundLayer: useEffect triggered:', {
-      mapExists: !!map,
-      boundaryLoaded,
-      boundaryLoading,
-      mapStyleLoaded: map ? map.isStyleLoaded() : 'no map'
-    });
-
-    if (map && !boundaryLoaded && !boundaryLoading) {
-      // Add a small delay to ensure map is fully ready
-      const timer = setTimeout(() => {
-        console.log('✅ HeatmapBackgroundLayer: Calling loadSA2Boundaries after delay...');
-        loadSA2Boundaries();
-      }, 100); // 100ms delay
-
-      return () => clearTimeout(timer);
-    }
-  }, [map, loadSA2Boundaries, boundaryLoaded, boundaryLoading]);
-
-  // Additional trigger when map style loads
-  useEffect(() => {
-    if (map && !boundaryLoaded && !boundaryLoading) {
-      const handleStyleLoad = () => {
-        console.log('🎯 HeatmapBackgroundLayer: Map style loaded, triggering boundary load...');
-        setTimeout(() => {
-          loadSA2Boundaries();
-        }, 200); // Slightly longer delay after style load
-      };
-
-      // Check if style is already loaded
-      if (map.isStyleLoaded()) {
-        handleStyleLoad();
-      } else {
-        // Wait for style to load
-        map.once('styledata', handleStyleLoad);
-      }
-
-      return () => {
-        map.off('styledata', handleStyleLoad);
-      };
-    }
-  }, [map, loadSA2Boundaries, boundaryLoaded, boundaryLoading]);
 
   // Update heatmap when data or visibility changes
   useEffect(() => {

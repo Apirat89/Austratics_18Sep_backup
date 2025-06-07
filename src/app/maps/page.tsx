@@ -12,6 +12,7 @@ import ActiveLayers from '../../components/ActiveLayers';
 import SavedSearches, { SavedSearchesRef } from '../../components/SavedSearches';
 import TopBottomPanel from '../../components/TopBottomPanel';
 import { RankedSA2Data } from '../../components/HeatmapDataService';
+import { getLocationByName } from '../../lib/mapSearchService';
 import { Map, Settings, User, Menu } from 'lucide-react';
 
 interface UserData {
@@ -412,6 +413,59 @@ export default function MapsPage() {
     }, 100);
   }, []);
 
+  // Handle region click from TopBottomPanel
+  const handleRegionClick = useCallback(async (sa2Id: string, sa2Name: string) => {
+    console.log('🎯 Maps Page: Region clicked from rankings:', { sa2Id, sa2Name });
+    
+    // Switch to SA2 boundary layer if not already selected
+    if (selectedGeoLayer !== 'sa2') {
+      console.log('📍 Auto-switching to SA2 layer for regional ranking navigation');
+      setSelectedGeoLayer('sa2');
+    }
+    
+    console.log('🔍 Looking up SA2 coordinates for:', sa2Name);
+    
+    try {
+      // Try to find the location using the search service
+      const locationResult = await getLocationByName(sa2Name);
+      
+      if (locationResult && locationResult.center) {
+        console.log('✅ Found SA2 location data:', locationResult);
+        
+        // Call handleSearch with proper navigation data
+        handleSearch(locationResult.name, {
+          center: locationResult.center,
+          bounds: locationResult.bounds,
+          searchResult: locationResult
+        });
+      } else {
+        console.log('⚠️ Could not find location data for SA2:', sa2Name);
+        console.log('🔄 Fallback: Trying search with SA2 ID:', sa2Id);
+        
+        // Fallback: try searching by SA2 ID instead
+        const locationResultById = await getLocationByName(sa2Id);
+        
+        if (locationResultById && locationResultById.center) {
+          console.log('✅ Found SA2 location data by ID:', locationResultById);
+          
+          handleSearch(locationResultById.name, {
+            center: locationResultById.center,
+            bounds: locationResultById.bounds,
+            searchResult: locationResultById
+          });
+        } else {
+          console.log('❌ Could not find location data by name or ID, performing basic search');
+          // Final fallback: basic search without navigation
+          handleSearch(sa2Name);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error looking up SA2 location:', error);
+      // Fallback to basic search on error
+      handleSearch(sa2Name);
+    }
+  }, [selectedGeoLayer, handleSearch]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -586,6 +640,7 @@ export default function MapsPage() {
               rankedData={rankedData}
               isVisible={topBottomPanelVisible}
               onToggle={handleTopBottomPanelToggle}
+              onRegionClick={handleRegionClick}
             />
           </div>
 
