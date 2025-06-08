@@ -23,6 +23,33 @@ interface FacilityTypes {
 type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality';
 type MapStyleType = 'basic' | 'topo' | 'satellite' | 'terrain' | 'streets';
 
+interface FacilityData {
+  OBJECTID: number;
+  Service_Name: string;
+  Physical_Address: string;
+  Physical_Suburb: string;
+  Physical_State: string;
+  Physical_Post_Code: number;
+  Care_Type: string;
+  Residential_Places: number | null;
+  Home_Care_Places: number | null;
+  Home_Care_Max_Places: number | null;
+  Restorative_Care_Places: number | null;
+  Provider_Name: string;
+  Organisation_Type: string;
+  ABS_Remoteness: string;
+  Phone?: string;
+  Email?: string;
+  Website?: string;
+  Latitude: number;
+  Longitude: number;
+  F2019_Aged_Care_Planning_Region: string;
+  F2016_SA2_Name: string;
+  F2016_SA3_Name: string;
+  F2016_LGA_Name: string;
+  facilityType: 'residential' | 'home' | 'retirement';
+}
+
 interface AustralianMapProps {
   className?: string;
   facilityTypes: FacilityTypes;
@@ -48,6 +75,8 @@ interface AustralianMapProps {
   onHeatmapMinMaxCalculated?: (minValue: number | undefined, maxValue: number | undefined) => void;
   // Add callback for ranked data calculation
   onRankedDataCalculated?: (rankedData: RankedSA2Data | null) => void;
+  // Add facility details modal callback
+  onFacilityDetailsClick?: (facility: FacilityData) => void;
   // Add loading completion state for flickering fix
   loadingComplete?: boolean;
 }
@@ -191,6 +220,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   heatmapSubcategory,
   onHeatmapMinMaxCalculated,
   onRankedDataCalculated,
+  onFacilityDetailsClick,
   loadingComplete = false
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -471,8 +501,10 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           if (typeKey === 'residential') {
             return careTypes.some(ct => facilityCareType.includes(ct));
           } else if (typeKey === 'home') {
-            return (facilityCareType.includes('Multi-Purpose Service') && feature.properties?.Home_Care_Places > 0) ||
-                   careTypes.some(ct => facilityCareType.includes(ct));
+            // Multi-Purpose Services are classified as residential, not home care
+            // Only include pure home care services here
+            return careTypes.some(ct => facilityCareType.includes(ct)) &&
+                   !facilityCareType.includes('Multi-Purpose Service');
           } else if (typeKey === 'retirement') {
             return careTypes.some(ct => facilityCareType.toLowerCase().includes(ct.toLowerCase())) ||
                    feature.properties?.Service_Name?.toLowerCase().includes('retirement');
@@ -727,6 +759,43 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             }
           };
 
+          // Helper function to handle facility details modal
+          const handleSeeDetails = () => {
+            if (onFacilityDetailsClick) {
+              const facilityData: FacilityData = {
+                OBJECTID: properties?.OBJECTID || 0,
+                Service_Name: serviceName,
+                Physical_Address: address,
+                Physical_Suburb: properties?.Physical_Suburb || '',
+                Physical_State: state,
+                Physical_Post_Code: postcode ? parseInt(postcode) : 0,
+                Care_Type: careType,
+                Residential_Places: residentialPlaces || null,
+                Home_Care_Places: properties?.Home_Care_Places || null,
+                Home_Care_Max_Places: homeCareMaxPlaces || null,
+                Restorative_Care_Places: properties?.Restorative_Care_Places || null,
+                Provider_Name: properties?.Provider_Name || '',
+                Organisation_Type: properties?.Organisation_Type || '',
+                ABS_Remoteness: properties?.ABS_Remoteness || '',
+                Phone: phone || undefined,
+                Email: email || undefined,
+                Website: website || undefined,
+                Latitude: lat,
+                Longitude: lng,
+                F2019_Aged_Care_Planning_Region: properties?.F2019_Aged_Care_Planning_Region || '',
+                F2016_SA2_Name: properties?.F2016_SA2_Name || '',
+                F2016_SA3_Name: properties?.F2016_SA3_Name || '',
+                F2016_LGA_Name: properties?.F2016_LGA_Name || '',
+                facilityType: typeKey as 'residential' | 'home' | 'retirement'
+              };
+              
+              onFacilityDetailsClick(facilityData);
+            }
+          };
+
+          // Determine if this facility should show "See Details" button (only homecare and residential)
+          const showSeeDetailsButton = typeKey === 'residential' || typeKey === 'home';
+
           // Create beautiful popup with save button
           const popup = new maptilersdk.Popup({ 
             offset: 25,
@@ -795,8 +864,19 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                 </div>
                 ` : ''}
                 
-                ${userId ? `
+                ${showSeeDetailsButton || userId ? `
                 <div class="popup-actions">
+                  ${showSeeDetailsButton ? `
+                  <button 
+                    id="details-btn-${popupId}"
+                    class="see-details-btn"
+                    onclick="window.seeDetails_${popupId.replace(/-/g, '_')}?.()"
+                    title="See details"
+                  >
+                    🚪 See Details
+                  </button>
+                  ` : ''}
+                  ${userId ? `
                   <button 
                     id="save-btn-${popupId}"
                     class="save-facility-btn"
@@ -804,6 +884,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                   >
                     ⏳ Checking...
                   </button>
+                  ` : ''}
                 </div>
                 ` : ''}
                 
@@ -884,6 +965,35 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                   margin: 16px 0 8px 0;
                   padding-top: 12px;
                   border-top: 1px solid #e2e8f0;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                }
+                
+                .see-details-btn {
+                  width: 100%;
+                  padding: 8px 16px;
+                  background-color: #10B981;
+                  color: white;
+                  border: 1px solid #10B981;
+                  border-radius: 6px;
+                  font-size: 12px;
+                  font-weight: 500;
+                  cursor: pointer;
+                  transition: all 0.2s ease;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 4px;
+                }
+                
+                .see-details-btn:hover {
+                  background-color: #059669;
+                  border-color: #059669;
+                }
+                
+                .see-details-btn:active {
+                  transform: translateY(1px);
                 }
                 
                 .save-facility-btn {
@@ -931,16 +1041,23 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             </div>
           `);
 
-          // Add the save function to the global window object for this specific popup
+          // Add functions to the global window object for this specific popup
+          const functionName = `saveFacility_${popupId.replace(/-/g, '_')}`;
+          const updateFunctionName = `updateSaveButton_${popupId.replace(/-/g, '_')}`;
+          const detailsFunctionName = `seeDetails_${popupId.replace(/-/g, '_')}`;
+          
+          // Add functions to window object
           if (userId) {
-            const functionName = `saveFacility_${popupId.replace(/-/g, '_')}`;
-            const updateFunctionName = `updateSaveButton_${popupId.replace(/-/g, '_')}`;
-            
-            // Add functions to window object
             (window as any)[functionName] = handleSaveFacility;
             (window as any)[updateFunctionName] = updateSaveButtonState;
-            
-            // Listen for save/unsave events from other sources
+          }
+          
+          if (showSeeDetailsButton) {
+            (window as any)[detailsFunctionName] = handleSeeDetails;
+          }
+          
+          // Listen for save/unsave events from other sources (only if userId exists)
+          if (userId) {
             const handleFacilitySaved = (event: CustomEvent) => {
               if (event.detail.facilityName === serviceName) {
                 updateSaveButtonState();
@@ -967,6 +1084,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             popup.on('close', () => {
               delete (window as any)[functionName];
               delete (window as any)[updateFunctionName];
+              if (showSeeDetailsButton) {
+                delete (window as any)[detailsFunctionName];
+              }
               window.removeEventListener('facilitySaved', handleFacilitySaved as EventListener);
               window.removeEventListener('facilityUnsaved', handleFacilityUnsaved as EventListener);
               window.removeEventListener('savedSearchDeleted', handleSavedSearchDeleted as EventListener);
@@ -975,6 +1095,11 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             // Check initial save status when popup opens
             popup.on('open', () => {
               setTimeout(updateSaveButtonState, 100); // Small delay to ensure DOM is ready
+            });
+          } else if (showSeeDetailsButton) {
+            // If only "See Details" button exists (no userId), still need cleanup
+            popup.on('close', () => {
+              delete (window as any)[detailsFunctionName];
             });
           }
 

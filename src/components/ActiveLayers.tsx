@@ -103,15 +103,18 @@ export default function ActiveLayers({
                 )}
               </div>
               <div className="text-xs text-gray-600">
-                {highlightedFeatureName ? (
+                {highlightedFeature ? (
                   <>
-                    {highlightedFeatureName}
-                    {highlightedFeature && (
-                      <span className="text-gray-500"> ({highlightedFeature})</span>
+                    {/* Always show the ID first, then name if available */}
+                    <span className="font-medium">{selectedGeoLayer.toUpperCase()}: {highlightedFeature}</span>
+                    {highlightedFeatureName && (
+                      <span className="text-gray-500">
+                        <br />{highlightedFeatureName}
+                      </span>
                     )}
                   </>
                 ) : (
-                  `${selectedGeoLayer.toUpperCase()}: ${highlightedFeature}`
+                  `${selectedGeoLayer.toUpperCase()}: Unknown`
                 )}
               </div>
             </div>

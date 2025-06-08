@@ -11,6 +11,7 @@ import DataLayers from '../../components/DataLayers';
 import ActiveLayers from '../../components/ActiveLayers';
 import SavedSearches, { SavedSearchesRef } from '../../components/SavedSearches';
 import TopBottomPanel from '../../components/TopBottomPanel';
+import FacilityDetailsModal from '../../components/FacilityDetailsModal';
 import { RankedSA2Data } from '../../components/HeatmapDataService';
 import { getLocationByName } from '../../lib/mapSearchService';
 import { Map, Settings, User, Menu } from 'lucide-react';
@@ -26,6 +27,33 @@ interface FacilityTypes {
   residential: boolean;
   home: boolean;
   retirement: boolean;
+}
+
+interface FacilityData {
+  OBJECTID: number;
+  Service_Name: string;
+  Physical_Address: string;
+  Physical_Suburb: string;
+  Physical_State: string;
+  Physical_Post_Code: number;
+  Care_Type: string;
+  Residential_Places: number | null;
+  Home_Care_Places: number | null;
+  Home_Care_Max_Places: number | null;
+  Restorative_Care_Places: number | null;
+  Provider_Name: string;
+  Organisation_Type: string;
+  ABS_Remoteness: string;
+  Phone?: string;
+  Email?: string;
+  Website?: string;
+  Latitude: number;
+  Longitude: number;
+  F2019_Aged_Care_Planning_Region: string;
+  F2016_SA2_Name: string;
+  F2016_SA3_Name: string;
+  F2016_LGA_Name: string;
+  facilityType: 'residential' | 'home' | 'retirement';
 }
 
 type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality';
@@ -88,6 +116,10 @@ export default function MapsPage() {
   // Loading completion state
   const [loadingComplete, setLoadingComplete] = useState(false);
   
+  // Facility Details Modal state
+  const [selectedFacility, setSelectedFacility] = useState<FacilityData | null>(null);
+  const [facilityModalOpen, setFacilityModalOpen] = useState(false);
+  
   // Map reference for calling map methods
   const mapRef = useRef<AustralianMapRef>(null);
   const savedSearchesRef = useRef<SavedSearchesRef>(null);
@@ -120,6 +152,83 @@ export default function MapsPage() {
     loadUser();
   }, [router]);
 
+  // Handle URL parameters for direct facility links
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const facilityId = urlParams.get('facility');
+    
+    if (facilityId && !facilityModalOpen) {
+      // Load facility data and open modal
+      loadFacilityById(facilityId);
+    }
+  }, [facilityModalOpen]);
+
+  // Function to load facility by ID and open modal
+  const loadFacilityById = async (facilityId: string) => {
+    try {
+      const response = await fetch('/maps/healthcare.geojson');
+      if (!response.ok) throw new Error('Failed to load facility data');
+      
+      const data = await response.json();
+      const facility = data.features.find((f: any) => 
+        f.properties.OBJECTID.toString() === facilityId
+      );
+      
+      if (facility) {
+        const facilityData: FacilityData = {
+          ...facility.properties,
+          facilityType: determineFacilityType(facility.properties.Care_Type)
+        };
+        
+        setSelectedFacility(facilityData);
+        setFacilityModalOpen(true);
+      }
+    } catch (error) {
+      console.error('Error loading facility:', error);
+    }
+  };
+
+  // Function to determine facility type from Care_Type
+  const determineFacilityType = (careType: string): 'residential' | 'home' | 'retirement' => {
+    const careTypeMapping = {
+      residential: ['Residential', 'Multi-Purpose Service'],
+      home: ['Home Care', 'Community Care'],
+      retirement: ['Retirement', 'Retirement Living', 'Retirement Village']
+    };
+
+    if (careTypeMapping.residential.some(ct => careType.includes(ct))) {
+      return 'residential';
+    } else if (careTypeMapping.home.some(ct => careType.includes(ct))) {
+      return 'home';
+    } else if (careTypeMapping.retirement.some(ct => careType.toLowerCase().includes(ct.toLowerCase()))) {
+      return 'retirement';
+    }
+    
+    return 'residential'; // default
+  };
+
+  // Function to open facility details modal
+  const openFacilityDetails = useCallback((facility: FacilityData) => {
+    setSelectedFacility(facility);
+    setFacilityModalOpen(true);
+    
+    // Update URL for shareable link
+    const url = new URL(window.location.href);
+    url.searchParams.set('facility', facility.OBJECTID.toString());
+    window.history.pushState({}, '', url.toString());
+  }, []);
+
+  // Function to close facility details modal
+  const closeFacilityModal = useCallback(() => {
+    setFacilityModalOpen(false);
+    setSelectedFacility(null);
+    
+    // Remove facility parameter from URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete('facility');
+    window.history.pushState({}, '', url.toString());
+  }, []);
+
   // Poll preload state from map
   useEffect(() => {
     const pollPreloadState = () => {
@@ -146,7 +255,7 @@ export default function MapsPage() {
   }, []);
 
   const handleSearch = (searchTerm: string, navigation?: { 
-    center: [number, number], 
+    center?: [number, number], 
     bounds?: [number, number, number, number],
     searchResult?: any
   }) => {
@@ -437,13 +546,20 @@ export default function MapsPage() {
       const locationResult = await getLocationByName(sa2Name);
       
       if (locationResult && locationResult.center) {
-        console.log('✅ Found SA2 location data:', locationResult);
+        console.log('✅ Found location data:', locationResult);
+        
+        // Force the result type to be 'sa2' and ensure SA2 ID is in the code field
+        const sa2SearchResult = {
+          ...locationResult,
+          type: 'sa2' as const, // Override type to ensure SA2 layer stays active
+          code: sa2Id // Ensure the SA2 ID is available for precise matching
+        };
         
         // Call handleSearch with proper navigation data
-        handleSearch(locationResult.name, {
-          center: locationResult.center,
-          bounds: locationResult.bounds,
-          searchResult: locationResult
+        handleSearch(sa2SearchResult.name, {
+          center: sa2SearchResult.center!,
+          bounds: sa2SearchResult.bounds,
+          searchResult: sa2SearchResult
         });
       } else {
         console.log('⚠️ Could not find location data for SA2:', sa2Name);
@@ -455,15 +571,30 @@ export default function MapsPage() {
         if (locationResultById && locationResultById.center) {
           console.log('✅ Found SA2 location data by ID:', locationResultById);
           
-          handleSearch(locationResultById.name, {
-            center: locationResultById.center,
-            bounds: locationResultById.bounds,
-            searchResult: locationResultById
+          // Force the result type to be 'sa2' and ensure SA2 ID is in the code field
+          const sa2SearchResultById = {
+            ...locationResultById,
+            type: 'sa2' as const,
+            code: sa2Id // Ensure the SA2 ID is available for precise matching
+          };
+          
+          handleSearch(sa2SearchResultById.name, {
+            center: sa2SearchResultById.center!,
+            bounds: sa2SearchResultById.bounds,
+            searchResult: sa2SearchResultById
           });
         } else {
-          console.log('❌ Could not find location data by name or ID, performing basic search');
-          // Final fallback: basic search without navigation
-          handleSearch(sa2Name);
+          console.log('❌ Could not find location data by name or ID, performing SA2 ID-only highlight');
+          // Final fallback: create a minimal search result with just the SA2 ID for highlighting
+          const sa2SearchResultMinimal = {
+            name: sa2Name,
+            type: 'sa2' as const,
+            code: sa2Id // Use SA2 ID for precise matching even without coordinates
+          };
+          
+          handleSearch(sa2Name, {
+            searchResult: sa2SearchResultMinimal
+          });
         }
       }
     } catch (error) {
@@ -665,12 +796,20 @@ export default function MapsPage() {
                 heatmapSubcategory={heatmapSubcategory}
                 onHeatmapMinMaxCalculated={handleHeatmapMinMaxCalculated}
                 onRankedDataCalculated={handleRankedDataCalculated}
+                onFacilityDetailsClick={openFacilityDetails}
                 loadingComplete={loadingComplete}
               />
             </MapLoadingCoordinator>
           </div>
         </main>
       </div>
+
+      {/* Facility Details Modal */}
+      <FacilityDetailsModal
+        facility={selectedFacility}
+        isOpen={facilityModalOpen}
+        onClose={closeFacilityModal}
+      />
     </div>
   );
 } 
