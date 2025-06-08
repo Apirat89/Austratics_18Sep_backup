@@ -48,6 +48,8 @@ interface AustralianMapProps {
   onHeatmapMinMaxCalculated?: (minValue: number | undefined, maxValue: number | undefined) => void;
   // Add callback for ranked data calculation
   onRankedDataCalculated?: (rankedData: RankedSA2Data | null) => void;
+  // Add loading completion state for flickering fix
+  loadingComplete?: boolean;
 }
 
 // Expose methods to parent component
@@ -188,7 +190,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   heatmapCategory,
   heatmapSubcategory,
   onHeatmapMinMaxCalculated,
-  onRankedDataCalculated
+  onRankedDataCalculated,
+  loadingComplete = false
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
@@ -1954,6 +1957,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         dataType={heatmapDataType}
         onDataProcessed={handleHeatmapDataProcessed}
         onRankedDataCalculated={onRankedDataCalculated}
+        loadingComplete={loadingComplete}
       />
     </div>
   );

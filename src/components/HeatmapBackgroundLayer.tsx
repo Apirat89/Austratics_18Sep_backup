@@ -332,15 +332,15 @@ export default function HeatmapBackgroundLayer({
         </div>
       )}
 
-      {/* Loading Status */}
-      {boundaryLoading && (
+      {/* Loading Status - REMOVED to eliminate flickering */}
+      {/* {boundaryLoading && (
         <div className="absolute top-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-3 z-20">
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
             <span className="text-sm text-blue-700">Loading heatmap...</span>
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 } 

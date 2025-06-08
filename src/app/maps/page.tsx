@@ -665,6 +665,7 @@ export default function MapsPage() {
                 heatmapSubcategory={heatmapSubcategory}
                 onHeatmapMinMaxCalculated={handleHeatmapMinMaxCalculated}
                 onRankedDataCalculated={handleRankedDataCalculated}
+                loadingComplete={loadingComplete}
               />
             </MapLoadingCoordinator>
           </div>

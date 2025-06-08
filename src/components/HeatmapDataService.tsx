@@ -58,6 +58,7 @@ interface HeatmapDataServiceProps {
   dataType?: 'healthcare' | 'demographics' | 'economics' | 'health-statistics'; // Extended data type selector
   onDataProcessed: (data: SA2HeatmapData | null, selectedOption: string) => void;
   onRankedDataCalculated?: (rankedData: RankedSA2Data | null) => void;
+  loadingComplete?: boolean; // Loading completion state for flickering fix
 }
 
 // Define healthcare program types and their data categories (18 total options)
@@ -237,7 +238,8 @@ export default function HeatmapDataService({
   selectedSubcategory,
   dataType = 'healthcare', // Default to healthcare for backward compatibility
   onDataProcessed,
-  onRankedDataCalculated
+  onRankedDataCalculated,
+  loadingComplete = false
 }: HeatmapDataServiceProps) {
   const [dssData, setDssData] = useState<DSSData[]>([]);
   const [demographicsData, setDemographicsData] = useState<DemographicsData[]>([]);
@@ -258,17 +260,31 @@ export default function HeatmapDataService({
   // Cache for boundary data to avoid multiple 170MB loads
   const boundaryDataCache = useRef<Map<string, any>>(new Map());
 
+  // 🔧 FLICKERING FIX: Local state flag to permanently prevent coordinator calls
+  const [hasEverReportedToCoordinator, setHasEverReportedToCoordinator] = useState(false);
+
+  // 🔧 FLICKERING FIX: Helper function to check if coordinator calls should be skipped
+  const shouldSkipCoordinator = useCallback(() => {
+    const skip = loadingComplete || 
+                 hasEverReportedToCoordinator || 
+                 globalLoadingCoordinator.isInitialLoadingComplete();
+    if (skip) {
+      console.log('⏭️  HeatmapDataService: Skipping coordinator call - already completed initial load');
+    }
+    return skip;
+  }, [loadingComplete, hasEverReportedToCoordinator]);
+
   // Load DSS healthcare data
   const loadDSSData = async () => {
     try {
       setLoading(true);
       setError(null);
       console.log('🔍 HeatmapDataService: Loading DSS healthcare data from /DSS_Cleaned_2024.json');
-      globalLoadingCoordinator.reportDataLoading('healthcare', 10);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('healthcare', 10);
       
       const response = await fetch('/DSS_Cleaned_2024.json');
       console.log('📡 HeatmapDataService: Response status:', response.status);
-      globalLoadingCoordinator.reportDataLoading('healthcare', 60);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('healthcare', 60);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
@@ -279,12 +295,12 @@ export default function HeatmapDataService({
       console.log('✅ HeatmapDataService: Sample DSS record:', data[0]);
       
       setDssData(data);
-      globalLoadingCoordinator.reportDataLoading('healthcare', 100);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('healthcare', 100);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       console.error('❌ HeatmapDataService: Error loading DSS healthcare data:', errorMessage);
       setError(`Failed to load DSS healthcare data: ${errorMessage}`);
-      globalLoadingCoordinator.reportDataLoading('healthcare', 100);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('healthcare', 100);
     } finally {
       setLoading(false);
     }
@@ -296,11 +312,11 @@ export default function HeatmapDataService({
       setLoading(true);
       setError(null);
       console.log('🔍 HeatmapDataService: Loading demographics data from /Maps_ABS_CSV/Demographics_2023.json');
-      globalLoadingCoordinator.reportDataLoading('demographics', 10);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('demographics', 10);
       
       const response = await fetch('/Maps_ABS_CSV/Demographics_2023.json');
       console.log('📡 HeatmapDataService: Response status:', response.status);
-      globalLoadingCoordinator.reportDataLoading('demographics', 60);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('demographics', 60);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
@@ -311,12 +327,12 @@ export default function HeatmapDataService({
       console.log('✅ HeatmapDataService: Sample demographics record:', data[0]);
       
       setDemographicsData(data);
-      globalLoadingCoordinator.reportDataLoading('demographics', 100);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('demographics', 100);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       console.error('❌ HeatmapDataService: Error loading demographics data:', errorMessage);
       setError(`Failed to load demographics data: ${errorMessage}`);
-      globalLoadingCoordinator.reportDataLoading('demographics', 100);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('demographics', 100);
     } finally {
       setLoading(false);
     }
@@ -328,11 +344,11 @@ export default function HeatmapDataService({
       setLoading(true);
       setError(null);
       console.log('🔍 HeatmapDataService: Loading economic statistics data from /Maps_ABS_CSV/econ_stats.json');
-      globalLoadingCoordinator.reportDataLoading('economics', 10);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('economics', 10);
       
       const response = await fetch('/Maps_ABS_CSV/econ_stats.json');
       console.log('📡 HeatmapDataService: Response status:', response.status);
-      globalLoadingCoordinator.reportDataLoading('economics', 60);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('economics', 60);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
@@ -343,12 +359,12 @@ export default function HeatmapDataService({
       console.log('✅ HeatmapDataService: Sample economic statistics record:', data[0]);
       
       setEconomicStatsData(data);
-      globalLoadingCoordinator.reportDataLoading('economics', 100);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('economics', 100);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       console.error('❌ HeatmapDataService: Error loading economic statistics data:', errorMessage);
       setError(`Failed to load economic statistics data: ${errorMessage}`);
-      globalLoadingCoordinator.reportDataLoading('economics', 100);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('economics', 100);
     } finally {
       setLoading(false);
     }
@@ -360,11 +376,11 @@ export default function HeatmapDataService({
       setLoading(true);
       setError(null);
       console.log('🔍 HeatmapDataService: Loading health statistics data from /Maps_ABS_CSV/health_stats.json');
-      globalLoadingCoordinator.reportDataLoading('health-stats', 10);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('health-stats', 10);
       
       const response = await fetch('/Maps_ABS_CSV/health_stats.json');
       console.log('📡 HeatmapDataService: Response status:', response.status);
-      globalLoadingCoordinator.reportDataLoading('health-stats', 60);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('health-stats', 60);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
@@ -375,12 +391,12 @@ export default function HeatmapDataService({
       console.log('✅ HeatmapDataService: Sample health statistics record:', data[0]);
       
       setHealthStatsData(data);
-      globalLoadingCoordinator.reportDataLoading('health-stats', 100);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('health-stats', 100);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       console.error('❌ HeatmapDataService: Error loading health statistics data:', errorMessage);
       setError(`Failed to load health statistics data: ${errorMessage}`);
-      globalLoadingCoordinator.reportDataLoading('health-stats', 100);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('health-stats', 100);
     } finally {
       setLoading(false);
     }
@@ -502,7 +518,7 @@ export default function HeatmapDataService({
         preloadingHeatmaps) return;
 
     console.log(`⚡ HeatmapDataService: Starting preload of all ${dataType} variable combinations...`);
-    globalLoadingCoordinator.reportDataProcessing(10);
+    if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataProcessing(10);
     setPreloadingHeatmaps(true);
 
     try {
@@ -518,7 +534,7 @@ export default function HeatmapDataService({
         ? getFlattenedHealthStatsOptions()
         : getFlattenedHealthcareOptions();
       
-      globalLoadingCoordinator.reportDataProcessing(30);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataProcessing(30);
       
       // Process each option and cache the result
       for (let i = 0; i < allOptions.length; i++) {
@@ -529,11 +545,11 @@ export default function HeatmapDataService({
         
         // Report progress during processing
         const progress = 30 + Math.floor((i / allOptions.length) * 60);
-        globalLoadingCoordinator.reportDataProcessing(progress);
+        if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataProcessing(progress);
       }
       
       setPreloadedHeatmapData(preloadedData);
-      globalLoadingCoordinator.reportDataProcessing(100);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataProcessing(100);
       
       const loadTime = (Date.now() - startTime) / 1000;
       console.log(`⚡ HeatmapDataService: Preloaded ${allOptions.length} ${dataType} variables in ${loadTime.toFixed(1)}s`);
@@ -541,7 +557,7 @@ export default function HeatmapDataService({
       
     } catch (err) {
       console.error(`❌ HeatmapDataService: Error during ${dataType} heatmap preloading:`, err);
-      globalLoadingCoordinator.reportDataProcessing(100);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataProcessing(100);
     } finally {
       setPreloadingHeatmaps(false);
     }
@@ -580,7 +596,7 @@ export default function HeatmapDataService({
     if (sa2NameCache || loadingSA2Names) return; // Already loaded or loading
 
     console.log('🗺️ HeatmapDataService: Loading SA2 names for ranking...');
-    globalLoadingCoordinator.reportNameMapping(10);
+    if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportNameMapping(10);
     setLoadingSA2Names(true);
     setSa2NameError(null);
 
@@ -590,7 +606,7 @@ export default function HeatmapDataService({
       
       if (geojsonData) {
         console.log('📦 HeatmapDataService: Using cached SA2 boundary data for names');
-        globalLoadingCoordinator.reportNameMapping(60);
+        if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportNameMapping(60);
       } else {
         console.log('📡 HeatmapDataService: Fetching SA2.geojson for name lookup...');
         const startTime = Date.now();
@@ -599,11 +615,11 @@ export default function HeatmapDataService({
         if (!response.ok) {
           throw new Error(`Failed to load SA2 boundaries: ${response.status} ${response.statusText}`);
         }
-        globalLoadingCoordinator.reportNameMapping(40);
+        if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportNameMapping(40);
         
         geojsonData = await response.json();
         boundaryDataCache.current.set('sa2-names', geojsonData);
-        globalLoadingCoordinator.reportNameMapping(60);
+        if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportNameMapping(60);
         
         const loadTime = (Date.now() - startTime) / 1000;
         console.log(`✅ HeatmapDataService: SA2 boundaries loaded in ${loadTime.toFixed(1)}s for name extraction`);
@@ -623,18 +639,18 @@ export default function HeatmapDataService({
           }
         });
       }
-      globalLoadingCoordinator.reportNameMapping(90);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportNameMapping(90);
       
       console.log(`✅ HeatmapDataService: Extracted ${Object.keys(nameMapping).length} SA2 name mappings`);
       console.log('🎯 HeatmapDataService: Sample SA2 name mapping:', Object.entries(nameMapping).slice(0, 3));
       
       setSa2NameCache(nameMapping);
-      globalLoadingCoordinator.reportNameMapping(100);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportNameMapping(100);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       console.error('❌ HeatmapDataService: Error loading SA2 names:', errorMessage);
       setSa2NameError(`Failed to load SA2 names: ${errorMessage}`);
-      globalLoadingCoordinator.reportNameMapping(100);
+      if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportNameMapping(100);
     } finally {
       setLoadingSA2Names(false);
     }
@@ -712,7 +728,9 @@ export default function HeatmapDataService({
       economicStatsDataLength: economicStatsData.length,
       healthStatsDataLength: healthStatsData.length,
       hasOnDataProcessed: !!onDataProcessed,
-      hasOnRankedDataCalculated: !!onRankedDataCalculated
+      hasOnRankedDataCalculated: !!onRankedDataCalculated,
+      loadingComplete,
+      hasEverReportedToCoordinator
     });
 
     const hasDataForType = (dataType === 'healthcare' && dssData.length > 0) || 
@@ -722,11 +740,20 @@ export default function HeatmapDataService({
 
     if (selectedCategory && selectedSubcategory && hasDataForType) {
       console.log('✅ HeatmapDataService: All conditions met, processing data...');
-      globalLoadingCoordinator.reportHeatmapRendering(10);
+      
+      // 🔧 FLICKERING FIX: Use centralized safety check for all coordinator calls
+      if (!shouldSkipCoordinator()) {
+        console.log('📡 HeatmapDataService: Reporting to coordinator (first time only)');
+        globalLoadingCoordinator.reportHeatmapRendering(10);
+        setHasEverReportedToCoordinator(true); // Set flag permanently
+      }
       
       const processedData = getProcessedData(selectedCategory, selectedSubcategory);
       const label = `${selectedCategory} - ${selectedSubcategory}`;
-      globalLoadingCoordinator.reportHeatmapRendering(50);
+      
+      if (!shouldSkipCoordinator()) {
+        globalLoadingCoordinator.reportHeatmapRendering(50);
+      }
       
       console.log('📊 HeatmapDataService: About to call onDataProcessed with:', {
         dataKeys: Object.keys(processedData).length,
@@ -736,7 +763,10 @@ export default function HeatmapDataService({
       
       // Call existing heatmap callback
       onDataProcessed(processedData, label);
-      globalLoadingCoordinator.reportHeatmapRendering(80);
+      
+      if (!shouldSkipCoordinator()) {
+        globalLoadingCoordinator.reportHeatmapRendering(80);
+      }
       
       // Calculate and call ranking callback if available
       if (onRankedDataCalculated) {
@@ -745,7 +775,10 @@ export default function HeatmapDataService({
         console.log('📊 HeatmapDataService: About to call onRankedDataCalculated with:', rankedData);
         onRankedDataCalculated(rankedData);
       }
-      globalLoadingCoordinator.reportHeatmapRendering(100);
+      
+      if (!shouldSkipCoordinator()) {
+        globalLoadingCoordinator.reportHeatmapRendering(100);
+      }
     } else {
       console.log('❌ HeatmapDataService: Conditions not met, clearing data:', {
         selectedCategory,
@@ -762,7 +795,7 @@ export default function HeatmapDataService({
         onRankedDataCalculated(null);
       }
     }
-  }, [selectedCategory, selectedSubcategory, dataType, dssData, demographicsData, economicStatsData, healthStatsData, onDataProcessed, onRankedDataCalculated]);
+  }, [selectedCategory, selectedSubcategory, dataType, dssData, demographicsData, economicStatsData, healthStatsData, onDataProcessed, onRankedDataCalculated, loadingComplete, hasEverReportedToCoordinator]);
 
   // Combined loading state for user feedback
   const isPreloading = loading || loadingSA2Names || preloadingHeatmaps;
@@ -770,12 +803,27 @@ export default function HeatmapDataService({
                        loadingSA2Names ? 'Loading region names...' : 
                        preloadingHeatmaps ? `Preloading ${dataType} heatmap data...` : 
                        'Ready';
+  
+  // Only show individual loading indicators during initial load (before loadingComplete)
+  const shouldShowLoadingIndicators = isPreloading && !loadingComplete;
+  
+  // Debug logging - only log when there's a change
+  if (isPreloading || loadingComplete) {
+    console.log('🔍 HeatmapDataService Loading Debug:', {
+      isPreloading,
+      loadingComplete,
+      shouldShowLoadingIndicators,
+      preloadStatus,
+      selectedCategory,
+      selectedSubcategory
+    });
+  }
 
   // Return loading/error state
   return (
     <>
       {/* Loading Status */}
-      {isPreloading && (
+      {shouldShowLoadingIndicators && (
         <div className="absolute top-4 left-4 bg-blue-50 border border-blue-200 rounded-lg p-3 z-20">
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>

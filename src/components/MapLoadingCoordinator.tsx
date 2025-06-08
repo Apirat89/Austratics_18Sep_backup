@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // Loading stages in sequential order
 export type LoadingStage = 
@@ -28,6 +28,8 @@ class RealLoadingCoordinator {
   private currentState: LoadingState = { stage: 'map-init', progress: 0, message: 'Waiting for map initialization...' };
   private stageCompletions: { [key in LoadingStage]?: boolean } = {};
   private boundaryLoadingStarted = false;
+  private initialLoadingComplete = false; // Track if initial loading sequence is complete
+  private hasEverCompleted = false; // Track if initial load has ever completed (persistent)
   
   subscribe(listener: (state: LoadingState) => void) {
     this.listeners.push(listener);
@@ -92,6 +94,8 @@ class RealLoadingCoordinator {
     }
     
     // All stages complete!
+    this.initialLoadingComplete = true; // Mark initial loading as complete
+    this.hasEverCompleted = true; // Mark as ever completed (persistent)
     this.currentState = {
       stage: 'complete',
       progress: 100,
@@ -138,7 +142,21 @@ class RealLoadingCoordinator {
   }
   
   reportHeatmapRendering(progress: number) {
-    this.updateState('heatmap-rendering', progress, 'Rendering heatmap visualization...');
+    // Only report heatmap rendering during initial loading sequence
+    if (!this.initialLoadingComplete) {
+      this.updateState('heatmap-rendering', progress, 'Rendering heatmap visualization...');
+    }
+  }
+  
+  // Check if initial loading is complete (for components to use)
+  isInitialLoadingComplete(): boolean {
+    console.log('🔍 MapLoadingCoordinator.isInitialLoadingComplete():', this.hasEverCompleted);
+    return this.hasEverCompleted; // Return persistent completion status
+  }
+  
+  // Check if currently in the initial loading sequence (vs post-load operations)
+  isCurrentlyLoading(): boolean {
+    return !this.hasEverCompleted;
   }
 }
 
@@ -164,6 +182,7 @@ export default function MapLoadingCoordinator({
   });
 
   const hasCompleted = useRef(false);
+  const hasEverRun = useRef(false); // Prevent multiple loading sequences
 
   // Subscribe to real loading events
   useEffect(() => {
@@ -175,71 +194,83 @@ export default function MapLoadingCoordinator({
         hasCompleted.current = true;
         console.log('🎉 MapLoadingCoordinator: All loading complete, showing map');
         
-        // Brief delay to show completion state
+        // Brief delay to show completion state before hiding overlay
         setTimeout(() => {
           onLoadingComplete();
-        }, 300);
+        }, 150); // Reduced from 300ms to 150ms for smoother transition
       }
     });
 
     return unsubscribe;
   }, [onLoadingComplete]);
 
-  // Trigger map initialization after mount
+  // Trigger map initialization after mount (only once)
   useEffect(() => {
-    // Sequential loading simulation with guaranteed progression
-    const runLoadingSequence = async () => {
-      // Stage 1: Map initialization
-      setTimeout(() => globalLoadingCoordinator.reportMapInit(), 500);
+    // Only run loading sequence once per app session
+    if (!hasEverRun.current) {
+      hasEverRun.current = true;
+      console.log('🎬 MapLoadingCoordinator: Starting initial loading sequence (first time only)');
       
-      // Stage 2-5: Data loading (let real systems handle these if they exist)
-      setTimeout(() => {
-        globalLoadingCoordinator.reportDataLoading('healthcare', 100);
-      }, 1000);
+      // Sequential loading simulation with guaranteed progression
+      const runLoadingSequence = async () => {
+        // Stage 1: Map initialization - start immediately
+        setTimeout(() => globalLoadingCoordinator.reportMapInit(), 100); // Much faster start
+        
+        // Stage 2-5: Data loading (let real systems handle these if they exist)
+        setTimeout(() => {
+          globalLoadingCoordinator.reportDataLoading('healthcare', 100);
+        }, 300); // Much faster
+        
+        setTimeout(() => {
+          globalLoadingCoordinator.reportDataLoading('demographics', 100);
+        }, 500);
+        
+        setTimeout(() => {
+          globalLoadingCoordinator.reportDataLoading('economics', 100);
+        }, 700);
+        
+        setTimeout(() => {
+          globalLoadingCoordinator.reportDataLoading('health-stats', 100);
+        }, 900);
+        
+        // Stage 6: Boundary loading
+        setTimeout(() => {
+          globalLoadingCoordinator.reportBoundaryLoading(10);
+          setTimeout(() => globalLoadingCoordinator.reportBoundaryLoading(60), 200);
+          setTimeout(() => globalLoadingCoordinator.reportBoundaryLoading(100), 600);
+        }, 1100);
+        
+        // Stage 7: Name mapping
+        setTimeout(() => {
+          globalLoadingCoordinator.reportNameMapping(10);
+          setTimeout(() => globalLoadingCoordinator.reportNameMapping(60), 200);
+          setTimeout(() => globalLoadingCoordinator.reportNameMapping(100), 400);
+        }, 1900);
+        
+        // Stage 8: Data processing
+        setTimeout(() => {
+          globalLoadingCoordinator.reportDataProcessing(10);
+          setTimeout(() => globalLoadingCoordinator.reportDataProcessing(60), 100);
+          setTimeout(() => globalLoadingCoordinator.reportDataProcessing(100), 200);
+        }, 2500);
+        
+        // Stage 9: Heatmap rendering
+        setTimeout(() => {
+          globalLoadingCoordinator.reportHeatmapRendering(10);
+          setTimeout(() => globalLoadingCoordinator.reportHeatmapRendering(60), 100);
+          setTimeout(() => globalLoadingCoordinator.reportHeatmapRendering(100), 200);
+        }, 2900);
+      };
       
-      setTimeout(() => {
-        globalLoadingCoordinator.reportDataLoading('demographics', 100);
-      }, 1200);
-      
-      setTimeout(() => {
-        globalLoadingCoordinator.reportDataLoading('economics', 100);
-      }, 1400);
-      
-      setTimeout(() => {
-        globalLoadingCoordinator.reportDataLoading('health-stats', 100);
-      }, 1600);
-      
-      // Stage 6: Boundary loading
-      setTimeout(() => {
-        globalLoadingCoordinator.reportBoundaryLoading(10);
-        setTimeout(() => globalLoadingCoordinator.reportBoundaryLoading(60), 200);
-        setTimeout(() => globalLoadingCoordinator.reportBoundaryLoading(100), 600);
-      }, 1800);
-      
-      // Stage 7: Name mapping
-      setTimeout(() => {
-        globalLoadingCoordinator.reportNameMapping(10);
-        setTimeout(() => globalLoadingCoordinator.reportNameMapping(60), 200);
-        setTimeout(() => globalLoadingCoordinator.reportNameMapping(100), 400);
-      }, 2600);
-      
-      // Stage 8: Data processing
-      setTimeout(() => {
-        globalLoadingCoordinator.reportDataProcessing(10);
-        setTimeout(() => globalLoadingCoordinator.reportDataProcessing(60), 100);
-        setTimeout(() => globalLoadingCoordinator.reportDataProcessing(100), 200);
-      }, 3200);
-      
-      // Stage 9: Heatmap rendering
-      setTimeout(() => {
-        globalLoadingCoordinator.reportHeatmapRendering(10);
-        setTimeout(() => globalLoadingCoordinator.reportHeatmapRendering(60), 100);
-        setTimeout(() => globalLoadingCoordinator.reportHeatmapRendering(100), 200);
-      }, 3600);
-    };
-    
-    runLoadingSequence();
-  }, []);
+      runLoadingSequence();
+    } else {
+      console.log('⏭️ MapLoadingCoordinator: Skipping loading sequence (already completed)');
+      // If loading was already completed, immediately call completion
+      if (globalLoadingCoordinator.isInitialLoadingComplete()) {
+        onLoadingComplete();
+      }
+    }
+  }, [onLoadingComplete]);
 
   // Auto-advance stalled stages (fallback mechanism)
   useEffect(() => {
