@@ -778,6 +778,7 @@ export default function MapsPage() {
           <div className="absolute inset-0">
             <MapLoadingCoordinator 
               onLoadingComplete={handleLoadingComplete}
+              mapRef={mapRef}
             >
               <AustralianMap
                 ref={mapRef}

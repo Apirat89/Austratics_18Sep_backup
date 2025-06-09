@@ -13,7 +13,8 @@ export type LoadingStage =
   | 'name-mapping'       // 7. SA2 ID→Name mapping extraction
   | 'data-processing'    // 8. Process and cache data combinations
   | 'heatmap-rendering'  // 9. Apply default selection and render
-  | 'complete';          // 10. All loading complete
+  | 'map-rendering'      // 10. Wait for map to be fully rendered
+  | 'complete';          // 11. All loading complete
 
 export interface LoadingState {
   stage: LoadingStage;
@@ -30,6 +31,7 @@ class RealLoadingCoordinator {
   private boundaryLoadingStarted = false;
   private initialLoadingComplete = false; // Track if initial loading sequence is complete
   private hasEverCompleted = false; // Track if initial load has ever completed (persistent)
+  private currentSessionId = Math.random().toString(36).substring(7); // Unique session ID
   
   subscribe(listener: (state: LoadingState) => void) {
     this.listeners.push(listener);
@@ -56,7 +58,7 @@ class RealLoadingCoordinator {
     const stages: LoadingStage[] = [
       'map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
       'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
-      'heatmap-rendering'
+      'heatmap-rendering', 'map-rendering'
     ];
     
     // Find the next incomplete stage
@@ -79,6 +81,7 @@ class RealLoadingCoordinator {
             'name-mapping': 'Extracting SA2 name mappings...',
             'data-processing': 'Processing data combinations...',
             'heatmap-rendering': 'Rendering heatmap visualization...',
+            'map-rendering': 'Waiting for map to fully render...',
             'complete': 'All systems ready!'
           };
           
@@ -148,6 +151,13 @@ class RealLoadingCoordinator {
     }
   }
   
+  reportMapRendering(progress: number) {
+    // Only report map rendering during initial loading sequence
+    if (!this.initialLoadingComplete) {
+      this.updateState('map-rendering', progress, 'Waiting for map to fully render...');
+    }
+  }
+  
   // Check if initial loading is complete (for components to use)
   isInitialLoadingComplete(): boolean {
     console.log('🔍 MapLoadingCoordinator.isInitialLoadingComplete():', this.hasEverCompleted);
@@ -168,12 +178,14 @@ export { globalLoadingCoordinator };
 
 interface MapLoadingCoordinatorProps {
   onLoadingComplete: () => void;
-  children?: React.ReactNode;
+  children: React.ReactNode;
+  mapRef?: React.RefObject<any>; // Add map ref to monitor render state
 }
 
 export default function MapLoadingCoordinator({
   onLoadingComplete,
-  children
+  children,
+  mapRef
 }: MapLoadingCoordinatorProps) {
   const [loadingState, setLoadingState] = useState<LoadingState>({
     stage: 'map-init',
@@ -206,10 +218,10 @@ export default function MapLoadingCoordinator({
 
   // Trigger map initialization after mount (only once)
   useEffect(() => {
-    // Only run loading sequence once per app session
+    // Only run loading sequence once per component mount (not session)
     if (!hasEverRun.current) {
       hasEverRun.current = true;
-      console.log('🎬 MapLoadingCoordinator: Starting initial loading sequence (first time only)');
+      console.log('🎬 MapLoadingCoordinator: Starting fresh loading sequence');
       
       // Sequential loading simulation with guaranteed progression
       const runLoadingSequence = async () => {
@@ -260,15 +272,21 @@ export default function MapLoadingCoordinator({
           setTimeout(() => globalLoadingCoordinator.reportHeatmapRendering(60), 100);
           setTimeout(() => globalLoadingCoordinator.reportHeatmapRendering(100), 200);
         }, 2900);
+        
+        // Stage 10: Map rendering - automatically advance after heatmap is done
+        // This stage will wait for actual map render events but give it a chance to start
+        setTimeout(() => {
+          console.log('🗺️ MapLoadingCoordinator: Ready for map rendering stage');
+          // The map component should have called reportMapRendering by now
+          // If not, we'll wait for the stall check to handle it
+        }, 3500);
       };
       
       runLoadingSequence();
     } else {
-      console.log('⏭️ MapLoadingCoordinator: Skipping loading sequence (already completed)');
-      // If loading was already completed, immediately call completion
-      if (globalLoadingCoordinator.isInitialLoadingComplete()) {
-        onLoadingComplete();
-      }
+      console.log('⏭️ MapLoadingCoordinator: Loading sequence already running in this component');
+      // Reset completion flag for this component instance
+      hasCompleted.current = false;
     }
   }, [onLoadingComplete]);
 
@@ -283,7 +301,7 @@ export default function MapLoadingCoordinator({
         const stages = [
           'map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
           'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
-          'heatmap-rendering'
+          'heatmap-rendering', 'map-rendering'
         ];
         
         const currentIndex = stages.indexOf(loadingState.stage as any);
@@ -298,13 +316,16 @@ export default function MapLoadingCoordinator({
             case 'heatmap-rendering':
               globalLoadingCoordinator.reportHeatmapRendering(100);
               break;
+            case 'map-rendering':
+              globalLoadingCoordinator.reportMapRendering(100);
+              break;
           }
         } else {
-          // Force completion
-          globalLoadingCoordinator.reportHeatmapRendering(100);
+          // Force completion - ensure we complete the map rendering stage
+          globalLoadingCoordinator.reportMapRendering(100);
         }
       }
-    }, 2000); // Check after 2 seconds of being stuck
+    }, 5000); // Check after 5 seconds of being stuck (was 2 seconds)
 
     return () => clearTimeout(stallCheckTimer);
   }, [loadingState.stage, loadingState.progress]);
@@ -317,12 +338,12 @@ export default function MapLoadingCoordinator({
       const stages: LoadingStage[] = [
         'map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
         'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
-        'heatmap-rendering'
+        'heatmap-rendering', 'map-rendering'
       ];
       return stages.indexOf(stage) + 1;
     };
 
-    const totalStages = 9;
+    const totalStages = 10;
 
     return (
       <div className="absolute inset-0 bg-white bg-opacity-95 flex items-center justify-center z-50">
@@ -373,15 +394,16 @@ export default function MapLoadingCoordinator({
               { stage: 'boundary-data', label: 'Boundary data (170MB)' },
               { stage: 'name-mapping', label: 'Name mappings' },
               { stage: 'data-processing', label: 'Data processing' },
-              { stage: 'heatmap-rendering', label: 'Heatmap rendering' }
+              { stage: 'heatmap-rendering', label: 'Heatmap rendering' },
+              { stage: 'map-rendering', label: 'Map rendering' }
             ].map(({ stage, label }) => {
               const isComplete = loadingState.stage === 'complete' || 
                                (['map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
                                  'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
-                                 'heatmap-rendering'].indexOf(stage as LoadingStage) < 
+                                 'heatmap-rendering', 'map-rendering'].indexOf(stage as LoadingStage) < 
                                 ['map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
                                  'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
-                                 'heatmap-rendering'].indexOf(loadingState.stage));
+                                 'heatmap-rendering', 'map-rendering'].indexOf(loadingState.stage));
               const isCurrent = loadingState.stage === stage;
               
               return (

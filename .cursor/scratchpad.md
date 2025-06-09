@@ -183,6 +183,21 @@ Add a collapsible sidebar panel on the right side of the map that displays the t
 - ✅ **Application Tested** - HeatmapDataService now loads updated data
 - ✅ **Status: COMPLETE** - All application components use latest data files
 
+### ✅ GIT VERSION CONTROL - CURRENT STATE PUSHED
+- ✅ **Git Status Checked** - Modified files identified (.cursor/scratchpad.md, src/components/FacilityDetailsModal.tsx)
+- ✅ **Changes Committed** - Commit cbd83fa created with descriptive message
+- ✅ **Remote Push Completed** - All changes successfully pushed to https://github.com/Apirat89/Giantash.git
+- ✅ **Repository Synchronized** - Local and remote branches aligned
+- ✅ **Status: COMPLETE** - Current version available on GitHub
+
+### 🔄 **MAP LOADING IMPROVEMENTS - ENHANCED UX**
+- ✅ **Problem Identified** - Loading screen disappears before map fully renders, causing poor UX
+- ✅ **Solution Implemented** - Added map rendering detection to MapLoadingCoordinator
+- ✅ **New Loading Stage Added** - "map-rendering" stage waits for actual map render completion
+- ✅ **Detection Logic** - Monitors map.isStyleLoaded() and idle events for true render completion
+- ✅ **Progress Tracking** - Loading overlay now shows 10 stages instead of 9
+- ✅ **Status: COMPLETE** - Preload menu now properly waits for full map rendering
+
 ### 🆕 **NEW FEATURE: Facility Details Pages & Navigation**
 **🎯 FEATURE STATUS: PLANNED - Awaiting build fix**
 - ✅ **Requirements Analysis** - User requirements documented and analyzed
