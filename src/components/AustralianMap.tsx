@@ -348,69 +348,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       preloadAllBoundaryData();
       preloadAllMapStyles();
       
-      // Wait for map to be visually rendered
-      console.log('🗺️ Map loaded, waiting for rendering to complete...');
-      
-      // Use requestAnimationFrame to wait for visual rendering
-      let renderComplete = false;
-      
-      const waitForRender = () => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              // Give the map 3 frames to render
-              if (!renderComplete && map.current) {
-                const isStyleLoaded = map.current.isStyleLoaded();
-                console.log('🎨 Map render check - styleLoaded:', isStyleLoaded);
-                
-                if (isStyleLoaded) {
-                  renderComplete = true;
-                  console.log('✅ Map rendering appears complete!');
-                  
-                  // Report rendering progress
-                  globalLoadingCoordinator.reportMapRendering(50);
-                  
-                  // Wait a bit more for any animations/transitions
-                  setTimeout(() => {
-                    globalLoadingCoordinator.reportMapRendering(100);
-                    console.log('🎉 Map fully rendered and ready!');
-                  }, 500);
-                } else {
-                  // Style not loaded yet, try again
-                  setTimeout(waitForRender, 100);
-                }
-              }
-            });
-          });
-        });
-      };
-      
-      // Start the render detection
-      globalLoadingCoordinator.reportMapRendering(10);
-      setTimeout(waitForRender, 100); // Give map a moment to start
-      
-      // Backup: listen for idle event
-      const onIdle = () => {
-        if (!renderComplete) {
-          console.log('💤 Map idle event - ensuring render completion');
-          renderComplete = true;
-          globalLoadingCoordinator.reportMapRendering(100);
-        }
-        map.current?.off('idle', onIdle);
-      };
-      
-      if (map.current) {
-        map.current.once('idle', onIdle);
-      }
-      
-      // Final backup: timeout after 3 seconds
-      setTimeout(() => {
-        if (!renderComplete) {
-          console.log('⏰ Map render timeout - forcing completion');
-          renderComplete = true;
-          globalLoadingCoordinator.reportMapRendering(100);
-        }
-      }, 3000);
+      // Map loaded - let MapLoadingCoordinator handle the timing
+      console.log('✅ Map loaded, MapLoadingCoordinator will handle rendering timing');
     });
 
     return () => {

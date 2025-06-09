@@ -25,13 +25,11 @@ export interface LoadingState {
 
 // Global loading coordinator that listens to real loading events
 class RealLoadingCoordinator {
-  private listeners: ((state: LoadingState) => void)[] = [];
-  private currentState: LoadingState = { stage: 'map-init', progress: 0, message: 'Waiting for map initialization...' };
+  protected listeners: ((state: LoadingState) => void)[] = [];
+  protected currentState: LoadingState = { stage: 'map-init', progress: 0, message: 'Waiting for map initialization...' };
   private stageCompletions: { [key in LoadingStage]?: boolean } = {};
   private boundaryLoadingStarted = false;
-  private initialLoadingComplete = false; // Track if initial loading sequence is complete
-  private hasEverCompleted = false; // Track if initial load has ever completed (persistent)
-  private currentSessionId = Math.random().toString(36).substring(7); // Unique session ID
+  protected initialLoadingComplete = false; // Track if initial loading sequence is complete
   
   subscribe(listener: (state: LoadingState) => void) {
     this.listeners.push(listener);
@@ -42,6 +40,18 @@ class RealLoadingCoordinator {
     };
   }
   
+  // Simple method to directly set stage and progress without complex logic
+  setStageDirectly(stage: LoadingStage, progress: number, message: string) {
+    this.currentState = { stage, progress, message };
+    console.log(`🔄 RealLoadingCoordinator: ${stage} - ${progress}% - ${message}`);
+    this.listeners.forEach(listener => listener(this.currentState));
+    
+    // Mark stage as complete when progress reaches 100%
+    if (progress >= 100) {
+      this.stageCompletions[stage] = true;
+    }
+  }
+  
   private updateState(stage: LoadingStage, progress: number, message: string, error?: string) {
     this.currentState = { stage, progress, message, error };
     console.log(`🔄 RealLoadingCoordinator: ${stage} - ${progress}% - ${message}`);
@@ -50,7 +60,8 @@ class RealLoadingCoordinator {
     // Mark stage as complete when progress reaches 100%
     if (progress >= 100) {
       this.stageCompletions[stage] = true;
-      this.checkForNextStage();
+      // Don't auto-advance during sequential loading - let the setTimeout sequence handle it
+      // this.checkForNextStage();
     }
   }
   
@@ -98,7 +109,6 @@ class RealLoadingCoordinator {
     
     // All stages complete!
     this.initialLoadingComplete = true; // Mark initial loading as complete
-    this.hasEverCompleted = true; // Mark as ever completed (persistent)
     this.currentState = {
       stage: 'complete',
       progress: 100,
@@ -160,13 +170,25 @@ class RealLoadingCoordinator {
   
   // Check if initial loading is complete (for components to use)
   isInitialLoadingComplete(): boolean {
-    console.log('🔍 MapLoadingCoordinator.isInitialLoadingComplete():', this.hasEverCompleted);
-    return this.hasEverCompleted; // Return persistent completion status
+    console.log('🔍 MapLoadingCoordinator.isInitialLoadingComplete():', this.initialLoadingComplete);
+    return this.initialLoadingComplete;
   }
   
   // Check if currently in the initial loading sequence (vs post-load operations)
   isCurrentlyLoading(): boolean {
-    return !this.hasEverCompleted;
+    return !this.initialLoadingComplete;
+  }
+  
+  // Manually trigger completion (used by sequential loading)
+  triggerCompletion() {
+    console.log('🎉 Manually triggering loading completion');
+    this.initialLoadingComplete = true;
+    this.currentState = {
+      stage: 'complete',
+      progress: 100,
+      message: 'All systems ready!'
+    };
+    this.listeners.forEach(listener => listener(this.currentState));
   }
 }
 
@@ -223,63 +245,47 @@ export default function MapLoadingCoordinator({
       hasEverRun.current = true;
       console.log('🎬 MapLoadingCoordinator: Starting fresh loading sequence');
       
-      // Sequential loading simulation with guaranteed progression
+      // Sequential loading simulation - 20 seconds total, no flickering
       const runLoadingSequence = async () => {
-        // Stage 1: Map initialization - start immediately
-        setTimeout(() => globalLoadingCoordinator.reportMapInit(), 100); // Much faster start
+        console.log('🎬 Starting clean 20-second sequential loading sequence...');
         
-        // Stage 2-5: Data loading (let real systems handle these if they exist)
-        setTimeout(() => {
-          globalLoadingCoordinator.reportDataLoading('healthcare', 100);
-        }, 300); // Much faster
+        const stages = [
+          { stage: 'map-init' as LoadingStage, message: 'Initializing map...', duration: 1000 },
+          { stage: 'healthcare-data' as LoadingStage, message: 'Loading healthcare data...', duration: 2000 },
+          { stage: 'demographics-data' as LoadingStage, message: 'Loading demographics data...', duration: 2000 },
+          { stage: 'economics-data' as LoadingStage, message: 'Loading economics data...', duration: 2000 },
+          { stage: 'health-stats-data' as LoadingStage, message: 'Loading health statistics data...', duration: 2000 },
+          { stage: 'boundary-data' as LoadingStage, message: 'Loading SA2 boundaries (170MB)...', duration: 6000 },
+          { stage: 'name-mapping' as LoadingStage, message: 'Extracting SA2 name mappings...', duration: 1000 },
+          { stage: 'data-processing' as LoadingStage, message: 'Processing data combinations...', duration: 1000 },
+          { stage: 'heatmap-rendering' as LoadingStage, message: 'Rendering heatmap visualization...', duration: 2000 },
+          { stage: 'map-rendering' as LoadingStage, message: 'Waiting for map to fully render...', duration: 1000 }
+        ];
         
-        setTimeout(() => {
-          globalLoadingCoordinator.reportDataLoading('demographics', 100);
-        }, 500);
+        let currentTime = 0;
         
-        setTimeout(() => {
-          globalLoadingCoordinator.reportDataLoading('economics', 100);
-        }, 700);
+        stages.forEach((stageInfo, index) => {
+          // Start each stage
+          setTimeout(() => {
+            globalLoadingCoordinator.setStageDirectly(stageInfo.stage, 0, stageInfo.message);
+          }, currentTime);
+          
+          // Progress updates within each stage
+          const progressSteps = [25, 50, 75, 100];
+          progressSteps.forEach((progress, progIndex) => {
+            setTimeout(() => {
+              globalLoadingCoordinator.setStageDirectly(stageInfo.stage, progress, stageInfo.message);
+            }, currentTime + (stageInfo.duration / 4) * (progIndex + 1));
+          });
+          
+          currentTime += stageInfo.duration;
+        });
         
+        // Final completion at exactly 20 seconds
         setTimeout(() => {
-          globalLoadingCoordinator.reportDataLoading('health-stats', 100);
-        }, 900);
-        
-        // Stage 6: Boundary loading
-        setTimeout(() => {
-          globalLoadingCoordinator.reportBoundaryLoading(10);
-          setTimeout(() => globalLoadingCoordinator.reportBoundaryLoading(60), 200);
-          setTimeout(() => globalLoadingCoordinator.reportBoundaryLoading(100), 600);
-        }, 1100);
-        
-        // Stage 7: Name mapping
-        setTimeout(() => {
-          globalLoadingCoordinator.reportNameMapping(10);
-          setTimeout(() => globalLoadingCoordinator.reportNameMapping(60), 200);
-          setTimeout(() => globalLoadingCoordinator.reportNameMapping(100), 400);
-        }, 1900);
-        
-        // Stage 8: Data processing
-        setTimeout(() => {
-          globalLoadingCoordinator.reportDataProcessing(10);
-          setTimeout(() => globalLoadingCoordinator.reportDataProcessing(60), 100);
-          setTimeout(() => globalLoadingCoordinator.reportDataProcessing(100), 200);
-        }, 2500);
-        
-        // Stage 9: Heatmap rendering
-        setTimeout(() => {
-          globalLoadingCoordinator.reportHeatmapRendering(10);
-          setTimeout(() => globalLoadingCoordinator.reportHeatmapRendering(60), 100);
-          setTimeout(() => globalLoadingCoordinator.reportHeatmapRendering(100), 200);
-        }, 2900);
-        
-        // Stage 10: Map rendering - automatically advance after heatmap is done
-        // This stage will wait for actual map render events but give it a chance to start
-        setTimeout(() => {
-          console.log('🗺️ MapLoadingCoordinator: Ready for map rendering stage');
-          // The map component should have called reportMapRendering by now
-          // If not, we'll wait for the stall check to handle it
-        }, 3500);
+          console.log('🎉 20-second sequence complete - manually triggering completion');
+          globalLoadingCoordinator.triggerCompletion();
+        }, 20000);
       };
       
       runLoadingSequence();
@@ -290,45 +296,7 @@ export default function MapLoadingCoordinator({
     }
   }, [onLoadingComplete]);
 
-  // Auto-advance stalled stages (fallback mechanism)
-  useEffect(() => {
-    const stallCheckTimer = setTimeout(() => {
-      // If we're stuck at a stage for too long, force advance
-      if (loadingState.progress === 100 && loadingState.stage !== 'complete') {
-        console.log('🔄 Loading appears stalled, forcing advancement...');
-        
-        // Trigger the next logical stage
-        const stages = [
-          'map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
-          'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
-          'heatmap-rendering', 'map-rendering'
-        ];
-        
-        const currentIndex = stages.indexOf(loadingState.stage as any);
-        if (currentIndex >= 0 && currentIndex < stages.length - 1) {
-          const nextStage = stages[currentIndex + 1];
-          
-          // Force trigger the next stage
-          switch (nextStage) {
-            case 'data-processing':
-              globalLoadingCoordinator.reportDataProcessing(100);
-              break;
-            case 'heatmap-rendering':
-              globalLoadingCoordinator.reportHeatmapRendering(100);
-              break;
-            case 'map-rendering':
-              globalLoadingCoordinator.reportMapRendering(100);
-              break;
-          }
-        } else {
-          // Force completion - ensure we complete the map rendering stage
-          globalLoadingCoordinator.reportMapRendering(100);
-        }
-      }
-    }, 5000); // Check after 5 seconds of being stuck (was 2 seconds)
-
-    return () => clearTimeout(stallCheckTimer);
-  }, [loadingState.stage, loadingState.progress]);
+  // Removed stall check - let 20-second sequence run without interference
 
   // Loading overlay component
   const LoadingOverlay = () => {
