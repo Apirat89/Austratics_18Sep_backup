@@ -296,19 +296,7 @@ export default function FacilityDetailsModal({ facility, isOpen, onClose }: Faci
               </div>
             </div>
 
-            {/* Mini Map Placeholder */}
-            <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Location Map</h3>
-              <div className="h-48 bg-gray-200 rounded-lg flex items-center justify-center">
-                <div className="text-center text-gray-500">
-                  <MapPin className="w-8 h-8 mx-auto mb-2" />
-                  <p className="text-sm">Interactive map coming soon</p>
-                  <p className="text-xs text-gray-400">
-                    {facility.Latitude.toFixed(4)}, {facility.Longitude.toFixed(4)}
-                  </p>
-                </div>
-              </div>
-            </div>
+
           </div>
         </div>
 
