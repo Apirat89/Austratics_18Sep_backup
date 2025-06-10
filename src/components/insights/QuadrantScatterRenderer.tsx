@@ -61,18 +61,24 @@ export default function QuadrantScatterRenderer({
       title: {
         text: config.name || 'Quadrant Scatter Plot',
         left: 'center',
+        top: '2%',
         textStyle: {
-          fontSize: 16,
-          fontWeight: 'bold'
+          fontSize: 18,
+          fontWeight: '500',
+          color: '#1f2937'
         }
       },
       tooltip: {
         trigger: 'item',
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderColor: '#ddd',
+        backgroundColor: 'rgba(255, 255, 255, 0.96)',
+        borderColor: '#e5e7eb',
         borderWidth: 1,
+        borderRadius: 8,
+        padding: [12, 16],
         textStyle: {
-          color: '#333'
+          color: '#374151',
+          fontSize: 13,
+          lineHeight: 20
         },
         formatter: (params: any) => {
           const data = params.data;
@@ -80,36 +86,66 @@ export default function QuadrantScatterRenderer({
           const yVar = getVariableName(config.measureY!);
           
           return `
-            <div style="font-weight: bold; margin-bottom: 4px;">${data.sa2Name}</div>
-            <div style="color: #666; font-size: 12px; margin-bottom: 8px;">SA2 ID: ${data.sa2Id}</div>
-            <div><strong>${xVar}:</strong> ${formatValue(data.xValue)}</div>
-            <div><strong>${yVar}:</strong> ${formatValue(data.yValue)}</div>
-            ${data.size ? `<div><strong>Size:</strong> ${formatValue(data.size)}</div>` : ''}
+            <div style="font-weight: 600; margin-bottom: 6px; font-size: 14px; color: #1f2937;">${data.sa2Name}</div>
+            <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">SA2 ID: ${data.sa2Id}</div>
+            <div style="margin-bottom: 3px;"><span style="color: #6b7280;">${xVar}:</span> <strong>${formatValue(data.xValue)}</strong></div>
+            <div style="margin-bottom: 3px;"><span style="color: #6b7280;">${yVar}:</span> <strong>${formatValue(data.yValue)}</strong></div>
+            ${data.size ? `<div><span style="color: #6b7280;">Size:</span> <strong>${formatValue(data.size)}</strong></div>` : ''}
           `;
         }
       },
       grid: {
-        left: '12%',
-        right: '10%',
-        top: '15%',
-        bottom: '15%',
-        containLabel: true
+        left: '15%',
+        right: '8%',
+        top: '12%',
+        bottom: '30%',
+        containLabel: false
       },
       xAxis: {
         type: 'value',
         name: getVariableName(config.measureX!),
         nameLocation: 'middle',
         nameGap: 35,
+        nameTextStyle: {
+          fontSize: 13,
+          color: '#374151',
+          fontWeight: '500',
+          padding: [15, 0, 0, 0]
+        },
         splitLine: {
           show: true,
           lineStyle: {
-            color: '#f0f0f0'
+            color: '#f3f4f6',
+            width: 1,
+            type: 'solid'
           }
         },
         axisLine: {
           show: true,
           lineStyle: {
-            color: '#ddd'
+            color: '#d1d5db',
+            width: 1.5
+          }
+        },
+        axisTick: {
+          show: true,
+          lineStyle: {
+            color: '#d1d5db',
+            width: 1
+          },
+          length: 6
+        },
+        axisLabel: {
+          fontSize: 12,
+          color: '#6b7280',
+          margin: 12,
+          formatter: (value: number) => {
+            if (Math.abs(value) >= 1000000) {
+              return `${(value / 1000000).toFixed(1)}M`;
+            } else if (Math.abs(value) >= 1000) {
+              return `${(value / 1000).toFixed(1)}K`;
+            }
+            return value.toString();
           }
         }
       },
@@ -117,17 +153,47 @@ export default function QuadrantScatterRenderer({
         type: 'value',
         name: getVariableName(config.measureY!),
         nameLocation: 'middle',
-        nameGap: 45,
+        nameGap: 60,
+        nameTextStyle: {
+          fontSize: 13,
+          color: '#374151',
+          fontWeight: '500',
+          padding: [0, 0, 0, 10]
+        },
         splitLine: {
           show: true,
           lineStyle: {
-            color: '#f0f0f0'
+            color: '#f3f4f6',
+            width: 1,
+            type: 'solid'
           }
         },
         axisLine: {
           show: true,
           lineStyle: {
-            color: '#ddd'
+            color: '#d1d5db',
+            width: 1.5
+          }
+        },
+        axisTick: {
+          show: true,
+          lineStyle: {
+            color: '#d1d5db',
+            width: 1
+          },
+          length: 6
+        },
+        axisLabel: {
+          fontSize: 12,
+          color: '#6b7280',
+          margin: 12,
+          formatter: (value: number) => {
+            if (Math.abs(value) >= 1000000) {
+              return `${(value / 1000000).toFixed(1)}M`;
+            } else if (Math.abs(value) >= 1000) {
+              return `${(value / 1000).toFixed(1)}K`;
+            }
+            return value.toString();
           }
         }
       },
@@ -137,9 +203,9 @@ export default function QuadrantScatterRenderer({
           data: scatterData,
           symbolSize: (data: any) => {
             if (config.bubbleSize && data.size !== undefined) {
-              return Math.max(6, Math.min(25, Math.sqrt(data.size) * 2));
+              return Math.max(8, Math.min(30, Math.sqrt(data.size) * 2.5));
             }
-            return 8;
+            return 12;
           },
           itemStyle: {
             color: (params: any) => {
@@ -149,15 +215,23 @@ export default function QuadrantScatterRenderer({
               }
               return palette[0];
             },
-            opacity: 0.7,
-            borderColor: '#fff',
-            borderWidth: 1
+            opacity: 0.8,
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 4,
+            shadowOffsetY: 2
           },
           emphasis: {
             itemStyle: {
               opacity: 1,
-              borderWidth: 2
-            }
+              borderWidth: 3,
+              shadowColor: 'rgba(0, 0, 0, 0.2)',
+              shadowBlur: 8,
+              shadowOffsetY: 4
+            },
+            scale: true,
+            scaleSize: 1.2
           }
         }
       ],
@@ -193,20 +267,43 @@ export default function QuadrantScatterRenderer({
           markLine: {
             silent: true,
             lineStyle: {
-              color: '#999',
+              color: '#6366f1',
               width: 2,
-              type: 'dashed'
+              type: [5, 5],
+              opacity: 0.7
             },
             data: [
               {
                 type: 'average',
                 name: 'X Median',
-                xAxis: xMedian
+                xAxis: xMedian,
+                label: {
+                  show: true,
+                  position: 'insideMiddleBottom',
+                  formatter: 'X Median',
+                  fontSize: 11,
+                  color: '#6366f1',
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  padding: [4, 8],
+                  borderRadius: 4,
+                  distance: 20
+                }
               },
               {
                 type: 'average', 
                 name: 'Y Median',
-                yAxis: yMedian
+                yAxis: yMedian,
+                label: {
+                  show: true,
+                  position: 'insideMiddleTop',
+                  formatter: 'Y Median',
+                  fontSize: 11,
+                  color: '#6366f1',
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  padding: [4, 8],
+                  borderRadius: 4,
+                  distance: 20
+                }
               }
             ]
           }
@@ -216,22 +313,90 @@ export default function QuadrantScatterRenderer({
         {
           type: 'inside',
           xAxisIndex: 0,
-          yAxisIndex: 0
+          yAxisIndex: 0,
+          throttle: 50
         },
         {
           type: 'slider',
           xAxisIndex: 0,
-          bottom: '5%',
-          height: 20,
-          fillerColor: 'rgba(30, 144, 255, 0.2)',
-          borderColor: '#ccc'
+          bottom: '12%',
+          height: 16,
+          fillerColor: 'rgba(99, 102, 241, 0.15)',
+          borderColor: '#d1d5db',
+          dataBackground: {
+            lineStyle: {
+              color: '#e5e7eb',
+              width: 1
+            },
+            areaStyle: {
+              color: 'rgba(99, 102, 241, 0.05)'
+            }
+          },
+          selectedDataBackground: {
+            lineStyle: {
+              color: '#6366f1',
+              width: 1.5
+            },
+            areaStyle: {
+              color: 'rgba(99, 102, 241, 0.1)'
+            }
+          },
+          handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z',
+          handleSize: '100%',
+          handleStyle: {
+            color: '#6366f1',
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 4
+          },
+          textStyle: {
+            color: '#6b7280',
+            fontSize: 11
+          }
+        },
+        {
+          type: 'slider',
+          yAxisIndex: 0,
+          right: '3%',
+          width: 16,
+          orient: 'vertical',
+          fillerColor: 'rgba(99, 102, 241, 0.15)',
+          borderColor: '#d1d5db',
+          dataBackground: {
+            lineStyle: {
+              color: '#e5e7eb',
+              width: 1
+            },
+            areaStyle: {
+              color: 'rgba(99, 102, 241, 0.05)'
+            }
+          },
+          selectedDataBackground: {
+            lineStyle: {
+              color: '#6366f1',
+              width: 1.5
+            },
+            areaStyle: {
+              color: 'rgba(99, 102, 241, 0.1)'
+            }
+          },
+          handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z',
+          handleSize: '100%',
+          handleStyle: {
+            color: '#6366f1',
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 4
+          },
+          textStyle: {
+            color: '#6b7280',
+            fontSize: 11
+          }
         }
       ],
-      brush: {
-        toolbox: ['rect', 'polygon', 'clear'],
-        xAxisIndex: 0,
-        yAxisIndex: 0
-      },
+
       animation: true,
       animationDuration: 1000,
       animationEasing: 'cubicOut' as const
@@ -270,23 +435,30 @@ export default function QuadrantScatterRenderer({
   const prepareScatterData = () => {
     if (!config.measureX || !config.measureY) return [];
 
-    return data.map((record, index) => {
+    // Debug logging can be enabled if needed
+    // console.log('🔍 QuadrantScatterRenderer - prepareScatterData debug:', { ... });
+
+    const scatterData = data.map((record, index) => {
       const xValue = getRecordValue(record, config.measureX!);
       const yValue = getRecordValue(record, config.measureY!);
       const sizeValue = config.bubbleSize ? getRecordValue(record, config.bubbleSize) : undefined;
 
-      if (xValue === null || yValue === null) return null;
+      if (xValue === null || yValue === null) {
+        return null;
+      }
 
       return {
         value: [xValue, yValue],
-        sa2Id: record['SA2 ID'] || record['SA2_ID'] || record.SA2_Code || `SA2_${index}`,
-        sa2Name: record['SA2 Name'] || record['SA2_Name'] || record.Name || `Region ${index + 1}`,
+        sa2Id: record.sa2Id || record['SA2 ID'] || record['SA2_ID'] || record.SA2_Code || `SA2_${index}`,
+        sa2Name: record.sa2Name || record['SA2 Name'] || record['SA2_Name'] || record.Name || `Region ${index + 1}`,
         xValue,
         yValue,
         size: sizeValue,
         originalRecord: record
       };
     }).filter(Boolean);
+
+    return scatterData;
   };
 
   const calculateMedians = () => {
@@ -316,7 +488,33 @@ export default function QuadrantScatterRenderer({
   };
 
   const getRecordValue = (record: any, fieldName: string): number | null => {
-    // Try different possible field name variations
+    // First, try to find a fuzzy match for unified SA2 data field names
+    const recordKeys = Object.keys(record);
+    
+    // Try exact match first
+    if (record[fieldName] !== undefined && record[fieldName] !== null) {
+      const value = Number(record[fieldName]);
+      return isNaN(value) ? null : value;
+    }
+    
+    // Try fuzzy matching based on partial field name
+    const normalizedSearchTerm = fieldName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    for (const key of recordKeys) {
+      if (key === 'sa2Id' || key === 'sa2Name') continue;
+      
+      const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+      
+      // Check if the search term is contained in the key
+      if (normalizedKey.includes(normalizedSearchTerm) || normalizedSearchTerm.includes(normalizedKey)) {
+        const value = Number(record[key]);
+        if (!isNaN(value)) {
+          return value;
+        }
+      }
+    }
+    
+    // Try common field name variations as fallback
     const possibleKeys = [
       fieldName,
       fieldName.replace(/\s+/g, '_'),
@@ -333,7 +531,6 @@ export default function QuadrantScatterRenderer({
         return isNaN(value) ? null : value;
       }
     }
-
     return null;
   };
 
@@ -365,8 +562,7 @@ export default function QuadrantScatterRenderer({
       ref={chartRef} 
       style={{ 
         width: '100%', 
-        height: '100%',
-        minHeight: '400px'
+        height: '100%'
       }} 
     />
   );

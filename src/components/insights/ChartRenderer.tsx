@@ -11,7 +11,7 @@ interface ChartRendererProps {
   width?: string;
 }
 
-export default function ChartRenderer({ config, height = '400px', width = '100%' }: ChartRendererProps) {
+export default function ChartRenderer({ config, height = '500px', width = '100%' }: ChartRendererProps) {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -360,8 +360,8 @@ export default function ChartRenderer({ config, height = '400px', width = '100%'
         />
         
         {/* Chart overlay info */}
-        <div className="absolute top-2 right-2 bg-white bg-opacity-90 rounded px-2 py-1 text-xs text-gray-600 shadow-sm">
-          <div>{config.chartType} • {config.selectedVariables.length} variables • {sa2DataArray.length} SA2 regions</div>
+        <div className="absolute -top-4 -right-1 bg-white bg-opacity-95 rounded px-2 py-1 text-xs text-gray-600 shadow-sm border border-gray-200">
+          <div className="font-medium">{config.chartType} • {config.selectedVariables.length} variables • {sa2DataArray.length} SA2 regions</div>
           <div className="text-xs text-gray-500 mt-1">
             {config.selectedVariables.map(v => v.name).join(', ')}
           </div>

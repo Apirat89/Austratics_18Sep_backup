@@ -134,11 +134,11 @@ export default function QuadrantScatterPlot({ config, data, medianCalculations }
         }
       },
       grid: {
-        left: '12%',
+        left: '15%',
         right: '8%',
-        top: '15%',
-        bottom: '15%',
-        containLabel: true
+        top: '12%',
+        bottom: '30%',
+        containLabel: false
       },
       xAxis: {
         type: 'value',
@@ -299,7 +299,7 @@ export default function QuadrantScatterPlot({ config, data, medianCalculations }
   }, []);
 
   return (
-    <div className="w-full h-96">
+    <div className="w-full h-[440px]">
       <div ref={chartRef} className="w-full h-full" />
     </div>
   );

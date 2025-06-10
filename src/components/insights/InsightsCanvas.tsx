@@ -192,7 +192,7 @@ export default function InsightsCanvas({
                 ) : widget.config ? (
                   <ChartRenderer 
                     config={widget.config}
-                    height="300px"
+                    height="440px"
                   />
                 ) : (
                   <div className="h-64 flex items-center justify-center text-gray-400">

@@ -76,8 +76,8 @@ export default function AnalysisSidebar({
     }).format(new Date(date));
   };
 
-  const renderAnalysisItem = (analysis: ChartConfiguration, isRecent: boolean = false) => {
-    const ChartIcon = chartIcons[analysis.chartType] || BarChart3;
+  const renderAnalysisItem = (analysis: EnhancedChartConfiguration, isRecent: boolean = false) => {
+    const ChartIcon = chartIcons[analysis.chartType as keyof typeof chartIcons] || BarChart3;
     const isEditing = editingId === analysis.id;
     
     return (
@@ -87,7 +87,7 @@ export default function AnalysisSidebar({
       >
         <div className="flex items-center gap-2">
           {/* Chart Type Icon */}
-          <div className={`flex-shrink-0 p-1 rounded ${dataTypeColors[analysis.dataType] || 'text-gray-600'}`}>
+          <div className={`flex-shrink-0 p-1 rounded ${dataTypeColors[analysis.selectedVariables?.[0]?.dataSource as keyof typeof dataTypeColors] || 'text-gray-600'}`}>
             <ChartIcon className="h-4 w-4" />
           </div>
           
@@ -115,7 +115,7 @@ export default function AnalysisSidebar({
                   {analysis.name}
                 </div>
                 <div className="text-xs text-gray-500 truncate">
-                  {analysis.chartType} • {analysis.dataType.replace('-', ' ')}
+                  {analysis.chartType} • {analysis.selectedVariables?.[0]?.dataSource ? analysis.selectedVariables[0].dataSource.replace('-', ' ') : 'Unknown'}
                 </div>
                 {isRecent && (
                   <div className="text-xs text-gray-400">
@@ -157,7 +157,7 @@ export default function AnalysisSidebar({
   const renderSection = (
     title: string,
     icon: React.ReactNode,
-    analyses: ChartConfiguration[],
+    analyses: EnhancedChartConfiguration[],
     sectionKey: 'saved' | 'recent',
     isRecent: boolean = false
   ) => {
