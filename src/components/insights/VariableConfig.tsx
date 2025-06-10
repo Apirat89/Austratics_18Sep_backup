@@ -60,6 +60,11 @@ export default function VariableConfig({ config, onConfigChange, onComplete }: V
     if (isSelected) {
       newSelection = selectedVariables.filter(v => v.id !== variable.id);
     } else {
+      // For scatter plots, enforce maximum of 2 variables (X and Y axis only)
+      if (config.chartType === 'scatter' && selectedVariables.length >= 2) {
+        // Don't allow more than 2 variables for scatter plots
+        return;
+      }
       newSelection = [...selectedVariables, variable];
     }
     
@@ -134,8 +139,7 @@ export default function VariableConfig({ config, onConfigChange, onComplete }: V
        case 'pie':
          return measures.length >= 1 && dimensions.length >= 1;
        case 'scatter':
-       case 'quadrant-scatter':
-         return measures.length >= 2;
+         return measures.length === 2;
        case 'bubble':
          return measures.length >= 3;
        case 'histogram':
@@ -171,8 +175,8 @@ export default function VariableConfig({ config, onConfigChange, onComplete }: V
         </div>
       </div>
 
-      {/* Enhanced Configuration for Quadrant Scatter Plot */}
-      {config.chartType === 'quadrant-scatter' && (
+      {/* Enhanced Configuration for Scatter Plot */}
+      {config.chartType === 'scatter' && (
         <div className="space-y-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
           <h4 className="text-sm font-medium text-purple-900">Enhanced Scatter Plot Options</h4>
           
@@ -239,8 +243,26 @@ export default function VariableConfig({ config, onConfigChange, onComplete }: V
           <h4 className="text-sm font-medium text-gray-900">Select Variables</h4>
           <span className="text-xs text-gray-500">
             {selectedVariables.length} selected
+            {config.chartType === 'scatter' && (
+              <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
+                Max: 2 variables
+              </span>
+            )}
           </span>
         </div>
+
+        {/* Scatter Plot Instructions */}
+        {config.chartType === 'scatter' && (
+          <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="h-4 w-4 text-blue-600">ℹ️</div>
+            <div className="text-sm text-blue-800">
+              <strong>Select exactly 2 variables:</strong> First variable becomes X-axis, second becomes Y-axis. 
+              {selectedVariables.length >= 2 && (
+                <span className="text-blue-600 font-medium"> Limit reached - remove a variable to change selection.</span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Search and Filter */}
         <div className="flex gap-2">
@@ -270,13 +292,19 @@ export default function VariableConfig({ config, onConfigChange, onComplete }: V
         <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-md">
           {getFilteredVariables().map((variable) => {
             const isSelected = selectedVariables.some(v => v.id === variable.id);
+            const isDisabled = config.chartType === 'scatter' && !isSelected && selectedVariables.length >= 2;
             
             return (
               <button
                 key={variable.id}
                 onClick={() => handleVariableSelect(variable)}
-                className={`w-full text-left p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                disabled={isDisabled}
+                className={`w-full text-left p-3 border-b border-gray-100 transition-colors ${
                   isSelected ? 'bg-blue-50 border-blue-200' : ''
+                } ${
+                  isDisabled 
+                    ? 'opacity-50 cursor-not-allowed bg-gray-50' 
+                    : 'hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-start justify-between">
@@ -392,7 +420,10 @@ export default function VariableConfig({ config, onConfigChange, onComplete }: V
             <>
               <X className="h-4 w-4 text-red-600" />
               <span className="text-sm text-red-700">
-                Select {chartType?.requiredAxes.length || 1} or more variables to continue
+                {config.chartType === 'scatter' 
+                  ? 'Select exactly 2 variables (X and Y axis) to continue'
+                  : `Select ${chartType?.requiredAxes.length || 1} or more variables to continue`
+                }
               </span>
             </>
           )}

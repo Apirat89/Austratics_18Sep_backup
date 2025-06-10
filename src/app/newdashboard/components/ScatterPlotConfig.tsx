@@ -227,7 +227,15 @@ export default function ScatterPlotConfig({
         <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
         <div className="text-sm text-blue-900">
           <p className="font-medium mb-1">Scatter Plot with Median Quadrants</p>
-          <p>SA2 regions will be plotted as dots with median crosshairs dividing the plot into quadrants. Hover over dots to see SA2 details.</p>
+          <p>Select exactly 2 variables: X-axis and Y-axis. SA2 regions will be plotted as dots with median crosshairs dividing the plot into quadrants.</p>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+              2 Variables Required
+            </span>
+            {selectedXAxis && selectedYAxis && (
+              <span className="text-green-700 text-xs font-medium">✓ Configuration Complete</span>
+            )}
+          </div>
         </div>
       </div>
 

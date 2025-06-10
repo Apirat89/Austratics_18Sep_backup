@@ -130,16 +130,6 @@ export const CHART_TYPES = [
   {
     type: 'scatter',
     name: 'Scatter Plot',
-    description: 'Explore relationships between two measures',
-    icon: 'GitBranch',
-    requiredAxes: ['measureX', 'measureY'],
-    optionalAxes: ['colorBy', 'groupBy'],
-    useCases: ['Find correlations', 'Identify patterns', 'Compare two metrics'],
-    dataPattern: 'relationship'
-  },
-  {
-    type: 'quadrant-scatter',
-    name: 'Quadrant Scatter Plot',
     description: 'Scatter plot with median crosshairs and custom styling',
     icon: 'Target',
     requiredAxes: ['measureX', 'measureY'],

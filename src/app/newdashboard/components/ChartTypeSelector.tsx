@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, GitBranch } from 'lucide-react';
+import { X, Target } from 'lucide-react';
 
 interface ChartTypeSelectorProps {
   isOpen: boolean;
@@ -60,7 +60,7 @@ export default function ChartTypeSelector({ isOpen, onClose, onSelect }: ChartTy
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                    <GitBranch className="h-6 w-6 text-blue-600" />
+                    <Target className="h-6 w-6 text-blue-600" />
                   </div>
                 </div>
                 <div className="ml-4">
@@ -68,34 +68,29 @@ export default function ChartTypeSelector({ isOpen, onClose, onSelect }: ChartTy
                     Scatter Plot
                   </h4>
                   <span className="text-sm text-gray-500">
-                    Explore relationships between variables
+                    Relationship
                   </span>
                 </div>
               </div>
 
               {/* Description */}
               <p className="text-sm text-gray-600 mb-4">
-                Plot SA2 regions as dots to explore relationships between two variables. 
-                Includes median quadrants to identify regional patterns.
+                Scatter plot with median crosshairs and custom styling
               </p>
 
               {/* Features */}
               <div className="space-y-2">
                 <div className="flex items-center text-sm text-gray-600">
                   <span className="w-2 h-2 bg-blue-400 rounded-full mr-3" />
-                  X and Y axis variable selection
+                  Performance matrix
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <span className="w-2 h-2 bg-blue-400 rounded-full mr-3" />
-                  Median quadrant lines
+                  Risk analysis
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <span className="w-2 h-2 bg-blue-400 rounded-full mr-3" />
-                  Interactive hover tooltips
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <span className="w-2 h-2 bg-blue-400 rounded-full mr-3" />
-                  SA2 region identification
+                  Strategic positioning
                 </div>
               </div>
             </button>

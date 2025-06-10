@@ -295,8 +295,8 @@ export default function ChartRenderer({ config, height = '400px', width = '100%'
     );
   }
 
-  // Special handling for quadrant scatter plot
-  if (config.chartType === 'quadrant-scatter') {
+  // Special handling for scatter plot (now includes quadrant functionality)
+  if (config.chartType === 'scatter') {
     return (
       <div className="relative" style={{ height, width }}>
         <QuadrantScatterRenderer
