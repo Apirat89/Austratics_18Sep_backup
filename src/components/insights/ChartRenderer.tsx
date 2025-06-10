@@ -47,6 +47,24 @@ export default function ChartRenderer({ config, height = '400px', width = '100%'
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Watch for SA2 data availability and rerender scatter plots
+  useEffect(() => {
+    if (config.chartType === 'scatter') {
+      const checkDataAvailability = () => {
+        const unifiedSA2Data = (window as any).unifiedSA2Data || {};
+        if (Object.keys(unifiedSA2Data).length > 0) {
+          // Force re-render by updating loading state
+          setIsLoading(false);
+        } else {
+          // Check again in a moment
+          setTimeout(checkDataAvailability, 500);
+        }
+      };
+      
+      checkDataAvailability();
+    }
+  }, [config.chartType]);
+
   const loadChartData = async () => {
     try {
       setIsLoading(true);
@@ -297,12 +315,45 @@ export default function ChartRenderer({ config, height = '400px', width = '100%'
 
   // Special handling for scatter plot (now includes quadrant functionality)
   if (config.chartType === 'scatter') {
+    // Get unified SA2 data from global window object (loaded by insights page)
+    const unifiedSA2Data = (window as any).unifiedSA2Data || {};
+    const unifiedSA2Medians = (window as any).unifiedSA2Medians || {};
+    
+    console.log('🔍 ChartRenderer - SA2 data check:', {
+      dataKeys: Object.keys(unifiedSA2Data).length,
+      medianKeys: Object.keys(unifiedSA2Medians).length,
+      selectedVariables: config.selectedVariables?.map(v => v.name)
+    });
+    
+    // Convert unified data to array format for QuadrantScatterRenderer
+    const sa2DataArray = Object.keys(unifiedSA2Data).map(sa2Id => ({
+      sa2Id,
+      sa2Name: unifiedSA2Data[sa2Id].sa2Name,
+      ...unifiedSA2Data[sa2Id]
+    }));
+    
+    // If no data available, show loading state
+    if (sa2DataArray.length === 0) {
+      return (
+        <div 
+          style={{ height, width }} 
+          className="flex items-center justify-center bg-gray-50 rounded-lg"
+        >
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-2 text-sm text-gray-600">Loading SA2 data for scatter plot...</p>
+            <p className="text-xs text-gray-500 mt-1">Waiting for unified dataset to load</p>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <div className="relative" style={{ height, width }}>
         <QuadrantScatterRenderer
           config={config}
-          data={[]} // TODO: Load actual data from InsightsDataService
-          medianCalculations={{}}
+          data={sa2DataArray}
+          medianCalculations={unifiedSA2Medians}
           onInteraction={(event) => {
             console.log('Chart interaction:', event);
           }}
@@ -310,7 +361,7 @@ export default function ChartRenderer({ config, height = '400px', width = '100%'
         
         {/* Chart overlay info */}
         <div className="absolute top-2 right-2 bg-white bg-opacity-90 rounded px-2 py-1 text-xs text-gray-600 shadow-sm">
-          <div>{config.chartType} • {config.selectedVariables.length} variables</div>
+          <div>{config.chartType} • {config.selectedVariables.length} variables • {sa2DataArray.length} SA2 regions</div>
           <div className="text-xs text-gray-500 mt-1">
             {config.selectedVariables.map(v => v.name).join(', ')}
           </div>

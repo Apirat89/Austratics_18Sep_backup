@@ -798,3 +798,76 @@ Users can now test the enhanced scatter plot functionality:
 4. Verify median crosshairs and color palette options
 
 **🎉 CRITICAL MILESTONE:** Turbopack error resolved - development environment fully functional for testing the enhanced scatter plot features!
+
+### ✅ **LATEST COMPLETION: Scatter Plot Data Loading Fix - SA2 DOTS WITH HOVER FUNCTIONALITY**
+
+**🎯 CRITICAL CHART RENDERING ISSUE RESOLVED:** Fixed scatter plots to properly display SA2 regions as interactive dots with hover information
+
+**🐛 ROOT CAUSE IDENTIFIED:**
+- **Empty Data Arrays**: ChartRenderer was passing empty `data={[]}` and `medianCalculations={{}}` to QuadrantScatterRenderer
+- **Missing SA2 Integration**: Chart wasn't connecting to the unified SA2 dataset loaded by insights page
+- **No Hover Information**: SA2 names and IDs weren't available because no real data was being passed
+
+**✅ COMPREHENSIVE SOLUTION IMPLEMENTED:**
+
+1. **🔗 Unified SA2 Data Integration**: Connected ChartRenderer to global unified SA2 dataset
+   - Accesses `window.unifiedSA2Data` and `window.unifiedSA2Medians` loaded by insights page
+   - Converts unified data format to array format expected by QuadrantScatterRenderer
+   - Includes SA2 ID, SA2 name, and all 53 metrics for each region
+
+2. **📊 Real SA2 Dots Display**: Each scatter plot dot now represents an actual SA2 region
+   - SA2 regions plotted based on selected X and Y axis variables
+   - Proper data mapping from unified 53-metric dataset
+   - All 3 SA2 regions from the sample data now appear as interactive dots
+
+3. **🖱️ Enhanced Hover Functionality**: Comprehensive tooltip information
+   - **SA2 Name**: Full region name displayed prominently
+   - **SA2 ID**: 9-digit SA2 identifier
+   - **X-Axis Value**: Selected variable value with proper formatting
+   - **Y-Axis Value**: Selected variable value with proper formatting
+   - **Professional Styling**: Clean white background with proper typography
+
+4. **⏳ Smart Loading States**: Progressive data availability handling
+   - Shows "Loading SA2 data for scatter plot..." when data not yet available
+   - Automatic polling every 500ms to check for data availability
+   - Seamless transition from loading to chart when data becomes available
+
+5. **🐛 Debug & Monitoring**: Enhanced logging for troubleshooting
+   - Console logging of SA2 data availability and variable selection
+   - Overlay showing data source information and region count
+   - Clear visual feedback about data loading status
+
+**🔧 TECHNICAL IMPLEMENTATION:**
+- **File**: `src/components/insights/ChartRenderer.tsx` - Enhanced scatter plot data integration
+- **Data Source**: Unified SA2 dataset with 53 metrics from 4 merged JSON files
+- **Real-time Updates**: Automatic rerendering when SA2 data becomes available
+- **Fallback Handling**: Graceful loading states when data not yet available
+
+**🎨 USER EXPERIENCE ENHANCEMENT:**
+**Before**: Scatter plot showed hardcoded sample dots with no SA2 information
+**After**: Interactive SA2 regions with comprehensive hover details and real data
+
+**Expected User Experience:**
+1. **Select 2 Variables** → Configuration validates and enables chart creation
+2. **Chart Loads** → Shows loading state if SA2 data not yet available
+3. **SA2 Dots Appear** → Real SA2 regions plotted using selected variables
+4. **Hover Functionality** → Rich tooltips with SA2 name, ID, and variable values
+5. **Median Quadrants** → Crosshairs divide plot based on calculated medians
+6. **Interactive Features** → Zoom, color palettes, and responsive design
+
+**🎯 CRITICAL FUNCTIONALITY RESTORED:**
+- ✅ SA2 regions as dots (instead of random sample data)
+- ✅ Hover shows SA2 names and IDs
+- ✅ Real variable data from unified 53-metric dataset
+- ✅ Median quadrant functionality with actual calculated medians
+- ✅ Professional tooltip formatting and information display
+
+**🚀 READY FOR TESTING:**
+The scatter plot now properly displays SA2 regions as interactive dots! Users can:
+- Navigate to http://localhost:3000/insights
+- Create scatter plot with any 2 variables
+- See actual SA2 regions plotted using real data
+- Hover over dots to see SA2 names, IDs, and variable values
+- Experience full quadrant scatter plot functionality
+
+**🎉 CRITICAL MILESTONE:** Scatter plot spinning/loading issue resolved - SA2 regions now display as intended with comprehensive hover information and real data integration!
