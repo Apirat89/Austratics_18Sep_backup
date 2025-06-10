@@ -211,7 +211,7 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
     
     // Cache the processed data and medians
     cachedData = mergedData;
-    cachedMedians = mergedFile.metadata.medians;
+    cachedMedians = mergedFile.metadata.medians || {};
     
     const regionCount = Object.keys(mergedData).length;
     const metricsSet = new Set<string>();
@@ -399,12 +399,46 @@ export async function listAllMetrics(): Promise<string[]> {
  * Helper function: Get pre-calculated medians for all metrics
  */
 export async function getMetricMedians(): Promise<{ [key: string]: number }> {
-  if (cachedMedians) {
+  if (cachedMedians && Object.keys(cachedMedians).length > 0) {
     return cachedMedians;
   }
   
   // Trigger loading of the merged data which will populate cachedMedians
-  await getMergedSA2Data();
+  const mergedData = await getMergedSA2Data();
+  
+  // If cachedMedians is still empty (from merged file), calculate them on-the-fly
+  if (!cachedMedians || Object.keys(cachedMedians).length === 0) {
+    console.log('📊 Calculating medians on-the-fly for all metrics...');
+    const calculatedMedians: { [key: string]: number } = {};
+    
+    // Get all unique metrics
+    const allMetrics = getAllMetrics(mergedData);
+    
+    // Calculate median for each metric
+    for (const metric of allMetrics) {
+      const values: number[] = [];
+      
+      // Collect all non-null values for this metric
+      Object.values(mergedData).forEach(region => {
+        const value = region[metric];
+        if (typeof value === 'number' && !isNaN(value)) {
+          values.push(value);
+        }
+      });
+      
+      if (values.length > 0) {
+        // Sort values and calculate median
+        values.sort((a, b) => a - b);
+        const mid = Math.floor(values.length / 2);
+        calculatedMedians[metric] = values.length % 2 === 0 
+          ? (values[mid - 1] + values[mid]) / 2 
+          : values[mid];
+      }
+    }
+    
+    cachedMedians = calculatedMedians;
+    console.log(`✅ Calculated medians for ${Object.keys(calculatedMedians).length} metrics`);
+  }
   
   return cachedMedians || {};
 }

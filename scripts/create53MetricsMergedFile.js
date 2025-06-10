@@ -54,10 +54,10 @@ async function create53MetricsMergedFile() {
           economics: 10,
           healthStats: 16,
           healthcare: 18
-        }
+        },
+        medians: {}
       },
-      regions: [],
-      medians: {}
+      regions: []
     };
     
     // Process each SA2 region
@@ -135,15 +135,19 @@ async function create53MetricsMergedFile() {
       
       if (values.length > 0) {
         const midIndex = Math.floor(values.length / 2);
-        mergedData.medians[metricKey] = values.length % 2 === 0
+        const median = values.length % 2 === 0
           ? (values[midIndex - 1] + values[midIndex]) / 2
           : values[midIndex];
+        
+        // Store median with the pipe-separated format that matches the loading system
+        const formattedKey = metricKey.replace(/_(.*)/, ' | $1');
+        mergedData.metadata.medians[formattedKey] = median;
       }
     }
     
     // Update metadata with actual counts
     mergedData.metadata.totalMetrics = allMetricKeys.size;
-    mergedData.metadata.mediansCalculated = Object.keys(mergedData.medians).length;
+    mergedData.metadata.mediansCalculated = Object.keys(mergedData.metadata.medians).length;
     
     // Write merged file
     const outputPath = path.join(dataDir, 'merged_sa2_data_comprehensive.json');
@@ -157,7 +161,7 @@ async function create53MetricsMergedFile() {
     console.log(`📍 Location: ${outputPath}`);
     console.log(`📊 Regions: ${mergedData.regions.length}`);
     console.log(`📈 Metrics: ${allMetricKeys.size}/53`);
-    console.log(`📊 Medians: ${Object.keys(mergedData.medians).length}`);
+    console.log(`📊 Medians: ${Object.keys(mergedData.metadata.medians).length}`);
     console.log(`💾 File size: ${fileSizeMB} MB`);
     
     // Verify we have exactly 53 metrics

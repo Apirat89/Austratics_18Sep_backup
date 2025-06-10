@@ -17,22 +17,28 @@ export default function ChartRenderer({ config, height = '500px', width = '100%'
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dataService] = useState(() => InsightsDataService.getInstance());
+  const [medians, setMedians] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    if (!chartRef.current) return;
+    // Load medians for scatter plots
+    if (config.chartType === 'scatter' as any) {
+      loadMedians();
+    } else if (!chartRef.current) {
+      return;
+    } else {
+      // Initialize chart instance for non-scatter charts
+      chartInstance.current = echarts.init(chartRef.current);
 
-    // Initialize chart instance
-    chartInstance.current = echarts.init(chartRef.current);
+      // Load and render chart data
+      loadChartData();
 
-    // Load and render chart data
-    loadChartData();
-
-    // Cleanup on unmount
-    return () => {
-      if (chartInstance.current) {
-        chartInstance.current.dispose();
-      }
-    };
+      // Cleanup on unmount
+      return () => {
+        if (chartInstance.current) {
+          chartInstance.current.dispose();
+        }
+      };
+    }
   }, [config]);
 
   useEffect(() => {
@@ -47,14 +53,28 @@ export default function ChartRenderer({ config, height = '500px', width = '100%'
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const loadMedians = async () => {
+    try {
+      const response = await fetch('/api/sa2');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.metadata?.medians) {
+          setMedians(result.metadata.medians);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading medians:', error);
+    }
+  };
+
   // For scatter plots, use the QuadrantScatterRenderer which handles real SA2 data
-  if (config.chartType === 'scatter') {
+  if (config.chartType === 'scatter' as any) {
     return (
       <div style={{ height, width }}>
         <QuadrantScatterRenderer 
           config={config}
           data={[]} // Will be loaded by QuadrantScatterRenderer
-          medianCalculations={{}}
+          medianCalculations={medians}
         />
       </div>
     );

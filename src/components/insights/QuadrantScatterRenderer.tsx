@@ -477,8 +477,13 @@ export default function QuadrantScatterRenderer({
   const prepareScatterData = () => {
     if (!config.measureX || !config.measureY) return [];
 
-    // Debug logging can be enabled if needed
-    // console.log('🔍 QuadrantScatterRenderer - prepareScatterData debug:', { ... });
+    // Debug logging (can be enabled if needed)
+    // console.log('🔍 QuadrantScatterRenderer - prepareScatterData debug:', {
+    //   measureX: config.measureX,
+    //   measureY: config.measureY,
+    //   dataLength: data.length,
+    //   sampleRecord: data[0] ? Object.keys(data[0]).slice(0, 5) : 'No data'
+    // });
 
     const scatterData = data.map((record, index) => {
       const xValue = getRecordValue(record, config.measureX!);
@@ -499,6 +504,13 @@ export default function QuadrantScatterRenderer({
         originalRecord: record
       };
     }).filter(Boolean);
+
+    // console.log('📊 Scatter data prepared:', {
+    //   totalRecords: data.length,
+    //   validDataPoints: scatterData.length,
+    //   nullDataPoints: data.length - scatterData.length,
+    //   sampleDataPoint: scatterData[0] || 'No valid data points'
+    // });
 
     return scatterData;
   };
@@ -536,7 +548,9 @@ export default function QuadrantScatterRenderer({
     // Try exact match first
     if (record[fieldName] !== undefined && record[fieldName] !== null) {
       const value = Number(record[fieldName]);
-      return isNaN(value) ? null : value;
+      if (!isNaN(value)) {
+        return value;
+      }
     }
     
     // Try fuzzy matching based on partial field name
@@ -570,9 +584,21 @@ export default function QuadrantScatterRenderer({
     for (const key of possibleKeys) {
       if (record[key] !== undefined && record[key] !== null) {
         const value = Number(record[key]);
-        return isNaN(value) ? null : value;
+        if (!isNaN(value)) {
+          return value;
+        }
       }
     }
+    
+    // Debug: Log when a field is not found
+    if (Math.random() < 0.001) { // Only log for 0.1% of calls to avoid spam
+      console.warn('🔍 Field not found:', {
+        fieldName,
+        normalizedSearchTerm,
+        availableKeys: recordKeys.filter(k => k !== 'sa2Id' && k !== 'sa2Name').slice(0, 10)
+      });
+    }
+    
     return null;
   };
 
