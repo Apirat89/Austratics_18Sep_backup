@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, BarChart3, GitBranch, Circle, PieChart, BarChart2, Map, Info } from 'lucide-react';
+import { X, BarChart3, GitBranch, Circle, PieChart, BarChart2, Map, Info, Target } from 'lucide-react';
 import { CHART_TYPES } from './InsightsDataService';
 
 interface ChartTypeSelectorProps {
@@ -16,7 +16,8 @@ const iconMap = {
   Circle,
   PieChart,
   BarChart2,
-  Map
+  Map,
+  Target
 };
 
 export default function ChartTypeSelector({ isOpen, onClose, onSelect }: ChartTypeSelectorProps) {

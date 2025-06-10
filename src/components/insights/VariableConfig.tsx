@@ -91,9 +91,14 @@ export default function VariableConfig({ config, onConfigChange, onComplete }: V
         break;
         
       case 'scatter':
+      case 'quadrant-scatter':
         if (measures.length >= 2) {
           assignment.measureX = measures[0].id;
           assignment.measureY = measures[1].id;
+          // For quadrant scatter, we can also use a third measure for bubble size
+          if (measures.length >= 3) {
+            assignment.bubbleSize = measures[2].id;
+          }
         }
         break;
         
@@ -129,6 +134,7 @@ export default function VariableConfig({ config, onConfigChange, onComplete }: V
        case 'pie':
          return measures.length >= 1 && dimensions.length >= 1;
        case 'scatter':
+       case 'quadrant-scatter':
          return measures.length >= 2;
        case 'bubble':
          return measures.length >= 3;
@@ -164,6 +170,68 @@ export default function VariableConfig({ config, onConfigChange, onComplete }: V
           <p className="text-xs text-blue-700 mt-1">{chartType?.description}</p>
         </div>
       </div>
+
+      {/* Enhanced Configuration for Quadrant Scatter Plot */}
+      {config.chartType === 'quadrant-scatter' && (
+        <div className="space-y-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+          <h4 className="text-sm font-medium text-purple-900">Enhanced Scatter Plot Options</h4>
+          
+          {/* Color Palette Selection */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">Color Palette</label>
+            <div className="grid grid-cols-5 gap-2">
+              {[
+                { key: 'default', name: 'Default', colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd'] },
+                { key: 'healthcare', name: 'Healthcare', colors: ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'] },
+                { key: 'warm', name: 'Warm', colors: ['#dc2626', '#ea580c', '#ca8a04', '#65a30d', '#059669'] },
+                { key: 'cool', name: 'Cool', colors: ['#1e40af', '#0891b2', '#059669', '#7c3aed', '#be185d'] },
+                { key: 'earth', name: 'Earth', colors: ['#92400e', '#a16207', '#166534', '#0f766e', '#7c2d12'] }
+              ].map((palette) => (
+                <button
+                  key={palette.key}
+                  onClick={() => onConfigChange({ ...config, colorBy: palette.key })}
+                  className={`p-2 rounded-md border-2 transition-all ${
+                    config.colorBy === palette.key 
+                      ? 'border-purple-500 bg-purple-100' 
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="text-xs font-medium text-gray-700 mb-1">{palette.name}</div>
+                  <div className="flex gap-1">
+                    {palette.colors.map((color, index) => (
+                      <div
+                        key={index}
+                        className="w-3 h-3 rounded-sm"
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Enhanced Features Display */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-2 text-sm text-purple-700">
+              <Check className="h-4 w-4" />
+              <span>Median quadrants</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-purple-700">
+              <Check className="h-4 w-4" />
+              <span>Interactive tooltips</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-purple-700">
+              <Check className="h-4 w-4" />
+              <span>Zoom controls</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-purple-700">
+              <Check className="h-4 w-4" />
+              <span>Bubble size option</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Variable Selection */}
       <div className="space-y-4">

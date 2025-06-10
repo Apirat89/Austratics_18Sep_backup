@@ -138,6 +138,18 @@ export const CHART_TYPES = [
     dataPattern: 'relationship'
   },
   {
+    type: 'quadrant-scatter',
+    name: 'Quadrant Scatter Plot',
+    description: 'Scatter plot with median crosshairs and custom styling',
+    icon: 'Target',
+    requiredAxes: ['measureX', 'measureY'],
+    optionalAxes: ['colorBy', 'bubbleSize'],
+    useCases: ['Performance matrix', 'Risk analysis', 'Strategic positioning'],
+    dataPattern: 'relationship',
+    enhanced: true,
+    features: ['Median quadrants', 'Custom color palettes', 'Interactive tooltips', 'Zoom controls']
+  },
+  {
     type: 'bubble',
     name: 'Bubble Chart',
     description: 'Show three measures in one visualization',
@@ -403,7 +415,7 @@ export const getChartRecommendations = (selectedVariables: SnapshotVariableOptio
 export interface EnhancedChartConfiguration {
   id: string;
   name: string;
-  chartType: 'bar' | 'scatter' | 'bubble' | 'pie' | 'histogram' | 'choropleth';
+  chartType: 'bar' | 'scatter' | 'bubble' | 'pie' | 'histogram' | 'choropleth' | 'quadrant-scatter';
   
   // Simplified axis configuration using roles
   measure?: string;        // Primary measure

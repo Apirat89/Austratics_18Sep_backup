@@ -1,0 +1,380 @@
+[
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": "485"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Spending",
+    "Amount": "1240000"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": "12"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Participants per provider",
+    "Amount": "40.4"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Spending per provider",
+    "Amount": "103333"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Spending per participant",
+    "Amount": "2557"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Home Care",
+    "Type": "Number of Participants",
+    "Amount": "156"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Home Care",
+    "Type": "Spending",
+    "Amount": "3250000"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Home Care",
+    "Type": "Number of Providers",
+    "Amount": "8"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Home Care",
+    "Type": "Participants per provider",
+    "Amount": "19.5"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Home Care",
+    "Type": "Spending per provider",
+    "Amount": "406250"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Home Care",
+    "Type": "Spending per participant",
+    "Amount": "20833"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Residential Care",
+    "Type": "Number of Participants",
+    "Amount": "89"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Residential Care",
+    "Type": "Spending",
+    "Amount": "5850000"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Residential Care",
+    "Type": "Number of Providers",
+    "Amount": "3"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Residential Care",
+    "Type": "Participants per provider",
+    "Amount": "29.7"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Residential Care",
+    "Type": "Spending per provider",
+    "Amount": "1950000"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Category": "Residential Care",
+    "Type": "Spending per participant",
+    "Amount": "65730"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": "620"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Spending",
+    "Amount": "1580000"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": "15"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Participants per provider",
+    "Amount": "41.3"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Spending per provider",
+    "Amount": "105333"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Spending per participant",
+    "Amount": "2548"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Home Care",
+    "Type": "Number of Participants",
+    "Amount": "198"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Home Care",
+    "Type": "Spending",
+    "Amount": "4120000"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Home Care",
+    "Type": "Number of Providers",
+    "Amount": "10"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Home Care",
+    "Type": "Participants per provider",
+    "Amount": "19.8"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Home Care",
+    "Type": "Spending per provider",
+    "Amount": "412000"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Home Care",
+    "Type": "Spending per participant",
+    "Amount": "20808"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Residential Care",
+    "Type": "Number of Participants",
+    "Amount": "112"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Residential Care",
+    "Type": "Spending",
+    "Amount": "7360000"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Residential Care",
+    "Type": "Number of Providers",
+    "Amount": "4"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Residential Care",
+    "Type": "Participants per provider",
+    "Amount": "28.0"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Residential Care",
+    "Type": "Spending per provider",
+    "Amount": "1840000"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Category": "Residential Care",
+    "Type": "Spending per participant",
+    "Amount": "65714"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": "380"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Spending",
+    "Amount": "965000"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": "9"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Participants per provider",
+    "Amount": "42.2"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Spending per provider",
+    "Amount": "107222"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Spending per participant",
+    "Amount": "2539"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Home Care",
+    "Type": "Number of Participants",
+    "Amount": "125"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Home Care",
+    "Type": "Spending",
+    "Amount": "2600000"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Home Care",
+    "Type": "Number of Providers",
+    "Amount": "6"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Home Care",
+    "Type": "Participants per provider",
+    "Amount": "20.8"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Home Care",
+    "Type": "Spending per provider",
+    "Amount": "433333"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Home Care",
+    "Type": "Spending per participant",
+    "Amount": "20800"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Residential Care",
+    "Type": "Number of Participants",
+    "Amount": "68"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Residential Care",
+    "Type": "Spending",
+    "Amount": "4470000"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Residential Care",
+    "Type": "Number of Providers",
+    "Amount": "2"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Residential Care",
+    "Type": "Participants per provider",
+    "Amount": "34.0"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Residential Care",
+    "Type": "Spending per provider",
+    "Amount": "2235000"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Category": "Residential Care",
+    "Type": "Spending per participant",
+    "Amount": "65735"
+  }
+] 

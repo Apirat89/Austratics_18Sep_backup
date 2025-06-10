@@ -1,0 +1,164 @@
+[
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Description": "Estimated resident population (no.)",
+    "Amount": "15420"
+  },
+  {
+    "SA2 ID": "101021007", 
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Description": "Population density (persons/km2)",
+    "Amount": "2850.5"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Description": "Median age - persons (years)",
+    "Amount": "42.5"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Description": "Persons - 55-64 years (%)",
+    "Amount": "14.2"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Description": "Persons - 55-64 years (no.)",
+    "Amount": "2189"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Description": "Persons - 65 years and over (%)",
+    "Amount": "18.6"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Description": "Persons - 65 years and over (no.)",
+    "Amount": "2868"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Description": "Working age population (aged 15-64 years) (%)",
+    "Amount": "68.4"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater", 
+    "Description": "Working age population (aged 15-64 years) (no.)",
+    "Amount": "10547"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Description": "Estimated resident population (no.)", 
+    "Amount": "18950"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Description": "Population density (persons/km2)",
+    "Amount": "1845.7"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Description": "Median age - persons (years)",
+    "Amount": "38.2"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Description": "Persons - 55-64 years (%)",
+    "Amount": "12.8"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Description": "Persons - 55-64 years (no.)",
+    "Amount": "2426"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Description": "Persons - 65 years and over (%)",
+    "Amount": "15.2"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Description": "Persons - 65 years and over (no.)",
+    "Amount": "2880"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Description": "Working age population (aged 15-64 years) (%)",
+    "Amount": "71.5"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Description": "Working age population (aged 15-64 years) (no.)",
+    "Amount": "13549"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Description": "Estimated resident population (no.)",
+    "Amount": "22680"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Description": "Population density (persons/km2)",
+    "Amount": "8920.1"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Description": "Median age - persons (years)", 
+    "Amount": "35.8"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Description": "Persons - 55-64 years (%)",
+    "Amount": "9.8"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Description": "Persons - 55-64 years (no.)",
+    "Amount": "2223"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Description": "Persons - 65 years and over (%)",
+    "Amount": "11.2"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Description": "Persons - 65 years and over (no.)",
+    "Amount": "2540"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Description": "Working age population (aged 15-64 years) (%)",
+    "Amount": "78.2"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Description": "Working age population (aged 15-64 years) (no.)",
+    "Amount": "17735"
+  }
+] 

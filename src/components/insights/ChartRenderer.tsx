@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as echarts from 'echarts';
 import { EnhancedChartConfiguration, InsightsDataService } from './InsightsDataService';
+import QuadrantScatterRenderer from './QuadrantScatterRenderer';
 
 interface ChartRendererProps {
   config: EnhancedChartConfiguration;
@@ -289,6 +290,30 @@ export default function ChartRenderer({ config, height = '400px', width = '100%'
           >
             Retry
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Special handling for quadrant scatter plot
+  if (config.chartType === 'quadrant-scatter') {
+    return (
+      <div className="relative" style={{ height, width }}>
+        <QuadrantScatterRenderer
+          config={config}
+          data={[]} // TODO: Load actual data from InsightsDataService
+          medianCalculations={{}}
+          onInteraction={(event) => {
+            console.log('Chart interaction:', event);
+          }}
+        />
+        
+        {/* Chart overlay info */}
+        <div className="absolute top-2 right-2 bg-white bg-opacity-90 rounded px-2 py-1 text-xs text-gray-600 shadow-sm">
+          <div>{config.chartType} • {config.selectedVariables.length} variables</div>
+          <div className="text-xs text-gray-500 mt-1">
+            {config.selectedVariables.map(v => v.name).join(', ')}
+          </div>
         </div>
       </div>
     );

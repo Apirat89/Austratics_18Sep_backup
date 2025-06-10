@@ -1,0 +1,338 @@
+[
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Core Activity Need",
+    "Description": "Persons who have need for assistance with core activities (%)",
+    "Amount": "8.2"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Core Activity Need",
+    "Description": "Persons who have need for assistance with core activities (no.)",
+    "Amount": "1264"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Household Composition",
+    "Description": "Lone person households (no.)",
+    "Amount": "2156"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Household Composition",
+    "Description": "Provided unpaid assistance (%)",
+    "Amount": "11.4"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": "15.6"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Health Conditions",
+    "Description": "Asthma (%)",
+    "Amount": "12.3"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Health Conditions",
+    "Description": "Cancer (including remission) (%)",
+    "Amount": "6.8"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Health Conditions",
+    "Description": "Dementia (including Alzheimer's) (%)",
+    "Amount": "2.1"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (excluding gestational diabetes) (%)",
+    "Amount": "8.9"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (including heart attack or angina) (%)",
+    "Amount": "7.4"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Health Conditions",
+    "Description": "Kidney disease (%)",
+    "Amount": "2.8"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Health Conditions",
+    "Description": "Lung condition (including COPD or emphysema) (%)",
+    "Amount": "4.2"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health condition (including depression or anxiety) (%)",
+    "Amount": "18.5"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Health Conditions",
+    "Description": "Stroke (%)",
+    "Amount": "2.6"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Health Conditions",
+    "Description": "Other long-term health condition(s) (%)",
+    "Amount": "12.8"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Health Conditions",
+    "Description": "No long-term health condition(s) (%)",
+    "Amount": "38.2"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Core Activity Need",
+    "Description": "Persons who have need for assistance with core activities (%)",
+    "Amount": "9.8"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Core Activity Need",
+    "Description": "Persons who have need for assistance with core activities (no.)",
+    "Amount": "1857"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Household Composition",
+    "Description": "Lone person households (no.)",
+    "Amount": "1890"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Household Composition",
+    "Description": "Provided unpaid assistance (%)",
+    "Amount": "13.2"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": "18.2"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Health Conditions",
+    "Description": "Asthma (%)",
+    "Amount": "14.8"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Health Conditions",
+    "Description": "Cancer (including remission) (%)",
+    "Amount": "5.9"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Health Conditions",
+    "Description": "Dementia (including Alzheimer's) (%)",
+    "Amount": "1.8"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (excluding gestational diabetes) (%)",
+    "Amount": "12.4"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (including heart attack or angina) (%)",
+    "Amount": "8.7"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Health Conditions",
+    "Description": "Kidney disease (%)",
+    "Amount": "3.4"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Health Conditions",
+    "Description": "Lung condition (including COPD or emphysema) (%)",
+    "Amount": "5.1"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health condition (including depression or anxiety) (%)",
+    "Amount": "21.2"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Health Conditions",
+    "Description": "Stroke (%)",
+    "Amount": "3.1"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Health Conditions",
+    "Description": "Other long-term health condition(s) (%)",
+    "Amount": "14.6"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Health Conditions",
+    "Description": "No long-term health condition(s) (%)",
+    "Amount": "32.8"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Core Activity Need",
+    "Description": "Persons who have need for assistance with core activities (%)",
+    "Amount": "6.4"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Core Activity Need",
+    "Description": "Persons who have need for assistance with core activities (no.)",
+    "Amount": "1451"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Household Composition",
+    "Description": "Lone person households (no.)",
+    "Amount": "3420"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Household Composition",
+    "Description": "Provided unpaid assistance (%)",
+    "Amount": "9.8"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": "12.1"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Asthma (%)",
+    "Amount": "10.8"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Cancer (including remission) (%)",
+    "Amount": "4.2"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Dementia (including Alzheimer's) (%)",
+    "Amount": "1.2"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (excluding gestational diabetes) (%)",
+    "Amount": "7.6"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (including heart attack or angina) (%)",
+    "Amount": "5.8"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Kidney disease (%)",
+    "Amount": "2.1"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Lung condition (including COPD or emphysema) (%)",
+    "Amount": "3.4"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health condition (including depression or anxiety) (%)",
+    "Amount": "16.8"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Stroke (%)",
+    "Amount": "1.8"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Other long-term health condition(s) (%)",
+    "Amount": "11.2"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "No long-term health condition(s) (%)",
+    "Amount": "44.8"
+  }
+] 

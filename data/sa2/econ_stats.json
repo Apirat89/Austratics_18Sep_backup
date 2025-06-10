@@ -1,0 +1,212 @@
+[
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Employment",
+    "Description": "% of total Census responding population employed",
+    "Amount": "82.5"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Employment", 
+    "Description": "Unemployment rate (%)",
+    "Amount": "3.2"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Income",
+    "Description": "Median employee income ($)",
+    "Amount": "78500"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Income",
+    "Description": "Median superannuation and annuity income ($)",
+    "Amount": "12400"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Housing",
+    "Description": "Median price of attached dwelling transfers ($)",
+    "Amount": "850000"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Housing",
+    "Description": "Median weekly household rental payment ($)",
+    "Amount": "580"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Housing",
+    "Description": "Owned outright (%)",
+    "Amount": "42.8"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Housing",
+    "Description": "Owned outright (no.)",
+    "Amount": "2856"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Socio-Economic Index",
+    "Description": "SEIFA Index of relative socio-economic advantage and disadvantage (IRSAD) - rank within Australia (decile)",
+    "Amount": "7"
+  },
+  {
+    "SA2 ID": "101021007",
+    "SA2 Name": "Homebush Bay - Silverwater",
+    "Parent Description": "Socio-Economic Index",
+    "Description": "SEIFA Index of relative socio-economic disadvantage (IRSD) - rank within Australia (decile)",
+    "Amount": "6"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Employment",
+    "Description": "% of total Census responding population employed",
+    "Amount": "76.2"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North", 
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": "4.8"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Income",
+    "Description": "Median employee income ($)",
+    "Amount": "65200"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Income",
+    "Description": "Median superannuation and annuity income ($)",
+    "Amount": "9800"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Housing",
+    "Description": "Median price of attached dwelling transfers ($)",
+    "Amount": "720000"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Housing",
+    "Description": "Median weekly household rental payment ($)",
+    "Amount": "480"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Housing",
+    "Description": "Owned outright (%)",
+    "Amount": "38.5"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Housing",
+    "Description": "Owned outright (no.)",
+    "Amount": "2890"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Socio-Economic Index",
+    "Description": "SEIFA Index of relative socio-economic advantage and disadvantage (IRSAD) - rank within Australia (decile)",
+    "Amount": "4"
+  },
+  {
+    "SA2 ID": "102011013",
+    "SA2 Name": "Blacktown - North",
+    "Parent Description": "Socio-Economic Index",
+    "Description": "SEIFA Index of relative socio-economic disadvantage (IRSD) - rank within Australia (decile)",
+    "Amount": "3"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Employment",
+    "Description": "% of total Census responding population employed",
+    "Amount": "85.1"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": "2.8"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Income",
+    "Description": "Median employee income ($)",
+    "Amount": "72800"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Income",
+    "Description": "Median superannuation and annuity income ($)",
+    "Amount": "11200"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Housing",
+    "Description": "Median price of attached dwelling transfers ($)",
+    "Amount": "920000"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Housing",
+    "Description": "Median weekly household rental payment ($)",
+    "Amount": "620"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Housing",
+    "Description": "Owned outright (%)",
+    "Amount": "28.5"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Housing",
+    "Description": "Owned outright (no.)",
+    "Amount": "1840"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Socio-Economic Index",
+    "Description": "SEIFA Index of relative socio-economic advantage and disadvantage (IRSAD) - rank within Australia (decile)",
+    "Amount": "8"
+  },
+  {
+    "SA2 ID": "103021001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Socio-Economic Index",
+    "Description": "SEIFA Index of relative socio-economic disadvantage (IRSD) - rank within Australia (decile)",
+    "Amount": "8"
+  }
+] 

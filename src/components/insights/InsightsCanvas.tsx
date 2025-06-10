@@ -7,11 +7,21 @@ import ChartTypeSelector from './ChartTypeSelector';
 import ChartRenderer from './ChartRenderer';
 import VariableConfig from './VariableConfig';
 
+interface DataLoadingStatus {
+  isLoading: boolean;
+  hasError: boolean;
+  errorMessage: string;
+  loadingStep: string;
+  isUsingFallbackData: boolean;
+  mediansCalculated: boolean;
+}
+
 interface InsightsCanvasProps {
   onSaveAnalysis: (config: EnhancedChartConfiguration) => void;
   savedAnalyses: EnhancedChartConfiguration[];
   onLoadAnalysis: (config: EnhancedChartConfiguration) => void;
   onDeleteAnalysis: (id: string) => void;
+  dataLoadingStatus: DataLoadingStatus;
 }
 
 interface WidgetState {
@@ -25,7 +35,8 @@ export default function InsightsCanvas({
   onSaveAnalysis, 
   savedAnalyses, 
   onLoadAnalysis,
-  onDeleteAnalysis 
+  onDeleteAnalysis,
+  dataLoadingStatus
 }: InsightsCanvasProps) {
   const [widgets, setWidgets] = useState<WidgetState[]>([]);
   const [activeWidgetId, setActiveWidgetId] = useState<string | null>(null);
@@ -54,12 +65,8 @@ export default function InsightsCanvas({
     };
   }, []);
 
-  // Initialize data service
-  useEffect(() => {
-    dataService.loadAllData().catch(error => {
-      console.warn('Data service initialization failed:', error);
-    });
-  }, [dataService]);
+  // Data loading is now handled by parent component, so we just wait for it to be ready
+  const isDataReady = !dataLoadingStatus.isLoading && dataLoadingStatus.mediansCalculated;
 
   const createNewWidget = () => {
     const newWidget: WidgetState = {
@@ -198,40 +205,51 @@ export default function InsightsCanvas({
 
           {/* Add New Widget Button */}
           {widgets.length === 0 && (
-            <div 
-              onClick={createNewWidget}
-              className="h-full bg-white rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-400 cursor-pointer transition-colors group"
-            >
-              <div className="h-full flex flex-col items-center justify-center text-gray-400 group-hover:text-blue-500">
-                <Plus className="h-12 w-12 mb-3" />
-                <span className="font-medium">Create New Chart</span>
-                <span className="text-sm text-gray-400 mt-1">Click to add analysis</span>
-              </div>
+            <div className="bg-white rounded-lg border-2 border-dashed border-gray-200 hover:border-gray-300 transition-colors">
+              <button
+                onClick={createNewWidget}
+                disabled={!isDataReady}
+                className="w-full h-64 flex flex-col items-center justify-center gap-4 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Plus className="h-12 w-12" />
+                <div className="text-center">
+                  <p className="text-lg font-medium">Create New Chart</p>
+                  <p className="text-sm text-gray-400">
+                    {dataLoadingStatus.isLoading 
+                      ? `${dataLoadingStatus.loadingStep}...` 
+                      : 'Start by selecting a chart type'
+                    }
+                  </p>
+                </div>
+              </button>
             </div>
           )}
 
-          {/* Additional widgets for non-empty state */}
+          {/* Additional widgets button when there are existing widgets */}
           {widgets.length > 0 && (
-            <div 
-              onClick={createNewWidget}
-              className="bg-white rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-400 cursor-pointer transition-colors group min-h-[300px]"
-            >
-              <div className="h-full flex flex-col items-center justify-center text-gray-400 group-hover:text-blue-500 py-12">
-                <Plus className="h-12 w-12 mb-3" />
-                <span className="font-medium">Create New Chart</span>
-                <span className="text-sm text-gray-400 mt-1">Click to add analysis</span>
-              </div>
+            <div className="bg-white rounded-lg border-2 border-dashed border-gray-200 hover:border-gray-300 transition-colors">
+              <button
+                onClick={createNewWidget}
+                disabled={!isDataReady}
+                className="w-full h-32 flex items-center justify-center gap-3 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Plus className="h-6 w-6" />
+                <span className="font-medium">Add Another Chart</span>
+              </button>
             </div>
           )}
         </div>
-      </div>
 
-      {/* Chart Type Selection Modal */}
-      <ChartTypeSelector
-        isOpen={isChartSelectorOpen}
-        onClose={() => setIsChartSelectorOpen(false)}
-        onSelect={handleChartTypeSelect}
-      />
+        {/* Chart Type Selector Modal */}
+        <ChartTypeSelector
+          isOpen={isChartSelectorOpen}
+          onSelect={handleChartTypeSelect}
+          onClose={() => {
+            setIsChartSelectorOpen(false);
+            setActiveWidgetId(null);
+          }}
+        />
+      </div>
     </div>
   );
 } 
