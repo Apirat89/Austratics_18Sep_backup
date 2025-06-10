@@ -627,14 +627,12 @@ export default function QuadrantScatterRenderer({
       }
     }
     
-    // Log field mapping failures for debugging (rare now that field names match)
-    if (Math.random() < 0.01) { // Only log 1% since this should be rare now
-      console.warn('🔍 Field not found in QuadrantScatterRenderer:', {
-        fieldName,
-        availableKeys: Object.keys(record).filter(k => k !== 'sa2Id' && k !== 'sa2Name').slice(0, 10),
-        recordId: record.sa2Id || 'unknown'
-      });
-    }
+    // Log field mapping failures for debugging
+    console.warn('🔍 Field not found in QuadrantScatterRenderer:', {
+      fieldName,
+      availableKeys: Object.keys(record).filter(k => k !== 'sa2Id' && k !== 'sa2Name').slice(0, 10),
+      recordId: record.sa2Id || 'unknown'
+    });
     
     return null;
   };

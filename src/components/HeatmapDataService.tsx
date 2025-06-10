@@ -217,7 +217,7 @@ export const getFlattenedHealthStatsOptions = () => {
   Object.entries(HEALTH_TYPES).forEach(([category, subcategories]) => {
     subcategories.forEach(subcategory => {
       options.push({
-        value: `Health Statistics | ${subcategory}`, // Match actual SA2 data format
+        value: `Health | ${subcategory}`, // Match actual SA2 data format
         label: `${category} - ${subcategory}`,
         category,
         subcategory
