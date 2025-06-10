@@ -1,0 +1,7002 @@
+[
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Upper Cairns",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 13.48781293994433
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 18.641308597440943
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 9.780689981033323
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Adelaide Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 6.469577376465505
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.692166766151523
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Brunswick North",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 157.82624150891678
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Hobart Hill",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2122
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Cairns Heights",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.87340919040737
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Joondalup Gardens",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 8.741692935209784
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Hill Ipswich",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 83.22993215296653
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Hobart Park",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 12.998088039405143
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Mount Penrith Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 9.371218066311231
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 22.950012421418915
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Perth",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 18.84493681534093
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Manly Hill",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.813999584523598
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 214.39267757376084
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Blacktown Beach",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1883
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Perth",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.83485738603889
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 11.228094020901743
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 74.18740181915997
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "West Fitzroy",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 24.16241766697075
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Kalgoorlie West",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 21.9683542193278
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Glenelg Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 16.51882674536324
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 8.801186890158519
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.42423981393879
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Ipswich Bay",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 243.03511585523577
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1039
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Joondalup South",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.93357262740956
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 6.05295431797197
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 85.79248033711232
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 8.383966882529288
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 22.246280194573256
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Ipswich North",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 16.906465417241343
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 17.514809766034286
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "North Sydney South",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.245318719227676
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 109.25747770960758
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2738
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "North Darwin",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 79.29753098955526
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Brisbane Park",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 10.342367423154792
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 97.12194979109103
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Geraldton Heights",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 10.59227639556768
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Rockhampton Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 17.552034690755814
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Perth",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 5.856252642568829
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Fitzroy West",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 12.736870505814363
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Mount Adelaide West",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.623545490863899
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 165.65596479987192
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Parramatta Point",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1451
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.64509949573451
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 13.815392113883306
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Morphett West",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 65.65923336049616
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 20.153364099062117
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Townsville Park",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 5.744658748802229
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Hill Melbourne",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 12.583924776566429
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Greater Townsville East",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 11.373704334828307
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.473297580640013
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "New Parramatta",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 97.57652582976357
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Greater Rockhampton",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2533
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.92220707029708
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Little Kalgoorlie Gardens",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 8.217836920531152
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Lower Blacktown",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 86.26622014812476
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Bunbury Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 11.90856809246467
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Royal Joondalup",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 20.698487301890445
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 6.349713038521014
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 23.08071358498698
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Park Melbourne",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.091457350924138
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Adelaide West",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 87.85303929367183
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Upper Norwood Creek",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2649
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Brunswick East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.40461445179058
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 20.752128251646727
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "North Fremantle Park",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 93.78612422994355
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Toowoomba Central",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 23.663502200617753
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Mount Melbourne Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 9.10830423198139
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 12.112289008161161
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Royal Toowoomba South",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 23.65371708769088
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.991909999802793
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "North Unley South",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 201.49043592194212
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1416
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 77.49457998060377
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Geraldton Bay",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 7.536063524465164
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Saint Fitzroy Park",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 88.43497319698258
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Big Rockhampton Valley",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 7.338545195056891
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Perth South",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 18.96995306729973
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Unley",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 21.47805111455797
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Unley East",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 11.777288606447902
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Park Morphett",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 6.616694150433689
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Big Liverpool",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 242.24688589505678
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3109
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "West Rockhampton",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.13402782057321
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Lower Fremantle",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 19.00551622226848
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Little Melbourne",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 90.33311060751694
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 13.565901738203223
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "South Brisbane",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 7.7875975046712576
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Bondi Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 21.155999569953888
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Geraldton Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 16.50850193913831
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.1710454496362637
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Cairns Bay",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 92.76584385643588
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3004
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 81.90031263508578
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Fitzroy Hill",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 11.14235396577131
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 77.8009530670656
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Collingwood North",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 12.207056324261218
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Old Collingwood West",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 14.528771427099683
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 16.11943366612824
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 7.371581101470475
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Melbourne Central",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 8.205755861442611
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 241.35137086673967
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Manly West",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3754
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Sydney East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.05035455156155
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Bunbury Point",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 24.50704532957852
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Upper Melbourne",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 85.39472874943206
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "North Melbourne Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 9.268986726074605
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 6.8948803560476435
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 16.074066649884347
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "East Bunbury",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 8.37520315285921
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.615599736339487
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Royal Carlton",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 201.6652410702909
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3004
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Richmond West",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.80592956053692
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 24.144506104276296
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 60.55072508990665
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 14.331187569201308
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Kalgoorlie Gardens",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 22.2785213983541
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Glenelg Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 19.586390258410056
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Lower Hobart Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 6.99273111984084
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Bondi Gardens",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.3589533585212195
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 158.09971106546973
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Parkville North",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3673
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 79.45482801029529
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "East Kalgoorlie",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 6.141473774967885
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Townsville Central",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 81.00960463941871
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 7.3167594914532685
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Saint Penrith Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 16.76859011311815
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 17.488662352337016
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 16.75860904075047
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Fremantle Gardens",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 4.050297565489927
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "West Richmond Gardens",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 232.12616357166215
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Bunbury East",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2965
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Rockhampton Gardens",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 83.99837307018282
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Upper Collingwood",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 18.45377636436368
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Kalgoorlie Junction",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 85.62092373055087
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Greater Brunswick Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 22.96080795209494
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 15.523864105190238
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 16.3936932100162
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Royal Liverpool East",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 7.289154152572643
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Valley Unley",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.423901238749037
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 240.90698595096512
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2600
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Greater Perth",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 79.40007321100846
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Mount Darwin Bay",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 24.87253057316241
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Liverpool Junction",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 84.55386764410562
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Old Cairns Park",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 16.722240494912594
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 23.803366379395158
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Fitzroy Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 14.1581386346976
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Port Adelaide Central",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 14.576068821056275
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "West Townsville South",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.143828770466314
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Upper Brisbane Hill",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 136.86806371324903
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1095
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.20560255153524
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Old Fitzroy Hill",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 18.380651829341048
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Port Unley Beach",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 71.93256934901268
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Darwin Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 21.967177457314477
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 11.550360688527084
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "South Townsville",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 16.778333428628084
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "New Brunswick West",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 24.779031559801886
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Norwood Creek",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.777980068091729
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 164.28598140645897
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3858
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 78.37895454671958
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Mount Parkville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 16.176799597318375
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Richmond Bay",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 94.5839416455198
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Ipswich Park",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 18.71741541527657
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Mount Richmond Beach",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 5.122168884195477
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 15.156171269805352
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Bondi Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 23.05997342231301
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 8.212462536123105
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Brunswick Park",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 182.04343091603033
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Valley Geraldton",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1723
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Lower Morphett",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.40508961005779
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 23.107903499213766
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "West Brisbane Heights",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 99.12234342226465
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 16.365115146309655
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 9.377518550595742
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Parramatta Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 15.086424516551169
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Upper Sydney",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 8.250029341029869
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Saint Geraldton",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.4720669079189115
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 117.95076658242469
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2458
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.50043499626409
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "South Morphett",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 19.03675868786175
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "South Brunswick",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 98.00861672590615
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Mount Morphett Park",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 18.90395159198791
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Cairns South",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 7.97566426279023
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Saint Fremantle",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 5.346192069733915
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 15.450977091704935
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Royal Darwin Gardens",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 8.030655210819791
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Upper Perth",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 222.00260145865892
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "West Townsville",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3988
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "South Parkville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 80.8149537959105
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "North Perth",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 7.403721916024728
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 84.86636241881811
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Penrith Park",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 5.365635516279883
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 6.435053163845037
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Little Toowoomba",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 12.258687875449542
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Geraldton Beach",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 9.636385146423777
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "South Cairns Valley",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 4.423328460837208
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 73.49257366230174
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Saint Hobart",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2030
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 77.91375238299905
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Darwin Creek",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 12.362014589354038
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Parramatta North",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 93.735728319884
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Darwin Central",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 20.722595620839467
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 10.589765220053247
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Park Brunswick",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 16.12490189955537
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Toowoomba South",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 24.911997291003676
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "North Fremantle",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.5248838808781944
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Hill Ipswich",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 183.5159995595286
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1002
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Manly East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 84.63772547192599
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Norwood Gardens",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 21.702397084722858
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Greater Joondalup",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 95.57821188891265
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 7.3384612355018275
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 6.289378689652736
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 9.347463617960049
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 21.67836972823188
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Little Cairns",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 6.262270674914033
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 185.43221606597135
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "East Richmond",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1727
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Unley Central",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.53560606920789
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 13.888085632382655
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 63.99979806722172
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Perth Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 21.597304437382718
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 8.59197812996733
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Valley Blacktown South",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 11.832411486511596
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 23.848022697440555
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.187215285869474
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Geraldton Beach",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 132.23609159611084
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2206
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Carlton Gardens",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 79.27679236609112
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "North Joondalup West",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 13.158099640759527
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Mount Penrith North",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 99.92681131726398
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 7.732694243901541
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Upper Hobart North",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 8.589653309054267
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Port Ipswich East",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 19.571758080692735
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Blacktown Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 16.61871457952334
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Old Carlton Gardens",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.6997783143491425
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 111.08911974279269
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Liverpool Point",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2067
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Adelaide Gardens",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 82.67153974848007
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 7.04527896790716
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Old Burnside West",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 98.15005303627166
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Fremantle Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 21.554791132543425
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Lower Manly",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 18.067409034706635
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 6.767438065438287
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Upper Townsville Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 14.032750283359597
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.597310365829028
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Collingwood Central",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 80.57599233720434
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Manly North",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2590
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Park Manly North",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.97074675023985
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 12.074345221274111
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 76.80648248221648
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 23.71075187396275
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "North Bondi",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 11.451445182245914
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Hill Brisbane",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 21.55201730427057
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Fitzroy Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 10.154494942536836
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 4.505749995894259
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 99.33318028966794
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Saint Toowoomba",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3996
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "South Fremantle",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 83.21770129848144
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "East Melbourne",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 13.304320450538185
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Port Burnside",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 75.56232439386636
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Joondalup Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 14.340465932249344
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Townsville Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 13.545506336231803
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Joondalup Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 23.79866782770947
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 14.17518207012363
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Glenelg Heights",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 5.257380234505305
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Unley Beach",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 112.92373362620958
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1870
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Royal Toowoomba",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 78.55857998530767
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Parramatta Beach",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 9.782913387197812
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Park Sydney",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 94.23847772991851
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Kalgoorlie South",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 14.647631863101985
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Fitzroy West",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 6.770109684536996
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 16.99507395632212
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 6.8115356187301135
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Geraldton West",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.193779611963095
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Kalgoorlie West",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 235.07081677363817
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2299
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Bondi Point",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.11434261027242
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Ipswich Beach",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 21.189411661096162
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Saint Brunswick",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 79.58567584343734
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Unley",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 12.213039864145173
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 19.72693455194049
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Lower Blacktown Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 20.405722743416568
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Townsville Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 21.027476921426018
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Townsville Point",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 5.313711229731593
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Kalgoorlie Heights",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 58.113262150069204
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3326
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Fitzroy West",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 80.5594091062394
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 18.96938488405873
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "New Toowoomba",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 61.97199246625659
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Royal Penrith Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 12.205931714312758
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 5.256970160921894
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Lower Rockhampton West",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 15.366929405256116
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Fitzroy Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 6.443867760465438
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Fremantle Bay",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 6.302814400571364
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 198.25677697159674
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Saint Geraldton Hill",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1231
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Carlton Central",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 80.19749486194688
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 6.745654423779612
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Greater Fremantle North",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 65.51616711127593
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Unley",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 24.18710930927316
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "New Parkville",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 12.49286999049267
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 23.496501012429786
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "North Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 19.115849441021805
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 4.356609914684848
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "East Cairns",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 207.7063387472057
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3761
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Port Joondalup",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 78.42706437224844
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Perth Beach",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 15.748962385617325
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Adelaide Beach",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 93.35947491143997
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Townsville West",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 15.069330987486316
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 9.231725198551178
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Bunbury Beach",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 17.271719735658344
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "New Kalgoorlie",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 23.825498484934002
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.26906729506112
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Darwin Bay",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 85.20454998221001
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1751
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Glen Manly",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.21198503748482
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 22.198149364507678
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Brunswick Valley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 97.51114800646195
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 19.378476726153224
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Perth",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 8.130867311577736
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "North Richmond Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 15.577972641156874
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 21.13698840999188
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Royal Geraldton",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 4.439177659717863
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Burnside East",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 54.088461466528194
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3370
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Joondalup Valley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 78.80157655636756
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Brunswick West",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 19.46128009603694
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Liverpool Central",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 68.3718003998362
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 24.433252889249204
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Ipswich Gardens",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 9.554139907546876
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Park Kalgoorlie",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 16.84932137427923
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Adelaide Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 24.999104840368815
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.76299383233412
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 66.04881357536007
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Liverpool Park",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2954
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 80.66150838463619
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Joondalup Central",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 6.654953597836135
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "East Liverpool Hill",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 72.84116044040974
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Parkville Park",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 9.043680152770515
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 11.953868805523369
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Royal Richmond",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 21.82582228403584
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 5.478654398842693
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.7430216058655557
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Royal Brunswick",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 194.66839435254832
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2293
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Bondi Gardens",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.75044944925912
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 6.758712401148084
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 70.38673657359354
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 15.323121954199198
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Big Fitzroy West",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 19.710239407265036
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 6.755537010945751
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Hobart Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 10.223771471315445
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Joondalup South",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.61087332965141
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Kalgoorlie South",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 126.90489310009139
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Sydney Point",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2620
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Perth Creek",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 81.67760611305164
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Liverpool Valley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 21.8849293273259
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "New Brunswick",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 77.86212129326384
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 24.279838081963703
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 5.821465527074676
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Bondi Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 19.171748675715317
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 24.42635957434917
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Bunbury Hill",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.568581626844404
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Parkville Point",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 171.13089866885105
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2225
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Manly",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.33619848951864
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "North Cairns Creek",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 12.86477716345959
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Royal Morphett",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 84.94382739712051
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Port Sydney Central",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 18.95174192432332
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 8.228029324704686
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Big Norwood",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 10.633535470930099
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 12.116490399880933
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.25813304031993
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Valley Fremantle Park",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 169.87668013885514
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3571
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "West Fitzroy",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 82.5751217916871
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 11.499941100765817
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 88.35282828003432
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Morphett West",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 23.84984387869425
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 21.443396895504957
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 24.19250733530392
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Toowoomba West",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 10.264497934997777
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.5094999390205466
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 191.5623596516776
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3637
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 79.7266568845207
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Ipswich East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 17.63374938049427
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "New Liverpool Park",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 60.608088637854564
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 23.607042162794624
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Royal Brisbane Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 8.566025321384124
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Glenelg East",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 20.489796109541565
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Perth Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 10.494593912951231
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.140167047434034
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "East Joondalup Beach",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 58.72988750226291
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Lower Brunswick",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2204
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Joondalup Park",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 78.40566991986694
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 13.327227289325378
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Upper Manly",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 67.03372181976648
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 10.037932257577594
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Big Geraldton",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 6.0441171098394
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Perth Central",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 17.077367116363035
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Liverpool Gardens",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 14.181882937554677
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Cairns Heights",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.7552059009048033
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 199.42800660456683
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3202
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Old Sydney East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 84.37835578706714
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Carlton Heights",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 23.99336325804713
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Manly Hill",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 73.46495533722175
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Glen Burnside Park",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 9.400119298226151
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Cairns Gardens",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 19.368596166851283
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Big Manly",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 16.520436556051333
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Parramatta Heights",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 12.409084045845793
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Ipswich East",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 6.531383849043715
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Hobart East",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 221.8045802944402
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3250
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Glen Adelaide North",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 81.67988881388199
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "West Glenelg",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 21.232393349194997
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 92.39558832486927
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Richmond Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 17.803977250030005
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Mount Rockhampton Park",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 23.121966432377995
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 23.58336326261053
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "West Carlton",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 12.254782535237233
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Joondalup Creek",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 5.55893943931512
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Parkville Central",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 99.8294142137051
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "West Manly",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2073
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Glen Joondalup",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 80.85634184294061
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Joondalup Gardens",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 19.84435361407897
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Bondi East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 94.64689843259161
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "West Sydney Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 13.495603903257813
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Toowoomba West",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 17.08500303815866
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 14.865418880635929
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 15.090599961623465
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 4.933640562006023
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "New Bondi",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 181.36924803837303
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1158
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.91329927522011
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 12.413239077331482
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Fitzroy Point",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 78.32506674319397
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Valley Toowoomba",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 15.923108498183982
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "South Fremantle",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 10.458566857716622
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 20.433777259615482
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Townsville Heights",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 12.720794151768562
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.889613502631109
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 141.01721903654098
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Perth West",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1053
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.74249948410812
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Unley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 22.75983722551782
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Bondi East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 95.97365830773067
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 13.217728541053324
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Brisbane Gardens",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 17.902516132379027
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "South Bondi",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 23.527211206271133
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 20.163090335603833
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 5.768798438400223
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 215.0106420351463
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Joondalup Junction",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3509
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Townsville Beach",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 84.63658617053875
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 21.461587014237658
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Townsville South",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 98.46018723895698
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 20.10994640034791
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Townsville South",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 6.777828308971179
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Perth",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 20.79950581687294
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Glen Carlton South",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 13.118176511766034
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 5.684568486114561
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "North Collingwood Point",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 165.83613153818322
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Valley Adelaide Central",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3852
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 84.83542891186038
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 9.21318223085596
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 96.34298030045277
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 17.033899728529917
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Valley Parkville",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 10.336239269860936
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 18.702539761141676
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Upper Melbourne",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 12.344382707168172
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.179861250512383
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 149.16954841620856
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3100
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 84.20787872442314
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "South Fitzroy",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 9.613789022404443
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 62.11631404577567
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Brunswick Central",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 10.259235802210526
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Brisbane South",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 17.911827854635103
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 24.676673995993994
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Saint Penrith Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 6.984148926851361
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Darwin Junction",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 4.175857728521244
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 180.35023671883118
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Brisbane Hill",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2708
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Toowoomba Central",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 77.28366360957041
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Brunswick Valley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 13.469272660221513
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 86.88327634970221
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "New Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 7.364058506809545
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Manly",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 8.404028041272973
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Fremantle North",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 9.368575038967508
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 21.72558875507223
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 6.39953169465759
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Hill Geraldton Central",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 226.1584889523305
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3038
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Glen Hobart",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 84.35674075903496
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 12.554593067990808
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Geraldton Gardens",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 93.17490651474954
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "New Manly",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 20.779768905767003
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Big Bunbury",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 11.59373338971655
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Blacktown Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 13.962176729778752
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 16.06635080608882
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Port Blacktown East",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 8.041593728512686
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Little Darwin",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 83.04079980303878
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "South Norwood Bay",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2361
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Glenelg Central",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.30499550435809
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Greater Kalgoorlie North",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 22.430076223878
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Lower Hobart",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 60.214197132742804
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 17.37737959638992
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Big Unley Central",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 21.306100124670976
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Joondalup South",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 23.512715368998972
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Old Brisbane Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 21.641763641917766
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Townsville Point",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 5.265323747101917
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Mount Penrith East",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 145.92543414080782
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "South Richmond Hill",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3713
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 80.07885900314925
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Parkville South",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 13.315469163031516
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 68.50850538941376
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Big Fremantle",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 24.403009205799556
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Townsville South",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 23.140663575407586
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Big Parkville",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 24.311168379722893
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 12.229348102804355
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "West Glenelg",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 8.351006518729385
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 170.92546600478155
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Hill Blacktown",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1180
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Brisbane Junction",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.40018871418225
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Burnside Heights",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 22.786596143902994
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 70.5368874983582
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 14.731781245172444
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Lower Blacktown Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 20.768109433803463
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 21.016872125986662
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Royal Townsville",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 6.5866857471098506
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Greater Liverpool",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.2589331528862395
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 237.69388500410122
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Manly Creek",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2783
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 84.17450702789787
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Greater Penrith",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 11.45044890125642
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 70.19014557657958
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 13.416704667468938
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "West Melbourne",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 11.503969189199733
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 9.233478233850626
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Rockhampton East",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 14.482408511967497
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Lower Carlton Junction",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.4250040930631833
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Little Glenelg East",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 53.22890579560124
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "East Toowoomba Park",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3753
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Darwin Point",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 82.31427009468634
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Glenelg Valley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 23.062788038989822
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 61.107100384821855
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Blacktown Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 9.407784878524538
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Joondalup Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 12.259014630265014
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Greater Perth East",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 21.541826386657384
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Manly Beach",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 23.728390935377973
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Bunbury Junction",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.512756720038187
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 102.67940370973565
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Manly",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3179
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 77.0727863496894
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 24.723565123255344
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Brisbane North",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 75.27417595907343
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Old Melbourne Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 14.160662051422852
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 18.52040574770339
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Carlton Heights",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 23.1007233012974
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 5.894642589708492
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Kalgoorlie Junction",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 4.620944807183305
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Penrith Junction",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 215.29715146708855
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "West Burnside",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2978
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Hill Rockhampton Bay",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 78.7458949963488
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "New Morphett",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 11.320547554048513
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 94.35290367234222
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 15.004865954867995
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 6.517860015942265
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 11.921823396050378
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Little Unley West",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 23.154325182527447
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.636420859288531
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Big Hobart",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 150.74339162632864
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2021
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "South Townsville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 82.34531067536227
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "West Manly Creek",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 16.179335356415343
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Old Richmond",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 60.3617129210625
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Hobart Park",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 12.076090473366099
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Royal Manly Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 9.97562048231516
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 17.32721625683766
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Sydney West",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 12.380301599668414
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.698411380429652
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 72.8208151000056
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1747
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 80.51543042427214
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 19.917710047918973
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Cairns Valley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 64.26983765552208
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Saint Cairns",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 10.963152355922134
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 9.523706603401951
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 5.827530949859949
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "South Bunbury",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 6.176342587749835
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Perth",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 8.871200925848937
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Fremantle East",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 237.9720160174171
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Rockhampton West",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2389
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 77.70428172109118
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "East Richmond Valley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 9.74516978911669
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 94.21992418241157
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 10.63728690495886
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Townsville Beach",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 19.22915969502847
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Little Carlton",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 22.258543918831172
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Richmond Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 5.061020771485891
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Perth",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 8.657752508191688
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 122.00604263876697
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Liverpool Beach",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2659
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Ipswich East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 79.98511754297358
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Park Carlton",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 18.698941351010415
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Hobart Junction",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 89.49222532225667
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 23.08015968308656
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Sydney Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 24.86927760309409
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "West Bunbury",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 9.879667389737792
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Bondi Valley",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 15.394899022348202
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Upper Parramatta Gardens",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.441688800861513
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 233.99508071457603
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Richmond Gardens",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3795
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Park Sydney East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 77.40720319059022
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Unley Beach",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 23.722851538417025
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Ipswich Park",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 97.83633411673493
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Kalgoorlie Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 24.9671946757731
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Unley",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 5.205836986516905
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 15.009384589481943
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Perth East",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 13.456473244835356
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Lower Rockhampton Junction",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.768262488528668
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Valley Geraldton",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 134.20630318776927
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3469
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Hill Perth Park",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.06633065650173
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Morphett Beach",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 8.259319874515763
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Manly",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 76.99159905802584
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 24.32051487186332
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 24.451826316017463
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Geraldton Heights",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 9.491040025135543
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "South Norwood",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 9.372529666557359
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 8.483476594714222
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "West Collingwood Bay",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 240.10355678836336
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Carlton Central",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1286
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Glenelg East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 78.1018329890903
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 7.483738398234023
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 86.42328182872579
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Mount Perth",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 22.318037971512943
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Kalgoorlie Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 24.04025621502679
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 22.962255864892832
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Blacktown South",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 15.625441700243186
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "West Glenelg Junction",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 6.2277010303933
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Parramatta South",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 101.14740137192356
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1876
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Greater Cairns",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 83.05978394213831
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Morphett Park",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 16.549082418003568
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Port Fitzroy",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 81.65607291008718
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Perth",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 12.854991138568849
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Manly South",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 20.361888609531192
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 6.970378266640624
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Perth",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 10.193675877891994
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.5667687783555735
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 125.12750254156857
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Hobart North",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3712
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 84.53697221466822
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 11.062510899003977
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 87.34220214053633
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Richmond Gardens",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 5.685432194075553
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "North Blacktown",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 16.618590165730048
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Parramatta Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 6.523534319422297
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Old Brisbane",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 21.462968034711125
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 8.304381464662091
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 71.88166286082182
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Royal Adelaide",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1423
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 80.35422202607523
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Port Geraldton Hill",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 10.377509292148046
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Hill Ipswich South",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 98.97002098143315
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "North Fitzroy",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 12.549383959101634
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Darwin Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 17.52604795608795
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Ipswich East",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 16.881508127565684
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "East Hobart",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 13.44886397843938
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.64896751886765
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Perth",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 67.07042207044482
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1342
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 82.33387989159726
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Liverpool Beach",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 11.114248741874352
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Park Sydney",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 75.101464816348
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "North Sydney",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 10.993536237168957
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Adelaide Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 10.575698681485331
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Unley West",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 14.094035843927797
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 9.03996451618962
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 5.949432663240026
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 233.4976276577697
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Blacktown Park",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2067
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Glen Brunswick Junction",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.03762221160893
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Fitzroy Bay",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 14.797777833562442
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Perth Point",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 93.92746993837027
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Greater Penrith",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 24.496354943811923
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 19.737528213652027
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Darwin Hill",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 5.805267896677981
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 8.946610062956854
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Liverpool Junction",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.3290032282870374
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Mount Toowoomba Gardens",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 154.87201151831388
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Ipswich Park",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2554
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 84.11099091919293
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 10.364852814344093
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 85.04182908145941
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Glenelg North",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 13.639910389017654
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Morphett Central",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 24.707833387859054
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 8.2894745677414
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Brunswick North",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 20.33128068811424
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 8.92288664234544
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "North Morphett",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 77.22210363961706
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Valley Parkville Creek",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1653
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 81.1325652419346
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 14.749816395675538
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "New Fremantle North",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 91.56508491343257
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Norwood Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 24.58296360509096
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "East Unley",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 24.835164927712107
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Glenelg South",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 24.370159073453163
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Burnside Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 20.243200980892656
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.143837861071889
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Geraldton Park",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 150.3392543675741
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "South Ipswich",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3492
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Adelaide North",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.92368681708506
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Brunswick Hill",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 22.060755419722934
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Old Brunswick",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 81.25856247716928
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 19.3510683385743
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 21.200232545461247
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Greater Cairns",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 24.566037425226188
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Liverpool Beach",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 18.36425817353648
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.901423515410148
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Royal Parramatta",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 177.77968469558908
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3704
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Joondalup Beach",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.36177883444444
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 15.035520409789157
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Royal Geraldton",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 94.38839299206046
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "East Adelaide",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 16.81586643341349
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Carlton North",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 21.779478058591877
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Manly",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 9.055142202377686
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 8.810057419183561
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.261703228607963
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Kalgoorlie North",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 180.68778183881892
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Brisbane Beach",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2889
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Upper Brisbane",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 78.77466001218409
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Royal Perth Creek",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 6.225519272438245
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Royal Collingwood Central",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 86.51676400953451
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Manly",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 20.887266157290853
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Adelaide Park",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 16.90317316835483
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Richmond Beach",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 24.285709380056097
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 23.99014714317797
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Park Blacktown Park",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.444145514699269
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Burnside Creek",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 58.232002318148886
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1219
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 82.59689742550073
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 7.974109784614769
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 65.55793024562918
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Hobart Heights",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 9.06874941796798
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Norwood Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 13.513842277226367
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Fremantle Beach",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 24.083312286700046
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Manly",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 16.288491252585786
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.265654087107796
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Blacktown Gardens",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 105.04889732458915
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3149
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 82.71101479080173
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Mount Cairns",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 23.490767919152944
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "New Richmond Creek",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 99.55251344488076
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Hobart Junction",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 14.959424054737696
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Ipswich Valley",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 21.374860205729313
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "North Bunbury",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 14.829015049119057
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Fremantle Central",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 15.416839908537225
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Toowoomba East",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.602805724556086
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Old Bunbury Hill",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 201.77763221010085
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1990
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.96614660044345
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 18.375807531121453
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Unley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 74.99276780165013
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Toowoomba Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 23.574232154602512
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Glen Collingwood Gardens",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 11.026982492369598
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Glen Melbourne North",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 12.861671857674729
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 13.753881868785388
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 8.638796888328386
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Lower Blacktown South",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 126.425517888396
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1134
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Lower Richmond Central",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 77.12932593584895
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Hill Townsville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 17.214135413002232
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 61.165508609946826
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Ipswich West",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 9.001979907927527
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Blacktown Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 14.555518079843148
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 18.546169840882314
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 19.489927541341558
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Kalgoorlie South",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 5.5598870331216315
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 161.59030379150198
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Manly East",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3540
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Melbourne East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.59058054152906
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 18.310378592440145
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Morphett Valley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 84.74649057108209
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 7.995104279237908
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Joondalup East",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 16.878557530403203
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 18.865555088364303
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Brunswick Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 5.025195015094401
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.845230333931855
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "North Brisbane",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 108.60276997520972
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Carlton Point",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2392
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Fremantle Junction",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 76.95541241309272
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Ipswich Point",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 5.8215531115603225
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 99.77201054656206
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 7.672359751017814
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 5.099562653566929
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 12.204418390960466
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Joondalup North",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 23.08506665259303
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.312445510176753
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 86.94197442027871
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2919
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Carlton Junction",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 82.68321024735324
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Carlton Valley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 17.746164059060344
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Upper Brunswick",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 93.67864036737359
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "East Rockhampton",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 24.628863958681503
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Port Adelaide Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 22.909293892997347
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Unley Valley",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 12.054066390811368
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 24.966344952172665
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.054511319452232
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 129.41431440860143
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Royal Adelaide",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2317
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Burnside Creek",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 82.59473438012719
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "New Geraldton Gardens",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 5.748508843985389
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Manly Bay",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 63.72539832746642
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 10.377150673239438
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 20.05235514598551
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Valley Adelaide",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 18.94894236397477
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "East Liverpool Valley",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 22.41943293980803
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "East Adelaide Junction",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 4.652713949245669
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Parkville Junction",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 72.75316899722175
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Rockhampton Beach",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2642
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 84.6713143620492
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Hill Norwood",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 16.198421869905143
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Manly",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 75.6689952408275
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Joondalup Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 24.654161820498928
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Blacktown North",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 16.574100122900877
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Townsville Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 22.79866637653503
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "New Sydney Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 16.496549010801317
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Park Geraldton",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.025766910546208
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 108.35368857417097
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Adelaide West",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3516
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 81.25393579631248
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 7.915454943246152
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 95.32517295882789
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Unley",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 7.916317180153523
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Rockhampton Gardens",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 17.18227411322931
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Sydney Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 22.165815899595486
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Perth",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 17.18318098405804
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 4.899911709135466
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 162.24102771064491
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3394
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Old Adelaide",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 77.2905891087353
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Manly Junction",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 18.119996975485236
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 87.11281489691147
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Lower Norwood",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 5.144049349207465
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Little Carlton",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 5.099432075888153
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 12.341770632716909
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Ipswich North",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 20.686330453461075
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Carlton Point",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.4060150915222884
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "East Sydney",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 79.90191041014181
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Morphett Gardens",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2222
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 75.14740548685094
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Greater Bondi",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 10.319570745963302
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 63.12471273369745
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "North Morphett Bay",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 7.459690230124698
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "East Carlton Creek",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 21.786705176746338
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 12.652861932451781
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 17.31250672548746
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "North Fitzroy",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.33673228656936
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Melbourne South",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 223.34455038549495
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Upper Burnside",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2621
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 84.05672980687886
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 18.234382422359
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 85.27554041708409
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Perth West",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 10.72293945558969
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Upper Kalgoorlie",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 23.07889938386917
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Brisbane North",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 22.04968556108191
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 19.259434404810577
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Morphett Beach",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 4.6148993743809985
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Park Bunbury",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 116.75630244900073
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2544
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Saint Unley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 78.51644527101838
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 12.864097964919345
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 71.48051869258958
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 24.147939307259698
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Glenelg Gardens",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 14.03900272156891
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Old Manly Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 12.131211198955887
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Port Cairns",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 8.04978803023129
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.054279289301958
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 96.42059830899896
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2977
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Mount Unley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 84.72543278013256
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Old Norwood Bay",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 16.189189219850707
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "East Bunbury Hill",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 71.21352996917288
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Unley Central",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 22.662266389290767
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 7.8656611811560495
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 20.400432255564326
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Richmond Gardens",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 23.66402380424011
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 7.254362430589975
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Unley",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 67.84318842923471
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2523
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Glen Morphett East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 83.89144220160895
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Bondi Valley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 12.545851009102273
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 63.657926006123795
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Glen Blacktown",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 13.668288813527344
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 13.11074500770677
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 12.967790038871359
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 9.00458860710775
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Big Richmond Park",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.8884693733648312
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 223.32372360071636
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2164
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Unley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 79.92665915550067
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 15.557629999028407
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 72.3750425682445
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Greater Parkville",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 9.464852796130145
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 15.999325001396677
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Upper Penrith",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 9.307252296301613
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Hobart Gardens",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 12.841244700423253
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 8.468955639639464
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Royal Bunbury",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 114.3666540995615
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Mount Fitzroy",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3259
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Perth",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 82.23867666648339
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "West Hobart Park",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 14.749997778874043
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 80.02734627459769
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 10.424097427709764
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Collingwood East",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 13.922738040512748
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Sydney North",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 8.705784113596987
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "East Hobart",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 11.331866650414222
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.278108470947775
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 225.69140866290658
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1518
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 78.23729225051068
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 17.45214705510131
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Lower Richmond East",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 80.26400908010913
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 14.437571271031864
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Valley Norwood",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 18.780914843711614
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 12.036817894119993
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Greater Bondi",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 11.896404544854683
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 2.1961890167113296
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 123.50703060117408
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "South Perth",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1241
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 77.09903347045369
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Mount Rockhampton",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 5.276124400153179
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Unley Creek",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 99.26301821930468
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Royal Sydney",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 20.302947689924387
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Little Kalgoorlie",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 19.219841904364085
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Royal Toowoomba",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 8.940349054353911
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Park Brisbane Gardens",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 10.460933833340933
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Parramatta Point",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.2105752185353538
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Park Unley",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 220.38285600400727
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Saint Norwood",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3567
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Collingwood Gardens",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 80.50992843551575
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Valley Perth",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 19.758289538628038
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Hobart Creek",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 66.75651004973628
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Brunswick West",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 10.412375006018678
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Manly",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 14.493397581051134
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 20.312792283918
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Brunswick North",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 12.990340179112575
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Saint Collingwood",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 3.9548050181657324
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 128.76222879991
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Royal Bondi",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 1804
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 81.03149572639464
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 12.599163906252038
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Fremantle Junction",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 72.8156697184271
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Little Blacktown",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 6.182875465722519
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Bondi West",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 5.913710333563222
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 23.851922152504027
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "New Toowoomba",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 10.244168298094944
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 6.836008417410605
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Park Parramatta",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 110.76011366381304
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Carlton Junction",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3716
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Joondalup Central",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 82.5708115503921
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 14.28631704608529
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "South Blacktown",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 63.249986122502364
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 22.300358433251233
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 9.389745206740322
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 10.185625339123238
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Darwin Park",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 14.589911168255618
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Hill Carlton",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 4.479655221767624
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Norwood East",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 203.50023149272
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Cairns Creek",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 2446
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Rockhampton Hill",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 80.29928658402048
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 22.610580001922827
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "South Fitzroy",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 81.03426376278736
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Hill Liverpool Valley",
+    "Parent Description": "Health Conditions",
+    "Description": "Diabetes (%)",
+    "Amount": 15.095060331172295
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Conditions",
+    "Description": "Heart disease (%)",
+    "Amount": 21.675207515080178
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Unley North",
+    "Parent Description": "Health Conditions",
+    "Description": "Mental health (%)",
+    "Amount": 7.938891529066483
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Cairns Point",
+    "Parent Description": "Health Conditions",
+    "Description": "Arthritis (%)",
+    "Amount": 8.819172993079075
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Valley Blacktown",
+    "Parent Description": "Health Services",
+    "Description": "GP visits per capita",
+    "Amount": 9.34760041274588
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "New Fitzroy North",
+    "Parent Description": "Health Services",
+    "Description": "Hospital admissions per 1000",
+    "Amount": 215.7917028582303
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Health Services",
+    "Description": "Health expenditure per capita",
+    "Amount": 3214
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Norwood Valley",
+    "Parent Description": "Health Outcomes",
+    "Description": "Life expectancy (years)",
+    "Amount": 78.84438021034693
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Health Outcomes",
+    "Description": "Disability rate (%)",
+    "Amount": 18.707458941826705
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Kalgoorlie Gardens",
+    "Parent Description": "Health Outcomes",
+    "Description": "Health score (0-100)",
+    "Amount": 68.02798169266862
+  }
+]

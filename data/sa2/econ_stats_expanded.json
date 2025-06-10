@@ -1,0 +1,6302 @@
+[
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Bunbury Bay",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 511
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1151
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 916
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Perth Bay",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 13.865313259142452
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 14.973435894484451
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Collingwood Gardens",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 107.7404835000813
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Ipswich Valley",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 573
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Joondalup West",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2121
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Parramatta South",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 6.968138777192653
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1667
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Unley East",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1383
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "West Hobart",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 810
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Brisbane Beach",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 16.43704166440133
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Glen Bondi",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 16.384784066471255
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Liverpool Junction",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 125.74277048510947
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 314
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1741
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 2.3891554349866055
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 782
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 525
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Hill Bunbury Bay",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 723
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 5.794702377581788
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Kalgoorlie Central",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 2.8288288868875258
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Greater Brisbane Gardens",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 56.7405310960553
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Brunswick North",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 262
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Carlton Gardens",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1102
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 14.359042516671744
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1467
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Bunbury Valley",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1510
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 628
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "North Kalgoorlie",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 4.598851299422119
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 16.19036271788727
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Manly",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 91.42848965034992
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Big Bondi Junction",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 270
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "East Penrith",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2083
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Royal Ipswich Park",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 4.557081352350758
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Brunswick West",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1180
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1107
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Valley Norwood North",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 961
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Unley Central",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 9.325894200977237
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Hobart Park",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 7.547994332009052
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Adelaide Beach",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 92.28258705610557
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "New Ipswich",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 343
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Richmond Hill",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1184
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 9.591955942439977
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Fitzroy Bay",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1151
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Royal Glenelg",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 729
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 821
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "East Collingwood",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 14.388226853113336
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Valley Joondalup",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 10.737994637081428
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Townsville West",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 88.31867569434411
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Lower Fitzroy",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 300
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Old Burnside East",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2600
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Little Fitzroy",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 2.4774973063726193
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1867
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1679
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 856
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Manly",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 10.390855162258868
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Upper Geraldton Heights",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 6.175078774385714
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Brunswick Point",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 100.81985033389745
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 224
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Rockhampton Bay",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1290
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Glen Glenelg",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 10.549184703090043
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Cairns Park",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1799
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1651
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 858
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Park Darwin",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 11.496016496021166
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Liverpool Hill",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 15.304464082094027
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Manly",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 74.5464758400903
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Toowoomba Gardens",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 416
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1427
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 8.028179961931302
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 862
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1998
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Lower Ipswich",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 923
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 13.55114534863638
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Adelaide Valley",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 2.348376872734022
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Parkville Bay",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 121.25230023503937
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Manly",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 256
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "South Kalgoorlie",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1231
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 4.611563585880826
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Sydney Heights",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1019
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Unley",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1649
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 634
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 10.0746566154859
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Manly Beach",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 11.032274273521756
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 143.56395509613446
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 508
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1571
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Toowoomba Beach",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 8.989738053263201
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Glen Manly Beach",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1701
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Lower Morphett South",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1952
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 769
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 4.234620170320431
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Parkville Valley",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 6.692841818606119
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 54.819605552956816
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Perth Park",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 534
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "New Parkville",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1556
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Geraldton Gardens",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 16.712851853271633
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Fitzroy Valley",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 999
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1362
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "North Melbourne Heights",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 986
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Morphett Valley",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 9.587569014061646
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 11.12930458587745
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Norwood Heights",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 96.92768641867502
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Lower Melbourne",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 540
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Liverpool Park",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2263
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Melbourne West",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 16.44837418934012
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Valley Morphett Heights",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1487
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Port Unley Park",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1825
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Upper Ipswich",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 716
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Sydney Heights",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 10.728884220614056
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Park Toowoomba Heights",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 5.9524882778288735
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "New Blacktown",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 56.37034192148107
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 254
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Penrith Junction",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1750
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Park Glenelg",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 7.19165764217299
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Old Richmond",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1510
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Greater Toowoomba East",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1607
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Perth Point",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 812
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Hobart Hill",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 8.827412323631226
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Glen Parramatta",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 11.506616027752434
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "West Rockhampton Hill",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 127.51561480504763
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Unley",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 275
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Geraldton Valley",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2008
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Rockhampton Valley",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 16.66859531581168
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1864
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Manly",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1165
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Joondalup Valley",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 645
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 2.7931884521667207
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Manly Gardens",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 11.993184665496493
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 83.76588610667486
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Fremantle Creek",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 373
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2629
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 7.080085585691487
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Valley Richmond Bay",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 876
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "North Kalgoorlie",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 778
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Adelaide Gardens",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 874
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Norwood Central",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 5.029364998928894
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Unley",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 14.610566290437989
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 110.76227099635591
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 445
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Old Rockhampton",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1045
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 10.049610968739094
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Hill Morphett",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1119
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1388
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Royal Bunbury Point",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 995
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "North Melbourne Gardens",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 14.227602522228732
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Cairns East",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 5.283130893506835
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 120.69522200310448
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 525
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1301
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 15.302533885616263
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1096
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "North Hobart",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1356
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 650
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Richmond Heights",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 15.446523247351875
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 11.757730286270947
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 94.97509316876219
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Lower Unley",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 464
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2322
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Park Norwood",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 12.225170285355
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1748
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Melbourne Bay",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1479
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Bunbury North",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 732
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Brisbane Junction",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 5.969762702878656
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Melbourne Point",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 16.27745598181616
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 117.86618348626176
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Adelaide Heights",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 351
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Mount Richmond Creek",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1738
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Penrith South",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 11.61381413062026
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Cairns Hill",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1745
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Perth",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1214
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 865
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 12.269797074542877
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 3.83061378432138
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 67.445592604296
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Hill Manly",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 374
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1365
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 15.374613682609471
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "East Joondalup",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1632
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1487
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 692
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Penrith Junction",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 3.954910106381149
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Port Sydney",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 6.773100456721549
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Mount Darwin North",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 54.61589062012495
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Big Brisbane",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 451
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Fitzroy Point",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1518
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Hill Unley Point",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 11.796270870839532
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1797
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1770
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Hobart Bay",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 735
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Fremantle Park",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 11.055057612411527
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Sydney Park",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 8.274395490955776
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "North Carlton Central",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 115.54574687105999
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Perth",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 316
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Greater Collingwood Hill",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1333
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 13.040359605978765
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Fremantle South",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1129
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1264
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "North Norwood Gardens",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 741
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 14.576546189353206
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Liverpool Hill",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 7.039942497235761
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Burnside Gardens",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 148.18172617246796
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 391
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "New Melbourne",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1139
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 6.877992084470204
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "South Rockhampton Bay",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1567
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1627
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "East Perth",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 617
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Lower Adelaide North",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 4.489261585343019
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 5.329162312364556
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Parramatta Bay",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 125.54946420976856
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Collingwood Creek",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 546
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Morphett Point",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2830
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 14.350897379982042
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Old Blacktown",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 978
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1773
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 992
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 11.42977710121312
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 15.892692399882348
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 65.61118435426042
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Hill Richmond South",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 395
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Saint Carlton",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1036
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "New Joondalup",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 6.971749604139665
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Greater Fitzroy",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1770
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Hill Townsville",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1729
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Joondalup Beach",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 992
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 8.868199326923314
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Bunbury Park",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 9.333548647675682
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Old Liverpool",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 137.68684756324393
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 553
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Saint Bondi Park",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2924
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Mount Unley Creek",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 12.035862685289707
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Collingwood Hill",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1639
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "West Parkville",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 725
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "South Fremantle",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 929
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Melbourne Valley",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 5.725335656913
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Saint Brunswick",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 5.209922243333994
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Little Brunswick Park",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 66.23409537547222
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Perth Gardens",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 534
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "New Melbourne Valley",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1584
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Unley West",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 10.87136149584575
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 974
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 782
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "West Hobart",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 684
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 9.406567246593735
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 3.930566272167311
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Fitzroy Heights",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 67.09274260866391
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Richmond West",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 344
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1871
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Lower Carlton",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 2.020975659472837
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Old Unley",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1497
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Morphett Junction",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1195
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 619
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 5.743699616438009
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Blacktown Beach",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 3.0054535474140716
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Norwood Junction",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 90.3527958925174
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Rockhampton North",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 224
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1289
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 6.000750996640518
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Glen Collingwood",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1308
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1344
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 915
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "South Brisbane",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 12.76989838045562
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Upper Collingwood East",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 14.457359898146699
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Royal Joondalup",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 77.58119433503046
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Saint Hobart South",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 478
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2906
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 14.274478351871197
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 957
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 920
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "West Carlton",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 734
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Old Fitzroy South",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 8.966135553366996
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Big Liverpool",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 6.1660936029986795
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Upper Manly North",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 113.15757381390205
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 486
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Parkville Gardens",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2148
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "South Joondalup",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 6.9690238197058365
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 825
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Parramatta Heights",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 600
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Little Rockhampton",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 839
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Morphett Hill",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 13.684304629871374
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "South Melbourne",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 11.512328628582566
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "South Perth Beach",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 147.93493640187341
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 343
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2230
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 5.183587237242323
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Melbourne Point",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1166
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Joondalup North",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 771
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 687
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Fitzroy Heights",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 15.838445717622985
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 4.926701706085682
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Norwood Heights",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 56.53185584194529
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 335
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Saint Brunswick",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2896
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Sydney Beach",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 14.475146953813196
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1193
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1469
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Brisbane North",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 952
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Carlton Valley",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 13.02173450288755
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Manly",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 11.148746854683466
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 54.300381353865326
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "East Melbourne South",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 590
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Mount Darwin",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2391
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Lower Fremantle",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 2.687036238590346
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 537
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 552
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Richmond Central",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 954
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Park Bunbury Junction",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 14.752488374273836
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 7.9850844638434335
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 54.74230855108713
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Collingwood Park",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 283
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1584
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Valley Glenelg",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 12.75973269716684
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Collingwood Creek",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1115
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1482
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Manly West",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 689
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 14.138721670799619
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Valley Brisbane Beach",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 6.197096929498914
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Townsville Heights",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 77.39379263438717
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 322
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Brunswick South",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1910
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Unley Valley",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 13.937996367850317
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "West Parkville",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1765
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1889
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 729
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 10.827614426810287
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Little Collingwood",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 3.239108885430422
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Little Glenelg Creek",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 50.80694134578092
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Glen Ipswich South",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 418
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1610
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Saint Ipswich Creek",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 8.436163399443409
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 851
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 540
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Mount Blacktown West",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 959
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Royal Penrith",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 7.395637861555983
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Saint Parramatta",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 11.961356097292143
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Cairns East",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 110.73029579534276
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Darwin Point",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 321
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Old Fitzroy",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1543
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Saint Parkville Valley",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 9.152215074885566
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1991
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Hill Brunswick Park",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1130
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Brisbane Valley",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 836
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 12.814813926836248
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Mount Townsville",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 10.504241076721572
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 62.408203455013904
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 232
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1153
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "South Norwood",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 11.951403784863071
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "South Brisbane",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 767
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Greater Unley",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1292
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 853
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 16.242298644519458
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 2.5952446112403873
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 81.8593537642583
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 218
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1738
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "East Ipswich",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 15.971005134574945
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Perth",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1946
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Glen Sydney",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1879
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Norwood Valley",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 826
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 10.945409088940593
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Joondalup West",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 3.650547748242431
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 65.92363533987768
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Unley",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 319
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Liverpool Beach",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1068
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 11.360396783517354
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Big Joondalup North",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1939
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "New Parramatta",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1192
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "West Toowoomba",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 888
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 10.230069509237152
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Manly Heights",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 14.52077630787398
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Liverpool Valley",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 140.55136594894583
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Port Fitzroy Heights",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 381
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Little Fremantle Heights",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1005
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Big Parkville Heights",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 11.139575441421945
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Hill Carlton",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 812
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Parramatta Beach",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1044
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Parramatta Valley",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 978
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Darwin West",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 12.003615163337686
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Penrith Beach",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 2.534136032893424
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 125.669694591045
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 324
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1452
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "South Bondi",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 7.96341686813234
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Lower Ipswich",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1404
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Hobart Hill",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1643
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 885
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Royal Fremantle Point",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 5.344804721978805
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 15.167690822583703
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Unley",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 87.4720139594256
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 218
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2914
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 10.239089235048219
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Manly",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1094
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1947
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Valley Fitzroy",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 616
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 9.754679631007587
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Burnside East",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 12.72148820894051
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 130.42565305336365
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "South Fremantle",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 289
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1203
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Saint Geraldton Beach",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 16.326860792964844
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Parramatta East",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1745
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Perth",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1487
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 656
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 8.118594946881599
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 8.917515622284403
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Ipswich North",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 87.37366597186873
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Brunswick Bay",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 352
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Glen Unley Hill",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2414
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Hobart Park",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 14.576346875369918
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Big Toowoomba",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1808
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Geraldton Heights",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 767
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Bunbury Valley",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 987
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Parramatta Hill",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 12.014131394117593
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Royal Hobart South",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 6.564387122078274
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Darwin Bay",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 130.41236633121622
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Glenelg South",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 332
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Manly Gardens",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1141
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Darwin",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 10.287677511289445
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "East Geraldton",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 653
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1284
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 646
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Unley Hill",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 15.671975520334465
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 3.6389606054753
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 59.03011623986549
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Hobart Hill",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 446
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1385
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 11.036679284674245
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Perth",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 642
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 976
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 710
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 7.1460241648294405
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Perth South",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 10.870049495477838
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Manly",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 52.60445699015441
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Old Melbourne",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 599
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2661
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Little Bunbury South",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 3.604633695019052
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 714
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Parramatta Park",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1548
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Perth",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 664
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Parramatta Park",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 2.7362760402845225
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 9.721064923475504
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 129.44200760013052
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 517
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1272
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Perth",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 16.628834691340096
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1007
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 773
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Blacktown West",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 654
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 10.956167909236685
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Melbourne Hill",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 14.364531454359408
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 87.4765042583783
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Lower Hobart Heights",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 251
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2247
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Bondi Point",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 5.2765878672938795
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Ipswich Valley",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 669
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "New Ipswich",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 618
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Old Carlton",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 753
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Park Carlton East",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 4.201289835314856
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Greater Bunbury",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 5.29616734663417
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Burnside Point",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 141.78700389525787
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Blacktown West",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 246
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Lower Ipswich",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1955
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 12.7387623388397
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Penrith Hill",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1844
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Big Collingwood",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1905
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 705
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 2.4917230214296895
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Port Townsville Hill",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 10.398053865115562
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 149.16871272315228
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Old Morphett Valley",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 362
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Big Penrith Central",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2841
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 5.446345437657159
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Geraldton Valley",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1385
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Mount Geraldton",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1341
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Fremantle Heights",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 630
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 10.741579102686996
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "West Bunbury Creek",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 14.47765841236205
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Unley Hill",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 118.73057692440734
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "New Unley",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 205
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Valley Sydney Bay",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2331
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 12.35479403678763
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1082
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 609
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "East Melbourne",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 838
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Rockhampton South",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 7.951441519433058
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 16.621394167703926
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Old Adelaide Bay",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 144.65580289892466
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Lower Adelaide Creek",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 486
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "South Norwood",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1844
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 3.5377697579592575
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1836
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1889
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 848
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Unley Hill",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 5.825345538064999
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 10.84250175319249
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 141.19855598930337
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Big Parramatta",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 299
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Hill Blacktown Creek",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2228
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Royal Unley",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 5.536484519924851
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1398
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Morphett East",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 530
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Geraldton Point",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 705
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Kalgoorlie Point",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 7.240266428808198
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Royal Brunswick",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 8.945963960111674
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 106.56446577799967
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Hill Carlton",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 375
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2616
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 8.842656547599406
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Parramatta Park",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1174
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Kalgoorlie North",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 720
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "South Richmond",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 808
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Big Norwood",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 15.200691324399106
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Morphett South",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 7.464097859137874
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 80.17506697865666
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Old Townsville",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 563
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1623
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 6.519212604522123
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Melbourne Heights",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1849
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Glen Manly Gardens",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1788
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Bondi Heights",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 658
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 5.247402464234152
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 11.607379589283111
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Rockhampton Point",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 134.3937584689448
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 448
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Upper Morphett Heights",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1680
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Lower Darwin South",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 7.125831300145256
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Saint Glenelg Junction",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1943
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Parramatta Central",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 974
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "New Perth Heights",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 977
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Old Sydney Central",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 11.153851083709002
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Glen Sydney",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 10.855247407553668
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 114.7729437728576
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Bondi Bay",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 232
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Joondalup West",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1021
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 16.78009893309401
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1885
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 539
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Royal Norwood",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 958
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 9.037368004425364
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Glenelg Beach",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 3.80433417880433
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Perth",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 118.51522198389924
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 200
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1033
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 16.50002943454037
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Upper Manly",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 721
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Bondi East",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 907
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 666
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Royal Geraldton North",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 3.752178436969177
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 8.45211874701862
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Glenelg Point",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 143.54390938063062
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 493
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1457
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 13.737107001684953
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Valley Darwin",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1917
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Glen Fremantle",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1381
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 793
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "West Bunbury",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 16.682601830963527
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "East Townsville Junction",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 2.1255439260860514
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 53.25222869727566
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "New Norwood East",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 351
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2887
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 7.329033727097821
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "New Townsville",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 739
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1860
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 770
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Perth",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 13.399912487460588
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Ipswich Beach",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 14.212631378072045
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Hill Cairns",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 126.41043258414125
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "West Liverpool East",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 205
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2494
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Lower Toowoomba Central",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 6.14706238348624
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Fitzroy Valley",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1377
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "North Richmond",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1280
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 783
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Manly Central",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 3.2181306948097568
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Bunbury Beach",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 12.882697323304294
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 85.42449152099208
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "New Unley Hill",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 480
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1442
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Port Joondalup",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 14.410435036348078
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Valley Carlton",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 879
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 615
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Parramatta Hill",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 855
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 3.775855356399807
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 8.939827901685433
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 97.37025186304011
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 497
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Little Cairns Point",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1819
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Sydney Bay",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 13.48475425081481
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1700
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 559
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 931
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Little Morphett",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 15.73694885268671
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Blacktown Bay",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 3.740840720649982
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Upper Rockhampton South",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 88.68393364113805
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 387
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Park Parkville Central",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1040
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Saint Bunbury Bay",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 7.20350196272772
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1478
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1782
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Valley Bunbury",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 835
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Little Parkville Junction",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 3.6811725862141347
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Rockhampton East",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 10.895854307595735
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 84.81226116608009
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Bondi Valley",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 220
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "South Norwood",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1284
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 15.410051276616864
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Park Geraldton",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 747
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Brunswick South",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 631
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 880
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 6.174680269534226
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Saint Perth Gardens",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 14.78515920476258
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Darwin Hill",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 74.1976609819059
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Glenelg Valley",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 555
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Lower Rockhampton",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1580
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Upper Unley",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 9.910079904915795
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Manly",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 933
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1010
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Big Blacktown",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 690
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Valley Carlton",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 11.791530992290038
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 2.0502289865590355
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 98.91215496175954
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 211
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Little Penrith",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1584
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Manly Central",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 14.17341448129581
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Park Norwood",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1120
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Brisbane Gardens",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1478
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 905
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Upper Hobart",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 6.324703236151921
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "West Rockhampton",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 4.416051171694875
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Mount Fitzroy",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 76.62765200134211
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 599
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Perth Gardens",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2159
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Lower Townsville",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 14.80166695487511
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Glenelg Junction",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1095
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 712
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Hobart",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 750
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Port Townsville",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 9.58636402784935
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 5.945733479405458
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 116.25397781155591
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "New Liverpool",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 466
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Hill Carlton Bay",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1212
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Parkville West",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 9.774315514082137
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Bunbury Beach",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1664
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Big Carlton North",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 690
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Park Richmond",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 743
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Adelaide Valley",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 16.848944356992607
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Greater Glenelg Valley",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 15.281627078965046
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Bunbury South",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 129.79739535198107
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Valley Toowoomba",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 540
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Cairns Park",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2894
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "New Adelaide Junction",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 5.869825728031441
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1937
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Valley Parramatta Point",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1829
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Blacktown Gardens",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 689
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 5.769930917159946
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Unley",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 3.7953516536600764
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Burnside Creek",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 135.63711529568818
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "South Melbourne",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 366
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Little Bunbury",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1945
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Penrith Junction",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 5.156487803612789
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Port Perth",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 816
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Royal Unley",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1366
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Perth Gardens",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 817
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 11.626129340476785
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 15.491527602685663
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 65.4497812066038
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "East Penrith Park",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 493
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Park Glenelg",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2011
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "North Parramatta",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 13.79066483792459
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 615
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Bondi Heights",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1156
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "North Hobart",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 912
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Greater Hobart Beach",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 2.5788216733775373
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Saint Bunbury Park",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 6.391814359967709
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "South Penrith Point",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 147.4612124045611
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Joondalup East",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 591
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Cairns North",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2992
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Port Kalgoorlie",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 15.375615525764367
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1249
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1658
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Geraldton Hill",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 822
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 4.120188427903597
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Norwood Hill",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 5.513234559547914
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Mount Parkville",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 68.68052774827353
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 524
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2600
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 13.77051622790369
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1445
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Valley Blacktown",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 560
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Greater Darwin Point",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 821
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 3.0146652509457024
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Blacktown Park",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 4.782402584696033
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 145.28607277622882
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 251
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2151
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 5.330592791774021
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Greater Joondalup Gardens",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 878
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Bondi",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1818
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 902
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 5.38025073375007
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 5.694137089207025
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Glenelg Bay",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 86.64038618300536
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 565
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Bunbury Beach",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1558
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 10.729281700777852
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1248
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Brisbane Point",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1803
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Park Blacktown",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 983
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 7.587026099880724
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Cairns North",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 2.4331806877049136
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 137.82306509346137
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Townsville Bay",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 201
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Parkville Heights",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1562
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 4.289347816537769
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Park Parramatta",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1109
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Brunswick",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 561
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 687
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 7.311179740169923
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "New Sydney",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 16.937593070246088
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Manly",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 110.73198369587226
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 210
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Valley Brisbane",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1457
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 11.422518995228724
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Brisbane Heights",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1852
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Hill Richmond",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 710
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 850
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 5.60680763854632
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Liverpool South",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 3.9464971093566943
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 76.07796383170593
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 381
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2249
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Manly",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 12.727488150017052
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 847
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Fremantle South",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1704
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 745
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Upper Unley West",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 10.187452264362419
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Glen Richmond",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 2.024852638570808
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Hill Parkville",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 125.18146488812292
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Valley Collingwood",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 531
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1641
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 15.241432019223476
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Manly",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1573
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1107
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Hobart Beach",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 782
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "West Parkville",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 9.818004445700392
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 10.962120408411353
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Bunbury Hill",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 79.24411843303099
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Fremantle Beach",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 496
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Cairns Creek",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1404
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Ipswich Valley",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 3.326717073326008
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1589
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Sydney",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1624
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Greater Cairns Beach",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 957
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Parramatta Central",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 13.4002372477429
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Perth",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 14.918956835527757
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Glenelg",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 75.23658399416138
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Saint Morphett Junction",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 483
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1310
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Perth West",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 8.524920322595287
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Liverpool",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1109
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1466
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 669
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 11.885959899296163
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Manly",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 3.845162763442354
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Lower Brunswick Heights",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 91.56725235039826
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Lower Joondalup",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 219
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1850
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Unley Central",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 9.631936115716432
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Greater Norwood Point",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1725
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1816
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 636
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Fitzroy Valley",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 3.936362021374045
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 15.157617655973377
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 93.90068601230921
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 418
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2972
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "North Unley",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 5.9694721015508785
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Parkville",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1879
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "South Darwin",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1887
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Joondalup",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 670
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Fitzroy Park",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 9.751177865479727
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Glen Kalgoorlie Central",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 4.090655899141456
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Valley Manly Junction",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 94.61230007317347
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 316
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Valley Carlton",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2082
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Lower Penrith Hill",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 5.034031694518625
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1311
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Carlton West",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1012
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Burnside",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 783
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Brisbane Beach",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 4.850739586562558
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 4.230230137459634
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Blacktown North",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 104.94569945483477
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "East Carlton Junction",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 325
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Unley",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2928
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 5.88430330511372
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Perth Junction",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 982
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Lower Carlton",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1180
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Bunbury Gardens",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 671
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Toowoomba Park",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 8.455163033161956
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Cairns",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 14.576137598906193
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "South Blacktown West",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 64.08042516559797
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 314
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2044
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Parramatta Junction",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 3.2251977394236366
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Upper Melbourne",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1352
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Mount Kalgoorlie Heights",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1704
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Perth",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 691
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Ipswich Bay",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 3.408800729510309
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Melbourne",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 15.170161813371497
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Rockhampton Park",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 110.42722636040409
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Cairns South",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 437
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2989
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 8.760647717325945
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 626
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Parramatta Point",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1711
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "North Perth West",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 841
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 2.0560647760482125
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 14.548169131371791
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Fitzroy",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 83.40620785598088
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 529
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Carlton",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1853
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 15.962980981442353
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "East Blacktown Bay",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1146
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Unley East",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 639
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Upper Brunswick",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 984
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Bunbury East",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 2.01490359157685
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 13.139795108644037
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Hill Blacktown Junction",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 95.71496144513608
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Brisbane",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 448
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Townsville Park",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1283
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 10.271183573492731
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1157
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Glenelg Park",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1379
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Valley Ipswich Park",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 769
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Glenelg West",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 13.385665376777483
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Morphett",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 7.342377148702656
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Penrith East",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 58.85252872760442
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Geraldton",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 465
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1111
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Penrith",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 2.878460981584345
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Morphett Park",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1395
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "West Manly Heights",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1315
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Morphett West",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 984
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Fitzroy Creek",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 3.00495379476224
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Parkville Bay",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 7.228504856361536
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Collingwood",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 50.94201481716394
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Royal Parkville",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 297
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Darwin Valley",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1731
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Lower Bunbury Hill",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 4.1105721851545844
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1543
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Valley Bunbury",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 880
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Little Norwood",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 781
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Park Brisbane",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 8.389319769016417
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "North Manly West",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 12.341214239467494
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Brisbane Heights",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 148.1242520593884
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "South Ipswich",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 584
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Toowoomba",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2095
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Townsville",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 4.424424164750319
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Park Toowoomba",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1741
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Richmond",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1259
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Fitzroy Junction",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 948
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Parramatta",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 16.67427607005469
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 15.429666752743806
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 80.11470106985496
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Melbourne North",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 453
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Mount Adelaide Heights",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1381
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Parkville Creek",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 16.10067746845806
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Fremantle",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 809
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Unley West",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1586
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Big Bunbury",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 976
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Ipswich",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 2.138815180140478
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Kalgoorlie",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 3.7986495698819316
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Norwood",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 102.80718590997733
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Rockhampton",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 453
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Old Cairns",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2212
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Blacktown Junction",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 8.438133911598904
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Port Perth",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 839
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Little Ipswich",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 1172
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Bondi Hill",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 992
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Valley Darwin Heights",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 11.530400825561754
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Adelaide",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 2.3632494376090376
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Fitzroy Junction",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 52.36421943175924
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Glen Darwin Creek",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 326
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "East Melbourne Junction",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 1316
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Bunbury Beach",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 15.286009666885018
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Richmond Creek",
+    "Parent Description": "Economics",
+    "Description": "Median household income ($/week)",
+    "Amount": 1158
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Blacktown",
+    "Parent Description": "Economics",
+    "Description": "Mean household income ($/week)",
+    "Amount": 756
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "South Penrith",
+    "Parent Description": "Economics",
+    "Description": "SEIFA Index",
+    "Amount": 714
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Big Ipswich",
+    "Parent Description": "Employment",
+    "Description": "Employment rate (%)",
+    "Amount": 7.944501917164326
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Park Parramatta East",
+    "Parent Description": "Employment",
+    "Description": "Unemployment rate (%)",
+    "Amount": 8.665225353468667
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Big Adelaide",
+    "Parent Description": "Employment",
+    "Description": "Labour force participation (%)",
+    "Amount": 54.462069857040895
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Big Glenelg Central",
+    "Parent Description": "Housing",
+    "Description": "Median rent ($/week)",
+    "Amount": 426
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Bunbury",
+    "Parent Description": "Housing",
+    "Description": "Median mortgage ($/month)",
+    "Amount": 2559
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Toowoomba Valley",
+    "Parent Description": "Housing",
+    "Description": "Housing stress (%)",
+    "Amount": 3.773174314812226
+  }
+]

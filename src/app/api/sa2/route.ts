@@ -82,10 +82,10 @@ export async function GET(request: NextRequest) {
         regionCount,
         metricCount,
         datasetSources: [
-          'Demographics_2023.json',
-          'econ_stats.json', 
-          'health_stats.json',
-          'DSS_Cleaned_2024.json'
+          'Demographics_2023_expanded.json',
+          'econ_stats_expanded.json', 
+          'health_stats_expanded.json',
+          'DSS_Cleaned_2024_expanded.json'
         ],
         lastUpdated: new Date().toISOString()
       }

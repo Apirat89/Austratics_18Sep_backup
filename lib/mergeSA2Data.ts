@@ -167,8 +167,8 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
   
   try {
     // 1. Load Demographics data
-    console.log('📊 Processing Demographics_2023.json...');
-    const demographicsData = await readDataFile<RawDemographicsRow>('Demographics_2023.json');
+    console.log('📊 Processing Demographics_2023_expanded.json...');
+    const demographicsData = await readDataFile<RawDemographicsRow>('Demographics_2023_expanded.json');
     
     demographicsData.forEach(row => {
       const sa2Id = normalizeSA2Id(row['SA2 ID']);
@@ -188,8 +188,8 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
     });
 
     // 2. Load Economics data
-    console.log('📊 Processing econ_stats.json...');
-    const economicsData = await readDataFile<RawEconHealthRow>('econ_stats.json');
+    console.log('📊 Processing econ_stats_expanded.json...');
+    const economicsData = await readDataFile<RawEconHealthRow>('econ_stats_expanded.json');
     
     economicsData.forEach(row => {
       const sa2Id = normalizeSA2Id(row['SA2 ID']);
@@ -209,8 +209,8 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
     });
 
     // 3. Load Health Stats data
-    console.log('📊 Processing health_stats.json...');
-    const healthData = await readDataFile<RawEconHealthRow>('health_stats.json');
+    console.log('📊 Processing health_stats_expanded.json...');
+    const healthData = await readDataFile<RawEconHealthRow>('health_stats_expanded.json');
     
     healthData.forEach(row => {
       const sa2Id = normalizeSA2Id(row['SA2 ID']);
@@ -230,8 +230,8 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
     });
 
     // 4. Load DSS data
-    console.log('📊 Processing DSS_Cleaned_2024.json...');
-    const dssData = await readDataFile<RawDSSRow>('DSS_Cleaned_2024.json');
+    console.log('📊 Processing DSS_Cleaned_2024_expanded.json...');
+    const dssData = await readDataFile<RawDSSRow>('DSS_Cleaned_2024_expanded.json');
     
     dssData.forEach(row => {
       const sa2Id = normalizeSA2Id(row['SA2 ID']);

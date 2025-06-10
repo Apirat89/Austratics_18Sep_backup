@@ -1,0 +1,6302 @@
+[
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Royal Geraldton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 252
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Little Brisbane Heights",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Unley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 388251
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Unley",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 321
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Cairns",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Toowoomba Gardens",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1608908
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Little Fremantle",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 610
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Glenelg",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 9
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Parramatta",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1326457
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Melbourne Junction",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 201
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "South Liverpool",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Townsville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 995623
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Lower Richmond",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 630
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Burnside Hill",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Geraldton",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1572081
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Little Richmond",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 511
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Little Melbourne",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "South Sydney",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1248755
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Upper Blacktown",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 616
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Blacktown Junction",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Hill Hobart Junction",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 2005740
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Melbourne",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 100
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Fremantle",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Melbourne",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 413265
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Morphett Bay",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 796
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Toowoomba",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Joondalup Park",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1717164
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Bondi",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 539
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Saint Rockhampton Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Valley Ipswich Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1550718
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Brisbane",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 708
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "East Brisbane Park",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Darwin North",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 766459
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Blacktown",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 179
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Burnside",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Toowoomba Central",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 949566
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Mount Collingwood Beach",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 638
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Bunbury",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "East Burnside",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1844196
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Unley Junction",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 442
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Joondalup Park",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Carlton Central",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 261336
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Kalgoorlie",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 708
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Liverpool Central",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Manly Heights",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 902893
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Kalgoorlie",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 144
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Melbourne",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Unley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1572443
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Joondalup Hill",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 762
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "West Burnside South",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Adelaide",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1238401
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Adelaide",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 499
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Cairns Beach",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Geraldton Valley",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1795554
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Burnside",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 151
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Burnside Junction",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Brunswick Creek",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 370398
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Glen Brunswick",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 570
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Glenelg",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Penrith Beach",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 765522
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "New Burnside Hill",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 796
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Collingwood Point",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "South Norwood",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1126512
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Park Melbourne Central",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 239
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Blacktown Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 9
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Big Unley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1629822
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Liverpool",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 714
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Bunbury Heights",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Perth East",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1316830
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Geraldton",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 446
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Brisbane South",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Brunswick Junction",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1563342
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "South Bunbury",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 708
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Brunswick",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "New Richmond",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1126529
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Norwood Hill",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 630
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Collingwood Valley",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 14
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "South Toowoomba",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 2064306
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Norwood Heights",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 757
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Liverpool Hill",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Fitzroy Point",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 946934
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Valley Cairns",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 740
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Big Collingwood Hill",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Burnside",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 330561
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Big Brisbane",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 598
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Fitzroy",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Hill Carlton Hill",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 563849
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Parkville",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 390
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Hill Bunbury",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Kalgoorlie",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 389009
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Glenelg Park",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 403
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Melbourne",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "North Adelaide",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 157909
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Valley Kalgoorlie",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 760
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Adelaide Park",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "South Kalgoorlie",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1485109
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Unley Gardens",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 562
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Rockhampton Central",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 15
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Cairns",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1948918
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Liverpool Valley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 678
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Greater Melbourne Beach",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "North Cairns Park",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 406342
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Little Perth",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 265
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Manly Heights",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Burnside Park",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1936065
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Royal Penrith",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 522
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Brisbane",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Darwin",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1751998
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Bunbury",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 646
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Mount Brunswick Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Sydney",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 286011
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Glen Manly",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 293
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "West Parkville",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Fitzroy",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1740630
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Joondalup",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 227
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Norwood",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Kalgoorlie Gardens",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1949699
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Cairns Central",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 422
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Bunbury Valley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Manly",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1135265
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Liverpool Gardens",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 829
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Royal Unley",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Bunbury",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1337916
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Little Fitzroy Central",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 373
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Greater Fitzroy Point",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Melbourne",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 2081064
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Royal Geraldton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 255
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Norwood",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 14
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Lower Toowoomba",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1569619
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Manly",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 112
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Saint Darwin Point",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "West Liverpool Beach",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1439478
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Mount Sydney East",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 659
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Townsville Central",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 11
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Richmond",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 591137
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Brisbane Gardens",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 216
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Morphett",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Manly",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 693001
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Joondalup",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 773
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Richmond West",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Lower Perth",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1072399
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "New Darwin",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 721
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Kalgoorlie Hill",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Burnside",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1796924
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Burnside",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 474
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Geraldton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Burnside",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 319331
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Parramatta",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 762
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Brunswick",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Morphett West",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 483440
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Old Joondalup East",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 642
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Joondalup",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 9
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Brunswick Bay",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1144205
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Perth Heights",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 467
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Cairns",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Geraldton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 767801
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Carlton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 569
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Blacktown Hill",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Big Hobart",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 190243
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Glenelg",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 399
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Parramatta",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Saint Geraldton Heights",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 757433
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "South Unley Central",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 580
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Bondi Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Toowoomba Park",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 2018444
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Rockhampton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 778
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Joondalup",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Darwin",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 311933
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Kalgoorlie Central",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 271
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Old Burnside Junction",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Geraldton East",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1256522
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Hill Cairns",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 490
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Townsville South",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Glen Parkville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1565700
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Penrith Gardens",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 290
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Perth",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Sydney",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 419696
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Burnside Park",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 264
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Blacktown Hill",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Parkville",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1374048
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Geraldton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 223
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Townsville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Rockhampton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 419640
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Richmond",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 607
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Blacktown",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 9
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Royal Bondi Hill",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 795975
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Port Richmond Park",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 90
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Greater Morphett Beach",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Big Bondi East",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1062166
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Upper Darwin Bay",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 164
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Old Blacktown",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Old Geraldton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 170611
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Ipswich",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 347
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Valley Hobart Creek",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Bunbury",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1260493
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "South Norwood",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 673
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Upper Parkville",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Parkville",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1787610
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Fremantle",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 142
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Manly Valley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Norwood Creek",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1277816
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Burnside",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 687
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Glen Adelaide",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 14
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Bondi",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 856118
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Darwin Valley",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 324
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Unley",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Hill Darwin West",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1443233
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Old Brisbane",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 307
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Rockhampton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Big Parkville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 769597
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Penrith",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 123
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Richmond",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Hill Liverpool Gardens",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 358348
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Parkville Beach",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 229
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Parramatta Point",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Collingwood",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 949178
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Upper Manly Bay",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 341
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Brisbane",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Old Perth",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 404438
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Brisbane",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 402
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Royal Liverpool Central",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 9
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Townsville",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1985110
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Townsville East",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 562
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Hobart",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Hobart",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 513790
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Carlton Hill",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 64
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Burnside Gardens",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Unley North",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 440629
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Parkville",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 337
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Greater Bunbury Hill",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 11
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "New Hobart",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1447962
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Park Townsville",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 91
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Manly",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "New Darwin Valley",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 344279
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Big Collingwood",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 406
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Blacktown Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 10
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Perth",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1997344
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Burnside Point",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 723
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Penrith",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 11
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Glenelg South",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 359153
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Brisbane Beach",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 774
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Bunbury",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Mount Blacktown",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1322382
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Glen Geraldton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 430
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Townsville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Bondi",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1214900
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Port Manly Creek",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 208
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "South Penrith Heights",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Rockhampton",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 930185
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Ipswich",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 249
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Toowoomba",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 14
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "New Collingwood Valley",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1310003
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Cairns West",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 86
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Old Kalgoorlie",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Joondalup Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1835353
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Toowoomba",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 122
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Ipswich",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Carlton Park",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1037724
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Royal Toowoomba",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 591
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Port Parkville",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Old Hobart",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1286613
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Collingwood",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 739
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Burnside",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Carlton Valley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1404843
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Hobart West",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 428
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Port Sydney",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Carlton",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 2099551
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Parkville",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 820
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Rockhampton",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 15
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Brisbane Junction",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1132508
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Old Glenelg",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 741
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Rockhampton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 11
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Park Manly East",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1056825
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Valley Morphett Creek",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 570
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Parkville Beach",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 14
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Big Hobart",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1723398
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Sydney",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 178
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Geraldton Valley",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Hill Blacktown",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1180527
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Hobart",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 587
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Glenelg",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Bondi South",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1717654
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Collingwood",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 253
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Big Joondalup Central",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Carlton Central",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1902722
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "North Brunswick East",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 297
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Norwood",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "New Liverpool South",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 840213
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Old Richmond",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 69
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Bondi Valley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 14
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Bondi",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1219075
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Old Carlton Gardens",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 249
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Melbourne",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 11
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Kalgoorlie Junction",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 126958
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Manly West",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 592
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Lower Penrith Heights",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "South Fremantle",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 452069
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Adelaide",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 576
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Carlton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Adelaide",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 359367
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Rockhampton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 339
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Joondalup West",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Parramatta",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 767523
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Townsville",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 533
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Parkville Point",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Fremantle",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1220334
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "North Melbourne South",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 93
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Sydney Valley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Brisbane",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1511724
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "North Fitzroy Hill",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 464
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Little Fremantle",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Glenelg",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 896289
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Sydney",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 79
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Blacktown",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 9
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Valley Bondi Point",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1675649
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Old Perth",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 484
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Adelaide Park",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Sydney",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 456514
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Glen Manly",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 653
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Cairns",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Mount Perth",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1137227
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Royal Liverpool",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 188
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Greater Rockhampton",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Perth",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1801187
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Darwin",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 840
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Toowoomba South",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Unley North",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 2017170
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Old Manly",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 291
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Hill Brunswick",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "West Glenelg Gardens",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 763223
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Toowoomba Point",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 775
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Saint Parkville Hill",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Perth",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1843784
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Melbourne Junction",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 527
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Melbourne",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Sydney",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 920187
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Ipswich Hill",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 548
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Big Rockhampton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Darwin",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1028420
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Penrith",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 436
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Penrith",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Parramatta",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 199664
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Brisbane",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 806
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Greater Richmond",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Rockhampton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 124868
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Valley Collingwood",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 563
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Rockhampton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 11
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Norwood",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1388593
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Norwood Gardens",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 131
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Morphett Junction",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 10
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Cairns",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1919776
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Darwin Gardens",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 698
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Mount Morphett",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Darwin",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 683577
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Hill Burnside",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 721
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Joondalup Bay",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Fitzroy Gardens",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1174350
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Townsville",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 226
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Liverpool",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Bondi",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1571386
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Upper Norwood Park",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 629
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Ipswich",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Parkville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 697086
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Penrith",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 90
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Park Parramatta North",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Park Joondalup Valley",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 158893
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Upper Geraldton",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 598
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Upper Collingwood",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Parramatta Hill",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1128282
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Richmond",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 557
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Glenelg",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Parramatta",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 738652
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "North Norwood Valley",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 200
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Ipswich Gardens",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Norwood",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1303302
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Park Bondi Central",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 334
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "South Rockhampton Heights",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Saint Blacktown",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 969648
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "West Burnside Gardens",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 333
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Valley Collingwood",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Brisbane",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 366538
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Brisbane",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 186
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Hobart",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Manly Central",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1870417
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Parkville",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 486
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Townsville North",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Hill Adelaide",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 220501
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Cairns",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 76
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Valley Fremantle",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Norwood",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 740269
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Blacktown",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 723
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Old Parkville Park",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Manly",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 622807
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Hobart Heights",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 223
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Brisbane",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Kalgoorlie South",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 124150
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Bondi Gardens",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 822
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Geraldton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "East Hobart Hill",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 518434
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "North Ipswich",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 781
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Hobart",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Ipswich",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 2021697
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Lower Liverpool",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 666
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Manly Beach",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Ipswich",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 193866
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Glenelg",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 731
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Sydney",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Toowoomba Valley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1928022
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Unley",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 681
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Brunswick",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Greater Fremantle",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 2085322
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Brunswick",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 760
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Saint Geraldton Junction",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Fitzroy",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 147215
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Joondalup",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 369
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Townsville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Big Unley Heights",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1268507
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Joondalup Junction",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 352
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Carlton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 10
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Valley Townsville",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1010271
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Collingwood",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 658
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Joondalup South",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Ipswich",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1384490
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Sydney",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 846
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Geraldton Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Blacktown",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1225553
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Morphett",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 314
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Manly Bay",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Greater Manly Gardens",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 2052768
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Old Melbourne",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 187
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "South Cairns",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Manly",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 976637
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Geraldton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 353
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Mount Fremantle",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Parkville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 888080
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "East Manly Point",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 306
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Manly",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Melbourne Bay",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1062461
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Norwood East",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 187
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Darwin West",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Geraldton",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1667797
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Collingwood Heights",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 601
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Collingwood",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Morphett Beach",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 187816
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Greater Geraldton South",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 338
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Cairns",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Old Manly",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1350576
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Glenelg",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 137
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Cairns Bay",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Joondalup Central",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1649152
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Cairns",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 848
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Darwin Park",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Burnside",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 155344
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Glenelg",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 761
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Park Geraldton South",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Burnside",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 649701
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Hobart",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 349
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "East Toowoomba",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Blacktown",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1862339
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Penrith",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 816
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Liverpool Heights",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 15
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Parramatta",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1583744
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Ipswich",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 512
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Carlton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Hobart South",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 2002589
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Toowoomba Hill",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 434
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Fitzroy Beach",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Townsville",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1123894
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Adelaide",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 630
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Rockhampton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Brunswick",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1053481
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Melbourne Bay",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 757
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Parramatta",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 10
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Melbourne Hill",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 558765
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Sydney Gardens",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 669
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Carlton North",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Rockhampton",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1671685
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Parkville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 618
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Parramatta Junction",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 14
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Burnside",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 888762
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Hobart",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 694
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "East Collingwood",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 11
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Adelaide Bay",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 894949
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Norwood",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 418
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Fremantle",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 11
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Adelaide",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 204943
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Royal Richmond Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 494
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Penrith Hill",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Rockhampton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 603903
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Burnside West",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 346
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Darwin Point",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Valley Bondi South",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1122989
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Lower Geraldton",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 445
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Norwood Beach",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Lower Brunswick Creek",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1338772
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Perth",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 215
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Liverpool",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Townsville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1302352
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Hill Geraldton Heights",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 704
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Blacktown Park",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Rockhampton Junction",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 529571
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Upper Penrith",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 553
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Morphett",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Ipswich Central",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 287329
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Ipswich",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 74
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "New Joondalup Beach",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Blacktown",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1269899
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Darwin",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 470
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Toowoomba",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 15
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Ipswich Junction",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1837469
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Upper Parkville",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 836
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Kalgoorlie West",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Brisbane",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1126179
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Carlton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 178
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Burnside",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Melbourne",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 439186
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Townsville",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 479
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Parkville Heights",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 15
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Darwin",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 119087
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Fitzroy Hill",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 273
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Carlton Park",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Cairns",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 506126
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Little Joondalup",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 697
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Glen Brunswick",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Glenelg",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1197083
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Fremantle Valley",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 311
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Fitzroy",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 14
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Upper Collingwood",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 609215
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Morphett",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 699
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Morphett",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Fremantle Point",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 710374
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Little Burnside",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 820
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Glenelg North",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Adelaide West",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1364155
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Glen Brisbane",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 432
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Brisbane Park",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "North Darwin",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 664457
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Bunbury South",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 671
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Brunswick",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Ipswich",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1304531
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Carlton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 203
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Old Blacktown",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Carlton Gardens",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 218015
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Kalgoorlie Beach",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 753
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Old Morphett",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 15
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "North Townsville",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1959238
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Sydney Heights",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 804
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Brisbane",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Park Fremantle",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 783656
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Liverpool Heights",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 366
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Fitzroy Gardens",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Parkville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1098069
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Upper Carlton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 532
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Mount Rockhampton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Fitzroy",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 2032406
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Joondalup South",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 61
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Darwin Bay",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "New Glenelg",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1594288
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Royal Liverpool",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 676
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Bondi",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 10
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Joondalup",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1651130
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Little Brisbane",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 367
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Townsville",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Parkville",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1175486
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Parkville Creek",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 720
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Hobart",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Port Carlton",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 150044
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Richmond",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 609
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Brunswick East",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Fremantle",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1658681
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Joondalup Heights",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 820
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Ipswich",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Morphett",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1883258
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Sydney Gardens",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 358
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Unley",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Parramatta Junction",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1694910
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Kalgoorlie East",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 327
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "South Joondalup Bay",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Glenelg",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 181020
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Hobart Beach",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 136
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Bondi Bay",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 10
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Mount Bondi",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 882666
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Glenelg Junction",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 436
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Upper Blacktown",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Brisbane Park",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 411286
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Lower Rockhampton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 430
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Rockhampton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 9
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Geraldton Gardens",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 881766
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Ipswich",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 584
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Morphett Hill",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 14
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Lower Morphett",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1881656
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Cairns",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 558
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Rockhampton South",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Manly Bay",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 776939
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Lower Fitzroy",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 235
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Parkville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Townsville Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1604950
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Valley Cairns Point",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 539
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Parkville Point",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Manly",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 516846
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Blacktown North",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 565
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Morphett",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Geraldton",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1676478
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Brisbane Bay",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 800
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Parkville Gardens",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 9
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Manly Beach",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 2081040
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "East Burnside",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 436
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Liverpool Point",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Collingwood Valley",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 2091363
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Little Morphett",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 86
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Burnside Heights",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Manly",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1258134
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Perth Park",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 395
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Park Brisbane",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Toowoomba",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1928787
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Kalgoorlie",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 808
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Collingwood",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 9
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Adelaide",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1169442
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Burnside Valley",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 148
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Glenelg",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Liverpool",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 245857
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Richmond",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 647
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Sydney",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Glenelg",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1888093
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Kalgoorlie",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 557
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Fremantle",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 10
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Townsville Bay",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1844071
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Geraldton Beach",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 695
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Fremantle",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Penrith",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1174722
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Joondalup Bay",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 620
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Unley Creek",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Darwin",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1369696
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Little Parkville",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 578
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "East Adelaide",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 15
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Big Bunbury",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1586548
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Fremantle West",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 461
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Joondalup",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Old Parkville",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 361240
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Glen Fitzroy",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 359
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Ipswich",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Big Unley South",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 323281
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Fitzroy Bay",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 285
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Mount Penrith",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 11
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Townsville",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1722298
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Park Fitzroy Junction",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 403
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "North Fremantle",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Glen Sydney North",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1921758
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Melbourne",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 212
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Bondi West",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 15
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Rockhampton North",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 141669
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Glenelg",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 694
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Carlton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Unley",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1918279
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Adelaide",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 142
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Kalgoorlie",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 11
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Toowoomba Junction",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1682299
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "New Joondalup Junction",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 100
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Parramatta Junction",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Penrith",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 103980
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Manly South",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 346
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "New Toowoomba",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "West Unley Valley",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 799254
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Sydney Creek",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 762
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Penrith",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Bunbury",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 2079524
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Brunswick South",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 189
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Ipswich Bay",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Greater Hobart",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 428751
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "New Toowoomba",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 743
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Hobart",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 15
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Parramatta",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1952332
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Kalgoorlie Junction",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 270
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Blacktown",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Morphett",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 2074749
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Joondalup Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 466
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Perth",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Brisbane",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 607335
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Sydney Point",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 413
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Morphett",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 10
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Penrith Point",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 764749
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Geraldton",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 247
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Burnside",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Collingwood",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 917229
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Big Collingwood East",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 683
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Geraldton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Saint Hobart",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 705224
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Port Adelaide",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 497
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Lower Unley South",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Richmond North",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 308616
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Fitzroy West",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 364
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Townsville",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 15
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Townsville",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 171969
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Parkville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 832
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Perth",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Perth",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1811140
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Rockhampton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 686
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "West Toowoomba",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Brisbane",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 804172
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Adelaide Bay",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 505
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Toowoomba Gardens",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Unley Park",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 956677
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "New Blacktown",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 149
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "North Townsville Creek",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 11
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Park Parkville West",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1867232
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Glen Collingwood Creek",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 599
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Geraldton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 9
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Cairns Gardens",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1188294
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Fitzroy",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 587
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Fitzroy Hill",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Mount Collingwood North",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1501718
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Ipswich East",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 237
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Greater Darwin",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Fremantle Valley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 458933
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Kalgoorlie",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 831
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Park Collingwood",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Park Townsville",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 654775
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Old Rockhampton",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 330
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Brisbane",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Geraldton",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 331411
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Little Carlton Hill",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 277
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "East Morphett Creek",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 9
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Parkville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 122971
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "West Fremantle",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 747
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Perth",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Geraldton",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1126356
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Greater Cairns",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 751
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Sydney Creek",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Big Unley Valley",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 743908
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Parramatta Creek",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 740
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Geraldton Valley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Lower Fitzroy Hill",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 438464
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Penrith",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 270
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Bunbury",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Hill Parramatta Central",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1969129
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Royal Norwood",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 423
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Old Carlton Park",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 10
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Burnside",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 102695
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Ipswich",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 284
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Park Unley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "West Liverpool",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1380843
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Rockhampton",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 166
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Mount Morphett",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Glenelg Junction",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 851744
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "North Parkville",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 503
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Brunswick Park",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Parramatta West",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 286537
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Unley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 292
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "East Fremantle Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Parramatta Junction",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 219421
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Melbourne South",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 613
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Hobart Junction",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Bunbury East",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 217802
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Parkville Park",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 119
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Brisbane Central",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 8
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Port Kalgoorlie Central",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1501928
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "New Adelaide Valley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 510
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Greater Adelaide South",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Morphett West",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1063492
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Brisbane",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 752
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Hobart",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Greater Parramatta",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 125721
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Toowoomba",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 279
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Perth North",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Brunswick",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 2097146
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Carlton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 52
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "North Burnside",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Hobart Creek",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 2036990
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Joondalup",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 257
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "East Perth Central",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Blacktown",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 2033825
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "North Ipswich",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 812
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Toowoomba",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Norwood West",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 857539
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Darwin",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 844
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Collingwood",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Richmond",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1801369
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Fitzroy",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 707
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Collingwood Beach",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 15
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Burnside",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 371487
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "North Unley",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 92
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Saint Norwood",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 1
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Blacktown",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 961081
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Little Townsville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 706
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Burnside Heights",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Unley North",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 470588
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "South Burnside",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 388
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Fremantle",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Kalgoorlie",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 389212
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Burnside",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 504
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Hill Bunbury",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 6
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "North Cairns",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1677354
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Morphett",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 427
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Rockhampton Gardens",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Big Brunswick",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 353166
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Old Glenelg",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 573
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "South Geraldton Creek",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Upper Joondalup West",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 2043676
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Lower Parramatta",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 714
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Carlton",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Bondi",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1294701
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Bondi Hill",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 654
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Brunswick",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "South Parramatta Valley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1402225
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Adelaide East",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 605
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Valley Ipswich West",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "North Townsville Point",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1101394
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Brunswick",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 512
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Lower Hobart Creek",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Adelaide",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 769605
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Lower Brunswick Valley",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 171
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Royal Brunswick",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Joondalup",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 406058
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Liverpool",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 498
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Liverpool West",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Parkville",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 2000045
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Joondalup",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 280
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Parkville",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Darwin",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 546756
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "East Perth Park",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 217
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Old Fitzroy",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Melbourne Beach",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 649923
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Carlton South",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 410
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "East Toowoomba",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 14
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Upper Parramatta",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 682806
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Big Sydney Gardens",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 170
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Perth North",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Ipswich",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1142766
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Glenelg Point",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 726
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Bondi",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Adelaide",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 657816
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Sydney North",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 154
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Townsville",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Norwood",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1349740
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "North Kalgoorlie",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 343
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Adelaide",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 17
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "West Perth",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1765284
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Burnside Gardens",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 670
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Cairns South",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 2
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Parramatta",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1235351
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Glen Blacktown Heights",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 578
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Darwin",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Glenelg Junction",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1696329
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Brunswick",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 384
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Geraldton Bay",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Burnside East",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 937044
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "North Hobart",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 748
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Perth Central",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Collingwood",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 480819
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Brisbane",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 688
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Sydney",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "East Perth",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1229886
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Carlton South",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 381
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Big Carlton",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Rockhampton Valley",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 553719
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Mount Fremantle",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 128
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Old Norwood",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 13
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Hill Parkville",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 379414
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Brunswick",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 738
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Glen Brisbane",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 14
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Fremantle",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 2042815
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Old Darwin Creek",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 322
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Toowoomba Point",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Little Glenelg",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1347916
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Collingwood Heights",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 497
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Darwin",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Hill Liverpool West",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 921358
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Park Hobart",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 194
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Penrith",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Hill Adelaide",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1090445
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Little Townsville South",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 271
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Adelaide Bay",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 16
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Fitzroy",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1820786
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "South Brunswick",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 243
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Collingwood",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Mount Penrith",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1529328
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Norwood Park",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 295
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Perth",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 7
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "South Darwin Beach",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1807530
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Toowoomba",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 784
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Bondi East",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 18
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Fitzroy",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1308008
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Brisbane",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 137
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Richmond",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 5
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Penrith Hill",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1460808
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Burnside",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 601
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Little Brunswick",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 20
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Rockhampton",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1358402
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Rockhampton Beach",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 133
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Cairns",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 19
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Fremantle",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 1024302
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Ipswich Heights",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Participants",
+    "Amount": 209
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Liverpool North",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Number of Providers",
+    "Amount": 3
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Rockhampton",
+    "Category": "Commonwealth Home Support Program",
+    "Type": "Total Spending",
+    "Amount": 1277958
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Greater Toowoomba",
+    "Category": "Home Care Packages",
+    "Type": "Number of Participants",
+    "Amount": 250
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Blacktown Heights",
+    "Category": "Home Care Packages",
+    "Type": "Number of Providers",
+    "Amount": 4
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "South Liverpool",
+    "Category": "Home Care Packages",
+    "Type": "Total Spending",
+    "Amount": 1029157
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Fitzroy Central",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Participants",
+    "Amount": 237
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Adelaide Park",
+    "Category": "Residential Aged Care",
+    "Type": "Number of Providers",
+    "Amount": 12
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Townsville Creek",
+    "Category": "Residential Aged Care",
+    "Type": "Total Spending",
+    "Amount": 605747
+  }
+]

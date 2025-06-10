@@ -1,0 +1,3602 @@
+[
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Darwin",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 3712
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Port Brisbane",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1193
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Darwin",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1349
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Darwin",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1559
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Upper Blacktown",
+    "Description": "Median age (years)",
+    "Amount": 42
+  },
+  {
+    "SA2 ID": "101010002",
+    "SA2 Name": "Adelaide",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2800
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Parramatta Beach",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 15762
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Kalgoorlie Creek",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1529
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Joondalup",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3307
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Brunswick",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 3209
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Adelaide",
+    "Description": "Median age (years)",
+    "Amount": 29
+  },
+  {
+    "SA2 ID": "201010003",
+    "SA2 Name": "Bondi Park",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 721
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Morphett Valley",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 10850
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Burnside",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2757
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Liverpool",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3170
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "New Bondi",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 4085
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Rockhampton",
+    "Description": "Median age (years)",
+    "Amount": 41
+  },
+  {
+    "SA2 ID": "301010004",
+    "SA2 Name": "Unley",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 273
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Liverpool Park",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 4130
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "West Perth Junction",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 158
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Unley",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3611
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Perth",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 6503
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Bunbury",
+    "Description": "Median age (years)",
+    "Amount": 28
+  },
+  {
+    "SA2 ID": "101010005",
+    "SA2 Name": "Saint Brunswick",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2952
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Geraldton",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 14662
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Hill Townsville",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2164
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Glen Blacktown",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3543
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Valley Bondi Junction",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 4115
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Sydney South",
+    "Description": "Median age (years)",
+    "Amount": 48
+  },
+  {
+    "SA2 ID": "201010006",
+    "SA2 Name": "Brunswick",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 82
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Collingwood",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 14465
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Hobart Valley",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1135
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Greater Joondalup North",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 7436
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Parramatta Point",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1205
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Collingwood",
+    "Description": "Median age (years)",
+    "Amount": 47
+  },
+  {
+    "SA2 ID": "301010007",
+    "SA2 Name": "Royal Adelaide",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2130
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Perth",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 12898
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Hobart Point",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2687
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Upper Bunbury",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 7542
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Fitzroy",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 3648
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Liverpool",
+    "Description": "Median age (years)",
+    "Amount": 48
+  },
+  {
+    "SA2 ID": "101010008",
+    "SA2 Name": "Valley Fitzroy Creek",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2054
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Glen Bondi",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 12293
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Collingwood",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1348
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Fitzroy",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1805
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Glenelg Point",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2494
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Glen Toowoomba",
+    "Description": "Median age (years)",
+    "Amount": 35
+  },
+  {
+    "SA2 ID": "201010009",
+    "SA2 Name": "Geraldton Heights",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 851
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Penrith",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 1342
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Melbourne Beach",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 3016
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Park Blacktown Point",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2573
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Penrith",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 263
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Adelaide",
+    "Description": "Median age (years)",
+    "Amount": 39
+  },
+  {
+    "SA2 ID": "301010010",
+    "SA2 Name": "Valley Burnside",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1756
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Geraldton Point",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 14878
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "North Perth",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2786
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Kalgoorlie",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2569
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Joondalup Junction",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 3565
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Collingwood Creek",
+    "Description": "Median age (years)",
+    "Amount": 49
+  },
+  {
+    "SA2 ID": "101020001",
+    "SA2 Name": "Glenelg",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 628
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Collingwood",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 12599
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Cairns Creek",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1972
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Burnside",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3897
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Darwin",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1600
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Hobart Junction",
+    "Description": "Median age (years)",
+    "Amount": 28
+  },
+  {
+    "SA2 ID": "201020002",
+    "SA2 Name": "Sydney",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3853
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Valley Toowoomba",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 8973
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Ipswich",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1093
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Sydney East",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 960
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Perth Gardens",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2387
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Lower Manly",
+    "Description": "Median age (years)",
+    "Amount": 31
+  },
+  {
+    "SA2 ID": "301020003",
+    "SA2 Name": "Blacktown West",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4543
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Hobart",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 9140
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Manly",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1843
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Cairns",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 5358
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Townsville",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 3528
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "East Carlton",
+    "Description": "Median age (years)",
+    "Amount": 30
+  },
+  {
+    "SA2 ID": "101020004",
+    "SA2 Name": "Bondi Point",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2503
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Sydney",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 2090
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Collingwood Beach",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1948
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Old Blacktown Point",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3069
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Penrith",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1411
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Manly Junction",
+    "Description": "Median age (years)",
+    "Amount": 30
+  },
+  {
+    "SA2 ID": "201020005",
+    "SA2 Name": "Norwood",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2023
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Little Fremantle South",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 15780
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Parramatta",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1187
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Blacktown",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2642
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Blacktown Point",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2196
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Carlton",
+    "Description": "Median age (years)",
+    "Amount": 28
+  },
+  {
+    "SA2 ID": "301020006",
+    "SA2 Name": "Little Perth Point",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2167
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Collingwood West",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 3216
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Perth West",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 765
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Rockhampton Point",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6869
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Parramatta",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 6361
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Brisbane",
+    "Description": "Median age (years)",
+    "Amount": 35
+  },
+  {
+    "SA2 ID": "101020007",
+    "SA2 Name": "Brisbane",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2564
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Joondalup",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 3845
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Old Brunswick Junction",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 630
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Darwin",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3081
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Unley",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7619
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "East Richmond Park",
+    "Description": "Median age (years)",
+    "Amount": 44
+  },
+  {
+    "SA2 ID": "201020008",
+    "SA2 Name": "Hobart",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2986
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Upper Ipswich",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 4787
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Valley Kalgoorlie",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 233
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "North Geraldton Valley",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6724
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "West Carlton",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7947
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "Manly",
+    "Description": "Median age (years)",
+    "Amount": 50
+  },
+  {
+    "SA2 ID": "301020009",
+    "SA2 Name": "West Kalgoorlie Bay",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 655
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Liverpool",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 9332
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Valley Parkville",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1748
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Rockhampton Valley",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1369
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Burnside",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2105
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Blacktown",
+    "Description": "Median age (years)",
+    "Amount": 47
+  },
+  {
+    "SA2 ID": "101020010",
+    "SA2 Name": "Rockhampton Hill",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2864
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Parkville",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 10182
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Liverpool",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2279
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Brunswick Beach",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4212
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Liverpool",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 333
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Geraldton North",
+    "Description": "Median age (years)",
+    "Amount": 44
+  },
+  {
+    "SA2 ID": "201030001",
+    "SA2 Name": "Little Penrith",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3891
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Bunbury",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 5530
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Kalgoorlie Park",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 916
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Parkville",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 5523
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Cairns",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7292
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Saint Fremantle Point",
+    "Description": "Median age (years)",
+    "Amount": 35
+  },
+  {
+    "SA2 ID": "301030002",
+    "SA2 Name": "Morphett Valley",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 420
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Manly",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 5414
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Bondi East",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1152
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Little Burnside East",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1044
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Richmond East",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1565
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Collingwood",
+    "Description": "Median age (years)",
+    "Amount": 39
+  },
+  {
+    "SA2 ID": "101030003",
+    "SA2 Name": "Adelaide",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3462
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Ipswich Bay",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 12010
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Kalgoorlie Park",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 192
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Park Bondi",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 5548
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Toowoomba",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 5527
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "East Kalgoorlie",
+    "Description": "Median age (years)",
+    "Amount": 40
+  },
+  {
+    "SA2 ID": "201030004",
+    "SA2 Name": "Greater Townsville Bay",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 949
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Park Unley",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 2487
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Kalgoorlie",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1050
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Blacktown",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3075
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Parkville",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 3162
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Kalgoorlie Point",
+    "Description": "Median age (years)",
+    "Amount": 37
+  },
+  {
+    "SA2 ID": "301030005",
+    "SA2 Name": "Parramatta Park",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4295
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Greater Collingwood",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 1692
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "North Richmond East",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2792
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Sydney Heights",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 299
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Parramatta",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1796
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Parramatta",
+    "Description": "Median age (years)",
+    "Amount": 50
+  },
+  {
+    "SA2 ID": "101030006",
+    "SA2 Name": "Joondalup",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2390
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Cairns",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 11746
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Port Rockhampton",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2534
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Glenelg Valley",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3791
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Manly Beach",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1038
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "Norwood",
+    "Description": "Median age (years)",
+    "Amount": 37
+  },
+  {
+    "SA2 ID": "201030007",
+    "SA2 Name": "North Melbourne",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3189
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Geraldton",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 1096
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Joondalup Park",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1390
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Hill Brisbane Junction",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 7367
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Big Bondi",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 5418
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Geraldton Park",
+    "Description": "Median age (years)",
+    "Amount": 48
+  },
+  {
+    "SA2 ID": "301030008",
+    "SA2 Name": "Mount Brunswick Bay",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1862
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Liverpool Central",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 3064
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Collingwood",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2269
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Collingwood Junction",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 383
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "North Brisbane",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2673
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Royal Parkville",
+    "Description": "Median age (years)",
+    "Amount": 34
+  },
+  {
+    "SA2 ID": "101030009",
+    "SA2 Name": "Saint Toowoomba Gardens",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 712
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Little Ipswich",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 10385
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Brunswick",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2429
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Big Sydney",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1579
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Sydney Junction",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2473
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Lower Norwood",
+    "Description": "Median age (years)",
+    "Amount": 41
+  },
+  {
+    "SA2 ID": "201030010",
+    "SA2 Name": "Hill Manly",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1741
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Kalgoorlie Central",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 7654
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Mount Adelaide",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2137
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Perth Bay",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4214
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Bunbury South",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 482
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Parramatta",
+    "Description": "Median age (years)",
+    "Amount": 45
+  },
+  {
+    "SA2 ID": "301040001",
+    "SA2 Name": "Brunswick",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1659
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Upper Townsville",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 13230
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Kalgoorlie Central",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2460
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Fremantle",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4284
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Perth Bay",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 4660
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Mount Burnside",
+    "Description": "Median age (years)",
+    "Amount": 32
+  },
+  {
+    "SA2 ID": "101040002",
+    "SA2 Name": "Brisbane Heights",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2645
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Glenelg",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 13912
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Hill Collingwood North",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 176
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Burnside",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 7685
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Rockhampton",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 6428
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Park Cairns",
+    "Description": "Median age (years)",
+    "Amount": 52
+  },
+  {
+    "SA2 ID": "201040003",
+    "SA2 Name": "Townsville",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3480
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Collingwood",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 2354
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Brunswick",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 985
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Bondi",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3356
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Collingwood",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 3576
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Hill Carlton",
+    "Description": "Median age (years)",
+    "Amount": 47
+  },
+  {
+    "SA2 ID": "301040004",
+    "SA2 Name": "Kalgoorlie",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1043
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "South Brunswick South",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 8361
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Brunswick Gardens",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2027
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Carlton",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4675
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Geraldton",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 8097
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Bunbury Valley",
+    "Description": "Median age (years)",
+    "Amount": 28
+  },
+  {
+    "SA2 ID": "101040005",
+    "SA2 Name": "Hobart",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3938
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Brisbane Junction",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 14027
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Hobart",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2910
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Upper Kalgoorlie Bay",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6843
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Bondi",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7465
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Parramatta Junction",
+    "Description": "Median age (years)",
+    "Amount": 25
+  },
+  {
+    "SA2 ID": "201040006",
+    "SA2 Name": "Sydney Beach",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 514
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Park Adelaide",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 11832
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "North Sydney Gardens",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 817
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Port Carlton Park",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4622
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Liverpool",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 6389
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "Park Hobart",
+    "Description": "Median age (years)",
+    "Amount": 41
+  },
+  {
+    "SA2 ID": "301040007",
+    "SA2 Name": "New Fitzroy",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3277
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Geraldton",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 6077
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Melbourne",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2462
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Hobart",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1303
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Richmond",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7115
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Lower Parkville",
+    "Description": "Median age (years)",
+    "Amount": 28
+  },
+  {
+    "SA2 ID": "101040008",
+    "SA2 Name": "Cairns",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3793
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Parramatta",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 8753
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Bunbury Valley",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 311
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Glenelg",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 5748
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Bunbury",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1352
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Fitzroy",
+    "Description": "Median age (years)",
+    "Amount": 40
+  },
+  {
+    "SA2 ID": "201040009",
+    "SA2 Name": "Kalgoorlie East",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4036
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "East Richmond",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 7330
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Carlton Central",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1317
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Richmond Bay",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 7546
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Big Sydney",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2578
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Hill Brunswick Junction",
+    "Description": "Median age (years)",
+    "Amount": 44
+  },
+  {
+    "SA2 ID": "301040010",
+    "SA2 Name": "Parkville West",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2200
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Brunswick Creek",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 4574
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Sydney",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 575
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Fremantle Gardens",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2855
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Richmond West",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2090
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Park Fitzroy",
+    "Description": "Median age (years)",
+    "Amount": 45
+  },
+  {
+    "SA2 ID": "101050001",
+    "SA2 Name": "Burnside Gardens",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1353
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Cairns Central",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 8479
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Sydney",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 113
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Unley Creek",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4305
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Brunswick",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 944
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Kalgoorlie",
+    "Description": "Median age (years)",
+    "Amount": 32
+  },
+  {
+    "SA2 ID": "201050002",
+    "SA2 Name": "Blacktown",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3578
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Geraldton",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 8886
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Saint Unley West",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2735
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Melbourne",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 5810
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Collingwood",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1906
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Geraldton",
+    "Description": "Median age (years)",
+    "Amount": 45
+  },
+  {
+    "SA2 ID": "301050003",
+    "SA2 Name": "Royal Glenelg",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3635
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Upper Burnside",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 4148
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Valley Carlton",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2559
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Brunswick",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4661
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Unley",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7324
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Valley Joondalup",
+    "Description": "Median age (years)",
+    "Amount": 50
+  },
+  {
+    "SA2 ID": "101050004",
+    "SA2 Name": "Old Blacktown Hill",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4331
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Joondalup",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 13894
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Lower Perth Central",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2365
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Manly Junction",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1060
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "East Brisbane Central",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7941
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "Morphett",
+    "Description": "Median age (years)",
+    "Amount": 47
+  },
+  {
+    "SA2 ID": "201050005",
+    "SA2 Name": "North Fitzroy Valley",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1271
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Old Hobart",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 9156
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Joondalup",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 468
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Old Glenelg Park",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4889
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "New Liverpool Bay",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 4226
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Royal Townsville",
+    "Description": "Median age (years)",
+    "Amount": 35
+  },
+  {
+    "SA2 ID": "301050006",
+    "SA2 Name": "Sydney Heights",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2535
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Lower Bondi",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 14875
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Sydney",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2796
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Valley Fitzroy",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 5646
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Hobart",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 4640
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Joondalup",
+    "Description": "Median age (years)",
+    "Amount": 27
+  },
+  {
+    "SA2 ID": "101050007",
+    "SA2 Name": "Unley East",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2612
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Fremantle",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 2680
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Ipswich",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2101
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Perth Creek",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 7198
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Rockhampton",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 674
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Saint Townsville",
+    "Description": "Median age (years)",
+    "Amount": 43
+  },
+  {
+    "SA2 ID": "201050008",
+    "SA2 Name": "Rockhampton",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4812
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Morphett",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 11702
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Bunbury",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1095
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "South Unley",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3276
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Toowoomba Heights",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2276
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Saint Brisbane",
+    "Description": "Median age (years)",
+    "Amount": 30
+  },
+  {
+    "SA2 ID": "301050009",
+    "SA2 Name": "Big Liverpool Hill",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1752
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Norwood Gardens",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 5678
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Upper Bunbury",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2850
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Kalgoorlie Beach",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3739
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "New Cairns",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7947
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Sydney Beach",
+    "Description": "Median age (years)",
+    "Amount": 26
+  },
+  {
+    "SA2 ID": "101050010",
+    "SA2 Name": "Townsville",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1338
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Hobart",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 15127
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Cairns",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2024
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Richmond",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2215
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Royal Brunswick West",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 924
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Blacktown Park",
+    "Description": "Median age (years)",
+    "Amount": 30
+  },
+  {
+    "SA2 ID": "201060001",
+    "SA2 Name": "Carlton Gardens",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1499
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Hobart South",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 8323
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Hobart",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2810
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Fitzroy",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 5798
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Townsville",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 5163
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Adelaide",
+    "Description": "Median age (years)",
+    "Amount": 49
+  },
+  {
+    "SA2 ID": "301060002",
+    "SA2 Name": "Lower Ipswich",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4177
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Blacktown Point",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 6514
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Glenelg East",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1358
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Parkville Heights",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 8179
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Perth East",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 3826
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Kalgoorlie Point",
+    "Description": "Median age (years)",
+    "Amount": 42
+  },
+  {
+    "SA2 ID": "101060003",
+    "SA2 Name": "Darwin Point",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3172
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Cairns North",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 2751
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Brisbane",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2217
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Morphett",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3772
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Saint Ipswich",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 4608
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "North Melbourne Gardens",
+    "Description": "Median age (years)",
+    "Amount": 33
+  },
+  {
+    "SA2 ID": "201060004",
+    "SA2 Name": "Port Norwood Beach",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1333
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Big Penrith Valley",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 4615
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Manly Valley",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1826
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Morphett",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4791
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Lower Carlton Gardens",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 5701
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Morphett Valley",
+    "Description": "Median age (years)",
+    "Amount": 39
+  },
+  {
+    "SA2 ID": "301060005",
+    "SA2 Name": "Port Geraldton",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 975
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Bunbury Hill",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 5021
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Collingwood Point",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2772
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Liverpool Hill",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2326
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Darwin Beach",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2878
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Unley",
+    "Description": "Median age (years)",
+    "Amount": 32
+  },
+  {
+    "SA2 ID": "101060006",
+    "SA2 Name": "Toowoomba",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1733
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Fremantle",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 11821
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Richmond",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2764
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Bunbury North",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6708
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Townsville",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7107
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "Rockhampton East",
+    "Description": "Median age (years)",
+    "Amount": 36
+  },
+  {
+    "SA2 ID": "201060007",
+    "SA2 Name": "South Unley Gardens",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 715
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "North Burnside",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 9850
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Valley Burnside",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2561
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Bondi",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6037
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Adelaide Central",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1307
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Big Richmond",
+    "Description": "Median age (years)",
+    "Amount": 44
+  },
+  {
+    "SA2 ID": "301060008",
+    "SA2 Name": "Norwood",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2265
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Glenelg",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 15153
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Manly Central",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1917
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Rockhampton Beach",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 7070
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Big Fremantle",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 3301
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Hill Penrith Heights",
+    "Description": "Median age (years)",
+    "Amount": 25
+  },
+  {
+    "SA2 ID": "101060009",
+    "SA2 Name": "Burnside",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1641
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Burnside Junction",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 7167
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Kalgoorlie Gardens",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2036
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Unley",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3199
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Geraldton",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 4598
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "East Penrith",
+    "Description": "Median age (years)",
+    "Amount": 33
+  },
+  {
+    "SA2 ID": "201060010",
+    "SA2 Name": "Darwin Junction",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 296
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Unley West",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 10236
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Old Unley South",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2731
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Big Joondalup",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 5929
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Kalgoorlie",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7716
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "South Richmond Point",
+    "Description": "Median age (years)",
+    "Amount": 45
+  },
+  {
+    "SA2 ID": "301070001",
+    "SA2 Name": "Manly",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3204
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Kalgoorlie",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 10034
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Bunbury Heights",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2880
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Big Rockhampton Central",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4851
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Sydney",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7995
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Fremantle",
+    "Description": "Median age (years)",
+    "Amount": 50
+  },
+  {
+    "SA2 ID": "101070002",
+    "SA2 Name": "Joondalup Valley",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2508
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Unley Gardens",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 15347
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Parramatta Hill",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1312
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Richmond",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4497
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Collingwood South",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 5843
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Valley Manly",
+    "Description": "Median age (years)",
+    "Amount": 33
+  },
+  {
+    "SA2 ID": "201070003",
+    "SA2 Name": "Richmond",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4623
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Port Bunbury East",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 9581
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Melbourne Heights",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2242
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Richmond",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 7056
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Parramatta",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 3510
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Townsville",
+    "Description": "Median age (years)",
+    "Amount": 54
+  },
+  {
+    "SA2 ID": "301070004",
+    "SA2 Name": "Liverpool Central",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 495
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Townsville",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 11079
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Norwood",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2004
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "New Darwin",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1915
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Glenelg",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2032
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Hobart",
+    "Description": "Median age (years)",
+    "Amount": 42
+  },
+  {
+    "SA2 ID": "101070005",
+    "SA2 Name": "Joondalup Heights",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1025
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Parramatta Point",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 6489
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Penrith",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2396
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Little Parkville",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2552
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Valley Geraldton Valley",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7042
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "Saint Bunbury Gardens",
+    "Description": "Median age (years)",
+    "Amount": 26
+  },
+  {
+    "SA2 ID": "201070006",
+    "SA2 Name": "South Darwin",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 315
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Darwin",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 10082
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Liverpool",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 926
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Richmond Bay",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 5345
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Brisbane Central",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 5277
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Bondi Valley",
+    "Description": "Median age (years)",
+    "Amount": 54
+  },
+  {
+    "SA2 ID": "301070007",
+    "SA2 Name": "Fremantle Heights",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3291
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Park Penrith",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 1205
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Bunbury",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 513
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Royal Bondi",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6672
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Cairns Beach",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7557
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Fremantle",
+    "Description": "Median age (years)",
+    "Amount": 42
+  },
+  {
+    "SA2 ID": "101070008",
+    "SA2 Name": "Richmond",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2170
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Bondi Beach",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 6521
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Norwood",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1838
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Upper Burnside Valley",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 341
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "New Kalgoorlie Beach",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7829
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Penrith Heights",
+    "Description": "Median age (years)",
+    "Amount": 52
+  },
+  {
+    "SA2 ID": "201070009",
+    "SA2 Name": "Little Sydney Gardens",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1063
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Hobart",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 9538
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "South Blacktown",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1481
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Glen Morphett West",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1650
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Port Brunswick South",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2718
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Carlton West",
+    "Description": "Median age (years)",
+    "Amount": 29
+  },
+  {
+    "SA2 ID": "301070010",
+    "SA2 Name": "Carlton Junction",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2468
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Big Blacktown",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 11298
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Sydney East",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 536
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Brisbane Valley",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4266
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Parramatta Junction",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 5861
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "Bunbury",
+    "Description": "Median age (years)",
+    "Amount": 33
+  },
+  {
+    "SA2 ID": "101080001",
+    "SA2 Name": "West Bunbury",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3741
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Geraldton North",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 9019
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Ipswich",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2930
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Hobart",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1197
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Unley East",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7178
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Blacktown North",
+    "Description": "Median age (years)",
+    "Amount": 33
+  },
+  {
+    "SA2 ID": "201080002",
+    "SA2 Name": "Bunbury",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1263
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Kalgoorlie",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 15575
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Old Carlton",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1863
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Rockhampton",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1100
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Sydney Point",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1969
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Upper Perth Creek",
+    "Description": "Median age (years)",
+    "Amount": 26
+  },
+  {
+    "SA2 ID": "301080003",
+    "SA2 Name": "Hill Parramatta Hill",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2123
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Rockhampton",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 7050
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Parramatta Creek",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 296
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Liverpool North",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3251
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Fremantle West",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1167
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Burnside",
+    "Description": "Median age (years)",
+    "Amount": 41
+  },
+  {
+    "SA2 ID": "101080004",
+    "SA2 Name": "Morphett",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 382
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "South Cairns",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 5283
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Darwin",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1116
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Adelaide",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 7402
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Parramatta Point",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7792
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Richmond",
+    "Description": "Median age (years)",
+    "Amount": 51
+  },
+  {
+    "SA2 ID": "201080005",
+    "SA2 Name": "Hobart",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 938
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Hill Toowoomba",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 12551
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Kalgoorlie",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 940
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Richmond Creek",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3192
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Little Cairns",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7726
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Morphett",
+    "Description": "Median age (years)",
+    "Amount": 35
+  },
+  {
+    "SA2 ID": "301080006",
+    "SA2 Name": "Fremantle",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 464
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Fremantle Hill",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 2385
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Liverpool",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1288
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Ipswich",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2814
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Mount Parramatta Park",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 5597
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Perth",
+    "Description": "Median age (years)",
+    "Amount": 34
+  },
+  {
+    "SA2 ID": "101080007",
+    "SA2 Name": "Park Penrith",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4197
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Adelaide Hill",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 12136
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Manly West",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 312
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Cairns Creek",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6936
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Ipswich",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2449
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Kalgoorlie",
+    "Description": "Median age (years)",
+    "Amount": 31
+  },
+  {
+    "SA2 ID": "201080008",
+    "SA2 Name": "Royal Sydney",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 73
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Burnside",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 3353
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Royal Perth Junction",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1340
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Penrith",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6832
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "North Fremantle",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 325
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Liverpool",
+    "Description": "Median age (years)",
+    "Amount": 42
+  },
+  {
+    "SA2 ID": "301080009",
+    "SA2 Name": "Manly",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4147
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Adelaide Valley",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 13107
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Greater Brunswick",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1842
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Blacktown",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6911
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Brisbane",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 793
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "West Unley Hill",
+    "Description": "Median age (years)",
+    "Amount": 43
+  },
+  {
+    "SA2 ID": "101080010",
+    "SA2 Name": "Mount Norwood",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2750
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Burnside East",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 15979
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Old Norwood",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2741
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Brunswick South",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3990
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Lower Darwin",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 4362
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Burnside",
+    "Description": "Median age (years)",
+    "Amount": 27
+  },
+  {
+    "SA2 ID": "201090001",
+    "SA2 Name": "Port Geraldton",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 465
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Joondalup Gardens",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 13077
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Upper Darwin",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2159
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Brisbane",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 7543
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Parramatta Hill",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2555
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Brunswick Heights",
+    "Description": "Median age (years)",
+    "Amount": 29
+  },
+  {
+    "SA2 ID": "301090002",
+    "SA2 Name": "Glenelg",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 273
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "North Perth",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 3938
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Mount Toowoomba",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2153
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Joondalup East",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2149
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Fitzroy Junction",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 905
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Blacktown",
+    "Description": "Median age (years)",
+    "Amount": 43
+  },
+  {
+    "SA2 ID": "101090003",
+    "SA2 Name": "Blacktown",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 922
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Blacktown",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 5768
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Townsville",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2769
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Norwood Valley",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3388
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Carlton Park",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 627
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Melbourne Park",
+    "Description": "Median age (years)",
+    "Amount": 25
+  },
+  {
+    "SA2 ID": "201090004",
+    "SA2 Name": "Penrith Bay",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 457
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Park Adelaide",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 10968
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Old Sydney Park",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 796
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Perth",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2889
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Parkville",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 6372
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Glenelg",
+    "Description": "Median age (years)",
+    "Amount": 51
+  },
+  {
+    "SA2 ID": "301090005",
+    "SA2 Name": "Fremantle",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1277
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Bunbury Heights",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 1720
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Hill Richmond Point",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2754
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Old Unley Park",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4490
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Melbourne",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 5334
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Geraldton Creek",
+    "Description": "Median age (years)",
+    "Amount": 34
+  },
+  {
+    "SA2 ID": "101090006",
+    "SA2 Name": "Joondalup Central",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1671
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Richmond Hill",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 10648
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Bondi",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 764
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Manly",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6512
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Sydney",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2800
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Cairns",
+    "Description": "Median age (years)",
+    "Amount": 43
+  },
+  {
+    "SA2 ID": "201090007",
+    "SA2 Name": "Blacktown",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 1185
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "North Geraldton",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 13164
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Joondalup Central",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 772
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "South Carlton North",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 5669
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "West Melbourne",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 3195
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Townsville",
+    "Description": "Median age (years)",
+    "Amount": 28
+  },
+  {
+    "SA2 ID": "301090008",
+    "SA2 Name": "Carlton Junction",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 453
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Richmond Valley",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 10266
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Ipswich",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 255
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Bunbury",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 5543
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Bondi Heights",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 6991
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Carlton",
+    "Description": "Median age (years)",
+    "Amount": 54
+  },
+  {
+    "SA2 ID": "101090009",
+    "SA2 Name": "Rockhampton",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4779
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Melbourne West",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 10014
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Saint Penrith",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 389
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Greater Richmond",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2414
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Rockhampton Heights",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1632
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Darwin Point",
+    "Description": "Median age (years)",
+    "Amount": 53
+  },
+  {
+    "SA2 ID": "201090010",
+    "SA2 Name": "Norwood",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2666
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Richmond",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 14867
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Melbourne Heights",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 310
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Hill Hobart",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 3360
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Morphett West",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7332
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Joondalup",
+    "Description": "Median age (years)",
+    "Amount": 32
+  },
+  {
+    "SA2 ID": "301100001",
+    "SA2 Name": "Kalgoorlie Creek",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2672
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Bondi North",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 13675
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Joondalup",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2566
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Saint Sydney Bay",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1297
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Blacktown",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2401
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "Sydney Junction",
+    "Description": "Median age (years)",
+    "Amount": 35
+  },
+  {
+    "SA2 ID": "101100002",
+    "SA2 Name": "West Liverpool",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2902
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Glenelg North",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 11331
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Parramatta Hill",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2439
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Parramatta South",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6243
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Melbourne",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 795
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Kalgoorlie Creek",
+    "Description": "Median age (years)",
+    "Amount": 33
+  },
+  {
+    "SA2 ID": "201100003",
+    "SA2 Name": "Hill Adelaide Point",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4011
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Brisbane North",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 5846
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Townsville",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1325
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Adelaide",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2544
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Big Liverpool",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 7483
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Brunswick",
+    "Description": "Median age (years)",
+    "Amount": 39
+  },
+  {
+    "SA2 ID": "301100004",
+    "SA2 Name": "Blacktown",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 629
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Penrith",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 11451
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "New Geraldton West",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2804
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Mount Unley Central",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4804
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Brunswick West",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 6321
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "West Collingwood Gardens",
+    "Description": "Median age (years)",
+    "Amount": 51
+  },
+  {
+    "SA2 ID": "101100005",
+    "SA2 Name": "Brunswick Central",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3916
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Perth Valley",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 2283
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Liverpool Point",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 818
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Park Melbourne Point",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1665
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Kalgoorlie Bay",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 6846
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Parkville",
+    "Description": "Median age (years)",
+    "Amount": 36
+  },
+  {
+    "SA2 ID": "201100006",
+    "SA2 Name": "Valley Melbourne",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 2771
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Richmond",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 8398
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Rockhampton Bay",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 1024
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Hill Bondi",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6168
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Richmond",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 1851
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Fremantle North",
+    "Description": "Median age (years)",
+    "Amount": 50
+  },
+  {
+    "SA2 ID": "301100007",
+    "SA2 Name": "Big Brunswick Hill",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 716
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Kalgoorlie Valley",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 9407
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Parramatta",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 3020
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "South Kalgoorlie West",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 6349
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Old Glenelg",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 671
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Unley",
+    "Description": "Median age (years)",
+    "Amount": 53
+  },
+  {
+    "SA2 ID": "101100008",
+    "SA2 Name": "Liverpool Gardens",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 3981
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "New Norwood Heights",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 8861
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Joondalup",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 668
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "North Parramatta Point",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 1220
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Parramatta",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 2640
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Rockhampton",
+    "Description": "Median age (years)",
+    "Amount": 34
+  },
+  {
+    "SA2 ID": "201100009",
+    "SA2 Name": "Brunswick",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 52
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Richmond",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 1842
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Brisbane Heights",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 2424
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Old Richmond",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 2005
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Glenelg West",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 5055
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Sydney",
+    "Description": "Median age (years)",
+    "Amount": 48
+  },
+  {
+    "SA2 ID": "301100010",
+    "SA2 Name": "Bondi Creek",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4563
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "South Unley",
+    "Description": "Estimated resident population (no.)",
+    "Amount": 15459
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Parramatta Valley",
+    "Description": "Population aged 65 years and over (no.)",
+    "Amount": 595
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Adelaide North",
+    "Description": "Population aged 0-14 years (no.)",
+    "Amount": 4675
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Fitzroy",
+    "Description": "Population aged 15-64 years (no.)",
+    "Amount": 4879
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Glen Brunswick",
+    "Description": "Median age (years)",
+    "Amount": 39
+  },
+  {
+    "SA2 ID": "101110001",
+    "SA2 Name": "Mount Hobart",
+    "Description": "Population density (persons per sq km)",
+    "Amount": 4295
+  }
+]
