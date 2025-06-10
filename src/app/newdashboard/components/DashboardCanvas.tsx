@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Plus, Edit3, Download, Trash2 } from 'lucide-react';
+import { Plus, Edit3, Trash2 } from 'lucide-react';
 import ChartTypeSelector from './ChartTypeSelector';
 import ScatterPlotConfig from './ScatterPlotConfig';
 import QuadrantScatterPlot from './QuadrantScatterPlot';

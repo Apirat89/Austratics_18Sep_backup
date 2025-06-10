@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit3, Download, Trash2 } from 'lucide-react';
+import { Plus, Edit3, Save, Trash2 } from 'lucide-react';
 import { EnhancedChartConfiguration, InsightsDataService } from './InsightsDataService';
 import ChartTypeSelector from './ChartTypeSelector';
 import ChartRenderer from './ChartRenderer';
@@ -163,7 +163,7 @@ export default function InsightsCanvas({
                         className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-blue-600"
                         title="Save analysis"
                       >
-                        <Download className="h-4 w-4" />
+                        <Save className="h-4 w-4" />
                       </button>
                     </>
                   )}

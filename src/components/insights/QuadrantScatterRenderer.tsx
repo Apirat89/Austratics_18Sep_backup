@@ -46,24 +46,39 @@ export default function QuadrantScatterRenderer({
       setIsLoading(true);
       setError(null);
       
+      console.log('🔄 QuadrantScatterRenderer: Starting SA2 data load...');
+      
       const response = await fetch('/api/sa2');
+      console.log('📡 QuadrantScatterRenderer: API response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error('Failed to load SA2 data');
+        const errorText = await response.text();
+        console.error('❌ QuadrantScatterRenderer: API error response:', errorText);
+        throw new Error(`Failed to load SA2 data (${response.status}): ${errorText}`);
       }
       
       const result = await response.json();
+      console.log('📊 QuadrantScatterRenderer: API result structure:', {
+        success: result.success,
+        hasData: !!result.data,
+        dataType: typeof result.data,
+        dataKeys: result.data ? Object.keys(result.data).length : 0
+      });
+      
       if (result.success && result.data) {
         // Convert SA2 data to array format
         const sa2Array = Object.entries(result.data).map(([sa2Id, sa2Data]: [string, any]) => ({
           sa2Id,
           ...sa2Data
         }));
+        console.log('✅ QuadrantScatterRenderer: Successfully converted SA2 data to array format:', sa2Array.length, 'regions');
         setData(sa2Array);
       } else {
+        console.error('❌ QuadrantScatterRenderer: Invalid SA2 data format:', result);
         throw new Error('Invalid SA2 data format');
       }
     } catch (error) {
-      console.error('Error loading SA2 data:', error);
+      console.error('❌ QuadrantScatterRenderer: Error loading SA2 data:', error);
       setError(error instanceof Error ? error.message : 'Failed to load data');
     } finally {
       setIsLoading(false);
@@ -477,13 +492,14 @@ export default function QuadrantScatterRenderer({
   const prepareScatterData = () => {
     if (!config.measureX || !config.measureY) return [];
 
-    // Debug logging (can be enabled if needed)
-    // console.log('🔍 QuadrantScatterRenderer - prepareScatterData debug:', {
-    //   measureX: config.measureX,
-    //   measureY: config.measureY,
-    //   dataLength: data.length,
-    //   sampleRecord: data[0] ? Object.keys(data[0]).slice(0, 5) : 'No data'
-    // });
+    // Debug logging enabled to diagnose data loading issue
+    console.log('🔍 QuadrantScatterRenderer - prepareScatterData debug:', {
+      measureX: config.measureX,
+      measureY: config.measureY,
+      dataLength: data.length,
+      sampleRecord: data[0] ? Object.keys(data[0]).slice(0, 10) : 'No data',
+      fullSampleRecord: data[0] || 'No data'
+    });
 
     const scatterData = data.map((record, index) => {
       const xValue = getRecordValue(record, config.measureX!);
@@ -505,12 +521,15 @@ export default function QuadrantScatterRenderer({
       };
     }).filter(Boolean);
 
-    // console.log('📊 Scatter data prepared:', {
-    //   totalRecords: data.length,
-    //   validDataPoints: scatterData.length,
-    //   nullDataPoints: data.length - scatterData.length,
-    //   sampleDataPoint: scatterData[0] || 'No valid data points'
-    // });
+    console.log('📊 Scatter data prepared:', {
+      totalRecords: data.length,
+      validDataPoints: scatterData.length,
+      nullDataPoints: data.length - scatterData.length,
+      sampleDataPoint: scatterData[0] || 'No valid data points',
+      firstFewValidPoints: scatterData.slice(0, 3),
+      measureXExists: data.filter(r => getRecordValue(r, config.measureX!) !== null).length,
+      measureYExists: data.filter(r => getRecordValue(r, config.measureY!) !== null).length
+    });
 
     return scatterData;
   };
@@ -583,8 +602,7 @@ export default function QuadrantScatterRenderer({
   };
 
   const getRecordValue = (record: any, fieldName: string): number | null => {
-    // First, try to find a match for unified SA2 data field names
-    const recordKeys = Object.keys(record);
+    // EXACT MATCHING ONLY - field names now match SA2 data format exactly
     
     // Try exact match first
     if (record[fieldName] !== undefined && record[fieldName] !== null) {
@@ -594,76 +612,34 @@ export default function QuadrantScatterRenderer({
       }
     }
     
-    // Enhanced fuzzy matching - handle multiple field name formats
-    const normalizedSearchTerm = fieldName.toLowerCase().replace(/[^a-z0-9]/g, '');
-    
-    // Create alternative search patterns for better matching
-    const searchPatterns = [
-      normalizedSearchTerm,
-      // Handle pipe-to-underscore conversion
-      fieldName.replace(/\s\|\s/g, '_').toLowerCase().replace(/[^a-z0-9]/g, ''),
-      // Handle partial matches for complex field names
-      ...fieldName.split(/[\|\s_\-]+/).filter(part => part.length > 3).map(part => 
-        part.toLowerCase().replace(/[^a-z0-9]/g, '')
-      )
-    ];
-    
-    for (const key of recordKeys) {
-      if (key === 'sa2Id' || key === 'sa2Name') continue;
-      
-      const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-      
-      // Check if any search pattern matches
-      for (const pattern of searchPatterns) {
-        if (pattern.length > 2 && (
-          normalizedKey.includes(pattern) || 
-          pattern.includes(normalizedKey) ||
-          // Check reverse - sometimes the search term is longer
-          normalizedKey.length > pattern.length ? normalizedKey.includes(pattern) : pattern.includes(normalizedKey)
-        )) {
-          const value = Number(record[key]);
-          if (!isNaN(value)) {
-            return value;
-          }
-        }
-      }
-    }
-    
-    // Try common field name variations as fallback
-    const possibleKeys = [
-      fieldName,
-      fieldName.replace(/\s+/g, '_'),
-      fieldName.replace(/_/g, ' '),
-      fieldName.replace(/\s\|\s/g, '_'), // Convert "Category | Subcategory" to "Category_Subcategory"
-      fieldName.replace(/\s\|\s/g, ' '), // Convert "Category | Subcategory" to "Category Subcategory"
-      `${fieldName}_Amount`,
-      `${fieldName}Amount`,
-      fieldName.toLowerCase(),
-      fieldName.toUpperCase()
+    // Basic format variations for backward compatibility
+    const basicVariations = [
+      fieldName.replace(/\s\|\s/g, '_'), // "Category | Subcategory" -> "Category_Subcategory"
+      fieldName.replace(/_/g, ' | ')     // "Category_Subcategory" -> "Category | Subcategory"
     ];
 
-    for (const key of possibleKeys) {
-      if (record[key] !== undefined && record[key] !== null) {
-        const value = Number(record[key]);
+    for (const variation of basicVariations) {
+      if (record[variation] !== undefined && record[variation] !== null) {
+        const value = Number(record[variation]);
         if (!isNaN(value)) {
           return value;
         }
       }
     }
     
-    // Enhanced debug logging for better diagnostics
-    if (Math.random() < 0.001) { // Only log for 0.1% of calls to avoid spam
+    // Log field mapping failures for debugging (rare now that field names match)
+    if (Math.random() < 0.01) { // Only log 1% since this should be rare now
       console.warn('🔍 Field not found in QuadrantScatterRenderer:', {
         fieldName,
-        normalizedSearchTerm,
-        searchPatterns,
-        availableKeys: recordKeys.filter(k => k !== 'sa2Id' && k !== 'sa2Name').slice(0, 15),
+        availableKeys: Object.keys(record).filter(k => k !== 'sa2Id' && k !== 'sa2Name').slice(0, 10),
         recordId: record.sa2Id || 'unknown'
       });
     }
     
     return null;
   };
+
+
 
   const getVariableName = (fieldName: string): string => {
     // Convert technical field names to user-friendly names

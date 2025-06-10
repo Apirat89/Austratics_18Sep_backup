@@ -305,19 +305,37 @@ export default function QuadrantScatterPlot({ config, data, medianCalculations }
   );
 }
 
-// Helper function to extract value from data item
+// Helper function to extract value from data item - EXACT MATCHING ONLY
 function getValueFromItem(item: any, fieldName: string): number {
   if (!item || !fieldName) return 0;
   
-  // Try different field name variations
-  const value = item[fieldName] || 
-                item[fieldName.toLowerCase()] || 
-                item[fieldName.toUpperCase()] ||
-                item[fieldName.replace(/\s+/g, '_')] ||
-                item[fieldName.replace(/_/g, ' ')];
+  // Try exact match first
+  if (item[fieldName] !== undefined && item[fieldName] !== null) {
+    const numValue = parseFloat(item[fieldName]);
+    return isNaN(numValue) ? 0 : numValue;
+  }
   
-  const numValue = parseFloat(value);
-  return isNaN(numValue) ? 0 : numValue;
+  // Only basic format variations (no fuzzy matching)
+  const basicVariations = [
+    fieldName.replace(/\s\|\s/g, '_'), // "Category | Subcategory" -> "Category_Subcategory"
+    fieldName.replace(/_/g, ' | ')     // "Category_Subcategory" -> "Category | Subcategory"
+  ];
+
+  for (const variation of basicVariations) {
+    if (item[variation] !== undefined && item[variation] !== null) {
+      const numValue = parseFloat(item[variation]);
+      return isNaN(numValue) ? 0 : numValue;
+    }
+  }
+  
+  // Log field mapping failures for debugging
+  console.warn('🔍 Field not found in QuadrantScatterPlot (EXACT MATCH ONLY):', {
+    fieldName,
+    availableKeys: Object.keys(item).slice(0, 20),
+    itemId: item.sa2Id || item.id || 'unknown'
+  });
+  
+  return 0;
 }
 
 // Helper function to format values for display

@@ -163,7 +163,7 @@ export const getFlattenedHealthcareOptions = () => {
   Object.entries(PROGRAM_TYPES).forEach(([category, subcategories]) => {
     subcategories.forEach(subcategory => {
       options.push({
-        value: `${category}|||${subcategory}`,
+        value: `${category} | ${subcategory}`, // Use single pipe to match SA2 data format
         label: `${category} - ${subcategory}`,
         category,
         subcategory
@@ -181,7 +181,7 @@ export const getFlattenedDemographicsOptions = () => {
   Object.entries(DEMOGRAPHICS_TYPES).forEach(([category, subcategories]) => {
     subcategories.forEach(subcategory => {
       options.push({
-        value: `${category}|||${subcategory}`,
+        value: `Demographics | ${subcategory}`, // Match actual SA2 data format
         label: `${category} - ${subcategory}`,
         category,
         subcategory
@@ -199,7 +199,7 @@ export const getFlattenedEconomicOptions = () => {
   Object.entries(ECONOMIC_TYPES).forEach(([category, subcategories]) => {
     subcategories.forEach(subcategory => {
       options.push({
-        value: `${category}|||${subcategory}`,
+        value: `Economics | ${subcategory}`, // Match actual SA2 data format
         label: `${category} - ${subcategory}`,
         category,
         subcategory
@@ -217,7 +217,7 @@ export const getFlattenedHealthStatsOptions = () => {
   Object.entries(HEALTH_TYPES).forEach(([category, subcategories]) => {
     subcategories.forEach(subcategory => {
       options.push({
-        value: `${category}|||${subcategory}`,
+        value: `Health Statistics | ${subcategory}`, // Match actual SA2 data format
         label: `${category} - ${subcategory}`,
         category,
         subcategory

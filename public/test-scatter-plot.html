@@ -137,10 +137,8 @@
             scatterCombinations: { working: 0, total: 0 }
         };
 
-        // Simulate the enhanced getRecordValue function from QuadrantScatterRenderer
+        // Simulate the CORRECTED getRecordValue function from QuadrantScatterRenderer (EXACT MATCHING ONLY)
         function testGetRecordValue(record, fieldName) {
-            const recordKeys = Object.keys(record);
-            
             // Try exact match first
             if (record[fieldName] !== undefined && record[fieldName] !== null) {
                 const value = Number(record[fieldName]);
@@ -149,51 +147,17 @@
                 }
             }
             
-            // Enhanced fuzzy matching
-            const normalizedSearchTerm = fieldName.toLowerCase().replace(/[^a-z0-9]/g, '');
-            
-            // Create alternative search patterns
-            const searchPatterns = [
-                normalizedSearchTerm,
-                fieldName.replace(/\s\|\s/g, '_').toLowerCase().replace(/[^a-z0-9]/g, ''),
-                ...fieldName.split(/[\|\s_\-]+/).filter(part => part.length > 3).map(part => 
-                    part.toLowerCase().replace(/[^a-z0-9]/g, '')
-                )
-            ];
-            
-            for (const key of recordKeys) {
-                if (key === 'sa2Id' || key === 'sa2Name') continue;
-                
-                const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-                
-                for (const pattern of searchPatterns) {
-                    if (pattern.length > 2 && (
-                        normalizedKey.includes(pattern) || 
-                        pattern.includes(normalizedKey) ||
-                        (normalizedKey.length > pattern.length ? normalizedKey.includes(pattern) : pattern.includes(normalizedKey))
-                    )) {
-                        const value = Number(record[key]);
-                        if (!isNaN(value)) {
-                            return { found: true, method: 'fuzzy', key, value };
-                        }
-                    }
-                }
-            }
-            
-            // Try common variations
-            const possibleKeys = [
-                fieldName,
-                fieldName.replace(/\s+/g, '_'),
-                fieldName.replace(/_/g, ' '),
-                fieldName.replace(/\s\|\s/g, '_'),
-                fieldName.replace(/\s\|\s/g, ' ')
+            // Only basic format variations (no fuzzy matching)
+            const basicVariations = [
+                fieldName.replace(/\s\|\s/g, '_'), // "Category | Subcategory" -> "Category_Subcategory"
+                fieldName.replace(/_/g, ' | ')     // "Category_Subcategory" -> "Category | Subcategory"
             ];
 
-            for (const key of possibleKeys) {
-                if (record[key] !== undefined && record[key] !== null) {
-                    const value = Number(record[key]);
+            for (const variation of basicVariations) {
+                if (record[variation] !== undefined && record[variation] !== null) {
+                    const value = Number(record[variation]);
                     if (!isNaN(value)) {
-                        return { found: true, method: 'variation', key, value };
+                        return { found: true, method: 'variation', key: variation, value };
                     }
                 }
             }

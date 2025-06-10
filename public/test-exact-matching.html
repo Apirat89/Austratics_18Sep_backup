@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Exact Field Matching</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .error { background-color: #ffe6e6; }
+        .success { background-color: #e6ffe6; }
+        .warning { background-color: #fff6e6; }
+        pre { font-size: 12px; max-height: 200px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>Test Exact Field Name Matching</h1>
+    <div id="results"></div>
+
+    <script>
+        async function testExactMatching() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                resultsDiv.innerHTML += '<div class="result">Fetching SA2 data...</div>';
+                
+                const response = await fetch('/api/sa2?limit=1');
+                const apiData = await response.json();
+                
+                if (!apiData.success) {
+                    throw new Error('API returned error: ' + apiData.error);
+                }
+                
+                const sa2Keys = Object.keys(apiData.data);
+                const firstSA2Id = sa2Keys[0];
+                const firstRecord = apiData.data[firstSA2Id];
+                
+                resultsDiv.innerHTML += `<div class="result success">
+                    <strong>✅ API Response:</strong><br>
+                    SA2 ID: ${firstSA2Id}<br>
+                    SA2 Name: ${firstRecord.sa2Name}<br>
+                    Total fields: ${Object.keys(firstRecord).length}
+                </div>`;
+                
+                // Test specific age group fields that were causing issues
+                const testFields = [
+                    'Demographics | Persons - 55-64 years (no.)',
+                    'Demographics | Persons - 65 years and over (no.)'
+                ];
+                
+                resultsDiv.innerHTML += '<div class="result"><strong>🎯 Testing problematic age group fields:</strong><br>';
+                
+                testFields.forEach(fieldName => {
+                    const exactValue = firstRecord[fieldName];
+                    const underscoreVariant = firstRecord[fieldName.replace(/\s\|\s/g, '_')];
+                    
+                    resultsDiv.innerHTML += `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd;">
+                            <strong>Field:</strong> ${fieldName}<br>
+                            <strong>Exact match:</strong> ${exactValue !== undefined ? `✅ ${exactValue}` : '❌ NOT FOUND'}<br>
+                            <strong>Underscore variant:</strong> ${underscoreVariant !== undefined ? `✅ ${underscoreVariant}` : '❌ NOT FOUND'}<br>
+                            <strong>Status:</strong> ${exactValue !== undefined ? 
+                                '<span style="color: green;">EXACT MATCH WORKS!</span>' : 
+                                (underscoreVariant !== undefined ? 
+                                    '<span style="color: orange;">NEEDS FORMAT CONVERSION</span>' :
+                                    '<span style="color: red;">FIELD NOT FOUND</span>')
+                            }
+                        </div>
+                    `;
+                });
+                
+                resultsDiv.innerHTML += '</div>';
+                
+                // Show all available field names for debugging
+                const allFields = Object.keys(firstRecord)
+                    .filter(k => k !== 'sa2Id' && k !== 'sa2Name')
+                    .sort();
+                
+                resultsDiv.innerHTML += `<div class="result">
+                    <strong>📝 All available field names (${allFields.length}):</strong><br>
+                    <pre>${allFields.slice(0, 50).map((field, i) => `${i+1}. ${field}`).join('\\n')}${allFields.length > 50 ? `\\n... and ${allFields.length - 50} more fields` : ''}</pre>
+                </div>`;
+                
+                // Test the new simplified getRecordValue logic
+                function testGetRecordValue(record, fieldName) {
+                    // Exact match
+                    if (record[fieldName] !== undefined && record[fieldName] !== null) {
+                        const value = Number(record[fieldName]);
+                        if (!isNaN(value)) {
+                            return { method: 'exact', value };
+                        }
+                    }
+                    
+                    // Basic variations only
+                    const variations = [
+                        fieldName.replace(/\s\|\s/g, '_'),
+                        fieldName.replace(/_/g, ' | ')
+                    ];
+
+                    for (const variation of variations) {
+                        if (record[variation] !== undefined && record[variation] !== null) {
+                            const value = Number(record[variation]);
+                            if (!isNaN(value)) {
+                                return { method: `variation: ${variation}`, value };
+                            }
+                        }
+                    }
+                    
+                    return { method: 'not found', value: null };
+                }
+                
+                resultsDiv.innerHTML += '<div class="result"><strong>🧪 Testing new simplified getRecordValue:</strong><br>';
+                
+                testFields.forEach(fieldName => {
+                    const result = testGetRecordValue(firstRecord, fieldName);
+                    const className = result.value !== null ? 'success' : 'error';
+                    
+                    resultsDiv.innerHTML += `
+                        <div style="margin: 5px 0; padding: 5px;" class="${className}">
+                            <strong>${fieldName}:</strong><br>
+                            Method: ${result.method}<br>
+                            Value: ${result.value}
+                        </div>
+                    `;
+                });
+                
+                resultsDiv.innerHTML += '</div>';
+                
+                // Final comparison test
+                const field1Value = testGetRecordValue(firstRecord, testFields[0]).value;
+                const field2Value = testGetRecordValue(firstRecord, testFields[1]).value;
+                
+                resultsDiv.innerHTML += `<div class="result ${field1Value === field2Value ? 'error' : 'success'}">
+                    <strong>🔍 Final Values Comparison:</strong><br>
+                    ${testFields[0]}: ${field1Value}<br>
+                    ${testFields[1]}: ${field2Value}<br>
+                    <strong>Are they equal? ${field1Value === field2Value ? '❌ YES (STILL A PROBLEM!)' : '✅ NO (FIXED!)'}</strong>
+                </div>`;
+                
+            } catch (error) {
+                resultsDiv.innerHTML += `<div class="result error">
+                    <strong>❌ Error:</strong> ${error.message}
+                </div>`;
+                console.error('Test error:', error);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', testExactMatching);
+    </script>
+</body>
+</html> 
