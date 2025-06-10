@@ -520,9 +520,50 @@ export default function QuadrantScatterRenderer({
       return { xMedian: undefined, yMedian: undefined };
     }
 
-    // Use pre-calculated medians if available
-    const xMedian = medianCalculations[config.measureX] ?? calculateFieldMedian(config.measureX);
-    const yMedian = medianCalculations[config.measureY] ?? calculateFieldMedian(config.measureY);
+    // Use pre-calculated medians if available, with enhanced fallback
+    let xMedian = medianCalculations[config.measureX];
+    let yMedian = medianCalculations[config.measureY];
+    
+    // If pre-calculated median not found, try alternative field name formats
+    if (xMedian === undefined) {
+      const xVariations = [
+        config.measureX,
+        config.measureX.replace(/\s\|\s/g, '_'),
+        config.measureX.replace(/_/g, ' | ')
+      ];
+      
+      for (const variation of xVariations) {
+        if (medianCalculations[variation] !== undefined) {
+          xMedian = medianCalculations[variation];
+          break;
+        }
+      }
+      
+      // If still not found, calculate from data
+      if (xMedian === undefined) {
+        xMedian = calculateFieldMedian(config.measureX);
+      }
+    }
+    
+    if (yMedian === undefined) {
+      const yVariations = [
+        config.measureY,
+        config.measureY.replace(/\s\|\s/g, '_'),
+        config.measureY.replace(/_/g, ' | ')
+      ];
+      
+      for (const variation of yVariations) {
+        if (medianCalculations[variation] !== undefined) {
+          yMedian = medianCalculations[variation];
+          break;
+        }
+      }
+      
+      // If still not found, calculate from data
+      if (yMedian === undefined) {
+        yMedian = calculateFieldMedian(config.measureY);
+      }
+    }
 
     return { xMedian, yMedian };
   };
@@ -542,7 +583,7 @@ export default function QuadrantScatterRenderer({
   };
 
   const getRecordValue = (record: any, fieldName: string): number | null => {
-    // First, try to find a fuzzy match for unified SA2 data field names
+    // First, try to find a match for unified SA2 data field names
     const recordKeys = Object.keys(record);
     
     // Try exact match first
@@ -553,19 +594,37 @@ export default function QuadrantScatterRenderer({
       }
     }
     
-    // Try fuzzy matching based on partial field name
+    // Enhanced fuzzy matching - handle multiple field name formats
     const normalizedSearchTerm = fieldName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    // Create alternative search patterns for better matching
+    const searchPatterns = [
+      normalizedSearchTerm,
+      // Handle pipe-to-underscore conversion
+      fieldName.replace(/\s\|\s/g, '_').toLowerCase().replace(/[^a-z0-9]/g, ''),
+      // Handle partial matches for complex field names
+      ...fieldName.split(/[\|\s_\-]+/).filter(part => part.length > 3).map(part => 
+        part.toLowerCase().replace(/[^a-z0-9]/g, '')
+      )
+    ];
     
     for (const key of recordKeys) {
       if (key === 'sa2Id' || key === 'sa2Name') continue;
       
       const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
       
-      // Check if the search term is contained in the key
-      if (normalizedKey.includes(normalizedSearchTerm) || normalizedSearchTerm.includes(normalizedKey)) {
-        const value = Number(record[key]);
-        if (!isNaN(value)) {
-          return value;
+      // Check if any search pattern matches
+      for (const pattern of searchPatterns) {
+        if (pattern.length > 2 && (
+          normalizedKey.includes(pattern) || 
+          pattern.includes(normalizedKey) ||
+          // Check reverse - sometimes the search term is longer
+          normalizedKey.length > pattern.length ? normalizedKey.includes(pattern) : pattern.includes(normalizedKey)
+        )) {
+          const value = Number(record[key]);
+          if (!isNaN(value)) {
+            return value;
+          }
         }
       }
     }
@@ -575,6 +634,8 @@ export default function QuadrantScatterRenderer({
       fieldName,
       fieldName.replace(/\s+/g, '_'),
       fieldName.replace(/_/g, ' '),
+      fieldName.replace(/\s\|\s/g, '_'), // Convert "Category | Subcategory" to "Category_Subcategory"
+      fieldName.replace(/\s\|\s/g, ' '), // Convert "Category | Subcategory" to "Category Subcategory"
       `${fieldName}_Amount`,
       `${fieldName}Amount`,
       fieldName.toLowerCase(),
@@ -590,12 +651,14 @@ export default function QuadrantScatterRenderer({
       }
     }
     
-    // Debug: Log when a field is not found
+    // Enhanced debug logging for better diagnostics
     if (Math.random() < 0.001) { // Only log for 0.1% of calls to avoid spam
-      console.warn('🔍 Field not found:', {
+      console.warn('🔍 Field not found in QuadrantScatterRenderer:', {
         fieldName,
         normalizedSearchTerm,
-        availableKeys: recordKeys.filter(k => k !== 'sa2Id' && k !== 'sa2Name').slice(0, 10)
+        searchPatterns,
+        availableKeys: recordKeys.filter(k => k !== 'sa2Id' && k !== 'sa2Name').slice(0, 15),
+        recordId: record.sa2Id || 'unknown'
       });
     }
     
