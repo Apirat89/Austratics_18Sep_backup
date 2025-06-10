@@ -217,22 +217,7 @@ export default function VariableConfig({ config, onConfigChange, onComplete }: V
 
           {/* Enhanced Features Display */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2 text-sm text-purple-700">
-              <Check className="h-4 w-4" />
-              <span>Median quadrants</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-purple-700">
-              <Check className="h-4 w-4" />
-              <span>Interactive tooltips</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-purple-700">
-              <Check className="h-4 w-4" />
-              <span>Zoom controls</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-purple-700">
-              <Check className="h-4 w-4" />
-              <span>Bubble size option</span>
-            </div>
+            {/* Removed: Median quadrants, Interactive tooltips, Zoom controls, Bubble size option */}
           </div>
         </div>
       )}

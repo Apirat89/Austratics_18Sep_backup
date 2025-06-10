@@ -405,7 +405,7 @@ export const getChartRecommendations = (selectedVariables: SnapshotVariableOptio
 export interface EnhancedChartConfiguration {
   id: string;
   name: string;
-  chartType: 'bar' | 'scatter' | 'bubble' | 'pie' | 'histogram' | 'choropleth' | 'quadrant-scatter';
+  chartType: 'bar' | 'scatter' | 'bubble' | 'pie' | 'histogram' | 'choropleth';
   
   // Simplified axis configuration using roles
   measure?: string;        // Primary measure

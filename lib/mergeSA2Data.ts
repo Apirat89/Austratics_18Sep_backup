@@ -76,6 +76,23 @@ interface RawDSSRow {
 // Module-level cache for memoization
 let cachedData: SA2DataWide | null = null;
 let cachedMetrics: string[] | null = null;
+let cachedMedians: { [key: string]: number } | null = null;
+
+// Interface for the merged comprehensive file
+interface MergedSA2File {
+  regions: Array<{
+    id: string;
+    name: string;
+    metrics: { [key: string]: number };
+  }>;
+  metadata: {
+    totalRegions: number;
+    totalMetrics: number;
+    medians: { [key: string]: number };
+    generatedAt: string;
+    [key: string]: any;
+  };
+}
 
 /**
  * Normalizes SA2 ID to 9-digit zero-padded string (ABS convention)
@@ -142,7 +159,12 @@ async function readDataFile<T>(filename: string): Promise<T[]> {
 }
 
 /**
- * Merges all SA2 datasets into a unified wide-format object
+ * Loads pre-merged SA2 data from the comprehensive merged file
+ * 
+ * **Optimized Approach:**
+ * Instead of loading and merging 4 separate files (14MB total), we load a single
+ * pre-merged file (5.4MB) with all 2,456 regions and 34 metrics, including
+ * pre-calculated medians for optimal performance.
  * 
  * **Format Choice: Wide Object**
  * We use wide format ({ [sa2Id]: { sa2Name, ...metrics } }) because:
@@ -150,8 +172,6 @@ async function readDataFile<T>(filename: string): Promise<T[]> {
  * - Better performance in ECharts and visualization libraries
  * - Easier to work with in React components
  * - Can easily convert to long format if needed via `convertToLongFormat()`
- * 
- * **To switch to long format:** Change return type and use `convertToLongFormat(mergedData)`
  */
 export async function getMergedSA2Data(): Promise<SA2DataWide> {
   // Return cached data if available (memoization)
@@ -160,15 +180,75 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
     return cachedData;
   }
 
-  console.log('📥 Loading and merging SA2 datasets...');
+  console.log('📥 Loading pre-merged SA2 comprehensive dataset...');
+  
+  try {
+    // Load the single merged file
+    const filePath = path.join(process.cwd(), 'data', 'sa2', 'merged_sa2_data_comprehensive.json');
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    const mergedFile: MergedSA2File = JSON.parse(fileContent);
+    
+    console.log(`📊 Processing merged data: ${mergedFile.metadata.totalRegions} regions, ${mergedFile.metadata.totalMetrics} metrics`);
+    
+    // Convert to wide format expected by the rest of the system
+    const mergedData: SA2DataWide = {};
+    
+    mergedFile.regions.forEach(region => {
+      const sa2Id = normalizeSA2Id(region.id);
+      const sa2Name = normalizeSA2Name(region.name);
+      
+      // Convert metrics to expected format (with proper prefixes)
+      const metrics: SA2Wide = { sa2Name };
+      
+      Object.entries(region.metrics).forEach(([metricKey, value]) => {
+        // Convert from "Demographics_Metric" to "Demographics | Metric" format
+        const formattedKey = metricKey.replace(/_(.*)/, ' | $1');
+        metrics[formattedKey] = value;
+      });
+      
+      mergedData[sa2Id] = metrics;
+    });
+    
+    // Cache the processed data and medians
+    cachedData = mergedData;
+    cachedMedians = mergedFile.metadata.medians;
+    
+    const regionCount = Object.keys(mergedData).length;
+    const metricsSet = new Set<string>();
+    Object.values(mergedData).forEach(region => {
+      Object.keys(region).forEach(key => {
+        if (key !== 'sa2Name') metricsSet.add(key);
+      });
+    });
+
+    console.log(`✅ SA2 data loaded successfully: ${regionCount} regions, ${metricsSet.size} unique metrics`);
+    console.log(`📊 Medians available for ${Object.keys(mergedFile.metadata.medians || {}).length} metrics`);
+    
+    return mergedData;
+
+  } catch (error) {
+    console.error('❌ Error loading merged SA2 data:', error);
+    console.log('🔄 Falling back to legacy loading method...');
+    
+    // Fallback to the old method if merged file doesn't exist
+    return await getMergedSA2DataLegacy();
+  }
+}
+
+/**
+ * Legacy method: Merges all SA2 datasets from individual files (fallback only)
+ * This method is kept as a fallback in case the merged file is missing
+ */
+async function getMergedSA2DataLegacy(): Promise<SA2DataWide> {
+  console.log('📥 Loading and merging SA2 datasets (legacy method)...');
   
   // Use Map for efficient merging
   const mergedMap = new Map<string, SA2Wide>();
   
   try {
     // 1. Load Demographics data
-    console.log('📊 Processing Demographics_2023_expanded.json...');
-    const demographicsData = await readDataFile<RawDemographicsRow>('Demographics_2023_expanded.json');
+    console.log('📊 Processing Demographics_2023_comprehensive.json...');
+    const demographicsData = await readDataFile<RawDemographicsRow>('Demographics_2023_comprehensive.json');
     
     demographicsData.forEach(row => {
       const sa2Id = normalizeSA2Id(row['SA2 ID']);
@@ -188,8 +268,8 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
     });
 
     // 2. Load Economics data
-    console.log('📊 Processing econ_stats_expanded.json...');
-    const economicsData = await readDataFile<RawEconHealthRow>('econ_stats_expanded.json');
+    console.log('📊 Processing econ_stats_comprehensive.json...');
+    const economicsData = await readDataFile<RawEconHealthRow>('econ_stats_comprehensive.json');
     
     economicsData.forEach(row => {
       const sa2Id = normalizeSA2Id(row['SA2 ID']);
@@ -209,8 +289,8 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
     });
 
     // 3. Load Health Stats data
-    console.log('📊 Processing health_stats_expanded.json...');
-    const healthData = await readDataFile<RawEconHealthRow>('health_stats_expanded.json');
+    console.log('📊 Processing health_stats_comprehensive.json...');
+    const healthData = await readDataFile<RawEconHealthRow>('health_stats_comprehensive.json');
     
     healthData.forEach(row => {
       const sa2Id = normalizeSA2Id(row['SA2 ID']);
@@ -230,8 +310,8 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
     });
 
     // 4. Load DSS data
-    console.log('📊 Processing DSS_Cleaned_2024_expanded.json...');
-    const dssData = await readDataFile<RawDSSRow>('DSS_Cleaned_2024_expanded.json');
+    console.log('📊 Processing DSS_Cleaned_2024_comprehensive.json...');
+    const dssData = await readDataFile<RawDSSRow>('DSS_Cleaned_2024_comprehensive.json');
     
     dssData.forEach(row => {
       const sa2Id = normalizeSA2Id(row['SA2 ID']);
@@ -313,6 +393,20 @@ export async function listAllMetrics(): Promise<string[]> {
   const data = await getMergedSA2Data();
   cachedMetrics = getAllMetrics(data);
   return cachedMetrics;
+}
+
+/**
+ * Helper function: Get pre-calculated medians for all metrics
+ */
+export async function getMetricMedians(): Promise<{ [key: string]: number }> {
+  if (cachedMedians) {
+    return cachedMedians;
+  }
+  
+  // Trigger loading of the merged data which will populate cachedMedians
+  await getMergedSA2Data();
+  
+  return cachedMedians || {};
 }
 
 /**

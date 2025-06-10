@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getMergedSA2Data, listAllMetrics, getSA2Row, searchSA2ByName } from '../../../../lib/mergeSA2Data';
+import { getMergedSA2Data, listAllMetrics, getSA2Row, searchSA2ByName, getMetricMedians } from '../../../../lib/mergeSA2Data';
 
 /**
  * API Route: /api/sa2
@@ -74,6 +74,7 @@ export async function GET(request: NextRequest) {
     const mergedData = await getMergedSA2Data();
     const regionCount = Object.keys(mergedData).length;
     const metricCount = await listAllMetrics().then(metrics => metrics.length);
+    const medians = await getMetricMedians();
 
     return NextResponse.json({
       success: true,
@@ -81,11 +82,13 @@ export async function GET(request: NextRequest) {
       metadata: {
         regionCount,
         metricCount,
+        medians,
         datasetSources: [
-          'Demographics_2023_expanded.json',
-          'econ_stats_expanded.json', 
-          'health_stats_expanded.json',
-          'DSS_Cleaned_2024_expanded.json'
+          'merged_sa2_data_comprehensive.json (primary)',
+          'Demographics_2023_comprehensive.json (fallback)', 
+          'econ_stats_comprehensive.json (fallback)',
+          'health_stats_comprehensive.json (fallback)',
+          'DSS_Cleaned_2024_comprehensive.json (fallback)'
         ],
         lastUpdated: new Date().toISOString()
       }

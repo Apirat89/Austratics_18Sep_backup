@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as echarts from 'echarts';
 import { EnhancedChartConfiguration, SnapshotVariableOption } from './InsightsDataService';
 
 interface QuadrantScatterRendererProps {
   config: EnhancedChartConfiguration;
-  data: any[];
+  data?: any[];
   medianCalculations?: Record<string, number>;
   onInteraction?: (event: any) => void;
 }
@@ -21,15 +21,57 @@ const COLOR_PALETTES = {
 
 export default function QuadrantScatterRenderer({ 
   config, 
-  data, 
+  data: propData, 
   medianCalculations = {},
   onInteraction 
 }: QuadrantScatterRendererProps) {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
+  const [data, setData] = useState<any[]>(propData || []);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load SA2 data if not provided
+  useEffect(() => {
+    if (propData && propData.length > 0) {
+      setData(propData);
+      setIsLoading(false);
+    } else {
+      loadSA2Data();
+    }
+  }, [propData]);
+
+  const loadSA2Data = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/sa2');
+      if (!response.ok) {
+        throw new Error('Failed to load SA2 data');
+      }
+      
+      const result = await response.json();
+      if (result.success && result.data) {
+        // Convert SA2 data to array format
+        const sa2Array = Object.entries(result.data).map(([sa2Id, sa2Data]: [string, any]) => ({
+          sa2Id,
+          ...sa2Data
+        }));
+        setData(sa2Array);
+      } else {
+        throw new Error('Invalid SA2 data format');
+      }
+    } catch (error) {
+      console.error('Error loading SA2 data:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (!chartRef.current || !data.length || !config.measureX || !config.measureY) {
+    if (!chartRef.current || !data.length || !config.measureX || !config.measureY || isLoading) {
       return;
     }
 
@@ -556,6 +598,51 @@ export default function QuadrantScatterRenderer({
       return value.toFixed(2);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div style={{ 
+        width: '100%', 
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#6b7280'
+      }}>
+        Loading SA2 data...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ 
+        width: '100%', 
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#ef4444'
+      }}>
+        Error: {error}
+      </div>
+    );
+  }
+
+  if (!data.length) {
+    return (
+      <div style={{ 
+        width: '100%', 
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#6b7280'
+      }}>
+        No data available
+      </div>
+    );
+  }
 
   return (
     <div 

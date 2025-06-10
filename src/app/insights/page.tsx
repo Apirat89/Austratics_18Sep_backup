@@ -98,7 +98,7 @@ export default function InsightsPage() {
       setDataLoadingStatus(prev => ({
         ...prev,
         isLoading: false,
-        loadingStep: 'Ready - Unified SA2 data loaded successfully',
+        loadingStep: 'Ready - Data loaded successfully',
         mediansCalculated: true
       }));
 
@@ -438,7 +438,7 @@ export default function InsightsPage() {
             <BarChart3 className="h-6 w-6 text-purple-600" />
             <h1 className="text-xl font-semibold text-gray-900">Analytics & Insights</h1>
             <div className="ml-auto text-xs text-gray-500">
-              Powered by Unified SA2 Data Pipeline
+              Powered by Austrytics
             </div>
           </div>
         </div>
@@ -474,11 +474,8 @@ export default function InsightsPage() {
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-600" />
               <span className="text-sm text-green-800">
-                Unified SA2 data loaded successfully • 53 metrics • Medians calculated • Ready for analysis
+                Data loaded successfully
               </span>
-              <div className="ml-auto text-xs text-green-700">
-                4 files merged: Demographics, Economics, Health Stats, DSS Aged Care
-              </div>
             </div>
           </div>
         )}

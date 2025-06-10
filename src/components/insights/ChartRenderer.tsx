@@ -47,23 +47,18 @@ export default function ChartRenderer({ config, height = '500px', width = '100%'
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Watch for SA2 data availability and rerender scatter plots
-  useEffect(() => {
-    if (config.chartType === 'scatter') {
-      const checkDataAvailability = () => {
-        const unifiedSA2Data = (window as any).unifiedSA2Data || {};
-        if (Object.keys(unifiedSA2Data).length > 0) {
-          // Force re-render by updating loading state
-          setIsLoading(false);
-        } else {
-          // Check again in a moment
-          setTimeout(checkDataAvailability, 500);
-        }
-      };
-      
-      checkDataAvailability();
-    }
-  }, [config.chartType]);
+  // For scatter plots, use the QuadrantScatterRenderer which handles real SA2 data
+  if (config.chartType === 'scatter') {
+    return (
+      <div style={{ height, width }}>
+        <QuadrantScatterRenderer 
+          config={config}
+          data={[]} // Will be loaded by QuadrantScatterRenderer
+          medianCalculations={{}}
+        />
+      </div>
+    );
+  }
 
   const loadChartData = async () => {
     try {
