@@ -87,8 +87,23 @@ export default function QuadrantScatterRenderer({
 
   useEffect(() => {
     if (!chartRef.current || !data.length || !config.measureX || !config.measureY || isLoading) {
+      // Debug logging for invalid configuration
+      console.log('🔍 QuadrantScatterRenderer: Configuration check:', {
+        hasChartRef: !!chartRef.current,
+        dataLength: data.length,
+        measureX: config.measureX,
+        measureY: config.measureY,
+        isLoading,
+        config: config
+      });
       return;
     }
+
+    console.log('✅ QuadrantScatterRenderer: Valid configuration, rendering chart:', {
+      measureX: config.measureX,
+      measureY: config.measureY,
+      dataLength: data.length
+    });
 
     renderChart();
 
@@ -490,33 +505,45 @@ export default function QuadrantScatterRenderer({
   };
 
   const prepareScatterData = () => {
-    if (!config.measureX || !config.measureY) return [];
+    if (!config.measureX || !config.measureY) {
+      console.warn('⚠️ Missing measure configuration:', { measureX: config.measureX, measureY: config.measureY });
+      return [];
+    }
 
-    // Debug logging enabled to diagnose data loading issue
-    console.log('🔍 QuadrantScatterRenderer - prepareScatterData debug:', {
+    console.log('🔍 Preparing scatter data with:', {
       measureX: config.measureX,
       measureY: config.measureY,
       dataLength: data.length,
-      sampleRecord: data[0] ? Object.keys(data[0]).slice(0, 10) : 'No data',
-      fullSampleRecord: data[0] || 'No data'
+      sampleRecordKeys: data[0] ? Object.keys(data[0]).slice(0, 10) : 'No data'
     });
 
     const scatterData = data.map((record, index) => {
       const xValue = getRecordValue(record, config.measureX!);
       const yValue = getRecordValue(record, config.measureY!);
-      const sizeValue = config.bubbleSize ? getRecordValue(record, config.bubbleSize) : undefined;
+      
+      // Log first few records for debugging
+      if (index < 3) {
+        console.log(`🔍 Record ${index} field mapping:`, {
+          sa2Id: record.sa2Id,
+          measureX: config.measureX,
+          xValue: xValue,
+          measureY: config.measureY,
+          yValue: yValue,
+          hasXField: record[config.measureX!] !== undefined,
+          hasYField: record[config.measureY!] !== undefined
+        });
+      }
 
       if (xValue === null || yValue === null) {
         return null;
       }
 
       return {
-        value: [xValue, yValue],
-        sa2Id: record.sa2Id || record['SA2 ID'] || record['SA2_ID'] || record.SA2_Code || `SA2_${index}`,
-        sa2Name: record.sa2Name || record['SA2 Name'] || record['SA2_Name'] || record.Name || `Region ${index + 1}`,
+        sa2Id: record.sa2Id,
+        sa2Name: record.sa2Name || record.sa2Id,
         xValue,
         yValue,
-        size: sizeValue,
+        size: config.bubbleSize ? getRecordValue(record, config.bubbleSize) : undefined,
         originalRecord: record
       };
     }).filter(Boolean);
@@ -636,8 +663,6 @@ export default function QuadrantScatterRenderer({
     
     return null;
   };
-
-
 
   const getVariableName = (fieldName: string): string => {
     // Convert technical field names to user-friendly names

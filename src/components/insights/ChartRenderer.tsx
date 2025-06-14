@@ -69,6 +69,14 @@ export default function ChartRenderer({ config, height = '500px', width = '100%'
 
   // For scatter plots, use the QuadrantScatterRenderer which handles real SA2 data
   if (config.chartType === 'scatter' as any) {
+    // Debug logging for scatter plot configuration
+    console.log('🔍 ChartRenderer: Rendering scatter plot with config:', {
+      measureX: config.measureX,
+      measureY: config.measureY,
+      selectedVariables: config.selectedVariables,
+      configName: config.name
+    });
+
     return (
       <div style={{ height, width }}>
         <QuadrantScatterRenderer 
