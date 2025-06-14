@@ -478,7 +478,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
 
       // Define care type mapping
       const careTypeMapping = {
-        residential: ['Residential', 'Multi-Purpose Service'],
+        residential: ['Residential'],
+        mps: ['Multi-Purpose Service'],
         home: ['Home Care', 'Community Care'],
         retirement: ['Retirement', 'Retirement Living', 'Retirement Village']
       };
@@ -486,7 +487,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       // Define colors for each type
       const typeColors = {
         residential: '#E53E3E', // Red
-        home: '#2E8B57',        // Green
+        mps: '#3182CE',        // Blue
+        home: '#38A169',       // Green
         retirement: '#9B59B6'   // Purple
       };
 
@@ -502,11 +504,15 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           const facilityCareType = feature.properties?.Care_Type;
           if (!facilityCareType) return false;
 
-          if (typeKey === 'residential') {
+          // Special handling for MPS type
+          if (typeKey === 'mps') {
             return careTypes.some(ct => facilityCareType.includes(ct));
+          }
+          // For other types, exclude MPS facilities
+          else if (typeKey === 'residential') {
+            return careTypes.some(ct => facilityCareType.includes(ct)) &&
+                   !facilityCareType.includes('Multi-Purpose Service');
           } else if (typeKey === 'home') {
-            // Multi-Purpose Services are classified as residential, not home care
-            // Only include pure home care services here
             return careTypes.some(ct => facilityCareType.includes(ct)) &&
                    !facilityCareType.includes('Multi-Purpose Service');
           } else if (typeKey === 'retirement') {
@@ -798,7 +804,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           };
 
           // Determine if this facility should show "See Details" button (only homecare and residential)
-          const showSeeDetailsButton = typeKey === 'residential' || typeKey === 'home';
+          const showSeeDetailsButton = typeKey === 'residential' || typeKey === 'home' || typeKey === 'mps' || typeKey === 'retirement';
 
           // Create beautiful popup with save button
           const popup = new maptilersdk.Popup({ 

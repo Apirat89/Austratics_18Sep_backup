@@ -25,6 +25,7 @@ interface UserData {
 
 interface FacilityTypes {
   residential: boolean;
+  mps: boolean;
   home: boolean;
   retirement: boolean;
 }
@@ -67,6 +68,7 @@ export default function MapsPage() {
   // Facility types state (keeping for backwards compatibility)
   const [facilityTypes, setFacilityTypes] = useState<FacilityTypes>({
     residential: true,
+    mps: true,
     home: true,
     retirement: true
   });
@@ -189,14 +191,17 @@ export default function MapsPage() {
   };
 
   // Function to determine facility type from Care_Type
-  const determineFacilityType = (careType: string): 'residential' | 'home' | 'retirement' => {
+  const determineFacilityType = (careType: string): 'residential' | 'mps' | 'home' | 'retirement' => {
     const careTypeMapping = {
-      residential: ['Residential', 'Multi-Purpose Service'],
+      residential: ['Residential'],
+      mps: ['Multi-Purpose Service'],
       home: ['Home Care', 'Community Care'],
       retirement: ['Retirement', 'Retirement Living', 'Retirement Village']
     };
 
-    if (careTypeMapping.residential.some(ct => careType.includes(ct))) {
+    if (careTypeMapping.mps.some(ct => careType.includes(ct))) {
+      return 'mps';
+    } else if (careTypeMapping.residential.some(ct => careType.includes(ct))) {
       return 'residential';
     } else if (careTypeMapping.home.some(ct => careType.includes(ct))) {
       return 'home';

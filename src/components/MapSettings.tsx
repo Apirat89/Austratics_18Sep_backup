@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Settings, ChevronDown, ChevronUp, Map, Check, Building, Home, Mail } from 'lucide-react';
+import { Settings, ChevronDown, ChevronUp, Map, Check, Building, Home, Mail, Building2 } from 'lucide-react';
 import BoundaryControls from './BoundaryControls';
 
 type MapStyleType = 'basic' | 'topo' | 'satellite' | 'terrain' | 'streets';
@@ -9,6 +9,7 @@ type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality';
 
 interface FacilityTypes {
   residential: boolean;
+  mps: boolean;
   home: boolean;
   retirement: boolean;
 }
@@ -54,18 +55,21 @@ export default function MapSettings({
 
   const facilityTypeLabels = {
     residential: 'Residential Care',
+    mps: 'Multi-Purpose Service',
     home: 'Home Care',
     retirement: 'Retirement Living'
   };
 
   const facilityTypeIcons = {
     residential: Building,
+    mps: Building2,
     home: Home,
     retirement: Mail
   };
 
   const facilityTypeColors = {
     residential: 'text-red-600',
+    mps: 'text-blue-600',
     home: 'text-green-600', 
     retirement: 'text-purple-600'
   };

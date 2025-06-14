@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { X, MapPin, Phone, Mail, Globe, Home, Building, Users, Calendar, Award, ExternalLink } from 'lucide-react';
+import { X, MapPin, Phone, Mail, Globe, Home, Building, Building2, Users, Calendar, Award, ExternalLink } from 'lucide-react';
 
 interface FacilityData {
   OBJECTID: number;
@@ -27,7 +27,7 @@ interface FacilityData {
   F2016_SA2_Name: string;
   F2016_SA3_Name: string;
   F2016_LGA_Name: string;
-  facilityType: 'residential' | 'home' | 'retirement';
+  facilityType: 'residential' | 'mps' | 'home' | 'retirement';
 }
 
 interface FacilityDetailsModalProps {
@@ -74,19 +74,31 @@ export default function FacilityDetailsModal({ facility, isOpen, onClose }: Faci
 
   const getFacilityTypeColor = (type: string) => {
     switch (type) {
-      case 'residential': return 'text-red-600 bg-red-50 border-red-200';
-      case 'home': return 'text-green-600 bg-green-50 border-green-200';
-      case 'retirement': return 'text-purple-600 bg-purple-50 border-purple-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'residential':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'mps':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'home':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'retirement':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   const getFacilityTypeIcon = (type: string) => {
     switch (type) {
-      case 'residential': return <Building className="w-4 h-4" />;
-      case 'home': return <Home className="w-4 h-4" />;
-      case 'retirement': return <Users className="w-4 h-4" />;
-      default: return <Building className="w-4 h-4" />;
+      case 'residential':
+        return <Building className="w-4 h-4" />;
+      case 'mps':
+        return <Building2 className="w-4 h-4" />;
+      case 'home':
+        return <Home className="w-4 h-4" />;
+      case 'retirement':
+        return <Users className="w-4 h-4" />;
+      default:
+        return <Building className="w-4 h-4" />;
     }
   };
 

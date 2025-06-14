@@ -7,6 +7,7 @@ interface FacilityTypes {
   residential: boolean;
   home: boolean;
   retirement: boolean;
+  mps: boolean;
 }
 
 type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality';
@@ -139,9 +140,15 @@ export default function ActiveLayers({
                   <span className="text-xs text-gray-700">Residential Care</span>
                 </div>
               )}
+              {facilityTypes.mps && (
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full border border-white" style={{backgroundColor: '#3182CE'}}></div>
+                  <span className="text-xs text-gray-700">Multi-Purpose Service</span>
+                </div>
+              )}
               {facilityTypes.home && (
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full border border-white" style={{backgroundColor: '#2E8B57'}}></div>
+                  <div className="w-3 h-3 rounded-full border border-white" style={{backgroundColor: '#38A169'}}></div>
                   <span className="text-xs text-gray-700">Home Care</span>
                 </div>
               )}
