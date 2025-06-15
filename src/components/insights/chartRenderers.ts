@@ -399,7 +399,7 @@ export function renderChartD(containerId: string, sa2Table: SA2Record[], selecte
 
   // For demonstration, use synthetic age group data
   // In a real implementation, this would come from detailed demographics data
-  const sa2Id = selectedSA2 || sa2Table[0]?["SA2 ID"];
+  const sa2Id = selectedSA2 || sa2Table[0]?.["SA2 ID"];
   const selectedRecord = sa2Table.find(d => d["SA2 ID"] === sa2Id);
   
   if (!selectedRecord) {

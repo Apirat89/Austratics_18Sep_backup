@@ -11,7 +11,7 @@ interface SearchResult {
   // Facility-specific properties
   address?: string;
   careType?: string;
-  facilityType?: 'residential' | 'home' | 'retirement';
+  facilityType?: 'residential' | 'mps' | 'home' | 'retirement';
 }
 
 interface GeoJSONFeature {
@@ -305,7 +305,7 @@ async function buildHealthcareFacilityIndex(): Promise<SearchResult[]> {
         }
 
         // Determine facility type based on care type
-        let facilityType: 'residential' | 'home' | 'retirement' | null = null;
+        let facilityType: 'residential' | 'mps' | 'home' | 'retirement' | null = null;
         
         if (careTypeMapping.residential.some(ct => careType.includes(ct))) {
           facilityType = 'residential';

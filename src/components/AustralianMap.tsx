@@ -17,6 +17,7 @@ const MAPTILER_API_KEY = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || 'YOUR_MAPTI
 
 interface FacilityTypes {
   residential: boolean;
+  mps: boolean;
   home: boolean;
   retirement: boolean;
 }
@@ -48,7 +49,7 @@ interface FacilityData {
   F2016_SA2_Name: string;
   F2016_SA3_Name: string;
   F2016_LGA_Name: string;
-  facilityType: 'residential' | 'home' | 'retirement';
+  facilityType: 'residential' | 'mps' | 'home' | 'retirement';
 }
 
 interface AustralianMapProps {
@@ -459,20 +460,18 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     if (!map.current) return;
 
     try {
-      console.log('🏥 Loading healthcare facilities...');
-      const response = await fetch('/maps/healthcare.geojson');
+      console.log('🏥 Loading hybrid facility data...');
       
-      if (!response.ok) {
-        throw new Error(`Failed to load healthcare data: ${response.status}`);
-      }
+      // Import and use the hybrid facility service
+      const { hybridFacilityService } = await import('../lib/HybridFacilityService');
+      const enhancedFacilities = await hybridFacilityService.loadAllFacilities();
       
-      const healthcareData = await response.json();
-      console.log('🏥 Healthcare data loaded:', { 
-        totalFeatures: healthcareData.features?.length || 0
+      console.log('🏥 Enhanced facility data loaded:', { 
+        totalFacilities: enhancedFacilities.length
       });
       
-      if (!healthcareData.features) {
-        console.warn('❌ No features found in healthcare data');
+      if (!enhancedFacilities || enhancedFacilities.length === 0) {
+        console.warn('❌ No facilities found in enhanced data');
         return;
       }
 
@@ -497,30 +496,10 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         if (!enabled) return;
 
         const typeKey = type as keyof typeof careTypeMapping;
-        const careTypes = careTypeMapping[typeKey];
         
-        // Filter facilities based on care type
-        const filteredFacilities = healthcareData.features.filter((feature: any) => {
-          const facilityCareType = feature.properties?.Care_Type;
-          if (!facilityCareType) return false;
-
-          // Special handling for MPS type
-          if (typeKey === 'mps') {
-            return careTypes.some(ct => facilityCareType.includes(ct));
-          }
-          // For other types, exclude MPS facilities
-          else if (typeKey === 'residential') {
-            return careTypes.some(ct => facilityCareType.includes(ct)) &&
-                   !facilityCareType.includes('Multi-Purpose Service');
-          } else if (typeKey === 'home') {
-            return careTypes.some(ct => facilityCareType.includes(ct)) &&
-                   !facilityCareType.includes('Multi-Purpose Service');
-          } else if (typeKey === 'retirement') {
-            return careTypes.some(ct => facilityCareType.toLowerCase().includes(ct.toLowerCase())) ||
-                   feature.properties?.Service_Name?.toLowerCase().includes('retirement');
-          }
-          
-          return false;
+        // Filter facilities based on facility type (already determined by hybrid service)
+        const filteredFacilities = enhancedFacilities.filter((facility) => {
+          return facility.facilityType === typeKey;
         });
 
         let validFacilities = 0;
@@ -528,12 +507,10 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         let outsideBounds = 0;
 
         // Add markers for filtered facilities
-        filteredFacilities.forEach((facility: any, index: number) => {
-          const properties = facility.properties;
-          
-          // Use separate Latitude/Longitude fields (not GeoJSON coordinates)
-          const lat = properties?.Latitude;
-          const lng = properties?.Longitude;
+        filteredFacilities.forEach((facility, index: number) => {
+          // Use facility data directly (no properties wrapper needed)
+          const lat = facility.Latitude;
+          const lng = facility.Longitude;
           
           // Validate coordinates exist and are numbers
           if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
@@ -567,16 +544,16 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           markerElement.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
 
           // Extract facility details
-          const serviceName = properties?.Service_Name || 'Unknown Service';
-          const address = properties?.Physical_Address || 'Address not available';
-          const careType = properties?.Care_Type || 'Unknown';
-          const state = properties?.Physical_State || '';
-          const postcode = properties?.Physical_Postcode || '';
-          const phone = properties?.Phone || '';
-          const email = properties?.Email || '';
-          const website = properties?.Website || '';
-          const residentialPlaces = properties?.Residential_Places || 0;
-          const homeCareMaxPlaces = properties?.Home_Care_Max_Places || 0;
+          const serviceName = facility.Service_Name || 'Unknown Service';
+          const address = facility.Physical_Address || 'Address not available';
+          const careType = facility.Care_Type || 'Unknown';
+          const state = facility.Physical_State || '';
+          const postcode = facility.Physical_Post_Code || '';
+          const phone = facility.Phone || '';
+          const email = facility.Email || '';
+          const website = facility.Website || '';
+          const residentialPlaces = facility.Residential_Places || 0;
+          const homeCareMaxPlaces = facility.Home_Care_Max_Places || 0;
 
           // Create unique popup ID for this facility
           const popupId = `facility-popup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -668,7 +645,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                   bounds: undefined, // Facilities don't have bounds
                   address: address,
                   careType: careType,
-                  facilityType: typeKey as 'residential' | 'home' | 'retirement'
+                  facilityType: typeKey as 'residential' | 'mps' | 'home' | 'retirement'
                 };
 
                 // Save the facility
@@ -773,30 +750,30 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           const handleSeeDetails = () => {
             if (onFacilityDetailsClick) {
               const facilityData: FacilityData = {
-                OBJECTID: properties?.OBJECTID || 0,
+                OBJECTID: facility.OBJECTID || 0,
                 Service_Name: serviceName,
                 Physical_Address: address,
-                Physical_Suburb: properties?.Physical_Suburb || '',
+                Physical_Suburb: facility.Physical_Suburb || '',
                 Physical_State: state,
-                Physical_Post_Code: postcode ? parseInt(postcode) : 0,
+                Physical_Post_Code: postcode || 0,
                 Care_Type: careType,
                 Residential_Places: residentialPlaces || null,
-                Home_Care_Places: properties?.Home_Care_Places || null,
+                Home_Care_Places: facility.Home_Care_Places || null,
                 Home_Care_Max_Places: homeCareMaxPlaces || null,
-                Restorative_Care_Places: properties?.Restorative_Care_Places || null,
-                Provider_Name: properties?.Provider_Name || '',
-                Organisation_Type: properties?.Organisation_Type || '',
-                ABS_Remoteness: properties?.ABS_Remoteness || '',
+                Restorative_Care_Places: facility.Restorative_Care_Places || null,
+                Provider_Name: facility.Provider_Name || '',
+                Organisation_Type: facility.Organisation_Type || '',
+                ABS_Remoteness: facility.ABS_Remoteness || '',
                 Phone: phone || undefined,
                 Email: email || undefined,
                 Website: website || undefined,
                 Latitude: lat,
                 Longitude: lng,
-                F2019_Aged_Care_Planning_Region: properties?.F2019_Aged_Care_Planning_Region || '',
-                F2016_SA2_Name: properties?.F2016_SA2_Name || '',
-                F2016_SA3_Name: properties?.F2016_SA3_Name || '',
-                F2016_LGA_Name: properties?.F2016_LGA_Name || '',
-                facilityType: typeKey as 'residential' | 'home' | 'retirement'
+                F2019_Aged_Care_Planning_Region: facility.F2019_Aged_Care_Planning_Region || '',
+                F2016_SA2_Name: facility.F2016_SA2_Name || '',
+                F2016_SA3_Name: facility.F2016_SA3_Name || '',
+                F2016_LGA_Name: facility.F2016_LGA_Name || '',
+                facilityType: typeKey as 'residential' | 'mps' | 'home' | 'retirement'
               };
               
               onFacilityDetailsClick(facilityData);

@@ -23,7 +23,7 @@ export interface LocationData {
   // Facility-specific properties
   address?: string;
   careType?: string;
-  facilityType?: 'residential' | 'home' | 'retirement';
+  facilityType?: 'residential' | 'mps' | 'home' | 'retirement';
 }
 
 export interface SavedSearchesResponse {

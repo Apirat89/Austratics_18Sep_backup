@@ -54,7 +54,7 @@ interface FacilityData {
   F2016_SA2_Name: string;
   F2016_SA3_Name: string;
   F2016_LGA_Name: string;
-  facilityType: 'residential' | 'home' | 'retirement';
+  facilityType: 'residential' | 'mps' | 'home' | 'retirement';
 }
 
 type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality';
