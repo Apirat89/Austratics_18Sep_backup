@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award } from 'lucide-react';
+import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ResidentialBoxPlots from '@/components/residential/ResidentialBoxPlots';
 
 interface ResidentialFacility {
   "Service Name": string;
@@ -238,16 +239,23 @@ export default function ResidentialPage() {
           /* Facility List */
           <div>
             {searchTerm.trim() === '' ? (
-              /* Empty State - No Search */
-              <div className="text-center py-12">
-                <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Search Residential Facilities</h3>
-                <p className="text-gray-600 mb-4">
-                  Use the search bar above to find residential aged care facilities by name, address, locality, or provider.
-                </p>
-                <p className="text-sm text-gray-500">
-                  {facilities.length} facilities available to search through
-                </p>
+              /* Empty State - No Search + Statistics */
+              <div>
+                <div className="text-center py-12">
+                  <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Search Residential Facilities</h3>
+                  <p className="text-gray-600 mb-4">
+                    Use the search bar above to find residential aged care facilities by name, address, locality, or provider.
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {facilities.length} facilities available to search through
+                  </p>
+                </div>
+                
+                {/* National Statistics Section */}
+                <div className="mt-8">
+                  <ResidentialBoxPlots />
+                </div>
               </div>
             ) : filteredFacilities.length > 0 ? (
               /* Facility Results */
@@ -336,7 +344,7 @@ export default function ResidentialPage() {
 
               {/* Tabs */}
               <Tabs defaultValue="main" className="p-6">
-                <TabsList className="grid grid-cols-7 gap-2 mb-6">
+                <TabsList className="grid grid-cols-8 gap-2 mb-6">
                   <TabsTrigger value="main">Main</TabsTrigger>
                   <TabsTrigger value="rooms">Rooms</TabsTrigger>
                   <TabsTrigger value="compliance">Compliance</TabsTrigger>
@@ -344,6 +352,7 @@ export default function ResidentialPage() {
                   <TabsTrigger value="experience">Residents' Experience</TabsTrigger>
                   <TabsTrigger value="staffing">Staff Rating</TabsTrigger>
                   <TabsTrigger value="finance">Finance</TabsTrigger>
+                  <TabsTrigger value="statistics">Statistics</TabsTrigger>
                 </TabsList>
 
                 {/* Tab 1: Main */}
@@ -762,6 +771,11 @@ export default function ResidentialPage() {
                       </div>
                     </CardContent>
                   </Card>
+                </TabsContent>
+
+                {/* Tab 8: Statistics */}
+                <TabsContent value="statistics">
+                  <ResidentialBoxPlots />
                 </TabsContent>
               </Tabs>
             </div>
