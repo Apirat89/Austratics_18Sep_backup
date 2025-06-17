@@ -129,7 +129,7 @@ export default function ResidentialPage() {
         const response = await fetch('/maps/abs_csv/Residential_May2025_ExcludeMPS_updated.json');
         const data = await response.json();
         setFacilities(data);
-        setFilteredFacilities(data);
+        setFilteredFacilities([]); // Start with empty list
       } catch (error) {
         console.error('Error loading facilities:', error);
       } finally {
@@ -142,7 +142,7 @@ export default function ResidentialPage() {
 
   useEffect(() => {
     if (searchTerm.trim() === '') {
-      setFilteredFacilities(facilities);
+      setFilteredFacilities([]); // Show no facilities when search is empty
     } else {
       const filtered = facilities.filter(facility =>
         facility["Service Name"]?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -225,7 +225,10 @@ export default function ResidentialPage() {
           </div>
           
           <p className="mt-2 text-sm text-gray-600">
-            Showing {filteredFacilities.length} of {facilities.length} facilities
+            {searchTerm.trim() === '' 
+              ? `Search through ${facilities.length} residential facilities using the search bar above`
+              : `Showing ${filteredFacilities.length} of ${facilities.length} facilities`
+            }
           </p>
         </div>
       </div>
@@ -233,50 +236,79 @@ export default function ResidentialPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {!selectedFacility ? (
           /* Facility List */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredFacilities.map((facility, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => setSelectedFacility(facility)}>
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-900">
-                    {facility["Service Name"]}
-                  </CardTitle>
-                  {facility.formatted_address && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <MapPin className="w-4 h-4" />
-                      {facility.formatted_address}
-                    </div>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {facility.overall_rating_stars && (
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">Overall Rating</p>
-                        {renderStarRating(facility.overall_rating_stars)}
+          <div>
+            {searchTerm.trim() === '' ? (
+              /* Empty State - No Search */
+              <div className="text-center py-12">
+                <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Search Residential Facilities</h3>
+                <p className="text-gray-600 mb-4">
+                  Use the search bar above to find residential aged care facilities by name, address, locality, or provider.
+                </p>
+                <p className="text-sm text-gray-500">
+                  {facilities.length} facilities available to search through
+                </p>
+              </div>
+            ) : filteredFacilities.length > 0 ? (
+              /* Facility Results */
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredFacilities.map((facility, index) => (
+                  <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer"
+                        onClick={() => setSelectedFacility(facility)}>
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold text-gray-900">
+                        {facility["Service Name"]}
+                      </CardTitle>
+                      {facility.formatted_address && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <MapPin className="w-4 h-4" />
+                          {facility.formatted_address}
+                        </div>
+                      )}
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {facility.overall_rating_stars && (
+                          <div>
+                            <p className="text-xs text-gray-500 mb-1">Overall Rating</p>
+                            {renderStarRating(facility.overall_rating_stars)}
+                          </div>
+                        )}
+                        
+                        {facility.rooms_data && facility.rooms_data.length > 0 && (
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Users className="w-4 h-4" />
+                            {facility.rooms_data.length} room types available
+                          </div>
+                        )}
+                        
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedFacility(facility);
+                          }}
+                          className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                          View Details
+                        </button>
                       </div>
-                    )}
-                    
-                    {facility.rooms_data && facility.rooms_data.length > 0 && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Users className="w-4 h-4" />
-                        {facility.rooms_data.length} room types available
-                      </div>
-                    )}
-                    
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedFacility(facility);
-                      }}
-                      className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      View Details
-                    </button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              /* No Results */
+              <div className="text-center py-12">
+                <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No facilities found</h3>
+                <p className="text-gray-600 mb-4">
+                  No residential facilities match your search criteria.
+                </p>
+                <p className="text-sm text-gray-500">
+                  Try adjusting your search terms or browse all {facilities.length} available facilities.
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           /* Facility Details */
