@@ -239,23 +239,16 @@ export default function ResidentialPage() {
           /* Facility List */
           <div>
             {searchTerm.trim() === '' ? (
-              /* Empty State - No Search + Statistics */
-              <div>
-                <div className="text-center py-12">
-                  <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Search Residential Facilities</h3>
-                  <p className="text-gray-600 mb-4">
-                    Use the search bar above to find residential aged care facilities by name, address, locality, or provider.
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {facilities.length} facilities available to search through
-                  </p>
-                </div>
-                
-                {/* National Statistics Section */}
-                <div className="mt-8">
-                  <ResidentialBoxPlots />
-                </div>
+              /* Empty State - No Search */
+              <div className="text-center py-12">
+                <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Search Residential Facilities</h3>
+                <p className="text-gray-600 mb-4">
+                  Use the search bar above to find residential aged care facilities by name, address, locality, or provider.
+                </p>
+                <p className="text-sm text-gray-500">
+                  {facilities.length} facilities available to search through
+                </p>
               </div>
             ) : filteredFacilities.length > 0 ? (
               /* Facility Results */
@@ -775,7 +768,7 @@ export default function ResidentialPage() {
 
                 {/* Tab 8: Statistics */}
                 <TabsContent value="statistics">
-                  <ResidentialBoxPlots />
+                  <ResidentialBoxPlots selectedFacility={selectedFacility} />
                 </TabsContent>
               </Tabs>
             </div>

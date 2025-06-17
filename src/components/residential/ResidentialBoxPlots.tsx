@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, TrendingUp, DollarSign, Star, Users, Activity, Heart, Award } from 'lucide-react';
+import { BarChart3, TrendingUp, DollarSign, Star, Users, Activity, Heart, Award, Globe, Building, MapPin, Home } from 'lucide-react';
 
 interface StatisticalData {
   count: number;
@@ -38,6 +38,16 @@ interface StatisticsData {
     fields: FieldStats;
   };
   byState: Array<{
+    groupName: string;
+    recordCount: number;
+    fields: FieldStats;
+  }>;
+  byPostcode: Array<{
+    groupName: string;
+    recordCount: number;
+    fields: FieldStats;
+  }>;
+  byLocality: Array<{
     groupName: string;
     recordCount: number;
     fields: FieldStats;
@@ -115,14 +125,56 @@ const fieldCategories = {
   }
 };
 
+interface ResidentialFacility {
+  "Service Name": string;
+  address_state?: string;
+  address_postcode?: string;
+  address_locality?: string;
+  rooms_data?: {
+    name: string;
+    configuration: string;
+    cost_per_day: number;
+    room_size: string;
+  }[];
+  // Financial Variables
+  expenditure_total_per_day?: number;
+  expenditure_care_nursing?: number;
+  expenditure_administration?: number;
+  expenditure_cleaning_laundry?: number;
+  expenditure_accommodation_maintenance?: number;
+  expenditure_food_catering?: number;
+  income_total_per_day?: number;
+  income_residents_contribution?: number;
+  income_government_funding?: number;
+  income_other?: number;
+  budget_surplus_per_day?: number;
+  care_staff_spending_last_quarter?: number;
+  // Rating Variables
+  overall_rating_stars?: number;
+  compliance_rating?: number;
+  quality_measures_rating?: number;
+  residents_experience_rating?: number;
+  staffing_rating?: number;
+  // Other numeric fields
+  residential_places?: number;
+  food_cost_per_day?: number;
+  food_sector_average?: number;
+  food_resident_satisfaction?: number;
+  [key: string]: any; // For other star rating fields
+}
+
+type GeographicScope = 'nationwide' | 'state' | 'postcode' | 'locality';
+
 interface ResidentialBoxPlotsProps {
+  selectedFacility: ResidentialFacility;
   className?: string;
 }
 
-export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPlotsProps) {
+export default function ResidentialBoxPlots({ selectedFacility, className = '' }: ResidentialBoxPlotsProps) {
   const [statisticsData, setStatisticsData] = useState<StatisticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedScope, setSelectedScope] = useState<GeographicScope>('nationwide');
   const chartRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const chartInstances = useRef<{ [key: string]: echarts.ECharts }>({});
 
@@ -146,9 +198,25 @@ export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPl
     loadStatistics();
   }, []);
 
-  const createBoxPlot = (fieldName: string, stats: StatisticalData, containerId: string) => {
+  // Function to get statistics for selected geographic scope
+  const getStatisticsForScope = () => {
+    if (!statisticsData) return null;
+    
+    switch (selectedScope) {
+      case 'state':
+        return statisticsData.byState.find(s => s.groupName === selectedFacility.address_state);
+      case 'postcode':
+        return statisticsData.byPostcode.find(s => s.groupName === selectedFacility.address_postcode);
+      case 'locality':
+        return statisticsData.byLocality.find(s => s.groupName === selectedFacility.address_locality);
+      default:
+        return statisticsData.nationwide;
+    }
+  };
+
+  const createBoxPlot = (fieldName: string, stats: StatisticalData | null, facilityValue: number | undefined, containerId: string) => {
     const container = chartRefs.current[containerId];
-    if (!container || !stats || stats.count === 0) return;
+    if (!container || facilityValue === undefined) return;
 
     // Dispose existing chart if it exists
     if (chartInstances.current[containerId]) {
@@ -158,8 +226,60 @@ export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPl
     const chart = echarts.init(container);
     chartInstances.current[containerId] = chart;
 
-    // Create box plot data: [min, Q1, median, Q3, max]
-    const boxData = [stats.min, stats.q1, stats.median, stats.q3, stats.max];
+    // Determine if we have comparison statistics
+    const hasStats = stats && stats.count > 0;
+    
+    // Create series based on available data
+    const series: any[] = [];
+    
+    // Add box plot if statistics are available
+    if (hasStats) {
+      const boxData = [stats.min, stats.q1, stats.median, stats.q3, stats.max];
+      series.push({
+        type: 'boxplot',
+        data: [boxData],
+        itemStyle: {
+          borderColor: '#3b82f6',
+          borderWidth: 2,
+          color: 'rgba(59, 130, 246, 0.3)'
+        },
+        emphasis: {
+          itemStyle: {
+            borderColor: '#1d4ed8',
+            borderWidth: 3,
+            color: 'rgba(29, 78, 216, 0.5)'
+          }
+        }
+      });
+    }
+    
+    // Always add facility value as red dot
+    series.push({
+      type: 'scatter',
+      data: [[0, facilityValue]],
+      symbolSize: 10,
+      itemStyle: {
+        color: '#ef4444'
+      },
+      markPoint: {
+        data: [
+          {
+            coord: [0, facilityValue],
+            symbol: 'diamond',
+            symbolSize: 10,
+            itemStyle: {
+              color: '#ef4444'
+            },
+            label: {
+              show: true,
+              position: 'right',
+              formatter: `Facility: ${facilityValue}`,
+              fontSize: 10
+            }
+          }
+        ]
+      }
+    });
 
     const option = {
       title: {
@@ -173,7 +293,7 @@ export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPl
       tooltip: {
         trigger: 'item',
         formatter: function(params: any) {
-          if (params.componentType === 'boxplot') {
+          if (params.componentType === 'boxplot' && hasStats) {
             return `
               <strong>${fieldName}</strong><br/>
               Min: ${stats.min}<br/>
@@ -183,7 +303,15 @@ export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPl
               Max: ${stats.max}<br/>
               Mean: ${stats.mean}<br/>
               IQR: ${stats.iqr}<br/>
-              Count: ${stats.count}
+              Count: ${stats.count}<br/>
+              <hr/>
+              <strong>Facility Value: ${facilityValue}</strong>
+            `;
+          } else if (params.componentType === 'scatter') {
+            return `
+              <strong>${fieldName}</strong><br/>
+              Facility Value: ${facilityValue}<br/>
+              ${hasStats ? '' : '(No comparison data available)'}
             `;
           }
           return '';
@@ -218,50 +346,7 @@ export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPl
           fontSize: 10
         }
       },
-      series: [
-        {
-          type: 'boxplot',
-          data: [boxData],
-          itemStyle: {
-            borderColor: '#3b82f6',
-            borderWidth: 2,
-            color: 'rgba(59, 130, 246, 0.3)'
-          },
-          emphasis: {
-            itemStyle: {
-              borderColor: '#1d4ed8',
-              borderWidth: 3,
-              color: 'rgba(29, 78, 216, 0.5)'
-            }
-          }
-        },
-        {
-          type: 'scatter',
-          data: [[0, stats.mean]],
-          symbolSize: 8,
-          itemStyle: {
-            color: '#ef4444'
-          },
-          markPoint: {
-            data: [
-              {
-                coord: [0, stats.mean],
-                symbol: 'diamond',
-                symbolSize: 8,
-                itemStyle: {
-                  color: '#ef4444'
-                },
-                label: {
-                  show: true,
-                  position: 'right',
-                  formatter: `Mean: ${stats.mean}`,
-                  fontSize: 10
-                }
-              }
-            ]
-          }
-        }
-      ]
+      series
     };
 
     chart.setOption(option);
@@ -280,16 +365,30 @@ export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPl
 
   useEffect(() => {
     if (statisticsData) {
+      const currentStats = getStatisticsForScope();
+      
       // Create box plots for all fields
       Object.entries(fieldCategories).forEach(([categoryKey, category]) => {
         category.fields.forEach(fieldName => {
-          const stats = statisticsData.nationwide.fields[fieldName];
-          if (stats && stats.count > 0) {
-            const containerId = `${categoryKey}-${fieldName}`;
-            setTimeout(() => createBoxPlot(fieldName, stats, containerId), 100);
+          const stats = currentStats?.fields[fieldName];
+          const facilityValue = selectedFacility[fieldName] as number;
+          const containerId = `${categoryKey}-${fieldName}`;
+          
+          // Create chart if facility has this value
+          if (facilityValue !== undefined && facilityValue !== null) {
+            setTimeout(() => createBoxPlot(fieldName, stats || null, facilityValue, containerId), 100);
           }
         });
       });
+      
+      // Handle room data separately
+      if (selectedFacility.rooms_data) {
+        selectedFacility.rooms_data.forEach((room, index) => {
+          const stats = currentStats?.fields['cost_per_day'];
+          const containerId = `rooms-cost_per_day-${index}`;
+          setTimeout(() => createBoxPlot(`${room.name} - Cost per Day`, stats || null, room.cost_per_day, containerId), 100);
+        });
+      }
     }
 
     // Cleanup function
@@ -299,7 +398,7 @@ export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPl
       });
       chartInstances.current = {};
     };
-  }, [statisticsData]);
+  }, [statisticsData, selectedScope, selectedFacility]);
 
   const formatFieldName = (fieldName: string) => {
     return fieldName
@@ -342,21 +441,77 @@ export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPl
     return null;
   }
 
+  const currentStats = getStatisticsForScope();
+  const scopeLabels = {
+    nationwide: 'Nationwide',
+    state: selectedFacility.address_state || 'State',
+    postcode: selectedFacility.address_postcode || 'Postcode', 
+    locality: selectedFacility.address_locality || 'Locality'
+  };
+
   return (
     <div className={`${className}`}>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="w-5 h-5" />
-            Statistical Analysis - Box Plots
+            Statistical Analysis - {selectedFacility["Service Name"]}
           </CardTitle>
           <p className="text-sm text-gray-600">
-            Nationwide distribution analysis for {statisticsData.metadata.numericFields} numeric variables across {statisticsData.metadata.totalRecords.toLocaleString()} facilities
+            Compare facility values against statistical distributions
           </p>
+          
+          {/* Geographic Scope Toggle */}
+          <div className="flex flex-wrap gap-2 mt-4">
+            <span className="text-sm font-medium text-gray-700">Compare against:</span>
+            {(['nationwide', 'state', 'postcode', 'locality'] as GeographicScope[]).map((scope) => {
+              const isAvailable = scope === 'nationwide' || 
+                (scope === 'state' && selectedFacility.address_state) ||
+                (scope === 'postcode' && selectedFacility.address_postcode) ||
+                (scope === 'locality' && selectedFacility.address_locality);
+              
+              const icons = {
+                nationwide: Globe,
+                state: Building,
+                postcode: MapPin,
+                locality: Home
+              };
+              const IconComponent = icons[scope];
+              
+              return (
+                <button
+                  key={scope}
+                  onClick={() => setSelectedScope(scope)}
+                  disabled={!isAvailable}
+                  className={`flex items-center gap-1 px-3 py-1 rounded-lg text-sm transition-colors ${
+                    selectedScope === scope
+                      ? 'bg-blue-600 text-white'
+                      : isAvailable
+                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  {scopeLabels[scope]}
+                </button>
+              );
+            })}
+          </div>
+          
+          {currentStats && (
+            <p className="text-xs text-gray-500 mt-2">
+              Comparing against {currentStats.recordCount.toLocaleString()} facilities in {scopeLabels[selectedScope]}
+            </p>
+          )}
+          {!currentStats && selectedScope !== 'nationwide' && (
+            <p className="text-xs text-orange-600 mt-2">
+              No comparison data available for {scopeLabels[selectedScope]}. Showing facility values only.
+            </p>
+          )}
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="financial" className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               {Object.entries(fieldCategories).map(([key, category]) => {
                 const IconComponent = category.icon;
                 return (
@@ -366,6 +521,12 @@ export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPl
                   </TabsTrigger>
                 );
               })}
+              {selectedFacility.rooms_data && selectedFacility.rooms_data.length > 0 && (
+                <TabsTrigger value="rooms" className="flex items-center gap-1">
+                  <Home className="w-4 h-4" />
+                  <span className="hidden sm:inline">Rooms</span>
+                </TabsTrigger>
+              )}
             </TabsList>
 
             {Object.entries(fieldCategories).map(([categoryKey, category]) => (
@@ -376,20 +537,20 @@ export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPl
                     {category.title}
                   </h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {category.fields.map(fieldName => {
-                      const stats = statisticsData.nationwide.fields[fieldName];
-                      if (!stats || stats.count === 0) return null;
+                      const facilityValue = selectedFacility[fieldName] as number;
+                      if (facilityValue === undefined || facilityValue === null) return null;
 
                       const containerId = `${categoryKey}-${fieldName}`;
                       
                       return (
                         <Card key={fieldName} className="h-80">
                           <CardContent className="p-4 h-full">
-                                                       <div 
-                               ref={el => { chartRefs.current[containerId] = el; }}
-                               className="w-full h-full"
-                             />
+                            <div 
+                              ref={el => { chartRefs.current[containerId] = el; }}
+                              className="w-full h-full"
+                            />
                           </CardContent>
                         </Card>
                       );
@@ -397,8 +558,8 @@ export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPl
                   </div>
                   
                   {category.fields.filter(fieldName => {
-                    const stats = statisticsData.nationwide.fields[fieldName];
-                    return stats && stats.count > 0;
+                    const facilityValue = selectedFacility[fieldName] as number;
+                    return facilityValue !== undefined && facilityValue !== null;
                   }).length === 0 && (
                     <div className="text-center py-8 text-gray-500">
                       No data available for {category.title.toLowerCase()}
@@ -407,6 +568,35 @@ export default function ResidentialBoxPlots({ className = '' }: ResidentialBoxPl
                 </div>
               </TabsContent>
             ))}
+
+            {/* Rooms Tab */}
+            {selectedFacility.rooms_data && selectedFacility.rooms_data.length > 0 && (
+              <TabsContent value="rooms">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Home className="w-5 h-5" />
+                    Room Cost Analysis
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {selectedFacility.rooms_data.map((room, index) => {
+                      const containerId = `rooms-cost_per_day-${index}`;
+                      
+                      return (
+                        <Card key={index} className="h-80">
+                          <CardContent className="p-4 h-full">
+                            <div 
+                              ref={el => { chartRefs.current[containerId] = el; }}
+                              className="w-full h-full"
+                            />
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              </TabsContent>
+            )}
           </Tabs>
         </CardContent>
       </Card>
