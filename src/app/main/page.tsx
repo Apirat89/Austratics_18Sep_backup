@@ -64,9 +64,9 @@ export default function MainPage() {
 
   const suggestionCards = [
     {
-      title: "Facilities",
+      title: "Residential",
       icon: Building,
-      route: "/facilities"
+      route: "/residential"
     },
     {
       title: "Maps",
