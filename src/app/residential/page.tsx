@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home } from 'lucide-react';
+import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InlineBoxPlot from '@/components/residential/InlineBoxPlot';
@@ -119,6 +119,13 @@ interface ResidentialFacility {
   care_staff_spending_last_quarter?: number;
 }
 
+interface SavedFacility {
+  facility: ResidentialFacility;
+  savedAt: string;
+  searchTerm: string;
+  id: string;
+}
+
 export default function ResidentialPage() {
   const [facilities, setFacilities] = useState<ResidentialFacility[]>([]);
   const [filteredFacilities, setFilteredFacilities] = useState<ResidentialFacility[]>([]);
@@ -126,11 +133,40 @@ export default function ResidentialPage() {
   const [loading, setLoading] = useState(true);
   const [selectedFacility, setSelectedFacility] = useState<ResidentialFacility | null>(null);
   
+  // Saved facilities state
+  const [savedFacilities, setSavedFacilities] = useState<SavedFacility[]>([]);
+  const [showSavedFacilities, setShowSavedFacilities] = useState(false);
+  
   // Statistical data for inline box plots
   const [statisticsData, setStatisticsData] = useState<any>(null);
   const [statsLoading, setStatsLoading] = useState(true);
   const [selectedScope, setSelectedScope] = useState<'nationwide' | 'state' | 'postcode' | 'locality'>('nationwide');
   const [showBoxPlots, setShowBoxPlots] = useState(true);
+
+  // Load saved facilities from localStorage on component mount
+  useEffect(() => {
+    const loadSavedFacilities = () => {
+      try {
+        const saved = localStorage.getItem('savedResidentialFacilities');
+        if (saved) {
+          setSavedFacilities(JSON.parse(saved));
+        }
+      } catch (error) {
+        console.error('Error loading saved facilities:', error);
+      }
+    };
+    
+    loadSavedFacilities();
+  }, []);
+
+  // Save facilities to localStorage whenever savedFacilities changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('savedResidentialFacilities', JSON.stringify(savedFacilities));
+    } catch (error) {
+      console.error('Error saving facilities:', error);
+    }
+  }, [savedFacilities]);
 
   useEffect(() => {
     const loadFacilities = async () => {
@@ -175,6 +211,44 @@ export default function ResidentialPage() {
       setFilteredFacilities(filtered);
     }
   }, [searchTerm, facilities]);
+
+  // Toggle save facility function (save/unsave)
+  const toggleSaveFacility = (facility: ResidentialFacility) => {
+    const facilityId = `${facility["Service Name"]}_${facility.provider_abn || Date.now()}`;
+    
+    // Check if facility is already saved
+    const isAlreadySaved = savedFacilities.some(saved => saved.id === facilityId);
+    
+    if (isAlreadySaved) {
+      // Unsave the facility
+      setSavedFacilities(prev => prev.filter(saved => saved.id !== facilityId));
+      alert('Facility removed from saved list!');
+    } else {
+      // Save the facility
+      const savedFacility: SavedFacility = {
+        facility,
+        savedAt: new Date().toISOString(),
+        searchTerm: searchTerm,
+        id: facilityId
+      };
+
+      setSavedFacilities(prev => [savedFacility, ...prev]);
+      alert('Facility saved successfully!');
+    }
+  };
+
+  // Delete saved facility function
+  const deleteSavedFacility = (id: string) => {
+    if (confirm('Are you sure you want to delete this saved facility?')) {
+      setSavedFacilities(prev => prev.filter(saved => saved.id !== id));
+    }
+  };
+
+  // Check if facility is saved
+  const isFacilitySaved = (facility: ResidentialFacility) => {
+    const facilityId = `${facility["Service Name"]}_${facility.provider_abn || Date.now()}`;
+    return savedFacilities.some(saved => saved.id === facilityId);
+  };
 
   const renderStarRating = (rating?: number) => {
     if (!rating) return <span className="text-gray-400">No rating</span>;
@@ -286,29 +360,70 @@ export default function ResidentialPage() {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Building className="w-8 h-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Residential Aged Care Facilities</h1>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Building className="w-8 h-8 text-blue-600" />
+              <h1 className="text-3xl font-bold text-gray-900">Residential Aged Care Facilities</h1>
+            </div>
+            
+            {/* Toggle between Search and Saved */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowSavedFacilities(false)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                  !showSavedFacilities
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Search className="w-4 h-4" />
+                Search Facilities
+              </button>
+              <button
+                onClick={() => setShowSavedFacilities(true)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                  showSavedFacilities
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <History className="w-4 h-4" />
+                Saved Facilities ({savedFacilities.length})
+              </button>
+            </div>
           </div>
           
-          {/* Search Bar */}
-          <div className="relative max-w-2xl">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by facility name, address, locality, or provider..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
+          {!showSavedFacilities && (
+            <>
+              {/* Search Bar */}
+              <div className="relative max-w-2xl">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search by facility name, address, locality, or provider..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              
+              <p className="mt-2 text-sm text-gray-600">
+                {searchTerm.trim() === '' 
+                  ? `Search through ${facilities.length} residential facilities using the search bar above`
+                  : `Showing ${filteredFacilities.length} of ${facilities.length} facilities`
+                }
+              </p>
+            </>
+          )}
           
-          <p className="mt-2 text-sm text-gray-600">
-            {searchTerm.trim() === '' 
-              ? `Search through ${facilities.length} residential facilities using the search bar above`
-              : `Showing ${filteredFacilities.length} of ${facilities.length} facilities`
-            }
-          </p>
+          {showSavedFacilities && (
+            <p className="text-sm text-gray-600">
+              {savedFacilities.length === 0 
+                ? 'No saved facilities yet. Search and save facilities to view them here.'
+                : `Viewing ${savedFacilities.length} saved facilities`
+              }
+            </p>
+          )}
         </div>
       </div>
 
@@ -316,76 +431,190 @@ export default function ResidentialPage() {
         {!selectedFacility ? (
           /* Facility List */
           <div>
-            {searchTerm.trim() === '' ? (
-              /* Empty State - No Search */
-              <div className="text-center py-12">
-                <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Search Residential Facilities</h3>
-                <p className="text-gray-600 mb-4">
-                  Use the search bar above to find residential aged care facilities by name, address, locality, or provider.
-                </p>
-                <p className="text-sm text-gray-500">
-                  {facilities.length} facilities available to search through
-                </p>
-              </div>
-            ) : filteredFacilities.length > 0 ? (
-              /* Facility Results */
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredFacilities.map((facility, index) => (
-                  <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer"
-                        onClick={() => setSelectedFacility(facility)}>
-                    <CardHeader>
-                      <CardTitle className="text-lg font-semibold text-gray-900">
-                        {facility["Service Name"]}
-                      </CardTitle>
-                      {facility.formatted_address && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <MapPin className="w-4 h-4" />
-                          {facility.formatted_address}
-                        </div>
-                      )}
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {facility.overall_rating_stars && (
-                          <div>
-                            <p className="text-xs text-gray-500 mb-1">Overall Rating</p>
-                            {renderStarRating(facility.overall_rating_stars)}
+            {!showSavedFacilities ? (
+              /* Search Results */
+              <div>
+                {searchTerm.trim() === '' ? (
+                  /* Empty State - No Search */
+                  <div className="text-center py-12">
+                    <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Search Residential Facilities</h3>
+                    <p className="text-gray-600 mb-4">
+                      Use the search bar above to find residential aged care facilities by name, address, locality, or provider.
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {facilities.length} facilities available to search through
+                    </p>
+                  </div>
+                ) : filteredFacilities.length > 0 ? (
+                  /* Facility Results */
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredFacilities.map((facility, index) => (
+                      <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer"
+                            onClick={() => setSelectedFacility(facility)}>
+                        <CardHeader>
+                          <CardTitle className="text-lg font-semibold text-gray-900">
+                            {facility["Service Name"]}
+                          </CardTitle>
+                          {facility.formatted_address && (
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <MapPin className="w-4 h-4" />
+                              {facility.formatted_address}
+                            </div>
+                          )}
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            {facility.overall_rating_stars && (
+                              <div>
+                                <p className="text-xs text-gray-500 mb-1">Overall Rating</p>
+                                {renderStarRating(facility.overall_rating_stars)}
+                              </div>
+                            )}
+                            
+                            {facility.rooms_data && facility.rooms_data.length > 0 && (
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <Users className="w-4 h-4" />
+                                {facility.rooms_data.length} room types available
+                              </div>
+                            )}
+                            
+                            <div className="flex gap-2 mt-4">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedFacility(facility);
+                                }}
+                                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                              >
+                                View Details
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleSaveFacility(facility);
+                                }}
+                                className={`p-2 rounded-lg transition-colors ${
+                                  isFacilitySaved(facility)
+                                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                                title={isFacilitySaved(facility) ? 'Remove from saved' : 'Save facility'}
+                              >
+                                {isFacilitySaved(facility) ? (
+                                  <BookmarkCheck className="w-4 h-4" />
+                                ) : (
+                                  <Bookmark className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
                           </div>
-                        )}
-                        
-                        {facility.rooms_data && facility.rooms_data.length > 0 && (
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Users className="w-4 h-4" />
-                            {facility.rooms_data.length} room types available
-                          </div>
-                        )}
-                        
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedFacility(facility);
-                          }}
-                          className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                          View Details
-                        </button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  /* No Results */
+                  <div className="text-center py-12">
+                    <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No facilities found</h3>
+                    <p className="text-gray-600 mb-4">
+                      No residential facilities match your search criteria.
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Try adjusting your search terms or browse all {facilities.length} available facilities.
+                    </p>
+                  </div>
+                )}
               </div>
             ) : (
-              /* No Results */
-              <div className="text-center py-12">
-                <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No facilities found</h3>
-                <p className="text-gray-600 mb-4">
-                  No residential facilities match your search criteria.
-                </p>
-                <p className="text-sm text-gray-500">
-                  Try adjusting your search terms or browse all {facilities.length} available facilities.
-                </p>
+              /* Saved Facilities */
+              <div>
+                {savedFacilities.length === 0 ? (
+                  /* Empty State - No Saved */
+                  <div className="text-center py-12">
+                    <History className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Saved Facilities</h3>
+                    <p className="text-gray-600 mb-4">
+                      You haven't saved any facilities yet. Search for facilities and save them to view here.
+                    </p>
+                    <button
+                      onClick={() => setShowSavedFacilities(false)}
+                      className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Start Searching
+                    </button>
+                  </div>
+                ) : (
+                  /* Saved Facility Results */
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {savedFacilities.map((savedItem) => (
+                      <Card key={savedItem.id} className="hover:shadow-lg transition-shadow cursor-pointer"
+                            onClick={() => setSelectedFacility(savedItem.facility)}>
+                        <CardHeader>
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <CardTitle className="text-lg font-semibold text-gray-900">
+                                {savedItem.facility["Service Name"]}
+                              </CardTitle>
+                              {savedItem.facility.formatted_address && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+                                  <MapPin className="w-4 h-4" />
+                                  {savedItem.facility.formatted_address}
+                                </div>
+                              )}
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteSavedFacility(savedItem.id);
+                              }}
+                              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
+                              title="Delete saved facility"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="text-xs text-gray-500 mt-2">
+                            Saved: {new Date(savedItem.savedAt).toLocaleDateString()} at {new Date(savedItem.savedAt).toLocaleTimeString()}
+                            {savedItem.searchTerm && (
+                              <div className="mt-1">
+                                Search term: "{savedItem.searchTerm}"
+                              </div>
+                            )}
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            {savedItem.facility.overall_rating_stars && (
+                              <div>
+                                <p className="text-xs text-gray-500 mb-1">Overall Rating</p>
+                                {renderStarRating(savedItem.facility.overall_rating_stars)}
+                              </div>
+                            )}
+                            
+                            {savedItem.facility.rooms_data && savedItem.facility.rooms_data.length > 0 && (
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <Users className="w-4 h-4" />
+                                {savedItem.facility.rooms_data.length} room types available
+                              </div>
+                            )}
+                            
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedFacility(savedItem.facility);
+                              }}
+                              className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                              View Details
+                            </button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -402,15 +631,42 @@ export default function ResidentialPage() {
             <div className="bg-white rounded-lg shadow-lg">
               {/* Header */}
               <div className="p-6 border-b space-y-4">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {selectedFacility["Service Name"]}
-                </h1>
-                {selectedFacility.formatted_address && (
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <MapPin className="w-4 h-4" />
-                    {selectedFacility.formatted_address}
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h1 className="text-2xl font-bold text-gray-900">
+                      {selectedFacility["Service Name"]}
+                    </h1>
+                    {selectedFacility.formatted_address && (
+                      <div className="flex items-center gap-2 text-gray-600 mt-2">
+                        <MapPin className="w-4 h-4" />
+                        {selectedFacility.formatted_address}
+                      </div>
+                    )}
                   </div>
-                )}
+                  
+                  {/* Save Button */}
+                  <button
+                    onClick={() => toggleSaveFacility(selectedFacility)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                      isFacilitySaved(selectedFacility)
+                        ? 'bg-green-100 text-green-700 hover:bg-green-200 border border-green-200'
+                        : 'bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-200'
+                    }`}
+                    title={isFacilitySaved(selectedFacility) ? 'Remove from saved' : 'Save this facility'}
+                  >
+                    {isFacilitySaved(selectedFacility) ? (
+                      <>
+                        <BookmarkCheck className="w-4 h-4" />
+                        Unsave
+                      </>
+                    ) : (
+                      <>
+                        <Bookmark className="w-4 h-4" />
+                        Save Facility
+                      </>
+                    )}
+                  </button>
+                </div>
                 
                 {/* Controls Row */}
                 <div className="flex items-center justify-between pt-2">
