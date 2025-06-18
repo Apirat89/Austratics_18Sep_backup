@@ -175,6 +175,7 @@ export default function ResidentialBoxPlots({ selectedFacility, className = '' }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedScope, setSelectedScope] = useState<GeographicScope>('nationwide');
+  const [activeTab, setActiveTab] = useState<string>('financial');
   const chartRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const chartInstances = useRef<{ [key: string]: echarts.ECharts }>({});
 
@@ -364,41 +365,50 @@ export default function ResidentialBoxPlots({ selectedFacility, className = '' }
   };
 
   useEffect(() => {
-    if (statisticsData) {
+    if (statisticsData && activeTab) {
       const currentStats = getStatisticsForScope();
       
-      // Create box plots for all fields
-      Object.entries(fieldCategories).forEach(([categoryKey, category]) => {
-        category.fields.forEach(fieldName => {
+      // Clear existing charts for the active tab
+      Object.keys(chartInstances.current).forEach(key => {
+        if (key.startsWith(activeTab)) {
+          chartInstances.current[key].dispose();
+          delete chartInstances.current[key];
+        }
+      });
+      
+      // Create charts only for the active tab
+      if (activeTab === 'rooms' && selectedFacility.rooms_data) {
+        // Handle room data
+        selectedFacility.rooms_data.forEach((room, index) => {
+          const stats = currentStats?.fields['cost_per_day'];
+          const containerId = `rooms-cost_per_day-${index}`;
+          setTimeout(() => createBoxPlot(`${room.name} - Cost per Day`, stats || null, room.cost_per_day, containerId), 100);
+        });
+      } else if (activeTab in fieldCategories) {
+        // Handle regular field categories
+        const category = fieldCategories[activeTab as keyof typeof fieldCategories];
+        category.fields.forEach((fieldName: string) => {
           const stats = currentStats?.fields[fieldName];
           const facilityValue = selectedFacility[fieldName] as number;
-          const containerId = `${categoryKey}-${fieldName}`;
+          const containerId = `${activeTab}-${fieldName}`;
           
           // Create chart if facility has this value
           if (facilityValue !== undefined && facilityValue !== null) {
             setTimeout(() => createBoxPlot(fieldName, stats || null, facilityValue, containerId), 100);
           }
         });
-      });
-      
-      // Handle room data separately
-      if (selectedFacility.rooms_data) {
-        selectedFacility.rooms_data.forEach((room, index) => {
-          const stats = currentStats?.fields['cost_per_day'];
-          const containerId = `rooms-cost_per_day-${index}`;
-          setTimeout(() => createBoxPlot(`${room.name} - Cost per Day`, stats || null, room.cost_per_day, containerId), 100);
-        });
       }
     }
+  }, [statisticsData, selectedScope, selectedFacility, activeTab]);
 
-    // Cleanup function
+  useEffect(() => {
     return () => {
       Object.values(chartInstances.current).forEach(chart => {
         if (chart) chart.dispose();
       });
       chartInstances.current = {};
     };
-  }, [statisticsData, selectedScope, selectedFacility]);
+  }, []);
 
   const formatFieldName = (fieldName: string) => {
     return fieldName
@@ -510,7 +520,7 @@ export default function ResidentialBoxPlots({ selectedFacility, className = '' }
           )}
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="financial" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-6">
               {Object.entries(fieldCategories).map(([key, category]) => {
                 const IconComponent = category.icon;
@@ -537,7 +547,7 @@ export default function ResidentialBoxPlots({ selectedFacility, className = '' }
                     {category.title}
                   </h3>
                   
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {category.fields.map(fieldName => {
                       const facilityValue = selectedFacility[fieldName] as number;
                       if (facilityValue === undefined || facilityValue === null) return null;

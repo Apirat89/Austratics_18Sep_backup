@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3 } from 'lucide-react';
+import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ResidentialBoxPlots from '@/components/residential/ResidentialBoxPlots';
+import InlineBoxPlot from '@/components/residential/InlineBoxPlot';
 
 interface ResidentialFacility {
   "Service Name": string;
@@ -19,6 +19,8 @@ interface ResidentialFacility {
   staffing_rating?: number;
   formatted_address?: string;
   address_locality?: string;
+  address_state?: string;
+  address_postcode?: string;
   contact_phone?: string;
   contact_email?: string;
   contact_website?: string;
@@ -123,6 +125,12 @@ export default function ResidentialPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedFacility, setSelectedFacility] = useState<ResidentialFacility | null>(null);
+  
+  // Statistical data for inline box plots
+  const [statisticsData, setStatisticsData] = useState<any>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [selectedScope, setSelectedScope] = useState<'nationwide' | 'state' | 'postcode' | 'locality'>('nationwide');
+  const [showBoxPlots, setShowBoxPlots] = useState(true);
 
   useEffect(() => {
     const loadFacilities = async () => {
@@ -138,7 +146,20 @@ export default function ResidentialPage() {
       }
     };
 
+    const loadStatistics = async () => {
+      try {
+        const response = await fetch('/maps/abs_csv/Residential_Statistics_Analysis.json');
+        const data = await response.json();
+        setStatisticsData(data);
+      } catch (error) {
+        console.error('Error loading statistics:', error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
     loadFacilities();
+    loadStatistics();
   }, []);
 
   useEffect(() => {
@@ -173,13 +194,70 @@ export default function ResidentialPage() {
     );
   };
 
-  const renderField = (label: string, value: any) => {
+  // Helper function to get statistics for current scope
+  const getStatisticsForScope = () => {
+    if (!statisticsData) return null;
+    
+    switch (selectedScope) {
+      case 'nationwide':
+        return statisticsData.nationwide;
+      case 'state':
+        return statisticsData.byState?.find((s: any) => s.groupName === selectedFacility?.address_state);
+      case 'postcode':
+        return statisticsData.byPostcode?.find((p: any) => p.groupName === selectedFacility?.address_postcode);
+      case 'locality':
+        return statisticsData.byLocality?.find((l: any) => l.groupName === selectedFacility?.address_locality);
+      default:
+        return statisticsData.nationwide;
+    }
+  };
+
+  const renderField = (label: string, value: any, fieldName?: string) => {
     if (value === null || value === undefined || value === '') return null;
+    
+    // Check if this is a numeric field that can have inline statistics
+    const isNumeric = typeof value === 'number';
+    const scopeStats = getStatisticsForScope();
+    const fieldStats = fieldName && scopeStats ? scopeStats.fields?.[fieldName] : null;
     
     return (
       <div className="mb-3">
         <dt className="text-sm font-medium text-gray-500">{label}</dt>
-        <dd className="text-gray-900">{value}</dd>
+        <dd className="text-gray-900 flex items-center">
+          {value}
+          {showBoxPlots && isNumeric && fieldName && !statsLoading && fieldStats && (
+            <InlineBoxPlot
+              fieldName={fieldName}
+              currentValue={value}
+              statistics={fieldStats}
+              scope={selectedScope}
+            />
+          )}
+        </dd>
+      </div>
+    );
+  };
+
+  const renderPercentageField = (label: string, value: number, fieldName: string) => {
+    if (value === null || value === undefined) return null;
+    
+    const scopeStats = getStatisticsForScope();
+    const fieldStats = scopeStats ? scopeStats.fields?.[fieldName] : null;
+    
+    return (
+      <div className="mb-3">
+        <dt className="text-sm font-medium text-gray-500">{label}</dt>
+        <dd className="text-gray-900 flex items-center">
+          {value}%
+          {showBoxPlots && !statsLoading && fieldStats && (
+            <InlineBoxPlot
+              fieldName={fieldName}
+              currentValue={value}
+              statistics={fieldStats}
+              scope={selectedScope}
+            />
+          )}
+        </dd>
       </div>
     );
   };
@@ -323,8 +401,8 @@ export default function ResidentialPage() {
             
             <div className="bg-white rounded-lg shadow-lg">
               {/* Header */}
-              <div className="p-6 border-b">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              <div className="p-6 border-b space-y-4">
+                <h1 className="text-2xl font-bold text-gray-900">
                   {selectedFacility["Service Name"]}
                 </h1>
                 {selectedFacility.formatted_address && (
@@ -333,11 +411,50 @@ export default function ResidentialPage() {
                     {selectedFacility.formatted_address}
                   </div>
                 )}
+                
+                {/* Controls Row */}
+                <div className="flex items-center justify-between pt-2">
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm font-medium text-gray-700">Statistical Comparison:</span>
+                    <div className="flex items-center gap-2">
+                      {[
+                        { key: 'nationwide', label: 'Nationwide', icon: Globe },
+                        { key: 'state', label: 'State', icon: Building },
+                        { key: 'postcode', label: 'Postcode', icon: MapPin },
+                        { key: 'locality', label: 'Locality', icon: Home }
+                      ].map(({ key, label, icon: Icon }) => (
+                        <button
+                          key={key}
+                          onClick={() => setSelectedScope(key as any)}
+                          className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                            selectedScope === key
+                              ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Box Plot Toggle */}
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showBoxPlots}
+                      onChange={(e) => setShowBoxPlots(e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Show Box Plots</span>
+                  </label>
+                </div>
               </div>
 
               {/* Tabs */}
               <Tabs defaultValue="main" className="p-6">
-                <TabsList className="grid grid-cols-8 gap-2 mb-6">
+                <TabsList className="grid grid-cols-7 gap-2 mb-6">
                   <TabsTrigger value="main">Main</TabsTrigger>
                   <TabsTrigger value="rooms">Rooms</TabsTrigger>
                   <TabsTrigger value="compliance">Compliance</TabsTrigger>
@@ -345,7 +462,6 @@ export default function ResidentialPage() {
                   <TabsTrigger value="experience">Residents' Experience</TabsTrigger>
                   <TabsTrigger value="staffing">Staff Rating</TabsTrigger>
                   <TabsTrigger value="finance">Finance</TabsTrigger>
-                  <TabsTrigger value="statistics">Statistics</TabsTrigger>
                 </TabsList>
 
                 {/* Tab 1: Main */}
@@ -378,16 +494,30 @@ export default function ResidentialPage() {
                         {selectedFacility.overall_rating_stars && (
                           <div>
                             <p className="text-sm font-medium text-gray-500 mb-1">Overall Rating</p>
-                            {renderStarRating(selectedFacility.overall_rating_stars)}
+                            <div className="flex items-center">
+                              {renderStarRating(selectedFacility.overall_rating_stars)}
+                              {showBoxPlots && !statsLoading && (() => {
+                                const scopeStats = getStatisticsForScope();
+                                const fieldStats = scopeStats ? scopeStats.fields?.["overall_rating_stars"] : null;
+                                return fieldStats ? (
+                                  <InlineBoxPlot
+                                    fieldName="overall_rating_stars"
+                                    currentValue={selectedFacility.overall_rating_stars}
+                                    statistics={fieldStats}
+                                    scope={selectedScope}
+                                  />
+                                ) : null;
+                              })()}
+                            </div>
                             {selectedFacility.overall_rating_text && (
                               <p className="text-sm text-gray-600">({selectedFacility.overall_rating_text})</p>
                             )}
                           </div>
                         )}
-                        {renderField("Compliance Rating", selectedFacility.compliance_rating)}
-                        {renderField("Quality Measures Rating", selectedFacility.quality_measures_rating)}
-                        {renderField("Residents Experience Rating", selectedFacility.residents_experience_rating)}
-                        {renderField("Staffing Rating", selectedFacility.staffing_rating)}
+                        {renderField("Compliance Rating", selectedFacility.compliance_rating, "compliance_rating")}
+                        {renderField("Quality Measures Rating", selectedFacility.quality_measures_rating, "quality_measures_rating")}
+                        {renderField("Residents Experience Rating", selectedFacility.residents_experience_rating, "residents_experience_rating")}
+                        {renderField("Staffing Rating", selectedFacility.staffing_rating, "staffing_rating")}
                       </CardContent>
                     </Card>
 
@@ -486,7 +616,7 @@ export default function ResidentialPage() {
                     </CardHeader>
                     <CardContent>
                       {renderField("Service Name", selectedFacility["Service Name"])}
-                      {renderField("Residential Places", selectedFacility.residential_places)}
+                      {renderField("Residential Places", selectedFacility.residential_places, "residential_places")}
                       
                       {selectedFacility.rooms_data && selectedFacility.rooms_data.length > 0 && (
                         <div className="mt-6">
@@ -496,7 +626,24 @@ export default function ResidentialPage() {
                               <div key={index} className="border rounded-lg p-4">
                                 {renderField("Room Name", room.name)}
                                 {renderField("Configuration", room.configuration)}
-                                {renderField("Cost per Day", formatCurrency(room.cost_per_day))}
+                                <div className="mb-3">
+                                  <dt className="text-sm font-medium text-gray-500">Cost per Day</dt>
+                                  <dd className="text-gray-900 flex items-center">
+                                    {formatCurrency(room.cost_per_day)}
+                                    {showBoxPlots && !statsLoading && (() => {
+                                      const scopeStats = getStatisticsForScope();
+                                      const fieldStats = scopeStats ? scopeStats.fields?.["income_residents_contribution"] : null;
+                                      return fieldStats ? (
+                                        <InlineBoxPlot
+                                          fieldName="income_residents_contribution"
+                                          currentValue={room.cost_per_day}
+                                          statistics={fieldStats}
+                                          scope={selectedScope}
+                                        />
+                                      ) : null;
+                                    })()}
+                                  </dd>
+                                </div>
                                 {renderField("Room Size", room.room_size)}
                               </div>
                             ))}
@@ -519,7 +666,7 @@ export default function ResidentialPage() {
                     <CardContent>
                       <dl className="space-y-2">
                         {renderField("Service Name", selectedFacility["Service Name"])}
-                        {renderField("Compliance Rating", selectedFacility["star_Compliance rating"])}
+                        {renderField("Compliance Rating", selectedFacility["star_Compliance rating"], "star_Compliance rating")}
                         {renderField("Decision Type", selectedFacility["star_[C] Decision type"])}
                         {renderField("Date Decision Applied", selectedFacility["star_[C] Date Decision Applied"])}
                         {renderField("Date Decision Ends", selectedFacility["star_[C] Date Decision Ends"])}
@@ -540,14 +687,14 @@ export default function ResidentialPage() {
                     <CardContent>
                       <dl className="space-y-2">
                         {renderField("Service Name", selectedFacility["Service Name"])}
-                        {renderField("Quality Measures Rating", selectedFacility["star_Quality Measures rating"])}
-                        {renderField("Pressure Injuries", selectedFacility["star_[QM] Pressure injuries*"])}
-                        {renderField("Restrictive Practices", selectedFacility["star_[QM] Restrictive practices"])}
-                        {renderField("Unplanned Weight Loss", selectedFacility["star_[QM] Unplanned weight loss*"])}
-                        {renderField("Falls and Major Injury - Falls", selectedFacility["star_[QM] Falls and major injury - falls*"])}
-                        {renderField("Falls and Major Injury - Major Injury", selectedFacility["star_[QM] Falls and major injury - major injury from a fall*"])}
-                        {renderField("Medication Management - Polypharmacy", selectedFacility["star_[QM] Medication management - polypharmacy"])}
-                        {renderField("Medication Management - Antipsychotic", selectedFacility["star_[QM] Medication management - antipsychotic"])}
+                        {renderField("Quality Measures Rating", selectedFacility["star_Quality Measures rating"], "star_Quality Measures rating")}
+                        {renderField("Pressure Injuries", selectedFacility["star_[QM] Pressure injuries*"], "star_[QM] Pressure injuries*")}
+                        {renderField("Restrictive Practices", selectedFacility["star_[QM] Restrictive practices"], "star_[QM] Restrictive practices")}
+                        {renderField("Unplanned Weight Loss", selectedFacility["star_[QM] Unplanned weight loss*"], "star_[QM] Unplanned weight loss*")}
+                        {renderField("Falls and Major Injury - Falls", selectedFacility["star_[QM] Falls and major injury - falls*"], "star_[QM] Falls and major injury - falls*")}
+                        {renderField("Falls and Major Injury - Major Injury", selectedFacility["star_[QM] Falls and major injury - major injury from a fall*"], "star_[QM] Falls and major injury - major injury from a fall*")}
+                        {renderField("Medication Management - Polypharmacy", selectedFacility["star_[QM] Medication management - polypharmacy"], "star_[QM] Medication management - polypharmacy")}
+                        {renderField("Medication Management - Antipsychotic", selectedFacility["star_[QM] Medication management - antipsychotic"], "star_[QM] Medication management - antipsychotic")}
                       </dl>
                     </CardContent>
                   </Card>
@@ -565,17 +712,17 @@ export default function ResidentialPage() {
                     <CardContent>
                       <div className="space-y-6">
                         {renderField("Service Name", selectedFacility["Service Name"])}
-                        {renderField("Residents' Experience Rating", selectedFacility["star_Residents' Experience rating"])}
+                        {renderField("Residents' Experience Rating", selectedFacility["star_Residents' Experience rating"], "star_Residents' Experience rating")}
                         {renderField("Interview Year", selectedFacility["star_[RE] Interview Year"])}
                         
                         {/* Food Experience */}
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Food Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Food - Always"] && renderField("Always", selectedFacility["star_[RE] Food - Always"] + '%')}
-                            {selectedFacility["star_[RE] Food - Most of the time"] && renderField("Most of the time", selectedFacility["star_[RE] Food - Most of the time"] + '%')}
-                            {selectedFacility["star_[RE] Food - Some of the time"] && renderField("Some of the time", selectedFacility["star_[RE] Food - Some of the time"] + '%')}
-                            {selectedFacility["star_[RE] Food - Never"] && renderField("Never", selectedFacility["star_[RE] Food - Never"] + '%')}
+                            {selectedFacility["star_[RE] Food - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Food - Always"], "star_[RE] Food - Always")}
+                            {selectedFacility["star_[RE] Food - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Food - Most of the time"], "star_[RE] Food - Most of the time")}
+                            {selectedFacility["star_[RE] Food - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Food - Some of the time"], "star_[RE] Food - Some of the time")}
+                            {selectedFacility["star_[RE] Food - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Food - Never"], "star_[RE] Food - Never")}
                           </dl>
                         </div>
 
@@ -583,10 +730,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Safety Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Safety - Always"] && renderField("Always", selectedFacility["star_[RE] Safety - Always"] + '%')}
-                            {selectedFacility["star_[RE] Safety - Most of the time"] && renderField("Most of the time", selectedFacility["star_[RE] Safety - Most of the time"] + '%')}
-                            {selectedFacility["star_[RE] Safety - Some of the time"] && renderField("Some of the time", selectedFacility["star_[RE] Safety - Some of the time"] + '%')}
-                            {selectedFacility["star_[RE] Safety - Never"] && renderField("Never", selectedFacility["star_[RE] Safety - Never"] + '%')}
+                            {selectedFacility["star_[RE] Safety - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Safety - Always"], "star_[RE] Safety - Always")}
+                            {selectedFacility["star_[RE] Safety - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Safety - Most of the time"], "star_[RE] Safety - Most of the time")}
+                            {selectedFacility["star_[RE] Safety - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Safety - Some of the time"], "star_[RE] Safety - Some of the time")}
+                            {selectedFacility["star_[RE] Safety - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Safety - Never"], "star_[RE] Safety - Never")}
                           </dl>
                         </div>
 
@@ -594,10 +741,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Operation Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Operation - Always"] && renderField("Always", selectedFacility["star_[RE] Operation - Always"] + '%')}
-                            {selectedFacility["star_[RE] Operation - Most of the time"] && renderField("Most of the time", selectedFacility["star_[RE] Operation - Most of the time"] + '%')}
-                            {selectedFacility["star_[RE] Operation - Some of the time"] && renderField("Some of the time", selectedFacility["star_[RE] Operation - Some of the time"] + '%')}
-                            {selectedFacility["star_[RE] Operation - Never"] && renderField("Never", selectedFacility["star_[RE] Operation - Never"] + '%')}
+                            {selectedFacility["star_[RE] Operation - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Operation - Always"], "star_[RE] Operation - Always")}
+                            {selectedFacility["star_[RE] Operation - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Operation - Most of the time"], "star_[RE] Operation - Most of the time")}
+                            {selectedFacility["star_[RE] Operation - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Operation - Some of the time"], "star_[RE] Operation - Some of the time")}
+                            {selectedFacility["star_[RE] Operation - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Operation - Never"], "star_[RE] Operation - Never")}
                           </dl>
                         </div>
 
@@ -605,10 +752,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Care Need Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Care Need - Always"] && renderField("Always", selectedFacility["star_[RE] Care Need - Always"] + '%')}
-                            {selectedFacility["star_[RE] Care Need - Most of the time"] && renderField("Most of the time", selectedFacility["star_[RE] Care Need - Most of the time"] + '%')}
-                            {selectedFacility["star_[RE] Care Need - Some of the time"] && renderField("Some of the time", selectedFacility["star_[RE] Care Need - Some of the time"] + '%')}
-                            {selectedFacility["star_[RE] Care Need - Never"] && renderField("Never", selectedFacility["star_[RE] Care Need - Never"] + '%')}
+                            {selectedFacility["star_[RE] Care Need - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Care Need - Always"], "star_[RE] Care Need - Always")}
+                            {selectedFacility["star_[RE] Care Need - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Care Need - Most of the time"], "star_[RE] Care Need - Most of the time")}
+                            {selectedFacility["star_[RE] Care Need - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Care Need - Some of the time"], "star_[RE] Care Need - Some of the time")}
+                            {selectedFacility["star_[RE] Care Need - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Care Need - Never"], "star_[RE] Care Need - Never")}
                           </dl>
                         </div>
 
@@ -616,10 +763,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Competent Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Competent - Always"] && renderField("Always", selectedFacility["star_[RE] Competent - Always"] + '%')}
-                            {selectedFacility["star_[RE] Competent - Most of the time"] && renderField("Most of the time", selectedFacility["star_[RE] Competent - Most of the time"] + '%')}
-                            {selectedFacility["star_[RE] Competent - Some of the time"] && renderField("Some of the time", selectedFacility["star_[RE] Competent - Some of the time"] + '%')}
-                            {selectedFacility["star_[RE] Competent - Never"] && renderField("Never", selectedFacility["star_[RE] Competent - Never"] + '%')}
+                            {selectedFacility["star_[RE] Competent - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Competent - Always"], "star_[RE] Competent - Always")}
+                            {selectedFacility["star_[RE] Competent - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Competent - Most of the time"], "star_[RE] Competent - Most of the time")}
+                            {selectedFacility["star_[RE] Competent - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Competent - Some of the time"], "star_[RE] Competent - Some of the time")}
+                            {selectedFacility["star_[RE] Competent - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Competent - Never"], "star_[RE] Competent - Never")}
                           </dl>
                         </div>
 
@@ -627,10 +774,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Independence Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Independent - Always"] && renderField("Always", selectedFacility["star_[RE] Independent - Always"] + '%')}
-                            {selectedFacility["star_[RE] Independent - Most of the time"] && renderField("Most of the time", selectedFacility["star_[RE] Independent - Most of the time"] + '%')}
-                            {selectedFacility["star_[RE] Independent - Some of the time"] && renderField("Some of the time", selectedFacility["star_[RE] Independent - Some of the time"] + '%')}
-                            {selectedFacility["star_[RE] Independent - Never"] && renderField("Never", selectedFacility["star_[RE] Independent - Never"] + '%')}
+                            {selectedFacility["star_[RE] Independent - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Independent - Always"], "star_[RE] Independent - Always")}
+                            {selectedFacility["star_[RE] Independent - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Independent - Most of the time"], "star_[RE] Independent - Most of the time")}
+                            {selectedFacility["star_[RE] Independent - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Independent - Some of the time"], "star_[RE] Independent - Some of the time")}
+                            {selectedFacility["star_[RE] Independent - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Independent - Never"], "star_[RE] Independent - Never")}
                           </dl>
                         </div>
 
@@ -638,10 +785,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Explanation Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Explain - Always"] && renderField("Always", selectedFacility["star_[RE] Explain - Always"] + '%')}
-                            {selectedFacility["star_[RE] Explain - Most of the time"] && renderField("Most of the time", selectedFacility["star_[RE] Explain - Most of the time"] + '%')}
-                            {selectedFacility["star_[RE] Explain - Some of the time"] && renderField("Some of the time", selectedFacility["star_[RE] Explain - Some of the time"] + '%')}
-                            {selectedFacility["star_[RE] Explain - Never"] && renderField("Never", selectedFacility["star_[RE] Explain - Never"] + '%')}
+                            {selectedFacility["star_[RE] Explain - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Explain - Always"], "star_[RE] Explain - Always")}
+                            {selectedFacility["star_[RE] Explain - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Explain - Most of the time"], "star_[RE] Explain - Most of the time")}
+                            {selectedFacility["star_[RE] Explain - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Explain - Some of the time"], "star_[RE] Explain - Some of the time")}
+                            {selectedFacility["star_[RE] Explain - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Explain - Never"], "star_[RE] Explain - Never")}
                           </dl>
                         </div>
 
@@ -649,10 +796,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Respect Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Respect - Always"] && renderField("Always", selectedFacility["star_[RE] Respect - Always"] + '%')}
-                            {selectedFacility["star_[RE] Respect - Most of the time"] && renderField("Most of the time", selectedFacility["star_[RE] Respect - Most of the time"] + '%')}
-                            {selectedFacility["star_[RE] Respect - Some of the time"] && renderField("Some of the time", selectedFacility["star_[RE] Respect - Some of the time"] + '%')}
-                            {selectedFacility["star_[RE] Respect - Never"] && renderField("Never", selectedFacility["star_[RE] Respect - Never"] + '%')}
+                            {selectedFacility["star_[RE] Respect - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Respect - Always"], "star_[RE] Respect - Always")}
+                            {selectedFacility["star_[RE] Respect - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Respect - Most of the time"], "star_[RE] Respect - Most of the time")}
+                            {selectedFacility["star_[RE] Respect - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Respect - Some of the time"], "star_[RE] Respect - Some of the time")}
+                            {selectedFacility["star_[RE] Respect - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Respect - Never"], "star_[RE] Respect - Never")}
                           </dl>
                         </div>
 
@@ -660,10 +807,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Follow Up Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Follow Up - Always"] && renderField("Always", selectedFacility["star_[RE] Follow Up - Always"] + '%')}
-                            {selectedFacility["star_[RE] Follow Up - Most of the time"] && renderField("Most of the time", selectedFacility["star_[RE] Follow Up - Most of the time"] + '%')}
-                            {selectedFacility["star_[RE] Follow Up - Some of the time"] && renderField("Some of the time", selectedFacility["star_[RE] Follow Up - Some of the time"] + '%')}
-                            {selectedFacility["star_[RE] Follow Up - Never"] && renderField("Never", selectedFacility["star_[RE] Follow Up - Never"] + '%')}
+                            {selectedFacility["star_[RE] Follow Up - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Follow Up - Always"], "star_[RE] Follow Up - Always")}
+                            {selectedFacility["star_[RE] Follow Up - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Follow Up - Most of the time"], "star_[RE] Follow Up - Most of the time")}
+                            {selectedFacility["star_[RE] Follow Up - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Follow Up - Some of the time"], "star_[RE] Follow Up - Some of the time")}
+                            {selectedFacility["star_[RE] Follow Up - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Follow Up - Never"], "star_[RE] Follow Up - Never")}
                           </dl>
                         </div>
 
@@ -671,10 +818,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Caring Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Caring - Always"] && renderField("Always", selectedFacility["star_[RE] Caring - Always"] + '%')}
-                            {selectedFacility["star_[RE] Caring - Most of the time"] && renderField("Most of the time", selectedFacility["star_[RE] Caring - Most of the time"] + '%')}
-                            {selectedFacility["star_[RE] Caring - Some of the time"] && renderField("Some of the time", selectedFacility["star_[RE] Caring - Some of the time"] + '%')}
-                            {selectedFacility["star_[RE] Caring - Never"] && renderField("Never", selectedFacility["star_[RE] Caring - Never"] + '%')}
+                            {selectedFacility["star_[RE] Caring - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Caring - Always"], "star_[RE] Caring - Always")}
+                            {selectedFacility["star_[RE] Caring - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Caring - Most of the time"], "star_[RE] Caring - Most of the time")}
+                            {selectedFacility["star_[RE] Caring - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Caring - Some of the time"], "star_[RE] Caring - Some of the time")}
+                            {selectedFacility["star_[RE] Caring - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Caring - Never"], "star_[RE] Caring - Never")}
                           </dl>
                         </div>
 
@@ -682,10 +829,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Voice Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Voice - Always"] && renderField("Always", selectedFacility["star_[RE] Voice - Always"] + '%')}
-                            {selectedFacility["star_[RE] Voice - Most of the time"] && renderField("Most of the time", selectedFacility["star_[RE] Voice - Most of the time"] + '%')}
-                            {selectedFacility["star_[RE] Voice - Some of the time"] && renderField("Some of the time", selectedFacility["star_[RE] Voice - Some of the time"] + '%')}
-                            {selectedFacility["star_[RE] Voice - Never"] && renderField("Never", selectedFacility["star_[RE] Voice - Never"] + '%')}
+                            {selectedFacility["star_[RE] Voice - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Voice - Always"], "star_[RE] Voice - Always")}
+                            {selectedFacility["star_[RE] Voice - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Voice - Most of the time"], "star_[RE] Voice - Most of the time")}
+                            {selectedFacility["star_[RE] Voice - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Voice - Some of the time"], "star_[RE] Voice - Some of the time")}
+                            {selectedFacility["star_[RE] Voice - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Voice - Never"], "star_[RE] Voice - Never")}
                           </dl>
                         </div>
 
@@ -693,10 +840,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Home Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Home - Always"] && renderField("Always", selectedFacility["star_[RE] Home - Always"] + '%')}
-                            {selectedFacility["star_[RE] Home - Most of the time"] && renderField("Most of the time", selectedFacility["star_[RE] Home - Most of the time"] + '%')}
-                            {selectedFacility["star_[RE] Home - Some of the time"] && renderField("Some of the time", selectedFacility["star_[RE] Home - Some of the time"] + '%')}
-                            {selectedFacility["star_[RE] Home - Never"] && renderField("Never", selectedFacility["star_[RE] Home - Never"] + '%')}
+                            {selectedFacility["star_[RE] Home - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Home - Always"], "star_[RE] Home - Always")}
+                            {selectedFacility["star_[RE] Home - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Home - Most of the time"], "star_[RE] Home - Most of the time")}
+                            {selectedFacility["star_[RE] Home - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Home - Some of the time"], "star_[RE] Home - Some of the time")}
+                            {selectedFacility["star_[RE] Home - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Home - Never"], "star_[RE] Home - Never")}
                           </dl>
                         </div>
                       </div>
@@ -716,11 +863,11 @@ export default function ResidentialPage() {
                     <CardContent>
                       <dl className="space-y-2">
                         {renderField("Service Name", selectedFacility["Service Name"])}
-                        {renderField("Staffing Rating", selectedFacility["star_Staffing rating"])}
-                        {renderField("Registered Nurse Care Minutes - Target", selectedFacility["star_[S] Registered Nurse Care Minutes - Target"])}
-                        {renderField("Registered Nurse Care Minutes - Actual", selectedFacility["star_[S] Registered Nurse Care Minutes - Actual"])}
-                        {renderField("Total Care Minutes - Target", selectedFacility["star_[S] Total Care Minutes - Target"])}
-                        {renderField("Total Care Minutes - Actual", selectedFacility["star_[S] Total Care Minutes - Actual"])}
+                        {renderField("Staffing Rating", selectedFacility["star_Staffing rating"], "star_Staffing rating")}
+                        {renderField("Registered Nurse Care Minutes - Target", selectedFacility["star_[S] Registered Nurse Care Minutes - Target"], "star_[S] Registered Nurse Care Minutes - Target")}
+                        {renderField("Registered Nurse Care Minutes - Actual", selectedFacility["star_[S] Registered Nurse Care Minutes - Actual"], "star_[S] Registered Nurse Care Minutes - Actual")}
+                        {renderField("Total Care Minutes - Target", selectedFacility["star_[S] Total Care Minutes - Target"], "star_[S] Total Care Minutes - Target")}
+                        {renderField("Total Care Minutes - Actual", selectedFacility["star_[S] Total Care Minutes - Actual"], "star_[S] Total Care Minutes - Actual")}
                       </dl>
                     </CardContent>
                   </Card>
@@ -741,34 +888,257 @@ export default function ResidentialPage() {
                           <h4 className="font-medium text-gray-900 mb-3">Expenditure (per day)</h4>
                           <dl className="space-y-2">
                             {renderField("Service Name", selectedFacility["Service Name"])}
-                            {renderField("Total Expenditure", formatCurrency(selectedFacility.expenditure_total_per_day))}
-                            {renderField("Care & Nursing", formatCurrency(selectedFacility.expenditure_care_nursing))}
-                            {renderField("Administration", formatCurrency(selectedFacility.expenditure_administration))}
-                            {renderField("Cleaning & Laundry", formatCurrency(selectedFacility.expenditure_cleaning_laundry))}
-                            {renderField("Accommodation & Maintenance", formatCurrency(selectedFacility.expenditure_accommodation_maintenance))}
-                            {renderField("Food & Catering", formatCurrency(selectedFacility.expenditure_food_catering))}
+                            {selectedFacility.expenditure_total_per_day && (
+                              <div className="mb-3">
+                                <dt className="text-sm font-medium text-gray-500">Total Expenditure</dt>
+                                <dd className="text-gray-900 flex items-center">
+                                  {formatCurrency(selectedFacility.expenditure_total_per_day)}
+                                  {showBoxPlots && !statsLoading && (() => {
+                                    const scopeStats = getStatisticsForScope();
+                                    const fieldStats = scopeStats ? scopeStats.fields?.["expenditure_total_per_day"] : null;
+                                    return fieldStats ? (
+                                      <InlineBoxPlot
+                                        fieldName="expenditure_total_per_day"
+                                        currentValue={selectedFacility.expenditure_total_per_day}
+                                        statistics={fieldStats}
+                                        scope={selectedScope}
+                                      />
+                                    ) : null;
+                                  })()}
+                                </dd>
+                              </div>
+                            )}
+                            {selectedFacility.expenditure_care_nursing && (
+                              <div className="mb-3">
+                                <dt className="text-sm font-medium text-gray-500">Care & Nursing</dt>
+                                <dd className="text-gray-900 flex items-center">
+                                  {formatCurrency(selectedFacility.expenditure_care_nursing)}
+                                  {showBoxPlots && !statsLoading && (() => {
+                                    const scopeStats = getStatisticsForScope();
+                                    const fieldStats = scopeStats ? scopeStats.fields?.["expenditure_care_nursing"] : null;
+                                    return fieldStats ? (
+                                      <InlineBoxPlot
+                                        fieldName="expenditure_care_nursing"
+                                        currentValue={selectedFacility.expenditure_care_nursing}
+                                        statistics={fieldStats}
+                                        scope={selectedScope}
+                                      />
+                                    ) : null;
+                                  })()}
+                                </dd>
+                              </div>
+                            )}
+                            {selectedFacility.expenditure_administration && (
+                              <div className="mb-3">
+                                <dt className="text-sm font-medium text-gray-500">Administration</dt>
+                                <dd className="text-gray-900 flex items-center">
+                                  {formatCurrency(selectedFacility.expenditure_administration)}
+                                  {showBoxPlots && !statsLoading && (() => {
+                                    const scopeStats = getStatisticsForScope();
+                                    const fieldStats = scopeStats ? scopeStats.fields?.["expenditure_administration"] : null;
+                                    return fieldStats ? (
+                                      <InlineBoxPlot
+                                        fieldName="expenditure_administration"
+                                        currentValue={selectedFacility.expenditure_administration}
+                                        statistics={fieldStats}
+                                        scope={selectedScope}
+                                      />
+                                    ) : null;
+                                  })()}
+                                </dd>
+                              </div>
+                            )}
+                            {selectedFacility.expenditure_cleaning_laundry && (
+                              <div className="mb-3">
+                                <dt className="text-sm font-medium text-gray-500">Cleaning & Laundry</dt>
+                                <dd className="text-gray-900 flex items-center">
+                                  {formatCurrency(selectedFacility.expenditure_cleaning_laundry)}
+                                  {showBoxPlots && !statsLoading && (() => {
+                                    const scopeStats = getStatisticsForScope();
+                                    const fieldStats = scopeStats ? scopeStats.fields?.["expenditure_cleaning_laundry"] : null;
+                                    return fieldStats ? (
+                                      <InlineBoxPlot
+                                        fieldName="expenditure_cleaning_laundry"
+                                        currentValue={selectedFacility.expenditure_cleaning_laundry}
+                                        statistics={fieldStats}
+                                        scope={selectedScope}
+                                      />
+                                    ) : null;
+                                  })()}
+                                </dd>
+                              </div>
+                            )}
+                            {selectedFacility.expenditure_accommodation_maintenance && (
+                              <div className="mb-3">
+                                <dt className="text-sm font-medium text-gray-500">Accommodation & Maintenance</dt>
+                                <dd className="text-gray-900 flex items-center">
+                                  {formatCurrency(selectedFacility.expenditure_accommodation_maintenance)}
+                                  {showBoxPlots && !statsLoading && (() => {
+                                    const scopeStats = getStatisticsForScope();
+                                    const fieldStats = scopeStats ? scopeStats.fields?.["expenditure_accommodation_maintenance"] : null;
+                                    return fieldStats ? (
+                                      <InlineBoxPlot
+                                        fieldName="expenditure_accommodation_maintenance"
+                                        currentValue={selectedFacility.expenditure_accommodation_maintenance}
+                                        statistics={fieldStats}
+                                        scope={selectedScope}
+                                      />
+                                    ) : null;
+                                  })()}
+                                </dd>
+                              </div>
+                            )}
+                            {selectedFacility.expenditure_food_catering && (
+                              <div className="mb-3">
+                                <dt className="text-sm font-medium text-gray-500">Food & Catering</dt>
+                                <dd className="text-gray-900 flex items-center">
+                                  {formatCurrency(selectedFacility.expenditure_food_catering)}
+                                  {showBoxPlots && !statsLoading && (() => {
+                                    const scopeStats = getStatisticsForScope();
+                                    const fieldStats = scopeStats ? scopeStats.fields?.["expenditure_food_catering"] : null;
+                                    return fieldStats ? (
+                                      <InlineBoxPlot
+                                        fieldName="expenditure_food_catering"
+                                        currentValue={selectedFacility.expenditure_food_catering}
+                                        statistics={fieldStats}
+                                        scope={selectedScope}
+                                      />
+                                    ) : null;
+                                  })()}
+                                </dd>
+                              </div>
+                            )}
                           </dl>
                         </div>
                         
                         <div>
                           <h4 className="font-medium text-gray-900 mb-3">Income (per day)</h4>
                           <dl className="space-y-2">
-                            {renderField("Total Income", formatCurrency(selectedFacility.income_total_per_day))}
-                            {renderField("Residents Contribution", formatCurrency(selectedFacility.income_residents_contribution))}
-                            {renderField("Government Funding", formatCurrency(selectedFacility.income_government_funding))}
-                            {renderField("Other Income", formatCurrency(selectedFacility.income_other))}
-                            {renderField("Budget Surplus", formatCurrency(selectedFacility.budget_surplus_per_day))}
-                            {renderField("Care Staff Spending (Last Quarter)", formatCurrency(selectedFacility.care_staff_spending_last_quarter))}
+                            {selectedFacility.income_total_per_day && (
+                              <div className="mb-3">
+                                <dt className="text-sm font-medium text-gray-500">Total Income</dt>
+                                <dd className="text-gray-900 flex items-center">
+                                  {formatCurrency(selectedFacility.income_total_per_day)}
+                                  {showBoxPlots && !statsLoading && (() => {
+                                    const scopeStats = getStatisticsForScope();
+                                    const fieldStats = scopeStats ? scopeStats.fields?.["income_total_per_day"] : null;
+                                    return fieldStats ? (
+                                      <InlineBoxPlot
+                                        fieldName="income_total_per_day"
+                                        currentValue={selectedFacility.income_total_per_day}
+                                        statistics={fieldStats}
+                                        scope={selectedScope}
+                                      />
+                                    ) : null;
+                                  })()}
+                                </dd>
+                              </div>
+                            )}
+                            {selectedFacility.income_residents_contribution && (
+                              <div className="mb-3">
+                                <dt className="text-sm font-medium text-gray-500">Residents Contribution</dt>
+                                <dd className="text-gray-900 flex items-center">
+                                  {formatCurrency(selectedFacility.income_residents_contribution)}
+                                  {showBoxPlots && !statsLoading && (() => {
+                                    const scopeStats = getStatisticsForScope();
+                                    const fieldStats = scopeStats ? scopeStats.fields?.["income_residents_contribution"] : null;
+                                    return fieldStats ? (
+                                      <InlineBoxPlot
+                                        fieldName="income_residents_contribution"
+                                        currentValue={selectedFacility.income_residents_contribution}
+                                        statistics={fieldStats}
+                                        scope={selectedScope}
+                                      />
+                                    ) : null;
+                                  })()}
+                                </dd>
+                              </div>
+                            )}
+                            {selectedFacility.income_government_funding && (
+                              <div className="mb-3">
+                                <dt className="text-sm font-medium text-gray-500">Government Funding</dt>
+                                <dd className="text-gray-900 flex items-center">
+                                  {formatCurrency(selectedFacility.income_government_funding)}
+                                  {showBoxPlots && !statsLoading && (() => {
+                                    const scopeStats = getStatisticsForScope();
+                                    const fieldStats = scopeStats ? scopeStats.fields?.["income_government_funding"] : null;
+                                    return fieldStats ? (
+                                      <InlineBoxPlot
+                                        fieldName="income_government_funding"
+                                        currentValue={selectedFacility.income_government_funding}
+                                        statistics={fieldStats}
+                                        scope={selectedScope}
+                                      />
+                                    ) : null;
+                                  })()}
+                                </dd>
+                              </div>
+                            )}
+                            {selectedFacility.income_other && (
+                              <div className="mb-3">
+                                <dt className="text-sm font-medium text-gray-500">Other Income</dt>
+                                <dd className="text-gray-900 flex items-center">
+                                  {formatCurrency(selectedFacility.income_other)}
+                                  {showBoxPlots && !statsLoading && (() => {
+                                    const scopeStats = getStatisticsForScope();
+                                    const fieldStats = scopeStats ? scopeStats.fields?.["income_other"] : null;
+                                    return fieldStats ? (
+                                      <InlineBoxPlot
+                                        fieldName="income_other"
+                                        currentValue={selectedFacility.income_other}
+                                        statistics={fieldStats}
+                                        scope={selectedScope}
+                                      />
+                                    ) : null;
+                                  })()}
+                                </dd>
+                              </div>
+                            )}
+                            {selectedFacility.budget_surplus_per_day && (
+                              <div className="mb-3">
+                                <dt className="text-sm font-medium text-gray-500">Budget Surplus</dt>
+                                <dd className="text-gray-900 flex items-center">
+                                  {formatCurrency(selectedFacility.budget_surplus_per_day)}
+                                  {showBoxPlots && !statsLoading && (() => {
+                                    const scopeStats = getStatisticsForScope();
+                                    const fieldStats = scopeStats ? scopeStats.fields?.["budget_surplus_per_day"] : null;
+                                    return fieldStats ? (
+                                      <InlineBoxPlot
+                                        fieldName="budget_surplus_per_day"
+                                        currentValue={selectedFacility.budget_surplus_per_day}
+                                        statistics={fieldStats}
+                                        scope={selectedScope}
+                                      />
+                                    ) : null;
+                                  })()}
+                                </dd>
+                              </div>
+                            )}
+                            {selectedFacility.care_staff_spending_last_quarter && (
+                              <div className="mb-3">
+                                <dt className="text-sm font-medium text-gray-500">Care Staff Spending (Last Quarter)</dt>
+                                <dd className="text-gray-900 flex items-center">
+                                  {formatCurrency(selectedFacility.care_staff_spending_last_quarter)}
+                                  {showBoxPlots && !statsLoading && (() => {
+                                    const scopeStats = getStatisticsForScope();
+                                    const fieldStats = scopeStats ? scopeStats.fields?.["care_staff_spending_last_quarter"] : null;
+                                    return fieldStats ? (
+                                      <InlineBoxPlot
+                                        fieldName="care_staff_spending_last_quarter"
+                                        currentValue={selectedFacility.care_staff_spending_last_quarter}
+                                        statistics={fieldStats}
+                                        scope={selectedScope}
+                                      />
+                                    ) : null;
+                                  })()}
+                                </dd>
+                              </div>
+                            )}
                           </dl>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                </TabsContent>
-
-                {/* Tab 8: Statistics */}
-                <TabsContent value="statistics">
-                  <ResidentialBoxPlots selectedFacility={selectedFacility} />
                 </TabsContent>
               </Tabs>
             </div>
