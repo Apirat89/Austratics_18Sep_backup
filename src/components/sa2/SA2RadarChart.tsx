@@ -87,7 +87,7 @@ const SA2RadarChart: React.FC<SA2RadarChartProps> = ({
                   <div>Range: ${metric.statistics.min.toLocaleString()} - ${metric.statistics.max.toLocaleString()}${metric.unit || ''}</div>
                 </div>
                 <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd;">
-                  Performance: <strong>${params.value.toFixed(1)}%</strong> of range
+                  Performance: <strong>${Array.isArray(params.value) ? params.value[metricIndex]?.toFixed(1) || 'N/A' : (typeof params.value === 'number' ? params.value.toFixed(1) : params.value)}%</strong> of range
                 </div>
               </div>
             `;
