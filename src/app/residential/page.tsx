@@ -873,12 +873,12 @@ export default function ResidentialPage() {
               <Tabs defaultValue="main" className="p-6">
                 <TabsList className="grid grid-cols-7 gap-2 mb-6">
                   <TabsTrigger value="main">Main</TabsTrigger>
-                  <TabsTrigger value="rooms">Rooms</TabsTrigger>
+                  <TabsTrigger value="rooms">Rooms & Costs</TabsTrigger>
                   <TabsTrigger value="compliance">Compliance</TabsTrigger>
                   <TabsTrigger value="quality">Quality Measures</TabsTrigger>
                   <TabsTrigger value="experience">Residents' Experience</TabsTrigger>
-                  <TabsTrigger value="staffing">Staff Rating</TabsTrigger>
-                  <TabsTrigger value="finance">Finance</TabsTrigger>
+                  <TabsTrigger value="staffing">Staffing</TabsTrigger>
+                  <TabsTrigger value="finance">Finance & Operations</TabsTrigger>
                 </TabsList>
 
                 {/* Tab 1: Main */}
@@ -1028,7 +1028,7 @@ export default function ResidentialPage() {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Building className="w-5 h-5" />
-                        Room Information
+                        Rooms & Costs
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -1348,13 +1348,13 @@ export default function ResidentialPage() {
                   </Card>
                 </TabsContent>
 
-                {/* Tab 6: Staff Rating */}
+                {/* Tab 6: Staffing */}
                 <TabsContent value="staffing">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Users className="w-5 h-5" />
-                        Staff Rating
+                        Staffing
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -1370,13 +1370,13 @@ export default function ResidentialPage() {
                   </Card>
                 </TabsContent>
 
-                {/* Tab 7: Finance */}
+                {/* Tab 7: Finance & Operations */}
                 <TabsContent value="finance">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <DollarSign className="w-5 h-5" />
-                        Financial Information
+                        Finance & Operations
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
