@@ -450,14 +450,24 @@ The hybrid facility implementation is complete and ready for testing:
 ## Project Status Board
 
 ### In Progress
-- 🔄 **Smart SA2 Proximity Suggestions**: Intelligent closest SA2 recommendations
+- 🔄 **Enhanced Box Plot Statistics Validation**: Comprehensive room cost data and field validation
+  - ✅ Added room cost extraction from rooms_data arrays - COMPLETED
+  - ✅ Implemented room_cost_min, room_cost_max, room_cost_median calculation per facility - COMPLETED
+  - ✅ Enhanced statistics script with comprehensive field discovery (91 total fields) - COMPLETED
+  - ✅ Added validation to ensure red dots fall within box plot ranges - COMPLETED
+  - ✅ Used dedicated address fields (address_state, address_postcode, address_locality) - COMPLETED
+  - ✅ Generated statistics for all geographic levels (nationwide, state, postcode, locality) - COMPLETED
+  - ✅ **Fixed room cost box plot field mapping**: Changed from `income_residents_contribution` to `room_cost_median` - COMPLETED
+  - ✅ **Fixed empty variables display in Residents' Experience tab**: Now hides fields with 0 values instead of showing "0%" - COMPLETED
+  - ⏳ **Testing room cost box plots in residential page UI** - READY FOR TESTING
+
+### Completed
+- ✅ **Smart SA2 Proximity Suggestions - FULLY COMPLETED**: Intelligent closest SA2 recommendations
   - ✅ Implemented Haversine distance calculation for geographic proximity - COMPLETED
   - ✅ Added automatic closest SA2 detection for non-SA2 search results - COMPLETED
   - ✅ Enhanced search results with proximity suggestions and distance indicators - COMPLETED
   - ✅ Added visual distinction for proximity suggestions (blue highlighting) - COMPLETED
   - ✅ Integrated analytics data enrichment for suggested SA2 regions - COMPLETED
-
-### Completed
 - ✅ **Multi-Source Geographic Search Integration - FULLY COMPLETED**: Applied Maps page search capabilities to Insights
   - ✅ Integrated mapSearchService.ts for comprehensive location search - COMPLETED
   - ✅ Added support for all 7 geographic types (LGA, SA2, SA3, SA4, Postcode, Locality, Facilities) - COMPLETED
@@ -619,6 +629,32 @@ User needs to add the missing environment variables to fix the password reset fu
 4. Should no longer show "Network error"
 
 ## Lessons
+
+### 🚨 **CRITICAL GITHUB RULE - NEVER PUSH WITHOUT EXPLICIT REQUEST** 🚨
+
+**⚠️ EXTREMELY IMPORTANT RULE:**
+- **NEVER push to GitHub without EXPLICIT user request to push**
+- **ALWAYS wait for user to specifically ask "push to github" or similar**
+- **This prevents accidentally wiping out good versions with failed versions**
+- **User must explicitly request: "pls push to github" or "commit and push changes"**
+- **Do NOT push automatically after completing tasks or fixes**
+- **Do NOT assume user wants changes pushed**
+
+**✅ ONLY push when user explicitly says:**
+- "push to github"
+- "commit and push"
+- "upload to github" 
+- "save to repository"
+- Or similar explicit GitHub push requests
+
+**🚫 NEVER push when user says:**
+- "fix this bug"
+- "implement this feature"
+- "make this change"
+- "update the code"
+- Or any other general development request
+
+**🎯 REASON:** Prevents accidental overwrites of working versions with potentially broken code
 
 ### 📚 **Password Reset Network Error Diagnosis**
 

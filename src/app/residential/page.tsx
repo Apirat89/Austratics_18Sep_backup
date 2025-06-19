@@ -346,6 +346,10 @@ export default function ResidentialPage() {
     }).format(amount);
   };
 
+  const hasValidValue = (value: any): boolean => {
+    return value !== null && value !== undefined && value > 0;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -901,10 +905,10 @@ export default function ResidentialPage() {
                                     {formatCurrency(room.cost_per_day)}
                                     {showBoxPlots && !statsLoading && (() => {
                                       const scopeStats = getStatisticsForScope();
-                                      const fieldStats = scopeStats ? scopeStats.fields?.["income_residents_contribution"] : null;
+                                      const fieldStats = scopeStats ? scopeStats.fields?.["room_cost_median"] : null;
                                       return fieldStats ? (
                                         <InlineBoxPlot
-                                          fieldName="income_residents_contribution"
+                                          fieldName="room_cost_median"
                                           currentValue={room.cost_per_day}
                                           statistics={fieldStats}
                                           scope={selectedScope}
@@ -988,10 +992,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Food Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Food - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Food - Always"], "star_[RE] Food - Always")}
-                            {selectedFacility["star_[RE] Food - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Food - Most of the time"], "star_[RE] Food - Most of the time")}
-                            {selectedFacility["star_[RE] Food - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Food - Some of the time"], "star_[RE] Food - Some of the time")}
-                            {selectedFacility["star_[RE] Food - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Food - Never"], "star_[RE] Food - Never")}
+                            {hasValidValue(selectedFacility["star_[RE] Food - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Food - Always"]!, "star_[RE] Food - Always")}
+                            {hasValidValue(selectedFacility["star_[RE] Food - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Food - Most of the time"]!, "star_[RE] Food - Most of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Food - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Food - Some of the time"]!, "star_[RE] Food - Some of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Food - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Food - Never"]!, "star_[RE] Food - Never")}
                           </dl>
                         </div>
 
@@ -999,10 +1003,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Safety Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Safety - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Safety - Always"], "star_[RE] Safety - Always")}
-                            {selectedFacility["star_[RE] Safety - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Safety - Most of the time"], "star_[RE] Safety - Most of the time")}
-                            {selectedFacility["star_[RE] Safety - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Safety - Some of the time"], "star_[RE] Safety - Some of the time")}
-                            {selectedFacility["star_[RE] Safety - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Safety - Never"], "star_[RE] Safety - Never")}
+                            {hasValidValue(selectedFacility["star_[RE] Safety - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Safety - Always"]!, "star_[RE] Safety - Always")}
+                            {hasValidValue(selectedFacility["star_[RE] Safety - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Safety - Most of the time"]!, "star_[RE] Safety - Most of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Safety - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Safety - Some of the time"]!, "star_[RE] Safety - Some of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Safety - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Safety - Never"]!, "star_[RE] Safety - Never")}
                           </dl>
                         </div>
 
@@ -1010,10 +1014,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Operation Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Operation - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Operation - Always"], "star_[RE] Operation - Always")}
-                            {selectedFacility["star_[RE] Operation - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Operation - Most of the time"], "star_[RE] Operation - Most of the time")}
-                            {selectedFacility["star_[RE] Operation - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Operation - Some of the time"], "star_[RE] Operation - Some of the time")}
-                            {selectedFacility["star_[RE] Operation - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Operation - Never"], "star_[RE] Operation - Never")}
+                            {hasValidValue(selectedFacility["star_[RE] Operation - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Operation - Always"]!, "star_[RE] Operation - Always")}
+                            {hasValidValue(selectedFacility["star_[RE] Operation - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Operation - Most of the time"]!, "star_[RE] Operation - Most of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Operation - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Operation - Some of the time"]!, "star_[RE] Operation - Some of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Operation - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Operation - Never"]!, "star_[RE] Operation - Never")}
                           </dl>
                         </div>
 
@@ -1021,10 +1025,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Care Need Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Care Need - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Care Need - Always"], "star_[RE] Care Need - Always")}
-                            {selectedFacility["star_[RE] Care Need - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Care Need - Most of the time"], "star_[RE] Care Need - Most of the time")}
-                            {selectedFacility["star_[RE] Care Need - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Care Need - Some of the time"], "star_[RE] Care Need - Some of the time")}
-                            {selectedFacility["star_[RE] Care Need - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Care Need - Never"], "star_[RE] Care Need - Never")}
+                            {hasValidValue(selectedFacility["star_[RE] Care Need - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Care Need - Always"]!, "star_[RE] Care Need - Always")}
+                            {hasValidValue(selectedFacility["star_[RE] Care Need - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Care Need - Most of the time"]!, "star_[RE] Care Need - Most of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Care Need - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Care Need - Some of the time"]!, "star_[RE] Care Need - Some of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Care Need - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Care Need - Never"]!, "star_[RE] Care Need - Never")}
                           </dl>
                         </div>
 
@@ -1032,10 +1036,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Competent Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Competent - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Competent - Always"], "star_[RE] Competent - Always")}
-                            {selectedFacility["star_[RE] Competent - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Competent - Most of the time"], "star_[RE] Competent - Most of the time")}
-                            {selectedFacility["star_[RE] Competent - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Competent - Some of the time"], "star_[RE] Competent - Some of the time")}
-                            {selectedFacility["star_[RE] Competent - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Competent - Never"], "star_[RE] Competent - Never")}
+                            {hasValidValue(selectedFacility["star_[RE] Competent - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Competent - Always"]!, "star_[RE] Competent - Always")}
+                            {hasValidValue(selectedFacility["star_[RE] Competent - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Competent - Most of the time"]!, "star_[RE] Competent - Most of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Competent - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Competent - Some of the time"]!, "star_[RE] Competent - Some of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Competent - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Competent - Never"]!, "star_[RE] Competent - Never")}
                           </dl>
                         </div>
 
@@ -1043,10 +1047,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Independence Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Independent - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Independent - Always"], "star_[RE] Independent - Always")}
-                            {selectedFacility["star_[RE] Independent - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Independent - Most of the time"], "star_[RE] Independent - Most of the time")}
-                            {selectedFacility["star_[RE] Independent - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Independent - Some of the time"], "star_[RE] Independent - Some of the time")}
-                            {selectedFacility["star_[RE] Independent - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Independent - Never"], "star_[RE] Independent - Never")}
+                            {hasValidValue(selectedFacility["star_[RE] Independent - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Independent - Always"]!, "star_[RE] Independent - Always")}
+                            {hasValidValue(selectedFacility["star_[RE] Independent - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Independent - Most of the time"]!, "star_[RE] Independent - Most of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Independent - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Independent - Some of the time"]!, "star_[RE] Independent - Some of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Independent - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Independent - Never"]!, "star_[RE] Independent - Never")}
                           </dl>
                         </div>
 
@@ -1054,10 +1058,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Explanation Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Explain - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Explain - Always"], "star_[RE] Explain - Always")}
-                            {selectedFacility["star_[RE] Explain - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Explain - Most of the time"], "star_[RE] Explain - Most of the time")}
-                            {selectedFacility["star_[RE] Explain - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Explain - Some of the time"], "star_[RE] Explain - Some of the time")}
-                            {selectedFacility["star_[RE] Explain - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Explain - Never"], "star_[RE] Explain - Never")}
+                            {hasValidValue(selectedFacility["star_[RE] Explain - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Explain - Always"]!, "star_[RE] Explain - Always")}
+                            {hasValidValue(selectedFacility["star_[RE] Explain - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Explain - Most of the time"]!, "star_[RE] Explain - Most of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Explain - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Explain - Some of the time"]!, "star_[RE] Explain - Some of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Explain - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Explain - Never"]!, "star_[RE] Explain - Never")}
                           </dl>
                         </div>
 
@@ -1065,10 +1069,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Respect Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Respect - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Respect - Always"], "star_[RE] Respect - Always")}
-                            {selectedFacility["star_[RE] Respect - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Respect - Most of the time"], "star_[RE] Respect - Most of the time")}
-                            {selectedFacility["star_[RE] Respect - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Respect - Some of the time"], "star_[RE] Respect - Some of the time")}
-                            {selectedFacility["star_[RE] Respect - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Respect - Never"], "star_[RE] Respect - Never")}
+                            {hasValidValue(selectedFacility["star_[RE] Respect - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Respect - Always"]!, "star_[RE] Respect - Always")}
+                            {hasValidValue(selectedFacility["star_[RE] Respect - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Respect - Most of the time"]!, "star_[RE] Respect - Most of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Respect - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Respect - Some of the time"]!, "star_[RE] Respect - Some of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Respect - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Respect - Never"]!, "star_[RE] Respect - Never")}
                           </dl>
                         </div>
 
@@ -1076,10 +1080,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Follow Up Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Follow Up - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Follow Up - Always"], "star_[RE] Follow Up - Always")}
-                            {selectedFacility["star_[RE] Follow Up - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Follow Up - Most of the time"], "star_[RE] Follow Up - Most of the time")}
-                            {selectedFacility["star_[RE] Follow Up - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Follow Up - Some of the time"], "star_[RE] Follow Up - Some of the time")}
-                            {selectedFacility["star_[RE] Follow Up - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Follow Up - Never"], "star_[RE] Follow Up - Never")}
+                            {hasValidValue(selectedFacility["star_[RE] Follow Up - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Follow Up - Always"]!, "star_[RE] Follow Up - Always")}
+                            {hasValidValue(selectedFacility["star_[RE] Follow Up - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Follow Up - Most of the time"]!, "star_[RE] Follow Up - Most of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Follow Up - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Follow Up - Some of the time"]!, "star_[RE] Follow Up - Some of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Follow Up - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Follow Up - Never"]!, "star_[RE] Follow Up - Never")}
                           </dl>
                         </div>
 
@@ -1087,10 +1091,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Caring Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Caring - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Caring - Always"], "star_[RE] Caring - Always")}
-                            {selectedFacility["star_[RE] Caring - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Caring - Most of the time"], "star_[RE] Caring - Most of the time")}
-                            {selectedFacility["star_[RE] Caring - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Caring - Some of the time"], "star_[RE] Caring - Some of the time")}
-                            {selectedFacility["star_[RE] Caring - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Caring - Never"], "star_[RE] Caring - Never")}
+                            {hasValidValue(selectedFacility["star_[RE] Caring - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Caring - Always"]!, "star_[RE] Caring - Always")}
+                            {hasValidValue(selectedFacility["star_[RE] Caring - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Caring - Most of the time"]!, "star_[RE] Caring - Most of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Caring - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Caring - Some of the time"]!, "star_[RE] Caring - Some of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Caring - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Caring - Never"]!, "star_[RE] Caring - Never")}
                           </dl>
                         </div>
 
@@ -1098,10 +1102,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Voice Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Voice - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Voice - Always"], "star_[RE] Voice - Always")}
-                            {selectedFacility["star_[RE] Voice - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Voice - Most of the time"], "star_[RE] Voice - Most of the time")}
-                            {selectedFacility["star_[RE] Voice - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Voice - Some of the time"], "star_[RE] Voice - Some of the time")}
-                            {selectedFacility["star_[RE] Voice - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Voice - Never"], "star_[RE] Voice - Never")}
+                            {hasValidValue(selectedFacility["star_[RE] Voice - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Voice - Always"]!, "star_[RE] Voice - Always")}
+                            {hasValidValue(selectedFacility["star_[RE] Voice - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Voice - Most of the time"]!, "star_[RE] Voice - Most of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Voice - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Voice - Some of the time"]!, "star_[RE] Voice - Some of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Voice - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Voice - Never"]!, "star_[RE] Voice - Never")}
                           </dl>
                         </div>
 
@@ -1109,10 +1113,10 @@ export default function ResidentialPage() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Home Experience</h4>
                           <dl className="space-y-1 ml-4">
-                            {selectedFacility["star_[RE] Home - Always"] && renderPercentageField("Always", selectedFacility["star_[RE] Home - Always"], "star_[RE] Home - Always")}
-                            {selectedFacility["star_[RE] Home - Most of the time"] && renderPercentageField("Most of the time", selectedFacility["star_[RE] Home - Most of the time"], "star_[RE] Home - Most of the time")}
-                            {selectedFacility["star_[RE] Home - Some of the time"] && renderPercentageField("Some of the time", selectedFacility["star_[RE] Home - Some of the time"], "star_[RE] Home - Some of the time")}
-                            {selectedFacility["star_[RE] Home - Never"] && renderPercentageField("Never", selectedFacility["star_[RE] Home - Never"], "star_[RE] Home - Never")}
+                            {hasValidValue(selectedFacility["star_[RE] Home - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Home - Always"]!, "star_[RE] Home - Always")}
+                            {hasValidValue(selectedFacility["star_[RE] Home - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Home - Most of the time"]!, "star_[RE] Home - Most of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Home - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Home - Some of the time"]!, "star_[RE] Home - Some of the time")}
+                            {hasValidValue(selectedFacility["star_[RE] Home - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Home - Never"]!, "star_[RE] Home - Never")}
                           </dl>
                         </div>
                       </div>

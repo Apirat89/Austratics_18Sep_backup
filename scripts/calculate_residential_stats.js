@@ -2,13 +2,79 @@ const fs = require('fs');
 const path = require('path');
 
 // Read the residential data
-const dataPath = 'Maps_ABS_CSV/Residential_May2025_ExcludeMPS_updated.json';
+const dataPath = 'public/maps/abs_csv/Residential_May2025_ExcludeMPS_updated.json';
 const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
 console.log(`Loaded ${data.length} residential facilities`);
 
-// Define numeric fields for analysis
-const numericFields = [
+// Function to extract room cost statistics for a facility
+function extractRoomCostStats(facility) {
+  if (!facility.rooms_data || !Array.isArray(facility.rooms_data)) {
+    return {
+      room_cost_min: null,
+      room_cost_max: null,
+      room_cost_median: null
+    };
+  }
+
+  // Extract all valid cost_per_day values
+  const roomCosts = facility.rooms_data
+    .map(room => room.cost_per_day)
+    .filter(cost => cost !== null && cost !== undefined && typeof cost === 'number' && !isNaN(cost));
+
+  if (roomCosts.length === 0) {
+    return {
+      room_cost_min: null,
+      room_cost_max: null,
+      room_cost_median: null
+    };
+  }
+
+  // Sort costs for median calculation
+  const sortedCosts = roomCosts.slice().sort((a, b) => a - b);
+  
+  // Calculate statistics
+  const min = sortedCosts[0];
+  const max = sortedCosts[sortedCosts.length - 1];
+  const median = sortedCosts.length % 2 === 0 
+    ? (sortedCosts[sortedCosts.length / 2 - 1] + sortedCosts[sortedCosts.length / 2]) / 2
+    : sortedCosts[Math.floor(sortedCosts.length / 2)];
+
+  return {
+    room_cost_min: Math.round(min * 100) / 100,
+    room_cost_max: Math.round(max * 100) / 100,
+    room_cost_median: Math.round(median * 100) / 100
+  };
+}
+
+// Function to scan all numeric fields in the dataset
+function scanAllNumericFields(data) {
+  const numericFields = new Set();
+  
+  data.forEach(facility => {
+    Object.keys(facility).forEach(key => {
+      const value = facility[key];
+      if (typeof value === 'number' && !isNaN(value)) {
+        numericFields.add(key);
+      }
+    });
+  });
+  
+  return Array.from(numericFields).sort();
+}
+
+// Scan for all numeric fields in the dataset
+console.log('Scanning dataset for all numeric fields...');
+const discoveredFields = scanAllNumericFields(data);
+console.log(`Found ${discoveredFields.length} numeric fields in dataset`);
+
+// Define comprehensive numeric fields for analysis
+const predefinedFields = [
+  // Room Cost Fields (calculated per facility)
+  'room_cost_min',
+  'room_cost_max', 
+  'room_cost_median',
+  
   // Financial Variables
   'expenditure_total_per_day',
   'expenditure_care_nursing', 
@@ -112,6 +178,26 @@ const numericFields = [
   'star_[RE] Home - Never'
 ];
 
+// Combine predefined fields with discovered fields (avoiding duplicates)
+const numericFields = [...predefinedFields, ...discoveredFields.filter(field => !predefinedFields.includes(field))];
+
+// Remove duplicates and sort
+const uniqueNumericFields = [...new Set(numericFields)].sort();
+
+console.log(`Processing ${uniqueNumericFields.length} total numeric fields (including room cost statistics)`);
+
+// Enhance facility data with room cost statistics
+console.log('Calculating room cost statistics for each facility...');
+const enhancedData = data.map(facility => {
+  const roomCostStats = extractRoomCostStats(facility);
+  return {
+    ...facility,
+    ...roomCostStats
+  };
+});
+
+console.log('Room cost statistics added to all facilities');
+
 // Function to calculate statistics for an array of values
 function calculateStats(values) {
   if (!values || values.length === 0) {
@@ -142,11 +228,11 @@ function calculateStats(values) {
   const min = sorted[0];
   const max = sorted[count - 1];
   
-  // Quartiles
-  const q1Index = Math.floor(count * 0.25);
-  const q3Index = Math.floor(count * 0.75);
-  const q1 = sorted[q1Index];
-  const q3 = sorted[q3Index];
+  // Quartiles (using proper percentile calculation)
+  const q1Index = Math.ceil(count * 0.25) - 1;
+  const q3Index = Math.ceil(count * 0.75) - 1;
+  const q1 = sorted[Math.max(0, q1Index)];
+  const q3 = sorted[Math.min(count - 1, q3Index)];
   const iqr = q3 - q1;
   
   return {
@@ -168,17 +254,52 @@ function getValidValues(records, field) {
     .filter(value => value !== null && value !== undefined && typeof value === 'number' && !isNaN(value));
 }
 
+// Function to validate that individual values fall within calculated ranges
+function validateStatistics(records, field, stats) {
+  if (!stats || stats.count === 0) return { valid: true, issues: [] };
+  
+  const values = getValidValues(records, field);
+  const issues = [];
+  
+  values.forEach((value, index) => {
+    if (value < stats.min || value > stats.max) {
+      const facility = records.find(r => r[field] === value);
+      issues.push({
+        facility: facility?.['Service Name'] || `Record ${index}`,
+        value: value,
+        field: field,
+        min: stats.min,
+        max: stats.max,
+        issue: `Value ${value} is outside calculated range [${stats.min}, ${stats.max}]`
+      });
+    }
+  });
+  
+  return {
+    valid: issues.length === 0,
+    issues: issues
+  };
+}
+
 // Function to calculate statistics for a group of records
 function calculateGroupStats(records, groupName) {
   const stats = {
     groupName,
     recordCount: records.length,
-    fields: {}
+    fields: {},
+    validationIssues: []
   };
   
-  numericFields.forEach(field => {
+  uniqueNumericFields.forEach(field => {
     const values = getValidValues(records, field);
-    stats.fields[field] = calculateStats(values);
+    const fieldStats = calculateStats(values);
+    stats.fields[field] = fieldStats;
+    
+    // Validate that individual values fall within calculated ranges
+    const validation = validateStatistics(records, field, fieldStats);
+    if (!validation.valid) {
+      stats.validationIssues.push(...validation.issues);
+    }
   });
   
   return stats;
@@ -188,12 +309,12 @@ console.log('Calculating statistics...');
 
 // 1. Nationwide statistics
 console.log('1. Calculating nationwide statistics...');
-const nationwideStats = calculateGroupStats(data, 'Nationwide');
+const nationwideStats = calculateGroupStats(enhancedData, 'Nationwide');
 
-// 2. Statistics by state
+// 2. Statistics by state (using address_state field)
 console.log('2. Calculating statistics by state...');
 const stateGroups = {};
-data.forEach(record => {
+enhancedData.forEach(record => {
   const state = record.address_state;
   if (state) {
     if (!stateGroups[state]) stateGroups[state] = [];
@@ -205,10 +326,10 @@ const stateStats = Object.keys(stateGroups).map(state =>
   calculateGroupStats(stateGroups[state], state)
 );
 
-// 3. Statistics by postcode
+// 3. Statistics by postcode (using address_postcode field)
 console.log('3. Calculating statistics by postcode...');
 const postcodeGroups = {};
-data.forEach(record => {
+enhancedData.forEach(record => {
   const postcode = record.address_postcode;
   if (postcode) {
     if (!postcodeGroups[postcode]) postcodeGroups[postcode] = [];
@@ -220,10 +341,10 @@ const postcodeStats = Object.keys(postcodeGroups).map(postcode =>
   calculateGroupStats(postcodeGroups[postcode], postcode)
 );
 
-// 4. Statistics by locality
+// 4. Statistics by locality (using address_locality field)
 console.log('4. Calculating statistics by locality...');
 const localityGroups = {};
-data.forEach(record => {
+enhancedData.forEach(record => {
   const locality = record.address_locality;
   if (locality) {
     if (!localityGroups[locality]) localityGroups[locality] = [];
@@ -235,22 +356,54 @@ const localityStats = Object.keys(localityGroups).map(locality =>
   calculateGroupStats(localityGroups[locality], locality)
 );
 
+// Collect all validation issues
+const allValidationIssues = [
+  ...nationwideStats.validationIssues,
+  ...stateStats.flatMap(s => s.validationIssues),
+  ...postcodeStats.flatMap(s => s.validationIssues),
+  ...localityStats.flatMap(s => s.validationIssues)
+];
+
+// Log validation issues
+if (allValidationIssues.length > 0) {
+  console.log(`\n⚠️  Found ${allValidationIssues.length} validation issues:`);
+  allValidationIssues.slice(0, 10).forEach(issue => {
+    console.log(`   • ${issue.facility}: ${issue.field} = ${issue.value} (outside range [${issue.min}, ${issue.max}])`);
+  });
+  if (allValidationIssues.length > 10) {
+    console.log(`   ... and ${allValidationIssues.length - 10} more issues`);
+  }
+} else {
+  console.log('\n✅ All individual facility values fall within calculated statistical ranges');
+}
+
 // Compile final results
 const results = {
   metadata: {
     generatedAt: new Date().toISOString(),
-    totalRecords: data.length,
-    numericFields: numericFields.length,
+    totalRecords: enhancedData.length,
+    numericFields: uniqueNumericFields.length,
+    roomCostFieldsAdded: ['room_cost_min', 'room_cost_max', 'room_cost_median'],
+    validationIssues: allValidationIssues.length,
     geographicLevels: {
       states: Object.keys(stateGroups).length,
       postcodes: Object.keys(postcodeGroups).length,
       localities: Object.keys(localityGroups).length
-    }
+    },
+    fieldList: uniqueNumericFields
   },
   nationwide: nationwideStats,
   byState: stateStats,
   byPostcode: postcodeStats,
-  byLocality: localityStats
+  byLocality: localityStats,
+  validationReport: {
+    totalIssues: allValidationIssues.length,
+    issuesByField: allValidationIssues.reduce((acc, issue) => {
+      acc[issue.field] = (acc[issue.field] || 0) + 1;
+      return acc;
+    }, {}),
+    sampleIssues: allValidationIssues.slice(0, 20)
+  }
 };
 
 // Save results to both public and non-public folders
@@ -267,10 +420,12 @@ fs.writeFileSync(publicPath, JSON.stringify(results, null, 2));
 console.log(`✅ Statistics saved to public folder: ${publicPath}`);
 
 // Print summary
-console.log('\n📊 STATISTICAL ANALYSIS COMPLETE');
-console.log('=================================');
-console.log(`📋 Total Records Analyzed: ${data.length}`);
-console.log(`📈 Numeric Fields: ${numericFields.length}`);
+console.log('\n📊 ENHANCED STATISTICAL ANALYSIS COMPLETE');
+console.log('=========================================');
+console.log(`📋 Total Records Analyzed: ${enhancedData.length}`);
+console.log(`📈 Numeric Fields: ${uniqueNumericFields.length}`);
+console.log(`🏠 Room Cost Fields Added: 3 (min, max, median)`);
+console.log(`🔍 Validation Issues: ${allValidationIssues.length}`);
 console.log(`🌏 Geographic Levels:`);
 console.log(`   • Nationwide: 1 group`);
 console.log(`   • States: ${Object.keys(stateGroups).length} groups`);
@@ -279,4 +434,4 @@ console.log(`   • Localities: ${Object.keys(localityGroups).length} groups`);
 console.log(`\n📁 Output Files:`);
 console.log(`   • ${nonPublicPath}`);
 console.log(`   • ${publicPath}`);
-console.log('\n✅ Analysis complete! Both files contain comprehensive statistics for all numeric variables.'); 
+console.log('\n✅ Enhanced analysis complete with room cost data and comprehensive field validation!'); 

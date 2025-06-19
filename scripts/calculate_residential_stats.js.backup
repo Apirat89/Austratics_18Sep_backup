@@ -1,0 +1,282 @@
+const fs = require('fs');
+const path = require('path');
+
+// Read the residential data
+const dataPath = 'Maps_ABS_CSV/Residential_May2025_ExcludeMPS_updated.json';
+const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+
+console.log(`Loaded ${data.length} residential facilities`);
+
+// Define numeric fields for analysis
+const numericFields = [
+  // Financial Variables
+  'expenditure_total_per_day',
+  'expenditure_care_nursing', 
+  'expenditure_administration',
+  'expenditure_cleaning_laundry',
+  'expenditure_accommodation_maintenance',
+  'expenditure_food_catering',
+  'income_total_per_day',
+  'income_residents_contribution',
+  'income_government_funding',
+  'income_other',
+  'budget_surplus_per_day',
+  'care_staff_spending_last_quarter',
+  
+  // Rating Variables
+  'overall_rating_stars',
+  'compliance_rating',
+  'quality_measures_rating',
+  'residents_experience_rating',
+  'staffing_rating',
+  
+  // Food Service Variables
+  'food_cost_per_day',
+  'food_sector_average',
+  'food_resident_satisfaction',
+  
+  // Capacity Variables
+  'residential_places',
+  
+  // Star Rating System Variables
+  'star_Overall Star Rating',
+  'star_Compliance rating',
+  'star_Quality Measures rating',
+  'star_Residents\' Experience rating',
+  'star_Staffing rating',
+  'star_[RE] Interview Year',
+  
+  // Staff Care Minutes
+  'star_[S] Registered Nurse Care Minutes - Target',
+  'star_[S] Registered Nurse Care Minutes - Actual',
+  'star_[S] Total Care Minutes - Target',
+  'star_[S] Total Care Minutes - Actual',
+  
+  // Quality Measures
+  'star_[QM] Pressure injuries*',
+  'star_[QM] Restrictive practices',
+  'star_[QM] Unplanned weight loss*',
+  'star_[QM] Falls and major injury - falls*',
+  'star_[QM] Falls and major injury - major injury from a fall*',
+  'star_[QM] Medication management - polypharmacy',
+  'star_[QM] Medication management - antipsychotic',
+  
+  // Residents' Experience Survey Data (44 fields)
+  'star_[RE] Food - Always',
+  'star_[RE] Food - Most of the time',
+  'star_[RE] Food - Some of the time',
+  'star_[RE] Food - Never',
+  'star_[RE] Safety - Always',
+  'star_[RE] Safety - Most of the time',
+  'star_[RE] Safety - Some of the time',
+  'star_[RE] Safety - Never',
+  'star_[RE] Operation - Always',
+  'star_[RE] Operation - Most of the time',
+  'star_[RE] Operation - Some of the time',
+  'star_[RE] Operation - Never',
+  'star_[RE] Care Need - Always',
+  'star_[RE] Care Need - Most of the time',
+  'star_[RE] Care Need - Some of the time',
+  'star_[RE] Care Need - Never',
+  'star_[RE] Competent - Always',
+  'star_[RE] Competent - Most of the time',
+  'star_[RE] Competent - Some of the time',
+  'star_[RE] Competent - Never',
+  'star_[RE] Independent - Always',
+  'star_[RE] Independent - Most of the time',
+  'star_[RE] Independent - Some of the time',
+  'star_[RE] Independent - Never',
+  'star_[RE] Explain - Always',
+  'star_[RE] Explain - Most of the time',
+  'star_[RE] Explain - Some of the time',
+  'star_[RE] Explain - Never',
+  'star_[RE] Respect - Always',
+  'star_[RE] Respect - Most of the time',
+  'star_[RE] Respect - Some of the time',
+  'star_[RE] Respect - Never',
+  'star_[RE] Follow Up - Always',
+  'star_[RE] Follow Up - Most of the time',
+  'star_[RE] Follow Up - Some of the time',
+  'star_[RE] Follow Up - Never',
+  'star_[RE] Caring - Always',
+  'star_[RE] Caring - Most of the time',
+  'star_[RE] Caring - Some of the time',
+  'star_[RE] Caring - Never',
+  'star_[RE] Voice - Always',
+  'star_[RE] Voice - Most of the time',
+  'star_[RE] Voice - Some of the time',
+  'star_[RE] Voice - Never',
+  'star_[RE] Home - Always',
+  'star_[RE] Home - Most of the time',
+  'star_[RE] Home - Some of the time',
+  'star_[RE] Home - Never'
+];
+
+// Function to calculate statistics for an array of values
+function calculateStats(values) {
+  if (!values || values.length === 0) {
+    return {
+      count: 0,
+      mean: null,
+      median: null,
+      min: null,
+      max: null,
+      q1: null,
+      q3: null,
+      iqr: null
+    };
+  }
+  
+  const sorted = values.slice().sort((a, b) => a - b);
+  const count = sorted.length;
+  
+  // Mean
+  const mean = values.reduce((sum, val) => sum + val, 0) / count;
+  
+  // Median
+  const median = count % 2 === 0 
+    ? (sorted[count / 2 - 1] + sorted[count / 2]) / 2
+    : sorted[Math.floor(count / 2)];
+  
+  // Min and Max
+  const min = sorted[0];
+  const max = sorted[count - 1];
+  
+  // Quartiles
+  const q1Index = Math.floor(count * 0.25);
+  const q3Index = Math.floor(count * 0.75);
+  const q1 = sorted[q1Index];
+  const q3 = sorted[q3Index];
+  const iqr = q3 - q1;
+  
+  return {
+    count,
+    mean: Math.round(mean * 100) / 100,
+    median: Math.round(median * 100) / 100,
+    min: Math.round(min * 100) / 100,
+    max: Math.round(max * 100) / 100,
+    q1: Math.round(q1 * 100) / 100,
+    q3: Math.round(q3 * 100) / 100,
+    iqr: Math.round(iqr * 100) / 100
+  };
+}
+
+// Function to get valid numeric values for a field
+function getValidValues(records, field) {
+  return records
+    .map(record => record[field])
+    .filter(value => value !== null && value !== undefined && typeof value === 'number' && !isNaN(value));
+}
+
+// Function to calculate statistics for a group of records
+function calculateGroupStats(records, groupName) {
+  const stats = {
+    groupName,
+    recordCount: records.length,
+    fields: {}
+  };
+  
+  numericFields.forEach(field => {
+    const values = getValidValues(records, field);
+    stats.fields[field] = calculateStats(values);
+  });
+  
+  return stats;
+}
+
+console.log('Calculating statistics...');
+
+// 1. Nationwide statistics
+console.log('1. Calculating nationwide statistics...');
+const nationwideStats = calculateGroupStats(data, 'Nationwide');
+
+// 2. Statistics by state
+console.log('2. Calculating statistics by state...');
+const stateGroups = {};
+data.forEach(record => {
+  const state = record.address_state;
+  if (state) {
+    if (!stateGroups[state]) stateGroups[state] = [];
+    stateGroups[state].push(record);
+  }
+});
+
+const stateStats = Object.keys(stateGroups).map(state => 
+  calculateGroupStats(stateGroups[state], state)
+);
+
+// 3. Statistics by postcode
+console.log('3. Calculating statistics by postcode...');
+const postcodeGroups = {};
+data.forEach(record => {
+  const postcode = record.address_postcode;
+  if (postcode) {
+    if (!postcodeGroups[postcode]) postcodeGroups[postcode] = [];
+    postcodeGroups[postcode].push(record);
+  }
+});
+
+const postcodeStats = Object.keys(postcodeGroups).map(postcode => 
+  calculateGroupStats(postcodeGroups[postcode], postcode)
+);
+
+// 4. Statistics by locality
+console.log('4. Calculating statistics by locality...');
+const localityGroups = {};
+data.forEach(record => {
+  const locality = record.address_locality;
+  if (locality) {
+    if (!localityGroups[locality]) localityGroups[locality] = [];
+    localityGroups[locality].push(record);
+  }
+});
+
+const localityStats = Object.keys(localityGroups).map(locality => 
+  calculateGroupStats(localityGroups[locality], locality)
+);
+
+// Compile final results
+const results = {
+  metadata: {
+    generatedAt: new Date().toISOString(),
+    totalRecords: data.length,
+    numericFields: numericFields.length,
+    geographicLevels: {
+      states: Object.keys(stateGroups).length,
+      postcodes: Object.keys(postcodeGroups).length,
+      localities: Object.keys(localityGroups).length
+    }
+  },
+  nationwide: nationwideStats,
+  byState: stateStats,
+  byPostcode: postcodeStats,
+  byLocality: localityStats
+};
+
+// Save results to both public and non-public folders
+const outputFilename = 'Residential_Statistics_Analysis.json';
+
+// Save to non-public folder
+const nonPublicPath = path.join('Maps_ABS_CSV', outputFilename);
+fs.writeFileSync(nonPublicPath, JSON.stringify(results, null, 2));
+console.log(`✅ Statistics saved to non-public folder: ${nonPublicPath}`);
+
+// Save to public folder
+const publicPath = path.join('public', 'maps', 'abs_csv', outputFilename);
+fs.writeFileSync(publicPath, JSON.stringify(results, null, 2));
+console.log(`✅ Statistics saved to public folder: ${publicPath}`);
+
+// Print summary
+console.log('\n📊 STATISTICAL ANALYSIS COMPLETE');
+console.log('=================================');
+console.log(`📋 Total Records Analyzed: ${data.length}`);
+console.log(`📈 Numeric Fields: ${numericFields.length}`);
+console.log(`🌏 Geographic Levels:`);
+console.log(`   • Nationwide: 1 group`);
+console.log(`   • States: ${Object.keys(stateGroups).length} groups`);
+console.log(`   • Postcodes: ${Object.keys(postcodeGroups).length} groups`);
+console.log(`   • Localities: ${Object.keys(localityGroups).length} groups`);
+console.log(`\n📁 Output Files:`);
+console.log(`   • ${nonPublicPath}`);
+console.log(`   • ${publicPath}`);
+console.log('\n✅ Analysis complete! Both files contain comprehensive statistics for all numeric variables.'); 
