@@ -350,6 +350,32 @@ export default function ResidentialPage() {
     return value !== null && value !== undefined && value > 0;
   };
 
+  const renderEnhancedQualityField = (title: string, description: string, value: any, fieldName?: string) => {
+    if (value === null || value === undefined) return null;
+    
+    return (
+      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+        <dt className="text-sm font-semibold text-gray-900 mb-2">{title}</dt>
+        <dd className="text-gray-900 flex items-center mb-3">
+          <span className="text-lg font-medium">{typeof value === 'number' ? `${value}%` : value}</span>
+          {showBoxPlots && !statsLoading && fieldName && (() => {
+            const scopeStats = getStatisticsForScope();
+            const fieldStats = scopeStats ? scopeStats.fields?.[fieldName] : null;
+            return fieldStats ? (
+              <InlineBoxPlot
+                fieldName={fieldName}
+                currentValue={value}
+                statistics={fieldStats}
+                scope={selectedScope}
+              />
+            ) : null;
+          })()}
+        </dd>
+        <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -958,17 +984,59 @@ export default function ResidentialPage() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <dl className="space-y-2">
+                      <div className="space-y-4">
                         {renderField("Service Name", selectedFacility["Service Name"])}
                         {renderField("Quality Measures Rating", selectedFacility["star_Quality Measures rating"], "star_Quality Measures rating")}
-                        {renderField("Pressure Injuries", selectedFacility["star_[QM] Pressure injuries*"], "star_[QM] Pressure injuries*")}
-                        {renderField("Restrictive Practices", selectedFacility["star_[QM] Restrictive practices"], "star_[QM] Restrictive practices")}
-                        {renderField("Unplanned Weight Loss", selectedFacility["star_[QM] Unplanned weight loss*"], "star_[QM] Unplanned weight loss*")}
-                        {renderField("Falls and Major Injury - Falls", selectedFacility["star_[QM] Falls and major injury - falls*"], "star_[QM] Falls and major injury - falls*")}
-                        {renderField("Falls and Major Injury - Major Injury", selectedFacility["star_[QM] Falls and major injury - major injury from a fall*"], "star_[QM] Falls and major injury - major injury from a fall*")}
-                        {renderField("Medication Management - Polypharmacy", selectedFacility["star_[QM] Medication management - polypharmacy"], "star_[QM] Medication management - polypharmacy")}
-                        {renderField("Medication Management - Antipsychotic", selectedFacility["star_[QM] Medication management - antipsychotic"], "star_[QM] Medication management - antipsychotic")}
-                      </dl>
+                        
+                        {renderEnhancedQualityField(
+                          "Pressure injuries (% residents experienced pressure injuries)",
+                          "Pressure injuries are areas of damage to the skin and the tissues underneath. They are caused by pressure, friction or both, and often occur over bony areas like the tailbone, elbows, heels or hips. Developing a pressure injury can affect quality of life, particularly if the injury becomes severe. Pressure injuries are very painful, can be difficult to heal, and can make it difficult to move.",
+                          selectedFacility["star_[QM] Pressure injuries*"],
+                          "star_[QM] Pressure injuries*"
+                        )}
+                        
+                        {renderEnhancedQualityField(
+                          "Restrictive practices (% of residents were subject to restrictive practices)",
+                          "Restrictive practices are any practice or intervention restricting a person's right or freedom of movement. High use of restrictive practices is an indicator of poor quality of care and it can lead to negative outcomes such as physical and mental harm. Restrictive practices should only be used as a last resort to protect the safety of the person in care.",
+                          selectedFacility["star_[QM] Restrictive practices"],
+                          "star_[QM] Restrictive practices"
+                        )}
+                        
+                        {renderEnhancedQualityField(
+                          "Unplanned Weight Loss (% of residents experienced unplanned weight loss)",
+                          "Unplanned weight loss happens when a person does not eat enough food to meet their daily needs and loses a significant amount of weight unintentionally. It can contribute to serious health issues such as hip fracture, poor wound healing, malnutrition, as well as decreased quality of life. Aged care homes should monitor the weight of the person in care and address changes as early as possible.",
+                          selectedFacility["star_[QM] Unplanned weight loss*"],
+                          "star_[QM] Unplanned weight loss*"
+                        )}
+                        
+                        {renderEnhancedQualityField(
+                          "Falls and Major Injury – Falls (% of residents experienced one or more falls)",
+                          "A fall is an event resulting in a person coming to rest inadvertently on the ground, floor or other lower level and may suffer from an injury as a result of a fall.",
+                          selectedFacility["star_[QM] Falls and major injury - falls*"],
+                          "star_[QM] Falls and major injury - falls*"
+                        )}
+                        
+                        {renderEnhancedQualityField(
+                          "Falls and Major Injury - Major Injury (% of residents experienced a major injury from a fall)",
+                          "Falls can reduce physical functioning, decrease independence, cause minor and major injury, psychological impacts and occasionally death.",
+                          selectedFacility["star_[QM] Falls and major injury - major injury from a fall*"],
+                          "star_[QM] Falls and major injury - major injury from a fall*"
+                        )}
+                        
+                        {renderEnhancedQualityField(
+                          "Medication Management – Polypharmacy (% of residents were prescribed nine or more medications)",
+                          "Polypharmacy is the prescription of nine or more medications to a care recipient. Regular monitoring of polypharmacy is important as polypharmacy can lead to a reduced quality of life, side effects, hospitalisation, and impact memory, thinking and decision making.",
+                          selectedFacility["star_[QM] Medication management - polypharmacy"],
+                          "star_[QM] Medication management - polypharmacy"
+                        )}
+                        
+                        {renderEnhancedQualityField(
+                          "Medication Management - Antipsychotic (% of residents received antipsychotic medication that was not for a diagnosed condition of psychosis)",
+                          "Antipsychotics are medications prescribed for the treatment of a diagnosed condition of psychosis. Regular monitoring of the use of antipsychotics is important because inappropriate use has been shown to be associated with poor health outcomes.",
+                          selectedFacility["star_[QM] Medication management - antipsychotic"],
+                          "star_[QM] Medication management - antipsychotic"
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 </TabsContent>
