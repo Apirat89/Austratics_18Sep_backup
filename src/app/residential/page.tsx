@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InlineBoxPlot from '@/components/residential/InlineBoxPlot';
@@ -127,6 +128,7 @@ interface SavedFacility {
 }
 
 export default function ResidentialPage() {
+  const router = useRouter();
   const [facilities, setFacilities] = useState<ResidentialFacility[]>([]);
   const [filteredFacilities, setFilteredFacilities] = useState<ResidentialFacility[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -366,8 +368,19 @@ export default function ResidentialPage() {
               <h1 className="text-3xl font-bold text-gray-900">Residential Aged Care Facilities</h1>
             </div>
             
-            {/* Toggle between Search and Saved */}
+            {/* Back to Main Menu and Toggle buttons */}
             <div className="flex items-center gap-2">
+              {/* Back to Main Menu Button */}
+              <button
+                onClick={() => router.push('/main')}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+                title="Back to Main Menu"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Main Menu
+              </button>
+              
+              {/* Toggle between Search and Saved */}
               <button
                 onClick={() => setShowSavedFacilities(false)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
