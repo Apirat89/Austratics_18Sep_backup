@@ -350,6 +350,10 @@ export default function ResidentialPage() {
     return value !== null && value !== undefined && value > 0;
   };
 
+  const hasValidValueForExperience = (value: any): boolean => {
+    return value !== null && value !== undefined && typeof value === 'number';
+  };
+
   const renderEnhancedQualityField = (title: string, description: string, value: any, fieldName?: string) => {
     if (value === null || value === undefined) return null;
     
@@ -372,6 +376,120 @@ export default function ResidentialPage() {
           })()}
         </dd>
         <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
+      </div>
+    );
+  };
+
+  const renderSurveyQuestion = (
+    questionNumber: number,
+    questionText: string,
+    always: number | undefined,
+    mostTime: number | undefined,
+    someTime: number | undefined,
+    never: number | undefined,
+    alwaysFieldName: string,
+    mostTimeFieldName: string,
+    someTimeFieldName: string,
+    neverFieldName: string
+  ) => {
+    // Check if we have any valid data (including 0 values for experience)
+    const hasData = hasValidValueForExperience(always) || hasValidValueForExperience(mostTime) || hasValidValueForExperience(someTime) || hasValidValueForExperience(never);
+    if (!hasData) return null;
+
+    return (
+      <div className="mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+        {/* Question Header */}
+        <div className="mb-4">
+          <h4 className="text-lg font-semibold text-gray-900 mb-2">Question {questionNumber}</h4>
+          <p className="text-base text-gray-800">{questionText}</p>
+        </div>
+
+        {/* Response Grid */}
+        <div className="grid grid-cols-4 gap-4">
+          {/* Always */}
+          {hasValidValueForExperience(always) && (
+            <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+              <div className="text-3xl mb-2">😊</div>
+              <div className="font-semibold text-green-800 mb-1">Always</div>
+                             <div className="text-2xl font-bold text-green-900 mb-2">{always}%</div>
+               {showBoxPlots && !statsLoading && (() => {
+                 const scopeStats = getStatisticsForScope();
+                 const fieldStats = scopeStats ? scopeStats.fields?.[alwaysFieldName] : null;
+                 return fieldStats ? (
+                   <InlineBoxPlot
+                     fieldName={alwaysFieldName}
+                     currentValue={always!}
+                     statistics={fieldStats}
+                     scope={selectedScope}
+                   />
+                 ) : null;
+               })()}
+            </div>
+          )}
+
+          {/* Most of the Time */}
+          {hasValidValueForExperience(mostTime) && (
+            <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+              <div className="text-3xl mb-2">🙂</div>
+              <div className="font-semibold text-yellow-800 mb-1">Most of the Time</div>
+                             <div className="text-2xl font-bold text-yellow-900 mb-2">{mostTime}%</div>
+               {showBoxPlots && !statsLoading && (() => {
+                 const scopeStats = getStatisticsForScope();
+                 const fieldStats = scopeStats ? scopeStats.fields?.[mostTimeFieldName] : null;
+                 return fieldStats ? (
+                   <InlineBoxPlot
+                     fieldName={mostTimeFieldName}
+                     currentValue={mostTime!}
+                     statistics={fieldStats}
+                     scope={selectedScope}
+                   />
+                 ) : null;
+               })()}
+             </div>
+           )}
+
+           {/* Some of the Time */}
+           {hasValidValueForExperience(someTime) && (
+             <div className="text-center p-4 bg-orange-50 rounded-lg border border-orange-200">
+               <div className="text-3xl mb-2">😐</div>
+               <div className="font-semibold text-orange-800 mb-1">Some of the Time</div>
+               <div className="text-2xl font-bold text-orange-900 mb-2">{someTime}%</div>
+               {showBoxPlots && !statsLoading && (() => {
+                 const scopeStats = getStatisticsForScope();
+                 const fieldStats = scopeStats ? scopeStats.fields?.[someTimeFieldName] : null;
+                 return fieldStats ? (
+                   <InlineBoxPlot
+                     fieldName={someTimeFieldName}
+                     currentValue={someTime!}
+                     statistics={fieldStats}
+                     scope={selectedScope}
+                   />
+                 ) : null;
+               })()}
+             </div>
+           )}
+
+           {/* Never */}
+           {hasValidValueForExperience(never) && (
+             <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
+               <div className="text-3xl mb-2">😞</div>
+               <div className="font-semibold text-red-800 mb-1">Never</div>
+               <div className="text-2xl font-bold text-red-900 mb-2">{never}%</div>
+               {showBoxPlots && !statsLoading && (() => {
+                 const scopeStats = getStatisticsForScope();
+                 const fieldStats = scopeStats ? scopeStats.fields?.[neverFieldName] : null;
+                 return fieldStats ? (
+                   <InlineBoxPlot
+                     fieldName={neverFieldName}
+                     currentValue={never!}
+                     statistics={fieldStats}
+                     scope={selectedScope}
+                   />
+                 ) : null;
+               })()}
+            </div>
+          )}
+        </div>
       </div>
     );
   };
@@ -1056,137 +1174,175 @@ export default function ResidentialPage() {
                         {renderField("Residents' Experience Rating", selectedFacility["star_Residents' Experience rating"], "star_Residents' Experience rating")}
                         {renderField("Interview Year", selectedFacility["star_[RE] Interview Year"])}
                         
-                        {/* Food Experience */}
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Food Experience</h4>
-                          <dl className="space-y-1 ml-4">
-                            {hasValidValue(selectedFacility["star_[RE] Food - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Food - Always"]!, "star_[RE] Food - Always")}
-                            {hasValidValue(selectedFacility["star_[RE] Food - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Food - Most of the time"]!, "star_[RE] Food - Most of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Food - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Food - Some of the time"]!, "star_[RE] Food - Some of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Food - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Food - Never"]!, "star_[RE] Food - Never")}
-                          </dl>
-                        </div>
 
-                        {/* Safety Experience */}
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Safety Experience</h4>
-                          <dl className="space-y-1 ml-4">
-                            {hasValidValue(selectedFacility["star_[RE] Safety - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Safety - Always"]!, "star_[RE] Safety - Always")}
-                            {hasValidValue(selectedFacility["star_[RE] Safety - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Safety - Most of the time"]!, "star_[RE] Safety - Most of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Safety - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Safety - Some of the time"]!, "star_[RE] Safety - Some of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Safety - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Safety - Never"]!, "star_[RE] Safety - Never")}
-                          </dl>
-                        </div>
-
-                        {/* Operation Experience */}
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Operation Experience</h4>
-                          <dl className="space-y-1 ml-4">
-                            {hasValidValue(selectedFacility["star_[RE] Operation - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Operation - Always"]!, "star_[RE] Operation - Always")}
-                            {hasValidValue(selectedFacility["star_[RE] Operation - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Operation - Most of the time"]!, "star_[RE] Operation - Most of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Operation - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Operation - Some of the time"]!, "star_[RE] Operation - Some of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Operation - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Operation - Never"]!, "star_[RE] Operation - Never")}
-                          </dl>
-                        </div>
-
-                        {/* Care Need Experience */}
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Care Need Experience</h4>
-                          <dl className="space-y-1 ml-4">
-                            {hasValidValue(selectedFacility["star_[RE] Care Need - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Care Need - Always"]!, "star_[RE] Care Need - Always")}
-                            {hasValidValue(selectedFacility["star_[RE] Care Need - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Care Need - Most of the time"]!, "star_[RE] Care Need - Most of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Care Need - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Care Need - Some of the time"]!, "star_[RE] Care Need - Some of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Care Need - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Care Need - Never"]!, "star_[RE] Care Need - Never")}
-                          </dl>
-                        </div>
-
-                        {/* Competent Experience */}
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Competent Experience</h4>
-                          <dl className="space-y-1 ml-4">
-                            {hasValidValue(selectedFacility["star_[RE] Competent - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Competent - Always"]!, "star_[RE] Competent - Always")}
-                            {hasValidValue(selectedFacility["star_[RE] Competent - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Competent - Most of the time"]!, "star_[RE] Competent - Most of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Competent - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Competent - Some of the time"]!, "star_[RE] Competent - Some of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Competent - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Competent - Never"]!, "star_[RE] Competent - Never")}
-                          </dl>
-                        </div>
-
-                        {/* Independence Experience */}
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Independence Experience</h4>
-                          <dl className="space-y-1 ml-4">
-                            {hasValidValue(selectedFacility["star_[RE] Independent - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Independent - Always"]!, "star_[RE] Independent - Always")}
-                            {hasValidValue(selectedFacility["star_[RE] Independent - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Independent - Most of the time"]!, "star_[RE] Independent - Most of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Independent - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Independent - Some of the time"]!, "star_[RE] Independent - Some of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Independent - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Independent - Never"]!, "star_[RE] Independent - Never")}
-                          </dl>
-                        </div>
-
-                        {/* Explanation Experience */}
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Explanation Experience</h4>
-                          <dl className="space-y-1 ml-4">
-                            {hasValidValue(selectedFacility["star_[RE] Explain - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Explain - Always"]!, "star_[RE] Explain - Always")}
-                            {hasValidValue(selectedFacility["star_[RE] Explain - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Explain - Most of the time"]!, "star_[RE] Explain - Most of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Explain - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Explain - Some of the time"]!, "star_[RE] Explain - Some of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Explain - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Explain - Never"]!, "star_[RE] Explain - Never")}
-                          </dl>
-                        </div>
 
                         {/* Respect Experience */}
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Respect Experience</h4>
-                          <dl className="space-y-1 ml-4">
-                            {hasValidValue(selectedFacility["star_[RE] Respect - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Respect - Always"]!, "star_[RE] Respect - Always")}
-                            {hasValidValue(selectedFacility["star_[RE] Respect - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Respect - Most of the time"]!, "star_[RE] Respect - Most of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Respect - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Respect - Some of the time"]!, "star_[RE] Respect - Some of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Respect - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Respect - Never"]!, "star_[RE] Respect - Never")}
-                          </dl>
-                        </div>
+                        {renderSurveyQuestion(
+                          1,
+                          "Do staff treat you with respect?",
+                          selectedFacility["star_[RE] Respect - Always"],
+                          selectedFacility["star_[RE] Respect - Most of the time"],
+                          selectedFacility["star_[RE] Respect - Some of the time"],
+                          selectedFacility["star_[RE] Respect - Never"],
+                          "star_[RE] Respect - Always",
+                          "star_[RE] Respect - Most of the time",
+                          "star_[RE] Respect - Some of the time",
+                          "star_[RE] Respect - Never"
+                        )}
+
+                        {/* Safety Experience */}
+                        {renderSurveyQuestion(
+                          2,
+                          "Do you feel safe here?",
+                          selectedFacility["star_[RE] Safety - Always"],
+                          selectedFacility["star_[RE] Safety - Most of the time"],
+                          selectedFacility["star_[RE] Safety - Some of the time"],
+                          selectedFacility["star_[RE] Safety - Never"],
+                          "star_[RE] Safety - Always",
+                          "star_[RE] Safety - Most of the time",
+                          "star_[RE] Safety - Some of the time",
+                          "star_[RE] Safety - Never"
+                        )}
+
+                        {/* Operation Experience */}
+                        {renderSurveyQuestion(
+                          3,
+                          "Is this place well run?",
+                          selectedFacility["star_[RE] Operation - Always"],
+                          selectedFacility["star_[RE] Operation - Most of the time"],
+                          selectedFacility["star_[RE] Operation - Some of the time"],
+                          selectedFacility["star_[RE] Operation - Never"],
+                          "star_[RE] Operation - Always",
+                          "star_[RE] Operation - Most of the time",
+                          "star_[RE] Operation - Some of the time",
+                          "star_[RE] Operation - Never"
+                        )}
+
+                        {/* Care Need Experience */}
+                        {renderSurveyQuestion(
+                          4,
+                          "Do you get the care you need?",
+                          selectedFacility["star_[RE] Care Need - Always"],
+                          selectedFacility["star_[RE] Care Need - Most of the time"],
+                          selectedFacility["star_[RE] Care Need - Some of the time"],
+                          selectedFacility["star_[RE] Care Need - Never"],
+                          "star_[RE] Care Need - Always",
+                          "star_[RE] Care Need - Most of the time",
+                          "star_[RE] Care Need - Some of the time",
+                          "star_[RE] Care Need - Never"
+                        )}
+
+                        {/* Competent Experience */}
+                        {renderSurveyQuestion(
+                          5,
+                          "Do staff know what they are doing?",
+                          selectedFacility["star_[RE] Competent - Always"],
+                          selectedFacility["star_[RE] Competent - Most of the time"],
+                          selectedFacility["star_[RE] Competent - Some of the time"],
+                          selectedFacility["star_[RE] Competent - Never"],
+                          "star_[RE] Competent - Always",
+                          "star_[RE] Competent - Most of the time",
+                          "star_[RE] Competent - Some of the time",
+                          "star_[RE] Competent - Never"
+                        )}
+
+                        {/* Independence Experience */}
+                        {renderSurveyQuestion(
+                          6,
+                          "Are you encouraged to do as much as possible for yourself?",
+                          selectedFacility["star_[RE] Independent - Always"],
+                          selectedFacility["star_[RE] Independent - Most of the time"],
+                          selectedFacility["star_[RE] Independent - Some of the time"],
+                          selectedFacility["star_[RE] Independent - Never"],
+                          "star_[RE] Independent - Always",
+                          "star_[RE] Independent - Most of the time",
+                          "star_[RE] Independent - Some of the time",
+                          "star_[RE] Independent - Never"
+                        )}
+
+                        {/* Explanation Experience */}
+                        {renderSurveyQuestion(
+                          7,
+                          "Do staff explain things to you?",
+                          selectedFacility["star_[RE] Explain - Always"],
+                          selectedFacility["star_[RE] Explain - Most of the time"],
+                          selectedFacility["star_[RE] Explain - Some of the time"],
+                          selectedFacility["star_[RE] Explain - Never"],
+                          "star_[RE] Explain - Always",
+                          "star_[RE] Explain - Most of the time",
+                          "star_[RE] Explain - Some of the time",
+                          "star_[RE] Explain - Never"
+                        )}
+
+                        {/* Food Experience */}
+                        {renderSurveyQuestion(
+                          8,
+                          "Do you like the food here?",
+                          selectedFacility["star_[RE] Food - Always"],
+                          selectedFacility["star_[RE] Food - Most of the time"],
+                          selectedFacility["star_[RE] Food - Some of the time"],
+                          selectedFacility["star_[RE] Food - Never"],
+                          "star_[RE] Food - Always",
+                          "star_[RE] Food - Most of the time",
+                          "star_[RE] Food - Some of the time",
+                          "star_[RE] Food - Never"
+                        )}
 
                         {/* Follow Up Experience */}
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Follow Up Experience</h4>
-                          <dl className="space-y-1 ml-4">
-                            {hasValidValue(selectedFacility["star_[RE] Follow Up - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Follow Up - Always"]!, "star_[RE] Follow Up - Always")}
-                            {hasValidValue(selectedFacility["star_[RE] Follow Up - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Follow Up - Most of the time"]!, "star_[RE] Follow Up - Most of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Follow Up - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Follow Up - Some of the time"]!, "star_[RE] Follow Up - Some of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Follow Up - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Follow Up - Never"]!, "star_[RE] Follow Up - Never")}
-                          </dl>
-                        </div>
+                        {renderSurveyQuestion(
+                          9,
+                          "Do staff follow up when you raise things with them?",
+                          selectedFacility["star_[RE] Follow Up - Always"],
+                          selectedFacility["star_[RE] Follow Up - Most of the time"],
+                          selectedFacility["star_[RE] Follow Up - Some of the time"],
+                          selectedFacility["star_[RE] Follow Up - Never"],
+                          "star_[RE] Follow Up - Always",
+                          "star_[RE] Follow Up - Most of the time",
+                          "star_[RE] Follow Up - Some of the time",
+                          "star_[RE] Follow Up - Never"
+                        )}
 
                         {/* Caring Experience */}
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Caring Experience</h4>
-                          <dl className="space-y-1 ml-4">
-                            {hasValidValue(selectedFacility["star_[RE] Caring - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Caring - Always"]!, "star_[RE] Caring - Always")}
-                            {hasValidValue(selectedFacility["star_[RE] Caring - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Caring - Most of the time"]!, "star_[RE] Caring - Most of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Caring - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Caring - Some of the time"]!, "star_[RE] Caring - Some of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Caring - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Caring - Never"]!, "star_[RE] Caring - Never")}
-                          </dl>
-                        </div>
+                        {renderSurveyQuestion(
+                          10,
+                          "Are staff kind and caring?",
+                          selectedFacility["star_[RE] Caring - Always"],
+                          selectedFacility["star_[RE] Caring - Most of the time"],
+                          selectedFacility["star_[RE] Caring - Some of the time"],
+                          selectedFacility["star_[RE] Caring - Never"],
+                          "star_[RE] Caring - Always",
+                          "star_[RE] Caring - Most of the time",
+                          "star_[RE] Caring - Some of the time",
+                          "star_[RE] Caring - Never"
+                        )}
 
                         {/* Voice Experience */}
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Voice Experience</h4>
-                          <dl className="space-y-1 ml-4">
-                            {hasValidValue(selectedFacility["star_[RE] Voice - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Voice - Always"]!, "star_[RE] Voice - Always")}
-                            {hasValidValue(selectedFacility["star_[RE] Voice - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Voice - Most of the time"]!, "star_[RE] Voice - Most of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Voice - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Voice - Some of the time"]!, "star_[RE] Voice - Some of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Voice - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Voice - Never"]!, "star_[RE] Voice - Never")}
-                          </dl>
-                        </div>
+                        {renderSurveyQuestion(
+                          11,
+                          "Do you have a say in your daily activities?",
+                          selectedFacility["star_[RE] Voice - Always"],
+                          selectedFacility["star_[RE] Voice - Most of the time"],
+                          selectedFacility["star_[RE] Voice - Some of the time"],
+                          selectedFacility["star_[RE] Voice - Never"],
+                          "star_[RE] Voice - Always",
+                          "star_[RE] Voice - Most of the time",
+                          "star_[RE] Voice - Some of the time",
+                          "star_[RE] Voice - Never"
+                        )}
 
                         {/* Home Experience */}
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Home Experience</h4>
-                          <dl className="space-y-1 ml-4">
-                            {hasValidValue(selectedFacility["star_[RE] Home - Always"]) && renderPercentageField("Always", selectedFacility["star_[RE] Home - Always"]!, "star_[RE] Home - Always")}
-                            {hasValidValue(selectedFacility["star_[RE] Home - Most of the time"]) && renderPercentageField("Most of the time", selectedFacility["star_[RE] Home - Most of the time"]!, "star_[RE] Home - Most of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Home - Some of the time"]) && renderPercentageField("Some of the time", selectedFacility["star_[RE] Home - Some of the time"]!, "star_[RE] Home - Some of the time")}
-                            {hasValidValue(selectedFacility["star_[RE] Home - Never"]) && renderPercentageField("Never", selectedFacility["star_[RE] Home - Never"]!, "star_[RE] Home - Never")}
-                          </dl>
-                        </div>
+                        {renderSurveyQuestion(
+                          12,
+                          "How likely are you to recommend this residential aged care home to someone?",
+                          selectedFacility["star_[RE] Home - Always"],
+                          selectedFacility["star_[RE] Home - Most of the time"],
+                          selectedFacility["star_[RE] Home - Some of the time"],
+                          selectedFacility["star_[RE] Home - Never"],
+                          "star_[RE] Home - Always",
+                          "star_[RE] Home - Most of the time",
+                          "star_[RE] Home - Some of the time",
+                          "star_[RE] Home - Never"
+                        )}
                       </div>
                     </CardContent>
                   </Card>

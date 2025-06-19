@@ -141,7 +141,7 @@ const InlineBoxPlot: React.FC<InlineBoxPlotProps> = ({
       <div
         ref={chartRef}
         style={{ width: `${width}px`, height: `${height}px` }}
-        className="cursor-help border border-gray-200 rounded bg-gray-50"
+        className="cursor-help border border-gray-200 rounded bg-transparent"
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
       />
