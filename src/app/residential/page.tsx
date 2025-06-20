@@ -111,8 +111,10 @@ interface ResidentialFacility {
   "star_Staffing rating"?: number;
   "star_[S] Registered Nurse Care Minutes - Target"?: number;
   "star_[S] Registered Nurse Care Minutes - Actual"?: number;
+  "star_[S] Registered Nurse Care Minutes - % Achievement"?: number;
   "star_[S] Total Care Minutes - Target"?: number;
   "star_[S] Total Care Minutes - Actual"?: number;
+  "star_[S] Total Care Minutes - % Achievement"?: number;
   // Finance
   expenditure_total_per_day?: number;
   expenditure_care_nursing?: number;
@@ -1395,8 +1397,50 @@ export default function ResidentialPage() {
                         {renderField("Staffing Rating", selectedFacility["star_Staffing rating"], "star_Staffing rating")}
                         {renderField("Registered Nurse Care Minutes - Target", selectedFacility["star_[S] Registered Nurse Care Minutes - Target"], "star_[S] Registered Nurse Care Minutes - Target")}
                         {renderField("Registered Nurse Care Minutes - Actual", selectedFacility["star_[S] Registered Nurse Care Minutes - Actual"], "star_[S] Registered Nurse Care Minutes - Actual")}
+                        {selectedFacility["star_[S] Registered Nurse Care Minutes - % Achievement"] !== null && 
+                         selectedFacility["star_[S] Registered Nurse Care Minutes - % Achievement"] !== undefined && (
+                          <div className="mb-3">
+                            <dt className="text-sm font-medium text-gray-500">Registered Nurse Care Minutes - % Achievement</dt>
+                            <dd className="text-gray-900 flex items-center">
+                              {selectedFacility["star_[S] Registered Nurse Care Minutes - % Achievement"]?.toFixed(1)}%
+                              {showBoxPlots && !statsLoading && (() => {
+                                const scopeStats = getStatisticsForScope();
+                                const fieldStats = scopeStats ? scopeStats.fields?.["star_[S] Registered Nurse Care Minutes - % Achievement"] : null;
+                                return fieldStats ? (
+                                  <InlineBoxPlot
+                                    fieldName="star_[S] Registered Nurse Care Minutes - % Achievement"
+                                    currentValue={selectedFacility["star_[S] Registered Nurse Care Minutes - % Achievement"]}
+                                    statistics={fieldStats}
+                                    scope={selectedScope}
+                                  />
+                                ) : null;
+                              })()}
+                            </dd>
+                          </div>
+                        )}
                         {renderField("Total Care Minutes - Target", selectedFacility["star_[S] Total Care Minutes - Target"], "star_[S] Total Care Minutes - Target")}
                         {renderField("Total Care Minutes - Actual", selectedFacility["star_[S] Total Care Minutes - Actual"], "star_[S] Total Care Minutes - Actual")}
+                        {selectedFacility["star_[S] Total Care Minutes - % Achievement"] !== null && 
+                         selectedFacility["star_[S] Total Care Minutes - % Achievement"] !== undefined && (
+                          <div className="mb-3">
+                            <dt className="text-sm font-medium text-gray-500">Total Care Minutes - % Achievement</dt>
+                            <dd className="text-gray-900 flex items-center">
+                              {selectedFacility["star_[S] Total Care Minutes - % Achievement"]?.toFixed(1)}%
+                              {showBoxPlots && !statsLoading && (() => {
+                                const scopeStats = getStatisticsForScope();
+                                const fieldStats = scopeStats ? scopeStats.fields?.["star_[S] Total Care Minutes - % Achievement"] : null;
+                                return fieldStats ? (
+                                  <InlineBoxPlot
+                                    fieldName="star_[S] Total Care Minutes - % Achievement"
+                                    currentValue={selectedFacility["star_[S] Total Care Minutes - % Achievement"]}
+                                    statistics={fieldStats}
+                                    scope={selectedScope}
+                                  />
+                                ) : null;
+                              })()}
+                            </dd>
+                          </div>
+                        )}
                       </dl>
                     </CardContent>
                   </Card>
