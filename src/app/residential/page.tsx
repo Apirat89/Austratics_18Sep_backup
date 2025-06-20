@@ -244,17 +244,16 @@ export default function ResidentialPage() {
           setSavedFacilities(prev => prev.filter(saved => saved.facility_id !== facilityId));
           alert('Facility removed from saved list!');
         } else {
-          alert(`Failed to remove facility: ${result.error}`);
+          alert(`Failed to remove facility: ${result.message}`);
         }
       }
     } else {
       // Save the facility
       const result = await saveResidentialFacility(
         currentUser.id,
-        facility["Service Name"],
         facilityId,
-        facility,
-        searchTerm
+        facility["Service Name"],
+        facility
       );
 
       if (result.success) {
@@ -263,7 +262,7 @@ export default function ResidentialPage() {
         setSavedFacilities(updatedResult.facilities);
         alert('Facility saved successfully!');
       } else {
-        alert(`Failed to save facility: ${result.error}`);
+        alert(`Failed to save facility: ${result.message}`);
       }
     }
   };
@@ -277,7 +276,7 @@ export default function ResidentialPage() {
       if (result.success) {
         setSavedFacilities(prev => prev.filter(saved => saved.id !== facilityDbId));
       } else {
-        alert(`Failed to delete facility: ${result.error}`);
+        alert(`Failed to delete facility: ${result.message}`);
       }
     }
   };
@@ -776,11 +775,6 @@ export default function ResidentialPage() {
                           </div>
                           <div className="text-xs text-gray-500 mt-2">
                             Saved: {savedItem.created_at ? new Date(savedItem.created_at).toLocaleDateString() : 'Unknown'} at {savedItem.created_at ? new Date(savedItem.created_at).toLocaleTimeString() : 'Unknown'}
-                            {savedItem.search_term && (
-                              <div className="mt-1">
-                                Search term: "{savedItem.search_term}"
-                              </div>
-                            )}
                           </div>
                         </CardHeader>
                         <CardContent className="flex flex-col flex-grow">
