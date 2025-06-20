@@ -219,11 +219,6 @@ export default function ResidentialPage() {
 
   // Toggle save facility function (save/unsave) - now using Supabase
   const toggleSaveFacility = async (facility: ResidentialFacility) => {
-    console.log('toggleSaveFacility called:', {
-      currentUser: currentUser ? { id: currentUser.id, email: currentUser.email } : null,
-      facilityName: facility["Service Name"]
-    });
-
     if (!currentUser) {
       alert('Please sign in to save facilities');
       router.push('/auth/signin');
@@ -746,9 +741,9 @@ export default function ResidentialPage() {
                   /* Saved Facility Results */
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {savedFacilities.map((savedItem) => (
-                      <Card key={savedItem.id} className="hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full"
+                      <Card key={savedItem.id} className="hover:shadow-lg transition-shadow cursor-pointer"
                             onClick={() => setSelectedFacility(savedItem.facility_data)}>
-                        <CardHeader className="flex-shrink-0">
+                        <CardHeader>
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <CardTitle className="text-lg font-semibold text-gray-900">
@@ -783,8 +778,8 @@ export default function ResidentialPage() {
                             )}
                           </div>
                         </CardHeader>
-                        <CardContent className="flex flex-col flex-grow">
-                          <div className="space-y-3 flex-grow">
+                        <CardContent>
+                          <div className="space-y-3">
                             {savedItem.facility_data.overall_rating_stars && (
                               <div>
                                 <p className="text-xs text-gray-500 mb-1">Overall Rating</p>
@@ -798,17 +793,17 @@ export default function ResidentialPage() {
                                 {savedItem.facility_data.rooms_data.length} room types available
                               </div>
                             )}
+                            
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedFacility(savedItem.facility_data);
+                              }}
+                              className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                              View Details
+                            </button>
                           </div>
-                          
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedFacility(savedItem.facility_data);
-                            }}
-                            className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0"
-                          >
-                            View Details
-                          </button>
                         </CardContent>
                       </Card>
                     ))}
