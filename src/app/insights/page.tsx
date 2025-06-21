@@ -1444,30 +1444,30 @@ export default function SA2AnalyticsPage() {
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
                     <Users className="h-8 w-8 mx-auto mb-2 text-blue-600" />
                     <p className="text-2xl font-bold text-blue-800">
-                      {(selectedSA2['Demographics | Estimated resident population (no.)'] || 0).toLocaleString()}
+                      {(selectedSA2['Demographics | Persons - 65 years and over (no.)'] || 0).toLocaleString()}
                     </p>
-                    <p className="text-sm text-blue-600">Population</p>
+                    <p className="text-sm text-blue-600">Persons 65+ Years</p>
                   </div>
                   <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <DollarSign className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                    <Heart className="h-8 w-8 mx-auto mb-2 text-green-600" />
                     <p className="text-2xl font-bold text-green-800">
-                      ${(selectedSA2['Economics | Median employee income ($)'] || 0).toLocaleString()}
+                      {(selectedSA2['Number of Participants | Home Care'] || 0).toLocaleString()}
                     </p>
-                    <p className="text-sm text-green-600">Median Income</p>
+                    <p className="text-sm text-green-600">Home Care</p>
                   </div>
                   <div className="text-center p-4 bg-purple-50 rounded-lg">
                     <Heart className="h-8 w-8 mx-auto mb-2 text-purple-600" />
                     <p className="text-2xl font-bold text-purple-800">
-                      {(selectedSA2['Healthcare | Commonwealth Home Support Program_Number of Participants'] || 0).toLocaleString()}
+                      {(selectedSA2['Number of Participants | Residential Care'] || 0).toLocaleString()}
                     </p>
-                    <p className="text-sm text-purple-600">CHSP Participants</p>
+                    <p className="text-sm text-purple-600">Residential Care</p>
                   </div>
                   <div className="text-center p-4 bg-orange-50 rounded-lg">
-                    <Activity className="h-8 w-8 mx-auto mb-2 text-orange-600" />
+                    <Heart className="h-8 w-8 mx-auto mb-2 text-orange-600" />
                     <p className="text-2xl font-bold text-orange-800">
-                      {(selectedSA2['Demographics | Median age - persons (years)'] || 0).toFixed(1)}
+                      {(selectedSA2['Number of Participants | Commonwealth Home Support Program'] || 0).toLocaleString()}
                     </p>
-                    <p className="text-sm text-orange-600">Median Age</p>
+                    <p className="text-sm text-orange-600">CHSP Participants</p>
                   </div>
                 </div>
               </CardContent>
