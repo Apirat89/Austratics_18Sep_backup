@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser } from '../../lib/auth';
 import BackToMainButton from '../../components/BackToMainButton';
-import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft } from 'lucide-react';
+import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Globe, Building, Home } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import SA2BoxPlot from '../../components/sa2/SA2BoxPlot';
@@ -1476,77 +1476,38 @@ export default function SA2AnalyticsPage() {
             {/* Comparison Level Selector */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
-                  Comparison Level
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+                    Comparison Level
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {[
+                      { key: 'national', label: 'National', icon: Globe, desc: 'vs All Australia' },
+                      { key: 'state', label: 'State', icon: Building, desc: `vs ${selectedSA2.STATE_NAME_2021}` },
+                      { key: 'sa4', label: 'SA4', icon: MapPin, desc: 'Regional Level' },
+                      { key: 'sa3', label: 'SA3', icon: Home, desc: 'Local Level' }
+                    ].map(({ key, label, icon: Icon, desc }) => (
+                      <button
+                        key={key}
+                        onClick={() => setComparisonLevel(key as any)}
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                          comparisonLevel === key
+                            ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                        title={desc}
+                      >
+                        <Icon className="w-4 h-4" />
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                 </CardTitle>
                 <CardDescription>
                   Choose what level to compare this SA2 against in the box plots below
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <button
-                    onClick={() => setComparisonLevel('national')}
-                    className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
-                      comparisonLevel === 'national'
-                        ? 'bg-blue-100 border-blue-300 text-blue-800'
-                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <div className="text-center">
-                      <div className="font-semibold">🇦🇺 National</div>
-                      <div className="text-xs mt-1">vs All Australia</div>
-                      <div className="text-xs text-gray-500">2,454 SA2s</div>
-                    </div>
-                  </button>
-                  
-                  <button
-                    onClick={() => setComparisonLevel('state')}
-                    className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
-                      comparisonLevel === 'state'
-                        ? 'bg-blue-100 border-blue-300 text-blue-800'
-                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <div className="text-center">
-                      <div className="font-semibold">🏛️ State</div>
-                      <div className="text-xs mt-1">vs {selectedSA2.STATE_NAME_2021}</div>
-                      <div className="text-xs text-gray-500">State level</div>
-                    </div>
-                  </button>
-                  
-                  <button
-                    onClick={() => setComparisonLevel('sa4')}
-                    className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
-                      comparisonLevel === 'sa4'
-                        ? 'bg-blue-100 border-blue-300 text-blue-800'
-                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <div className="text-center">
-                      <div className="font-semibold">🗺️ SA4</div>
-                      <div className="text-xs mt-1">vs {selectedSA2.SA4_NAME_2021}</div>
-                      <div className="text-xs text-gray-500">Regional level</div>
-                    </div>
-                  </button>
-                  
-                  <button
-                    onClick={() => setComparisonLevel('sa3')}
-                    className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
-                      comparisonLevel === 'sa3'
-                        ? 'bg-blue-100 border-blue-300 text-blue-800'
-                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <div className="text-center">
-                      <div className="font-semibold">📍 SA3</div>
-                      <div className="text-xs mt-1">vs {selectedSA2.SA3_NAME_2021}</div>
-                      <div className="text-xs text-gray-500">Local level</div>
-                    </div>
-                  </button>
-                </div>
-              </CardContent>
             </Card>
 
             {/* Detailed Analysis Tabs */}
