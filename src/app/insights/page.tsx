@@ -68,6 +68,13 @@ interface SA2Statistics {
   count: number;
 }
 
+interface HierarchicalStatistics {
+  national: SA2Statistics;
+  state?: SA2Statistics;
+  sa4?: SA2Statistics;
+  sa3?: SA2Statistics;
+}
+
 interface DataLoadingStatus {
   isLoading: boolean;
   hasError: boolean;
@@ -87,7 +94,9 @@ export default function SA2AnalyticsPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [allSA2Data, setAllSA2Data] = useState<Record<string, SA2Data>>({});
   const [sa2Statistics, setSA2Statistics] = useState<Record<string, SA2Statistics>>({});
+  const [hierarchicalStatistics, setHierarchicalStatistics] = useState<Record<string, HierarchicalStatistics>>({});
   const [availableMetrics, setAvailableMetrics] = useState<string[]>([]);
+  const [comparisonLevel, setComparisonLevel] = useState<'national' | 'state' | 'sa4' | 'sa3'>('national');
   const [dataLoadingStatus, setDataLoadingStatus] = useState<DataLoadingStatus>({
     isLoading: true,
     hasError: false,
@@ -164,6 +173,11 @@ export default function SA2AnalyticsPage() {
       // Calculate enhanced statistics for all metrics
       await calculateEnhancedStatistics(transformedSA2Data, metricsData.metrics || []);
 
+      setDataLoadingStatus(prev => ({ ...prev, loadingStep: 'Calculating hierarchical statistics (state, SA4, SA3 levels)...' }));
+      
+      // Calculate hierarchical statistics for all levels
+      await calculateHierarchicalStatistics(transformedSA2Data, metricsData.metrics || []);
+
       setDataLoadingStatus(prev => ({
         ...prev,
         isLoading: false,
@@ -189,6 +203,19 @@ export default function SA2AnalyticsPage() {
       dataLoadingRef.current = false;
     }
   }, []);
+
+  // Helper function to get hierarchical statistics for a specific SA2 and metric
+  const getHierarchicalStatsForSA2 = (sa2: SA2Data, metric: string): HierarchicalStatistics | undefined => {
+    const sa2Key = `${sa2.id}_${metric}`;
+    return hierarchicalStatistics[sa2Key];
+  };
+
+  // Helper function to get SA2 info for comparison level display
+  const getSA2Info = (sa2: SA2Data) => ({
+    stateName: sa2.STATE_NAME_2021,
+    sa4Name: sa2.SA4_NAME_2021,
+    sa3Name: sa2.SA3_NAME_2021
+  });
 
   // Helper function to shorten long metric names for display
   const getDisplayName = (metric: string): string => {
@@ -226,7 +253,134 @@ export default function SA2AnalyticsPage() {
     return metric.replace(/^[^|]*\|\s*/, '');
   };
 
-  // Calculate enhanced statistics (min, max, Q1, Q3, percentiles)
+  // Calculate hierarchical statistics for all levels (national, state, SA4, SA3)
+  const calculateHierarchicalStatistics = async (sa2Data: Record<string, SA2Data>, metrics: string[]) => {
+    try {
+      console.log('📊 Calculating hierarchical statistics for all levels...');
+      
+      const hierarchicalStats: Record<string, HierarchicalStatistics> = {};
+      
+      // Group SA2s by hierarchy levels
+      const sa2Array = Object.values(sa2Data);
+      const stateGroups: Record<string, SA2Data[]> = {};
+      const sa4Groups: Record<string, SA2Data[]> = {};
+      const sa3Groups: Record<string, SA2Data[]> = {};
+      
+      // Group SA2s by their hierarchical levels
+      sa2Array.forEach(sa2 => {
+        const stateCode = sa2.STATE_CODE_2021;
+        const sa4Code = sa2.SA4_CODE_2021;
+        const sa3Code = sa2.SA3_CODE_2021;
+        
+        if (stateCode) {
+          if (!stateGroups[stateCode]) stateGroups[stateCode] = [];
+          stateGroups[stateCode].push(sa2);
+        }
+        
+        if (sa4Code) {
+          if (!sa4Groups[sa4Code]) sa4Groups[sa4Code] = [];
+          sa4Groups[sa4Code].push(sa2);
+        }
+        
+        if (sa3Code) {
+          if (!sa3Groups[sa3Code]) sa3Groups[sa3Code] = [];
+          sa3Groups[sa3Code].push(sa2);
+        }
+      });
+      
+      console.log(`📊 Grouped SA2s: ${Object.keys(stateGroups).length} states, ${Object.keys(sa4Groups).length} SA4s, ${Object.keys(sa3Groups).length} SA3s`);
+      
+      // Calculate statistics for each metric
+      metrics.forEach(metric => {
+        const stats: HierarchicalStatistics = {
+          national: calculateStatsForGroup(sa2Array, metric)
+        };
+        
+        // For each SA2, calculate its hierarchical statistics
+        sa2Array.forEach(sa2 => {
+          const stateCode = sa2.STATE_CODE_2021;
+          const sa4Code = sa2.SA4_CODE_2021;
+          const sa3Code = sa2.SA3_CODE_2021;
+          
+          // Use SA2 ID as the key for hierarchical stats
+          const sa2Key = `${sa2.id}_${metric}`;
+          
+          if (!hierarchicalStats[sa2Key]) {
+            hierarchicalStats[sa2Key] = {
+              national: stats.national
+            };
+          }
+          
+          // Add state-level stats
+          if (stateCode && stateGroups[stateCode]) {
+            hierarchicalStats[sa2Key].state = calculateStatsForGroup(stateGroups[stateCode], metric);
+          }
+          
+          // Add SA4-level stats
+          if (sa4Code && sa4Groups[sa4Code]) {
+            hierarchicalStats[sa2Key].sa4 = calculateStatsForGroup(sa4Groups[sa4Code], metric);
+          }
+          
+          // Add SA3-level stats
+          if (sa3Code && sa3Groups[sa3Code]) {
+            hierarchicalStats[sa2Key].sa3 = calculateStatsForGroup(sa3Groups[sa3Code], metric);
+          }
+        });
+      });
+      
+      setHierarchicalStatistics(hierarchicalStats);
+      console.log(`✅ Hierarchical statistics calculated for ${Object.keys(hierarchicalStats).length} SA2-metric combinations`);
+      
+    } catch (error) {
+      console.warn('⚠️ Hierarchical statistics calculation failed:', error);
+    }
+  };
+  
+  // Helper function to calculate statistics for a group of SA2s
+  const calculateStatsForGroup = (sa2Group: SA2Data[], metric: string): SA2Statistics => {
+    const values: number[] = [];
+    
+    sa2Group.forEach((sa2: SA2Data) => {
+      const value = sa2[metric];
+      if (typeof value === 'number' && !isNaN(value)) {
+        values.push(value);
+      }
+    });
+
+    if (values.length === 0) {
+      return { min: 0, max: 0, q1: 0, median: 0, q3: 0, mean: 0, count: 0 };
+    }
+
+    // Sort values for quartile calculations
+    const sortedValues = values.sort((a, b) => a - b);
+    const count = sortedValues.length;
+    
+    // Calculate statistics
+    const min = sortedValues[0];
+    const max = sortedValues[count - 1];
+    const mean = values.reduce((sum, val) => sum + val, 0) / count;
+    
+    // Calculate quartiles
+    const q1Index = Math.floor(count * 0.25);
+    const medianIndex = Math.floor(count * 0.5);
+    const q3Index = Math.floor(count * 0.75);
+    
+    const q1 = count % 4 === 0 ? 
+      (sortedValues[q1Index - 1] + sortedValues[q1Index]) / 2 : 
+      sortedValues[q1Index];
+    
+    const median = count % 2 === 0 ? 
+      (sortedValues[medianIndex - 1] + sortedValues[medianIndex]) / 2 : 
+      sortedValues[medianIndex];
+    
+    const q3 = count % 4 === 0 ? 
+      (sortedValues[q3Index - 1] + sortedValues[q3Index]) / 2 : 
+      sortedValues[q3Index];
+
+    return { min, max, q1, median, q3, mean, count };
+  };
+
+  // Calculate enhanced statistics (min, max, Q1, Q3, percentiles) - keeping for backward compatibility
   const calculateEnhancedStatistics = async (sa2Data: Record<string, SA2Data>, metrics: string[]) => {
     try {
       console.log('📊 Calculating enhanced statistics for all metrics...');
@@ -1319,6 +1473,82 @@ export default function SA2AnalyticsPage() {
               </CardContent>
             </Card>
 
+            {/* Comparison Level Selector */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+                  Comparison Level
+                </CardTitle>
+                <CardDescription>
+                  Choose what level to compare this SA2 against in the box plots below
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <button
+                    onClick={() => setComparisonLevel('national')}
+                    className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
+                      comparisonLevel === 'national'
+                        ? 'bg-blue-100 border-blue-300 text-blue-800'
+                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="font-semibold">🇦🇺 National</div>
+                      <div className="text-xs mt-1">vs All Australia</div>
+                      <div className="text-xs text-gray-500">2,454 SA2s</div>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => setComparisonLevel('state')}
+                    className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
+                      comparisonLevel === 'state'
+                        ? 'bg-blue-100 border-blue-300 text-blue-800'
+                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="font-semibold">🏛️ State</div>
+                      <div className="text-xs mt-1">vs {selectedSA2.STATE_NAME_2021}</div>
+                      <div className="text-xs text-gray-500">State level</div>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => setComparisonLevel('sa4')}
+                    className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
+                      comparisonLevel === 'sa4'
+                        ? 'bg-blue-100 border-blue-300 text-blue-800'
+                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="font-semibold">🗺️ SA4</div>
+                      <div className="text-xs mt-1">vs {selectedSA2.SA4_NAME_2021}</div>
+                      <div className="text-xs text-gray-500">Regional level</div>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => setComparisonLevel('sa3')}
+                    className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
+                      comparisonLevel === 'sa3'
+                        ? 'bg-blue-100 border-blue-300 text-blue-800'
+                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="font-semibold">📍 SA3</div>
+                      <div className="text-xs mt-1">vs {selectedSA2.SA3_NAME_2021}</div>
+                      <div className="text-xs text-gray-500">Local level</div>
+                    </div>
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Detailed Analysis Tabs */}
             <Card>
               <CardContent className="p-6">
@@ -1372,12 +1602,18 @@ export default function SA2AnalyticsPage() {
                           
                           if (typeof currentValue !== 'number' || !stats) return null;
                           
+                          const hierarchicalStats = getHierarchicalStatsForSA2(selectedSA2, metric);
+                          const sa2Info = getSA2Info(selectedSA2);
+                          
                           return (
                             <SA2BoxPlot
                               key={metric}
                               metricName={getDisplayName(metric)}
                               currentValue={currentValue}
                               statistics={stats}
+                              hierarchicalStats={hierarchicalStats}
+                              comparisonLevel={comparisonLevel}
+                              sa2Info={sa2Info}
                               width={380}
                               height={140}
                               showPerformanceIndicator={true}
@@ -1416,12 +1652,18 @@ export default function SA2AnalyticsPage() {
                           
                           if (typeof currentValue !== 'number' || !stats) return null;
                           
+                          const hierarchicalStats = getHierarchicalStatsForSA2(selectedSA2, metric);
+                          const sa2Info = getSA2Info(selectedSA2);
+                          
                           return (
                             <SA2BoxPlot
                               key={metric}
                               metricName={getDisplayName(metric)}
                               currentValue={currentValue}
                               statistics={stats}
+                              hierarchicalStats={hierarchicalStats}
+                              comparisonLevel={comparisonLevel}
+                              sa2Info={sa2Info}
                               width={380}
                               height={140}
                               showPerformanceIndicator={true}
@@ -1469,12 +1711,18 @@ export default function SA2AnalyticsPage() {
                           
                           if (typeof currentValue !== 'number' || !stats) return null;
                           
+                          const hierarchicalStats = getHierarchicalStatsForSA2(selectedSA2, metric);
+                          const sa2Info = getSA2Info(selectedSA2);
+                          
                           return (
                             <SA2BoxPlot
                               key={metric}
                               metricName={getDisplayName(metric)}
                               currentValue={currentValue}
                               statistics={stats}
+                              hierarchicalStats={hierarchicalStats}
+                              comparisonLevel={comparisonLevel}
+                              sa2Info={sa2Info}
                               width={380}
                               height={140}
                               showPerformanceIndicator={true}
@@ -1520,12 +1768,18 @@ export default function SA2AnalyticsPage() {
                           
                           if (typeof currentValue !== 'number' || !stats) return null;
                           
+                          const hierarchicalStats = getHierarchicalStatsForSA2(selectedSA2, metric);
+                          const sa2Info = getSA2Info(selectedSA2);
+                          
                           return (
                             <SA2BoxPlot
                               key={metric}
                               metricName={getDisplayName(metric)}
                               currentValue={currentValue}
                               statistics={stats}
+                              hierarchicalStats={hierarchicalStats}
+                              comparisonLevel={comparisonLevel}
+                              sa2Info={sa2Info}
                               width={380}
                               height={140}
                               showPerformanceIndicator={true}

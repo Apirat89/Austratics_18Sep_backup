@@ -145,11 +145,17 @@ Each SA2 region includes complete geographic hierarchy:
 
 ### 🎯 Features
 
-- **Interactive Box Plots**: Compare any SA2 against national distribution
-- **Performance Indicators**: Top 25%, Middle 50%, Bottom 25% rankings
-- **Search & Filter**: Find SA2s by name, postcode, or geographic hierarchy
-- **Statistical Analysis**: Min, max, quartiles, median, mean for all metrics
-- **Responsive Design**: Works on desktop and mobile devices
+- **📊 Interactive Box Plots**: Statistical distribution analysis with quartiles and performance indicators
+- **🏛️ Hierarchical Comparisons**: Compare SA2 regions at multiple levels:
+  - **🇦🇺 National**: Against all 2,454 SA2s across Australia
+  - **🏛️ State**: Against SA2s within the same state/territory  
+  - **🗺️ SA4**: Against SA2s within the same Statistical Area Level 4
+  - **📍 SA3**: Against SA2s within the same Statistical Area Level 3
+- **📈 Performance Indicators**: Automatically categorizes SA2 performance (Top 25%, Middle 50%, Bottom 25%)
+- **🔍 Search & Filter**: Find SA2s by name, postcode, or geographic hierarchy with proximity suggestions
+- **💾 Save & Compare**: Save favorite SA2 regions for quick access and comparison
+- **📊 Statistical Analysis**: Min, max, quartiles, median, mean calculated at each comparison level
+- **🎨 Responsive Design**: Clean, modern interface that works on desktop and mobile devices
 
 ### 🔧 Data Processing
 

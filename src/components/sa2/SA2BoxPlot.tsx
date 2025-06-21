@@ -13,10 +13,24 @@ interface SA2Statistics {
   count: number;
 }
 
+interface HierarchicalStatistics {
+  national: SA2Statistics;
+  state?: SA2Statistics;
+  sa4?: SA2Statistics;
+  sa3?: SA2Statistics;
+}
+
 interface SA2BoxPlotProps {
   metricName: string;
   currentValue: number;
   statistics: SA2Statistics;
+  hierarchicalStats?: HierarchicalStatistics;
+  comparisonLevel?: 'national' | 'state' | 'sa4' | 'sa3';
+  sa2Info?: {
+    stateName?: string;
+    sa4Name?: string;
+    sa3Name?: string;
+  };
   width?: number;
   height?: number;
   showPerformanceIndicator?: boolean;
@@ -26,6 +40,9 @@ const SA2BoxPlot: React.FC<SA2BoxPlotProps> = ({
   metricName,
   currentValue,
   statistics,
+  hierarchicalStats,
+  comparisonLevel = 'national',
+  sa2Info,
   width = 300,
   height = 200,
   showPerformanceIndicator = true
@@ -34,16 +51,43 @@ const SA2BoxPlot: React.FC<SA2BoxPlotProps> = ({
   const chartInstance = useRef<echarts.ECharts | null>(null);
   const [performanceLevel, setPerformanceLevel] = useState<'low' | 'medium' | 'high'>('medium');
 
+  // Get the appropriate statistics based on comparison level
+  const getActiveStatistics = (): SA2Statistics => {
+    if (hierarchicalStats) {
+      switch (comparisonLevel) {
+        case 'state': return hierarchicalStats.state || hierarchicalStats.national;
+        case 'sa4': return hierarchicalStats.sa4 || hierarchicalStats.national;
+        case 'sa3': return hierarchicalStats.sa3 || hierarchicalStats.national;
+        default: return hierarchicalStats.national;
+      }
+    }
+    return statistics;
+  };
+
+  const activeStats = getActiveStatistics();
+
+  // Get comparison level display name
+  const getComparisonLevelName = (): string => {
+    switch (comparisonLevel) {
+      case 'state': return sa2Info?.stateName ? `${sa2Info.stateName} (State)` : 'State Level';
+      case 'sa4': return sa2Info?.sa4Name ? `${sa2Info.sa4Name} (SA4)` : 'SA4 Level';
+      case 'sa3': return sa2Info?.sa3Name ? `${sa2Info.sa3Name} (SA3)` : 'SA3 Level';
+      default: return 'National';
+    }
+  };
+
+  const comparisonName = getComparisonLevelName();
+
   // Calculate performance level based on quartiles
   useEffect(() => {
-    if (currentValue <= statistics.q1) {
+    if (currentValue <= activeStats.q1) {
       setPerformanceLevel('low');
-    } else if (currentValue >= statistics.q3) {
+    } else if (currentValue >= activeStats.q3) {
       setPerformanceLevel('high');
     } else {
       setPerformanceLevel('medium');
     }
-  }, [currentValue, statistics]);
+  }, [currentValue, activeStats]);
 
   useEffect(() => {
     if (!chartRef.current) return;
@@ -52,15 +96,20 @@ const SA2BoxPlot: React.FC<SA2BoxPlotProps> = ({
     chartInstance.current = echarts.init(chartRef.current);
 
     // Box plot data: [min, Q1, median, Q3, max]
-    const boxData = [statistics.min, statistics.q1, statistics.median, statistics.q3, statistics.max];
+    const boxData = [activeStats.min, activeStats.q1, activeStats.median, activeStats.q3, activeStats.max];
 
     const option: echarts.EChartsOption = {
       title: {
         text: metricName,
+        subtext: `vs ${comparisonName}`,
         left: 'center',
         textStyle: {
           fontSize: 12,
           fontWeight: 'normal'
+        },
+        subtextStyle: {
+          fontSize: 10,
+          color: '#666'
         }
       },
       tooltip: {
@@ -70,14 +119,15 @@ const SA2BoxPlot: React.FC<SA2BoxPlotProps> = ({
             return `
               <div style="font-size: 12px;">
                 <strong>${metricName}</strong><br/>
+                <div style="color: #666; font-size: 11px; margin-bottom: 8px;">Compared to: ${comparisonName}</div>
                 <div style="margin: 8px 0;">
-                  <div>Min: <strong>${statistics.min.toLocaleString()}</strong></div>
-                  <div>Q1: <strong>${statistics.q1.toLocaleString()}</strong></div>
-                  <div>Median: <strong>${statistics.median.toLocaleString()}</strong></div>
-                  <div>Q3: <strong>${statistics.q3.toLocaleString()}</strong></div>
-                  <div>Max: <strong>${statistics.max.toLocaleString()}</strong></div>
-                  <div>Mean: <strong>${statistics.mean.toLocaleString()}</strong></div>
-                  <div>Count: <strong>${statistics.count}</strong></div>
+                  <div>Min: <strong>${activeStats.min.toLocaleString()}</strong></div>
+                  <div>Q1: <strong>${activeStats.q1.toLocaleString()}</strong></div>
+                  <div>Median: <strong>${activeStats.median.toLocaleString()}</strong></div>
+                  <div>Q3: <strong>${activeStats.q3.toLocaleString()}</strong></div>
+                  <div>Max: <strong>${activeStats.max.toLocaleString()}</strong></div>
+                  <div>Mean: <strong>${activeStats.mean.toLocaleString()}</strong></div>
+                  <div>Count: <strong>${activeStats.count}</strong></div>
                 </div>
                 <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd;">
                   Current Value: <strong style="color: ${
@@ -179,7 +229,7 @@ const SA2BoxPlot: React.FC<SA2BoxPlotProps> = ({
       window.removeEventListener('resize', handleResize);
       chartInstance.current?.dispose();
     };
-  }, [metricName, currentValue, statistics, performanceLevel]);
+  }, [metricName, currentValue, activeStats, performanceLevel, comparisonName]);
 
   const getPerformanceColor = () => {
     switch (performanceLevel) {
