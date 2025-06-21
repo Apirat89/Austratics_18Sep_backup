@@ -11,6 +11,7 @@ import SA2BoxPlot from '../../components/sa2/SA2BoxPlot';
 import SA2RadarChart from '../../components/sa2/SA2RadarChart';
 import SA2RankingChart from '../../components/sa2/SA2RankingChart';
 import SA2HeatmapChart from '../../components/sa2/SA2HeatmapChart';
+import InsightsLandingRankings from '../../components/insights/InsightsLandingRankings';
 import { searchLocations } from '../../lib/mapSearchService';
 
 interface UserData {
@@ -1382,6 +1383,17 @@ export default function SA2AnalyticsPage() {
               </CardContent>
             </Card>
           </div>
+        )}
+
+        {/* Regional Rankings - Landing Page Feature */}
+        {!selectedSA2 && !dataLoadingStatus.isLoading && Object.keys(allSA2Data).length > 0 && (
+          <InsightsLandingRankings
+            allSA2Data={allSA2Data}
+            availableMetrics={availableMetrics}
+            sa2Statistics={sa2Statistics}
+            isLoading={dataLoadingStatus.isLoading}
+            onSelectSA2={handleSelectSA2}
+          />
         )}
 
         {/* Empty State */}

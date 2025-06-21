@@ -461,6 +461,27 @@ The hybrid facility implementation is complete and ready for testing:
   - ✅ **Fixed empty variables display in Residents' Experience tab**: Now hides fields with 0 values instead of showing "0%" - COMPLETED
   - ✅ **Enhanced Quality Measures tab labels**: Added detailed descriptions and improved formatting with enhanced renderEnhancedQualityField function - COMPLETED
   - ⏳ **Testing room cost box plots in residential page UI** - READY FOR TESTING
+- 🔄 **Top 5 Bottom 5 SA2 Rankings for Insights Landing Page - NAVIGATION FIX COMPLETED**: Add interactive SA2 rankings below search bar with navigation to detailed SA2 pages
+  - 📋 **Analysis Phase**: ✅ Analyzed existing TopBottomPanel component from maps page - COMPLETED
+  - 📋 **Feature Requirements**: Add top 5/bottom 5 rankings for all heatmap variables on insights landing page with click-to-navigate functionality - CONFIRMED
+  - 📋 **Technical Approach**: Create InsightsLandingRankings component for landing page below search bar, supporting all heatmap variables - PLANNED
+  - ✅ **Component Creation**: Create new InsightsLandingRankings component for insights landing page - COMPLETED
+  - ✅ **Data Integration**: Calculate rankings for all heatmap variables using existing SA2 data - COMPLETED
+  - ✅ **Navigation Integration**: Implement click-to-navigate to SA2 detailed analytics page - COMPLETED
+  - ✅ **UI Integration**: Add rankings section below search bar on landing page - COMPLETED
+  - ✅ **Variable Selection**: Enable rankings for all heatmap variables with dropdown selector - COMPLETED
+  - ✅ **Testing and Verification**: Test the complete functionality on insights landing page - COMPLETED
+  - ✅ **Navigation Fix**: Fixed SA2 navigation issue - now uses state management instead of URL routing - COMPLETED
+  - 🎯 **READY FOR USER TESTING**: Feature fully implemented and functional at http://localhost:3002/insights
+- 🔄 **Top 5 Bottom 5 SA2 Rankings for Insights Page - PLANNING PHASE**: Add interactive SA2 rankings to Economics tab with navigation to detailed SA2 pages
+  - 📋 **Analysis Phase**: ✅ Analyzed existing TopBottomPanel component from maps page - COMPLETED
+  - 📋 **Feature Requirements**: Add top 5/bottom 5 rankings for each economic variable with click-to-navigate functionality - PLANNED
+  - 📋 **Technical Approach**: Create InsightsTopBottomPanel component based on existing TopBottomPanel but with navigation to insights SA2 detail pages - PLANNED
+  - ⏳ **Component Creation**: Create new InsightsTopBottomPanel component for insights page
+  - ⏳ **Data Integration**: Calculate rankings for economic variables using existing SA2 data
+  - ⏳ **Navigation Integration**: Implement click-to-navigate to SA2 detailed analytics page
+  - ⏳ **UI Integration**: Add rankings section to Economics tab layout
+  - ⏳ **Multi-variable Support**: Enable rankings for all economic metrics with variable selection
 
 ### Completed
 - ✅ **Smart SA2 Proximity Suggestions - FULLY COMPLETED**: Intelligent closest SA2 recommendations
