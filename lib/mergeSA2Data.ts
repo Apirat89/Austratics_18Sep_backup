@@ -84,6 +84,12 @@ interface MergedSA2File {
     id: string;
     name: string;
     metrics: { [key: string]: number };
+    SA3_CODE_2021?: string;
+    SA3_NAME_2021?: string;
+    SA4_CODE_2021?: string;
+    SA4_NAME_2021?: string;
+    STATE_CODE_2021?: string;
+    STATE_NAME_2021?: string;
   }>;
   metadata: {
     totalRegions: number;
@@ -199,6 +205,14 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
       
       // Convert metrics to expected format (with proper prefixes)
       const metrics: SA2Wide = { sa2Name };
+      
+      // Include hierarchical fields for geographic comparisons
+      if (region.SA3_CODE_2021) metrics.SA3_CODE_2021 = region.SA3_CODE_2021;
+      if (region.SA3_NAME_2021) metrics.SA3_NAME_2021 = region.SA3_NAME_2021;
+      if (region.SA4_CODE_2021) metrics.SA4_CODE_2021 = region.SA4_CODE_2021;
+      if (region.SA4_NAME_2021) metrics.SA4_NAME_2021 = region.SA4_NAME_2021;
+      if (region.STATE_CODE_2021) metrics.STATE_CODE_2021 = region.STATE_CODE_2021;
+      if (region.STATE_NAME_2021) metrics.STATE_NAME_2021 = region.STATE_NAME_2021;
       
       Object.entries(region.metrics).forEach(([metricKey, value]) => {
         // Convert from "Demographics_Metric" to "Demographics | Metric" format

@@ -206,7 +206,7 @@ export default function SA2AnalyticsPage() {
 
   // Helper function to get hierarchical statistics for a specific SA2 and metric
   const getHierarchicalStatsForSA2 = (sa2: SA2Data, metric: string): HierarchicalStatistics | undefined => {
-    const sa2Key = `${sa2.id}_${metric}`;
+    const sa2Key = `${sa2.sa2Id}_${metric}`;
     return hierarchicalStatistics[sa2Key];
   };
 
@@ -303,7 +303,7 @@ export default function SA2AnalyticsPage() {
           const sa3Code = sa2.SA3_CODE_2021;
           
           // Use SA2 ID as the key for hierarchical stats
-          const sa2Key = `${sa2.id}_${metric}`;
+          const sa2Key = `${sa2.sa2Id}_${metric}`;
           
           if (!hierarchicalStats[sa2Key]) {
             hierarchicalStats[sa2Key] = {
