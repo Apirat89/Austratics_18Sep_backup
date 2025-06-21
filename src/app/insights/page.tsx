@@ -687,9 +687,8 @@ export default function SA2AnalyticsPage() {
     }
 
     try {
-      const isSaved = await isSA2SearchSaved(user.id, sa2.sa2Id);
-      
-      if (isSaved) {
+      // Use the current state instead of making another database call to avoid race conditions
+      if (currentSA2SavedStatus) {
         // Unsave the SA2
         const result = await deleteSavedSA2SearchBySA2Id(user.id, sa2.sa2Id);
         if (result.success) {
@@ -1307,104 +1306,48 @@ export default function SA2AnalyticsPage() {
                     </TabsTrigger>
                   </TabsList>
                   
+
                   {/* 🟢 Economics Tab */}
                   <TabsContent value="economics" className="mt-6">
                     <div className="space-y-6">
                       <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
                         <h3 className="text-xl font-bold text-green-800 flex items-center gap-2 mb-2">
                           <TrendingUp className="h-6 w-6" />
-                          Economic Performance Analysis
+                          Economics Metrics
                         </h3>
                         <p className="text-green-700">Employment rates, income levels, and economic indicators for regional prosperity assessment.</p>
                       </div>
                       
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Economic Indicators Box Plots */}
-                        <div className="space-y-4">
-                          <h4 className="text-lg font-semibold mb-4 flex items-center">
-                            <DollarSign className="h-5 w-5 mr-2 text-green-600" />
-                            Key Economic Indicators
-                          </h4>
-                          {availableMetrics.filter(metric => 
-                            metric.includes('Economics') || metric.includes('Income') || metric.includes('income') || metric.includes('Employment')
-                          ).slice(0, 5).map(metric => {
-                            const currentValue = selectedSA2[metric];
-                            const stats = sa2Statistics[metric];
-                            
-                            if (typeof currentValue !== 'number' || !stats) return null;
-                            
-                            return (
-                              <SA2BoxPlot
-                                key={metric}
-                                metricName={metric.replace(/^[^|]*\|\s*/, '')}
-                                currentValue={currentValue}
-                                statistics={stats}
-                                width={380}
-                                height={140}
-                                showPerformanceIndicator={true}
-                              />
-                            );
-                          }).filter(Boolean)}
-                        </div>
-                        
-                        {/* Economic Performance Radar */}
-                        <div>
-                          <h4 className="text-lg font-semibold mb-4 flex items-center">
-                            <Target className="h-5 w-5 mr-2 text-green-600" />
-                            Economic Profile Overview
-                          </h4>
-                          {(() => {
-                            const economicMetrics = availableMetrics.filter(metric => 
-                              metric.includes('Economics') || 
-                              (metric.includes('Income') || metric.includes('income')) ||
-                              metric.includes('Employment')
-                            ).slice(0, 6);
-                            
-                            const radarData = prepareRadarData(selectedSA2, economicMetrics).filter(item => item !== null) as any[];
-                            
-                            return radarData.length > 0 ? (
-                              <SA2RadarChart
-                                title="Economic Performance Profile"
-                                metrics={radarData}
-                                width={400}
-                                height={320}
-                              />
-                            ) : (
-                              <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                                <TrendingUp className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                                <p className="text-gray-500">Limited economic data available for this region</p>
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                      
-                      {/* Economic Rankings */}
-                      <div>
-                        <h4 className="text-lg font-semibold mb-4 flex items-center">
-                          <Award className="h-5 w-5 mr-2 text-green-600" />
-                          Economic Performance Rankings
-                        </h4>
-                        {(() => {
-                          const economicRankingMetrics = availableMetrics.filter(metric => 
-                            metric.includes('Economics') || metric.includes('Income') || metric.includes('income')
-                          ).slice(0, 4);
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {availableMetrics.filter(metric => [
+                          "Labour force status - Census | % of total Census responding population employed",
+                          "Personal income in Australia - year ended 30 June | Median employee income ($)",
+                          "Residential property transfers - year ended 30 June | Median price of attached dwelling transfers ($)",
+                          "Personal income in Australia - year ended 30 June | Median superannuation and annuity income ($)",
+                          "Rent and mortgage payments - Occupied private dwellings - Census | Median weekly household rental payment ($)",
+                          "Tenure type - Occupied private dwellings - Census | Owned outright (%)",
+                          "Tenure type - Occupied private dwellings - Census | Owned outright (no.)",
+                          "Socio-economic indexes for areas (SEIFA) - rank within Australia - Census | SEIFA Index of relative socio-economic advantage and disadvantage (IRSAD) - rank within Australia (decile)",
+                          "Socio-economic indexes for areas (SEIFA) - rank within Australia - Census | SEIFA Index of relative socio-economic disadvantage (IRSD) - rank within Australia (decile)",
+                          "Labour force status - Persons aged 15 years and over - Census | Unemployment rate (%)"
+                        ].includes(metric)).map(metric => {
+                          const currentValue = selectedSA2[metric];
+                          const stats = sa2Statistics[metric];
                           
-                          const rankings = calculateRankings(selectedSA2, economicRankingMetrics).filter(item => item !== null) as any[];
+                          if (typeof currentValue !== 'number' || !stats) return null;
                           
-                          return rankings.length > 0 ? (
-                            <SA2RankingChart
-                              title="Economic Percentile Rankings"
-                              rankings={rankings}
-                              width={800}
-                              height={300}
+                          return (
+                            <SA2BoxPlot
+                              key={metric}
+                              metricName={metric.replace(/^[^|]*\|\s*/, '')}
+                              currentValue={currentValue}
+                              statistics={stats}
+                              width={380}
+                              height={140}
+                              showPerformanceIndicator={true}
                             />
-                          ) : (
-                            <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                              <p className="text-gray-500">Insufficient economic data for rankings</p>
-                            </div>
                           );
-                        })()}
+                        }).filter(Boolean)}
                       </div>
                     </div>
                   </TabsContent>
@@ -1415,97 +1358,40 @@ export default function SA2AnalyticsPage() {
                       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
                         <h3 className="text-xl font-bold text-blue-800 flex items-center gap-2 mb-2">
                           <Users className="h-6 w-6" />
-                          Demographic Composition Analysis
+                          Demographics Metrics
                         </h3>
                         <p className="text-blue-700">Population statistics, age distribution, and demographic characteristics of the region.</p>
                       </div>
                       
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Demographics Box Plots */}
-                        <div className="space-y-4">
-                          <h4 className="text-lg font-semibold mb-4 flex items-center">
-                            <Users className="h-5 w-5 mr-2 text-blue-600" />
-                            Population Metrics
-                          </h4>
-                          {availableMetrics.filter(metric => 
-                            metric.includes('Demographics') || metric.includes('Population') || metric.includes('Age') || metric.includes('age')
-                          ).slice(0, 5).map(metric => {
-                            const currentValue = selectedSA2[metric];
-                            const stats = sa2Statistics[metric];
-                            
-                            if (typeof currentValue !== 'number' || !stats) return null;
-                            
-                            return (
-                              <SA2BoxPlot
-                                key={metric}
-                                metricName={metric.replace(/^[^|]*\|\s*/, '')}
-                                currentValue={currentValue}
-                                statistics={stats}
-                                width={380}
-                                height={140}
-                                showPerformanceIndicator={true}
-                              />
-                            );
-                          }).filter(Boolean)}
-                        </div>
-                        
-                        {/* Demographics Radar Chart */}
-                        <div>
-                          <h4 className="text-lg font-semibold mb-4 flex items-center">
-                            <Radar className="h-5 w-5 mr-2 text-blue-600" />
-                            Demographic Profile Overview
-                          </h4>
-                          {(() => {
-                            const ageMetrics = availableMetrics.filter(metric => 
-                              metric.includes('Demographics') && 
-                              (metric.includes('age') || metric.includes('Age') || metric.includes('Population'))
-                            ).slice(0, 6);
-                            
-                            const radarData = prepareRadarData(selectedSA2, ageMetrics).filter(item => item !== null) as any[];
-                            
-                            return radarData.length > 0 ? (
-                              <SA2RadarChart
-                                title="Demographics Profile"
-                                metrics={radarData}
-                                width={400}
-                                height={320}
-                              />
-                            ) : (
-                              <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                                <Users className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                                <p className="text-gray-500">Limited demographic data available for this region</p>
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                      
-                      {/* Demographic Rankings */}
-                      <div>
-                        <h4 className="text-lg font-semibold mb-4 flex items-center">
-                          <Award className="h-5 w-5 mr-2 text-blue-600" />
-                          Demographic Performance Rankings
-                        </h4>
-                        {(() => {
-                          const demographicRankingMetrics = availableMetrics.filter(metric => 
-                            metric.includes('Demographics') || metric.includes('Population')
-                          ).slice(0, 4);
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {availableMetrics.filter(metric => [
+                          "Demographics | Estimated resident population (no.)",
+                          "Demographics | Median age - persons (years)",
+                          "Demographics | Persons - 55-64 years (%)",
+                          "Demographics | Persons - 55-64 years (no.)",
+                          "Demographics | Persons - 65 years and over (%)",
+                          "Demographics | Persons - 65 years and over (no.)",
+                          "Demographics | Population density (persons/km2)",
+                          "Demographics | Working age population (aged 15-64 years) (%)",
+                          "Demographics | Working age population (aged 15-64 years) (no.)"
+                        ].includes(metric)).map(metric => {
+                          const currentValue = selectedSA2[metric];
+                          const stats = sa2Statistics[metric];
                           
-                          const rankings = calculateRankings(selectedSA2, demographicRankingMetrics).filter(item => item !== null) as any[];
+                          if (typeof currentValue !== 'number' || !stats) return null;
                           
-                          return rankings.length > 0 ? (
-                            <SA2RankingChart
-                              title="Demographic Percentile Rankings"
-                              rankings={rankings}
-                              width={800}
-                              height={300}
+                          return (
+                            <SA2BoxPlot
+                              key={metric}
+                              metricName={metric.replace(/^[^|]*\|\s*/, '')}
+                              currentValue={currentValue}
+                              statistics={stats}
+                              width={380}
+                              height={140}
+                              showPerformanceIndicator={true}
                             />
-                          ) : (
-                            <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                              <p className="text-gray-500">Insufficient demographic data for rankings</p>
-                            </div>
                           );
-                        })()}
+                        }).filter(Boolean)}
                       </div>
                     </div>
                   </TabsContent>
@@ -1516,96 +1402,49 @@ export default function SA2AnalyticsPage() {
                       <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg p-4 border border-purple-200">
                         <h3 className="text-xl font-bold text-purple-800 flex items-center gap-2 mb-2">
                           <Heart className="h-6 w-6" />
-                          Health Sector Services Analysis
+                          Health Sector Metrics
                         </h3>
                         <p className="text-purple-700">Healthcare infrastructure, service availability, and support programs in the region.</p>
                       </div>
                       
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Healthcare Services Box Plots */}
-                        <div className="space-y-4">
-                          <h4 className="text-lg font-semibold mb-4 flex items-center">
-                            <Heart className="h-5 w-5 mr-2 text-purple-600" />
-                            Healthcare Services & Infrastructure
-                          </h4>
-                          {availableMetrics.filter(metric => 
-                            metric.includes('Healthcare') || metric.includes('Home Support') || metric.includes('Care') || metric.includes('Program')
-                          ).slice(0, 5).map(metric => {
-                            const currentValue = selectedSA2[metric];
-                            const stats = sa2Statistics[metric];
-                            
-                            if (typeof currentValue !== 'number' || !stats) return null;
-                            
-                            return (
-                              <SA2BoxPlot
-                                key={metric}
-                                metricName={metric.replace(/^[^|]*\|\s*/, '')}
-                                currentValue={currentValue}
-                                statistics={stats}
-                                width={380}
-                                height={140}
-                                showPerformanceIndicator={true}
-                              />
-                            );
-                          }).filter(Boolean)}
-                        </div>
-                        
-                        {/* Healthcare Services Radar */}
-                        <div>
-                          <h4 className="text-lg font-semibold mb-4 flex items-center">
-                            <Radar className="h-5 w-5 mr-2 text-purple-600" />
-                            Healthcare Access Profile
-                          </h4>
-                          {(() => {
-                            const healthcareMetrics = availableMetrics.filter(metric => 
-                              metric.includes('Healthcare') || metric.includes('Home Support') || metric.includes('Program')
-                            ).slice(0, 6);
-                            
-                            const radarData = prepareRadarData(selectedSA2, healthcareMetrics).filter(item => item !== null) as any[];
-                            
-                            return radarData.length > 0 ? (
-                              <SA2RadarChart
-                                title="Healthcare Services Profile"
-                                metrics={radarData}
-                                width={400}
-                                height={320}
-                              />
-                            ) : (
-                              <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                                <Heart className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                                <p className="text-gray-500">Limited healthcare data available for this region</p>
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                      
-                      {/* Healthcare Rankings */}
-                      <div>
-                        <h4 className="text-lg font-semibold mb-4 flex items-center">
-                          <Award className="h-5 w-5 mr-2 text-purple-600" />
-                          Healthcare Service Rankings
-                        </h4>
-                        {(() => {
-                          const healthcareRankingMetrics = availableMetrics.filter(metric => 
-                            metric.includes('Healthcare') || metric.includes('Home Support')
-                          ).slice(0, 4);
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {availableMetrics.filter(metric => [
+                          "Number of Participants | Commonwealth Home Support Program",
+                          "Number of Providers | Commonwealth Home Support Program",
+                          "Participants per provider | Commonwealth Home Support Program",
+                          "Spending | Commonwealth Home Support Program",
+                          "Spending per participant | Commonwealth Home Support Program",
+                          "Spending per provider | Commonwealth Home Support Program",
+                          "Number of Participants | Home Care",
+                          "Number of Providers | Home Care",
+                          "Participants per provider | Home Care",
+                          "Spending | Home Care",
+                          "Spending per participant | Home Care",
+                          "Spending per provider | Home Care",
+                          "Number of Participants | Residential Care",
+                          "Number of Providers | Residential Care",
+                          "Participants per provider | Residential Care",
+                          "Spending | Residential Care",
+                          "Spending per participant | Residential Care",
+                          "Spending per provider | Residential Care"
+                        ].includes(metric)).map(metric => {
+                          const currentValue = selectedSA2[metric];
+                          const stats = sa2Statistics[metric];
                           
-                          const rankings = calculateRankings(selectedSA2, healthcareRankingMetrics).filter(item => item !== null) as any[];
+                          if (typeof currentValue !== 'number' || !stats) return null;
                           
-                          return rankings.length > 0 ? (
-                            <SA2RankingChart
-                              title="Healthcare Service Percentile Rankings"
-                              rankings={rankings}
-                              width={800}
-                              height={300}
+                          return (
+                            <SA2BoxPlot
+                              key={metric}
+                              metricName={metric.replace(/^[^|]*\|\s*/, '')}
+                              currentValue={currentValue}
+                              statistics={stats}
+                              width={380}
+                              height={140}
+                              showPerformanceIndicator={true}
                             />
-                          ) : (
-                            <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                              <p className="text-gray-500">Insufficient healthcare data for rankings</p>
-                            </div>
                           );
-                        })()}
+                        }).filter(Boolean)}
                       </div>
                     </div>
                   </TabsContent>
@@ -1616,96 +1455,47 @@ export default function SA2AnalyticsPage() {
                       <div className="bg-gradient-to-r from-red-50 to-rose-50 rounded-lg p-4 border border-red-200">
                         <h3 className="text-xl font-bold text-red-800 flex items-center gap-2 mb-2">
                           <Cross className="h-6 w-6" />
-                          Health Statistics & Conditions Analysis
+                          Health Stats Metrics
                         </h3>
-                        <p className="text-red-700">Health conditions, assistance needs, and wellness indicators for community health assessment.</p>
+                        <p className="text-red-700">Health conditions, assistance needs, and wellness indicators for the region.</p>
                       </div>
                       
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Health Conditions Box Plots */}
-                        <div className="space-y-4">
-                          <h4 className="text-lg font-semibold mb-4 flex items-center">
-                            <Activity className="h-5 w-5 mr-2 text-red-600" />
-                            Health Conditions & Assistance Needs
-                          </h4>
-                          {availableMetrics.filter(metric => 
-                            metric.includes('Health Statistics') || metric.includes('Core activity') || metric.includes('assistance') || metric.includes('need')
-                          ).slice(0, 5).map(metric => {
-                            const currentValue = selectedSA2[metric];
-                            const stats = sa2Statistics[metric];
-                            
-                            if (typeof currentValue !== 'number' || !stats) return null;
-                            
-                            return (
-                              <SA2BoxPlot
-                                key={metric}
-                                metricName={metric.replace(/^[^|]*\|\s*/, '')}
-                                currentValue={currentValue}
-                                statistics={stats}
-                                width={380}
-                                height={140}
-                                showPerformanceIndicator={true}
-                              />
-                            );
-                          }).filter(Boolean)}
-                        </div>
-                        
-                        {/* Health Risk Profile */}
-                        <div>
-                          <h4 className="text-lg font-semibold mb-4 flex items-center">
-                            <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
-                            Health Risk Assessment Profile
-                          </h4>
-                          {(() => {
-                            const healthMetrics = availableMetrics.filter(metric => 
-                              metric.includes('Health Statistics') || metric.includes('activity need') || metric.includes('assistance')
-                            ).slice(0, 6);
-                            
-                            const radarData = prepareRadarData(selectedSA2, healthMetrics).filter(item => item !== null) as any[];
-                            
-                            return radarData.length > 0 ? (
-                              <SA2RadarChart
-                                title="Health Risk Factors"
-                                metrics={radarData}
-                                width={400}
-                                height={320}
-                              />
-                            ) : (
-                              <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                                <Cross className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                                <p className="text-gray-500">Limited health statistics available for this region</p>
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                      
-                      {/* Health Statistics Rankings */}
-                      <div>
-                        <h4 className="text-lg font-semibold mb-4 flex items-center">
-                          <Award className="h-5 w-5 mr-2 text-red-600" />
-                          Health Statistics Rankings
-                        </h4>
-                        {(() => {
-                          const healthStatsRankingMetrics = availableMetrics.filter(metric => 
-                            metric.includes('Health Statistics') || metric.includes('Core activity')
-                          ).slice(0, 4);
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {availableMetrics.filter(metric => [
+                          "Long-term health conditions - Census | Arthritis (%)",
+                          "Long-term health conditions - Census | Asthma (%)",
+                          "Long-term health conditions - Census | Cancer (including remission) (%)",
+                          "Long-term health conditions - Census | Dementia (including Alzheimer's) (%)",
+                          "Long-term health conditions - Census | Diabetes (excluding gestational diabetes) (%)",
+                          "Long-term health conditions - Census | Heart disease (including heart attack or angina) (%)",
+                          "Long-term health conditions - Census | Kidney disease (%)",
+                          "Household composition - Occupied private dwellings - Census | Lone person households (no.)",
+                          "Long-term health conditions - Census | Lung condition (including COPD or emphysema) (%)",
+                          "Long-term health conditions - Census | Mental health condition (including depression or anxiety) (%)",
+                          "Long-term health conditions - Census | No long-term health condition(s) (%)",
+                          "Long-term health conditions - Census | Other long-term health condition(s) (%)",
+                          "Core activity need for assistance - Census | Persons who have need for assistance with core activities (%)",
+                          "Core activity need for assistance - Census | Persons who have need for assistance with core activities (no.)",
+                          "Unpaid assistance to a person with a disability - Census | Provided unpaid assistance (%)",
+                          "Long-term health conditions - Census | Stroke (%)"
+                        ].includes(metric)).map(metric => {
+                          const currentValue = selectedSA2[metric];
+                          const stats = sa2Statistics[metric];
                           
-                          const rankings = calculateRankings(selectedSA2, healthStatsRankingMetrics).filter(item => item !== null) as any[];
+                          if (typeof currentValue !== 'number' || !stats) return null;
                           
-                          return rankings.length > 0 ? (
-                            <SA2RankingChart
-                              title="Health Statistics Percentile Rankings"
-                              rankings={rankings}
-                              width={800}
-                              height={300}
+                          return (
+                            <SA2BoxPlot
+                              key={metric}
+                              metricName={metric.replace(/^[^|]*\|\s*/, '')}
+                              currentValue={currentValue}
+                              statistics={stats}
+                              width={380}
+                              height={140}
+                              showPerformanceIndicator={true}
                             />
-                          ) : (
-                            <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                              <p className="text-gray-500">Insufficient health statistics for rankings</p>
-                            </div>
                           );
-                        })()}
+                        }).filter(Boolean)}
                       </div>
                     </div>
                   </TabsContent>
