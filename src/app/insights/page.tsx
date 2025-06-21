@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser } from '../../lib/auth';
 import BackToMainButton from '../../components/BackToMainButton';
-import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross } from 'lucide-react';
+import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import SA2BoxPlot from '../../components/sa2/SA2BoxPlot';
@@ -13,6 +13,14 @@ import SA2RankingChart from '../../components/sa2/SA2RankingChart';
 import SA2HeatmapChart from '../../components/sa2/SA2HeatmapChart';
 import InsightsLandingRankings from '../../components/insights/InsightsLandingRankings';
 import { searchLocations } from '../../lib/mapSearchService';
+import { 
+  saveSA2Search, 
+  getUserSavedSA2Searches, 
+  deleteSavedSA2Search, 
+  deleteSavedSA2SearchBySA2Id,
+  isSA2SearchSaved,
+  type SavedSA2Search 
+} from '../../lib/savedSA2Searches';
 
 interface UserData {
   email: string;
@@ -89,6 +97,13 @@ export default function SA2AnalyticsPage() {
     statisticsCalculated: false
   });
   
+  // Saved SA2 searches state
+  const [savedSA2Searches, setSavedSA2Searches] = useState<SavedSA2Search[]>([]);
+  const [showSavedSearches, setShowSavedSearches] = useState(false);
+  const [currentUserLoading, setCurrentUserLoading] = useState(true);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [currentSA2SavedStatus, setCurrentSA2SavedStatus] = useState<boolean>(false);
+  
   const router = useRouter();
   const dataLoadingRef = useRef(false);
   const dataLoadedRef = useRef(false);
@@ -125,8 +140,19 @@ export default function SA2AnalyticsPage() {
 
       setDataLoadingStatus(prev => ({ ...prev, loadingStep: 'Processing SA2 data structure...' }));
       
-      const sa2Data = apiData.data;
-      setAllSA2Data(sa2Data);
+      // Transform the API data to include sa2Id in each SA2 object
+      const rawSA2Data = apiData.data;
+      const transformedSA2Data: Record<string, SA2Data> = {};
+      
+      Object.entries(rawSA2Data).forEach(([sa2Id, sa2Info]: [string, any]) => {
+        transformedSA2Data[sa2Id] = {
+          sa2Id,
+          sa2Name: sa2Info.sa2Name,
+          ...sa2Info
+        };
+      });
+      
+      setAllSA2Data(transformedSA2Data);
 
       // Get available metrics
       const metricsResponse = await fetch('/api/sa2?metrics=true');
@@ -136,7 +162,7 @@ export default function SA2AnalyticsPage() {
       setDataLoadingStatus(prev => ({ ...prev, loadingStep: 'Calculating enhanced statistics (min, max, Q1, Q3, percentiles)...' }));
       
       // Calculate enhanced statistics for all metrics
-      await calculateEnhancedStatistics(sa2Data, metricsData.metrics || []);
+      await calculateEnhancedStatistics(transformedSA2Data, metricsData.metrics || []);
 
       setDataLoadingStatus(prev => ({
         ...prev,
@@ -147,7 +173,7 @@ export default function SA2AnalyticsPage() {
 
       dataLoadedRef.current = true;
       console.log('✅ SA2 Analytics Platform loaded successfully');
-      console.log(`📊 Dataset: ${Object.keys(sa2Data).length} regions, ${metricsData.metrics?.length || 0} metrics`);
+      console.log(`📊 Dataset: ${Object.keys(transformedSA2Data).length} regions, ${metricsData.metrics?.length || 0} metrics`);
       
     } catch (error) {
       console.warn('⚠️ SA2 data loading failed:', error);
@@ -641,6 +667,113 @@ export default function SA2AnalyticsPage() {
     setSelectedLocation(null);
   };
 
+  // Load saved SA2 searches for the current user
+  const loadSavedSA2Searches = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      const result = await getUserSavedSA2Searches(user.id);
+      setSavedSA2Searches(result.searches);
+    } catch (error) {
+      console.error('Error loading saved SA2 searches:', error);
+    }
+  }, [user]);
+
+  // Toggle save/unsave current SA2 search
+  const toggleSA2SaveHandler = async (sa2: SA2Data) => {
+    if (!user) {
+      router.push('/auth/signin');
+      return;
+    }
+
+    try {
+      const isSaved = await isSA2SearchSaved(user.id, sa2.sa2Id);
+      
+      if (isSaved) {
+        // Unsave the SA2
+        const result = await deleteSavedSA2SearchBySA2Id(user.id, sa2.sa2Id);
+        if (result.success) {
+          setSaveMessage({ type: 'success', text: 'SA2 region removed from saved searches!' });
+          setCurrentSA2SavedStatus(false);
+          await loadSavedSA2Searches(); // Refresh the list
+        } else {
+          console.error('Failed to remove SA2 search:', result.message);
+          setSaveMessage({ type: 'error', text: result.message });
+        }
+      } else {
+        // Save the SA2
+        const searchMetadata = {
+          originalQuery: searchQuery,
+          selectedLocation: selectedLocation,
+          timestamp: new Date().toISOString()
+        };
+
+        const result = await saveSA2Search(
+          user.id,
+          sa2.sa2Id,
+          sa2.sa2Name,
+          sa2,
+          searchMetadata
+        );
+
+        if (result.success) {
+          console.log('SA2 search saved successfully');
+          setSaveMessage({ type: 'success', text: 'SA2 region saved successfully!' });
+          setCurrentSA2SavedStatus(true);
+          await loadSavedSA2Searches(); // Refresh the list
+        } else {
+          console.error('Failed to save SA2 search:', result.message);
+          setSaveMessage({ type: 'error', text: result.message });
+        }
+      }
+      
+      // Clear message after 5 seconds
+      setTimeout(() => setSaveMessage(null), 5000);
+    } catch (error) {
+      console.error('Error toggling SA2 search save status:', error);
+      setSaveMessage({ type: 'error', text: 'Failed to update SA2 search. Please try again.' });
+      setTimeout(() => setSaveMessage(null), 5000);
+    }
+  };
+
+  // Delete a saved SA2 search
+  const deleteSavedSA2SearchHandler = async (searchId: number) => {
+    if (!user) return;
+
+    try {
+      const result = await deleteSavedSA2Search(user.id, searchId);
+      if (result.success) {
+        console.log('SA2 search deleted successfully');
+        await loadSavedSA2Searches(); // Refresh the list
+      } else {
+        console.error('Failed to delete SA2 search:', result.message);
+      }
+    } catch (error) {
+      console.error('Error deleting SA2 search:', error);
+    }
+  };
+
+  // Load saved SA2 search
+  const loadSavedSA2Search = (savedSearch: SavedSA2Search) => {
+    setSelectedSA2(savedSearch.sa2_data);
+    setSearchQuery(savedSearch.sa2_name);
+    setSearchResults([]);
+    setSelectedLocation(null);
+    setShowSavedSearches(false);
+  };
+
+  // Check if current SA2 is saved
+  const isCurrentSA2Saved = useCallback(async () => {
+    if (!user || !selectedSA2) return false;
+    
+    try {
+      return await isSA2SearchSaved(user.id, selectedSA2.sa2Id);
+    } catch (error) {
+      console.error('Error checking if SA2 is saved:', error);
+      return false;
+    }
+  }, [user, selectedSA2]);
+
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
@@ -654,25 +787,53 @@ export default function SA2AnalyticsPage() {
   useEffect(() => {
     const initializePage = async () => {
       try {
-                 const currentUser = await getCurrentUser();
-         if (currentUser) {
-           setUser({
-             email: currentUser.email || '',
-             name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User',
-             id: currentUser.id
-           });
-         }
+        setCurrentUserLoading(true);
+        const currentUser = await getCurrentUser();
+        if (currentUser) {
+          setUser({
+            email: currentUser.email || '',
+            name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User',
+            id: currentUser.id
+          });
+        }
         await loadSA2Data();
       } catch (error) {
         console.error('Error initializing SA2 analytics page:', error);
         router.push('/auth/login');
       } finally {
         setIsLoading(false);
+        setCurrentUserLoading(false);
       }
     };
 
     initializePage();
   }, [router, loadSA2Data]);
+
+  // Load saved searches when user is available
+  useEffect(() => {
+    if (user && !currentUserLoading) {
+      loadSavedSA2Searches();
+    }
+  }, [user, currentUserLoading, loadSavedSA2Searches]);
+
+  // Check if current SA2 is saved when SA2 changes
+  useEffect(() => {
+    const checkSavedStatus = async () => {
+      if (user && selectedSA2) {
+        try {
+          const isSaved = await isSA2SearchSaved(user.id, selectedSA2.sa2Id);
+          setCurrentSA2SavedStatus(isSaved);
+        } catch (error) {
+          console.error('Error checking SA2 saved status:', error);
+          setCurrentSA2SavedStatus(false);
+        }
+      } else {
+        setCurrentSA2SavedStatus(false);
+      }
+    };
+
+    checkSavedStatus();
+  }, [user, selectedSA2]);
 
   // Handle search input changes
   useEffect(() => {
@@ -696,21 +857,78 @@ export default function SA2AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <BarChart3 className="h-8 w-8 mr-3 text-blue-600" />
-              SA2 Analytics Platform
-            </h1>
-            <p className="text-gray-600 mt-2">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <BarChart3 className="w-8 h-8 text-blue-600" />
+              <h1 className="text-3xl font-bold text-gray-900">SA2 Analytics Platform</h1>
+            </div>
+            
+            {/* Back to Main Menu and Toggle buttons */}
+            <div className="flex items-center gap-2">
+              {/* Back to Main Menu Button */}
+              <button
+                onClick={() => router.push('/main')}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+                title="Back to Main Menu"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Main Menu
+              </button>
+              
+              {/* Toggle between Search and Saved */}
+              <button
+                onClick={() => {
+                  setShowSavedSearches(false);
+                  // Navigate back to landing page - clear selected SA2 and location
+                  setSelectedSA2(null);
+                  setSelectedLocation(null);
+                  setSearchQuery('');
+                  setSearchResults([]);
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                  !showSavedSearches
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Search className="w-4 h-4" />
+                Search SA2 Regions
+              </button>
+              <button
+                onClick={() => setShowSavedSearches(true)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                  showSavedSearches
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <History className="w-4 h-4" />
+                Saved Searches ({savedSA2Searches.length})
+              </button>
+            </div>
+          </div>
+          
+          {!showSavedSearches && (
+            <p className="text-gray-600">
               Comprehensive analysis of Statistical Area Level 2 regions across Australia
             </p>
-          </div>
-          <BackToMainButton />
+          )}
+          
+          {showSavedSearches && (
+            <p className="text-sm text-gray-600">
+              {savedSA2Searches.length === 0 
+                ? 'No saved SA2 searches yet. Search and save SA2 regions to view them here.'
+                : `Viewing ${savedSA2Searches.length} saved SA2 searches`
+              }
+            </p>
+          )}
         </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Data Loading Status */}
         {dataLoadingStatus.isLoading && (
           <Card className="mb-6 border-blue-200 bg-blue-50">
@@ -749,129 +967,241 @@ export default function SA2AnalyticsPage() {
           </Card>
         )}
 
-        {/* Search Interface */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Search className="h-5 w-5 mr-2" />
-              Search SA2 Regions
-            </CardTitle>
-            <CardDescription>
-              Search by SA2 name, postcode, or locality. Results prioritized by population size.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-                                     <div className="relative">
-              <input
-                type="text"
-                placeholder="Search regions (SA2/SA3/SA4/LGA), postcodes, localities, or facilities..."
-                value={searchQuery}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
-                className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              {isSearching && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                </div>
-              )}
-              
-              {/* Search Results Dropdown */}
-              {!selectedSA2 && (searchResults.length > 0 || (searchQuery.length >= 2 && !isSearching && searchResults.length === 0)) && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-80 overflow-y-auto">
-                  {searchResults.map((result, index) => {
-                    // Get type-specific icon and info
-                    const getTypeInfo = (type: string) => {
-                      switch (type) {
-                        case 'sa2': return { icon: '📍', label: 'SA2' };
-                        case 'sa3': return { icon: '🗺️', label: 'SA3' };
-                        case 'sa4': return { icon: '🌏', label: 'SA4' };
-                        case 'lga': return { icon: '🏛️', label: 'LGA' };
-                        case 'postcode': return { icon: '📮', label: 'Postcode' };
-                        case 'locality': return { icon: '🏘️', label: 'Locality' };
-                        case 'facility': return { icon: '🏥', label: 'Facility' };
-                        default: return { icon: '📍', label: 'Location' };
-                      }
-                    };
-                    
-                    const typeInfo = getTypeInfo(result.type);
-                    const isPostcodeMatch = /^\d{4}$/.test(searchQuery.trim()) && result.type === 'postcode';
-                    const isProximitySuggestion = result.isProximitySuggestion;
-                    
-                    return (
+        {/* Save Message */}
+        {saveMessage && (
+          <Card className={`mb-6 ${saveMessage.type === 'success' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
+            <CardContent className="p-4">
+              <div className="flex items-center">
+                {saveMessage.type === 'success' ? (
+                  <CheckCircle className="h-5 w-5 mr-3 text-green-600" />
+                ) : (
+                  <AlertTriangle className="h-5 w-5 mr-3 text-red-600" />
+                )}
+                <span className={`font-medium ${saveMessage.type === 'success' ? 'text-green-800' : 'text-red-800'}`}>
+                  {saveMessage.text}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {!showSavedSearches && (
+          <>
+            {/* Search Interface */}
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Search className="h-5 w-5 mr-2" />
+                  Search SA2 Regions
+                </CardTitle>
+                <CardDescription>
+                  Search by SA2 name, postcode, or locality. Results prioritized by population size.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Save Current SA2 Button */}
+                  {selectedSA2 && user && (
+                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-md">
+                      <div className="flex items-center">
+                        <MapPin className="h-4 w-4 mr-2 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-900">
+                          Currently viewing: {selectedSA2.sa2Name}
+                        </span>
+                      </div>
                       <button
-                        key={`${result.id}-${index}`}
-                        onClick={() => handleLocationSelect(result)}
-                        className={`w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 focus:bg-gray-50 focus:outline-none ${
-                          isProximitySuggestion ? 'bg-blue-50 border-l-4 border-l-blue-400' : ''
+                        onClick={() => toggleSA2SaveHandler(selectedSA2)}
+                        className={`flex items-center px-3 py-1 text-sm rounded-md transition-colors ${
+                          currentSA2SavedStatus
+                            ? 'bg-green-600 text-white hover:bg-green-700'
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center">
-                              <span className="text-lg mr-2">{typeInfo.icon}</span>
-                              <div>
-                                <p className="font-medium text-gray-900 truncate">{result.name}</p>
-                                <div className="flex items-center space-x-3 text-sm text-gray-500">
-                                  <span>{typeInfo.label} {result.code || result.id}</span>
-                                  {result.area && <span>• {result.area}</span>}
-                                  {result.state && <span>• {result.state}</span>}
-                                  {isPostcodeMatch && (
-                                    <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium">
-                                      Postcode Match
-                                    </span>
-                                  )}
-                                  {result.type === 'sa2' && result.analyticsData && (
-                                    <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-medium">
-                                      Analytics Available
-                                    </span>
-                                  )}
-                                  {isProximitySuggestion && (
-                                    <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium">
-                                      Near {result.proximityTo}
-                                    </span>
+                        {currentSA2SavedStatus ? (
+                          <>
+                            <BookmarkCheck className="h-4 w-4 mr-1" />
+                            Saved
+                          </>
+                        ) : (
+                          <>
+                            <Bookmark className="h-4 w-4 mr-1" />
+                            Save SA2
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                  
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search regions (SA2/SA3/SA4/LGA), postcodes, localities, or facilities..."
+                      value={searchQuery}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
+                      className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    {isSearching && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      </div>
+                    )}
+                  
+                  {/* Search Results Dropdown */}
+                  {!selectedSA2 && (searchResults.length > 0 || (searchQuery.length >= 2 && !isSearching && searchResults.length === 0)) && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-80 overflow-y-auto">
+                      {searchResults.map((result, index) => {
+                        // Get type-specific icon and info
+                        const getTypeInfo = (type: string) => {
+                          switch (type) {
+                            case 'sa2': return { icon: '📍', label: 'SA2' };
+                            case 'sa3': return { icon: '🗺️', label: 'SA3' };
+                            case 'sa4': return { icon: '🌏', label: 'SA4' };
+                            case 'lga': return { icon: '🏛️', label: 'LGA' };
+                            case 'postcode': return { icon: '📮', label: 'Postcode' };
+                            case 'locality': return { icon: '🏘️', label: 'Locality' };
+                            case 'facility': return { icon: '🏥', label: 'Facility' };
+                            default: return { icon: '📍', label: 'Location' };
+                          }
+                        };
+                        
+                        const typeInfo = getTypeInfo(result.type);
+                        const isPostcodeMatch = /^\d{4}$/.test(searchQuery.trim()) && result.type === 'postcode';
+                        const isProximitySuggestion = result.isProximitySuggestion;
+                        
+                        return (
+                          <button
+                            key={`${result.id}-${index}`}
+                            onClick={() => handleLocationSelect(result)}
+                            className={`w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 focus:bg-gray-50 focus:outline-none ${
+                              isProximitySuggestion ? 'bg-blue-50 border-l-4 border-l-blue-400' : ''
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center">
+                                  <span className="text-lg mr-2">{typeInfo.icon}</span>
+                                  <div>
+                                    <p className="font-medium text-gray-900 truncate">{result.name}</p>
+                                    <div className="flex items-center space-x-3 text-sm text-gray-500">
+                                      <span>{typeInfo.label} {result.code || result.id}</span>
+                                      {result.area && <span>• {result.area}</span>}
+                                      {result.state && <span>• {result.state}</span>}
+                                      {isPostcodeMatch && (
+                                        <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                                          Postcode Match
+                                        </span>
+                                      )}
+                                      {result.type === 'sa2' && result.analyticsData && (
+                                        <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                                          Analytics Available
+                                        </span>
+                                      )}
+                                      {isProximitySuggestion && (
+                                        <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                                          Near {result.proximityTo}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right flex-shrink-0 ml-4">
+                                {result.population && (
+                                  <p className="text-sm font-medium text-gray-700">
+                                    Pop: {result.population.toLocaleString()}
+                                  </p>
+                                )}
+                                <div className="text-xs text-gray-500 space-y-0.5">
+                                  {result.medianAge && result.medianAge > 0 && <div>Age: {result.medianAge.toFixed(1)}</div>}
+                                  {result.medianIncome && result.medianIncome > 0 && <div>Income: ${(result.medianIncome/1000).toFixed(0)}k</div>}
+                                  {result.address && <div className="truncate max-w-32">{result.address}</div>}
+                                  {isProximitySuggestion && result.proximityDistance && (
+                                    <div className="text-blue-600 font-medium">
+                                      ~{result.proximityDistance.toFixed(1)} km away
+                                    </div>
                                   )}
                                 </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="text-right flex-shrink-0 ml-4">
-                            {result.population && (
-                              <p className="text-sm font-medium text-gray-700">
-                                Pop: {result.population.toLocaleString()}
-                              </p>
-                            )}
-                            <div className="text-xs text-gray-500 space-y-0.5">
-                              {result.medianAge && result.medianAge > 0 && <div>Age: {result.medianAge.toFixed(1)}</div>}
-                              {result.medianIncome && result.medianIncome > 0 && <div>Income: ${(result.medianIncome/1000).toFixed(0)}k</div>}
-                              {result.address && <div className="truncate max-w-32">{result.address}</div>}
-                              {isProximitySuggestion && result.proximityDistance && (
-                                <div className="text-blue-600 font-medium">
-                                  ~{result.proximityDistance.toFixed(1)} km away
-                                </div>
-                              )}
-                            </div>
-                          </div>
+                          </button>
+                        );
+                      })}
+                      
+                      {/* No Results State */}
+                      {searchQuery.length >= 2 && !isSearching && searchResults.length === 0 && (
+                        <div className="px-4 py-8 text-center">
+                          <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm text-gray-500">No locations found</p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            Try searching for regions (SA2/SA3/SA4/LGA), postcodes, localities, or healthcare facilities
+                          </p>
                         </div>
-                      </button>
-                    );
-                  })}
-                  
-                  {/* No Results State */}
-                  {searchQuery.length >= 2 && !isSearching && searchResults.length === 0 && (
-                    <div className="px-4 py-8 text-center">
-                      <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">No locations found</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Try searching for regions (SA2/SA3/SA4/LGA), postcodes, localities, or healthcare facilities
-                      </p>
+                      )}
                     </div>
                   )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {showSavedSearches && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <History className="h-4 w-4 mr-2" />
+                  Saved Searches ({savedSA2Searches.length})
+                </div>
+              </CardTitle>
+              <CardDescription>
+                Search and save SA2 regions to access them quickly
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {savedSA2Searches.length === 0 ? (
+                <div className="text-center py-12">
+                  <Bookmark className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Saved SA2 Searches</h3>
+                  <p className="text-gray-600 mb-4">
+                    Search for SA2 regions and save them to access quickly later.
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Switch to "Search SA2 Regions" to start exploring regions
+                  </p>
+                </div>
+              ) : (
+                <div className="max-h-80 overflow-y-auto">
+                  {savedSA2Searches.map((savedSearch) => (
+                    <div key={savedSearch.id} className="p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
+                      <div className="flex items-center justify-between">
+                        <button
+                          onClick={() => loadSavedSA2Search(savedSearch)}
+                          className="flex-1 text-left"
+                        >
+                          <p className="font-medium text-gray-900 truncate">{savedSearch.sa2_name}</p>
+                          <p className="text-sm text-gray-500">SA2 {savedSearch.sa2_id}</p>
+                          <p className="text-xs text-gray-400">
+                            Saved {new Date(savedSearch.created_at).toLocaleDateString()}
+                          </p>
+                        </button>
+                        <button
+                          onClick={() => deleteSavedSA2SearchHandler(savedSearch.id)}
+                          className="ml-2 p-1 text-gray-400 hover:text-red-600 transition-colors"
+                          title="Delete saved search"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Selected Location Information */}
         {selectedLocation && !selectedSA2 && (
