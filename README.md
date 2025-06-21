@@ -30,9 +30,11 @@ A modern web application for aged care analytics, featuring authentication, loca
 - User authentication with Supabase
 - Interactive maps powered by MapTiler
 - AI chat assistance using Google's Gemini 2.5
-- Location-based analytics
+- Location-based analytics with hierarchical geographic data
+- SA2 insights with comprehensive metrics across 4 categories
 - Facility screening tools
 - Top lists and rankings
+- Statistical analysis with box plots and performance indicators
 
 ## 🛠 Tech Stack
 
@@ -54,9 +56,16 @@ AnalyticsCode/                    ← Your workspace directory
 │   │   ├── auth/
 │   │   │   ├── signin/page.tsx  ← Sign in page
 │   │   │   └── signup/page.tsx  ← Sign up page
-│   │   └── dashboard/page.tsx   ← Dashboard (after login)
+│   │   ├── dashboard/page.tsx   ← Dashboard (after login)
+│   │   └── insights/page.tsx    ← SA2 Analytics & Insights
 │   ├── components/              ← Reusable React components
 │   └── lib/                     ← Utility functions and API clients
+├── data/
+│   └── sa2/                     ← SA2 geographic and statistical data
+│       ├── merged_sa2_data_comprehensive.json  ← Main SA2 dataset
+│       └── SA2_2021_AUST.json  ← Geographic correspondence data
+├── scripts/
+│   └── merge_sa2_correspondence.js  ← Data processing scripts
 ├── package.json                 ← Dependencies and scripts
 └── README.md                    ← This file
 ```
@@ -94,6 +103,65 @@ NEXT_PUBLIC_MAPTILER_API_KEY=your_maptiler_api_key_here
 1. Get your Google AI API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Add it to your `.env.local` file
 
+## 📊 SA2 Analytics & Geographic Data
+
+The platform includes comprehensive Statistical Area Level 2 (SA2) analytics with hierarchical geographic data.
+
+### 🗺️ Geographic Hierarchy
+
+Each SA2 region includes complete geographic hierarchy:
+- **SA2**: Statistical Area Level 2 (smallest geographic unit)
+- **SA3**: Statistical Area Level 3 (regional grouping)
+- **SA4**: Statistical Area Level 4 (broader regional grouping)
+- **State**: Australian State/Territory
+
+### 📈 Available Metrics (53 total across 4 categories)
+
+**🟢 Economics (10 metrics)**
+- Employment rates and unemployment statistics
+- Income levels (employee, superannuation)
+- Property prices and rental costs
+- Housing tenure (owned outright %)
+- SEIFA socio-economic indexes (advantage/disadvantage)
+
+**🔵 Demographics (9 metrics)**
+- Population statistics and density
+- Age distribution (55-64, 65+ years)
+- Working age population metrics
+- Median age
+
+**🟣 Healthcare (18 metrics)**
+- Commonwealth Home Support Program data
+- Home Care participation and spending
+- Residential Care statistics
+- Provider numbers and participant ratios
+
+**🔴 Health Statistics (16 metrics)**
+- Long-term health conditions (arthritis, diabetes, heart disease, etc.)
+- Mental health conditions
+- Core activity assistance needs
+- Unpaid assistance provision
+- Household composition
+
+### 🎯 Features
+
+- **Interactive Box Plots**: Compare any SA2 against national distribution
+- **Performance Indicators**: Top 25%, Middle 50%, Bottom 25% rankings
+- **Search & Filter**: Find SA2s by name, postcode, or geographic hierarchy
+- **Statistical Analysis**: Min, max, quartiles, median, mean for all metrics
+- **Responsive Design**: Works on desktop and mobile devices
+
+### 🔧 Data Processing
+
+The SA2 dataset is created by merging multiple data sources:
+- **Demographics**: ABS Census 2021 data
+- **Economics**: ABS Economic statistics
+- **Health Stats**: ABS Health condition data  
+- **Healthcare**: Department of Social Services aged care data
+- **Geographic**: ABS Geographic correspondence (SA2→SA3→SA4→State)
+
+Use `scripts/merge_sa2_correspondence.js` to reprocess geographic correspondence data if needed.
+
 ## 📋 Development Commands
 
 | Command | Description |
@@ -102,6 +170,13 @@ NEXT_PUBLIC_MAPTILER_API_KEY=your_maptiler_api_key_here
 | `npm run build` | Build for production |
 | `npm run start` | Start production server |
 | `npm run lint` | Run ESLint |
+| `node scripts/merge_sa2_correspondence.js` | Reprocess SA2 geographic data |
+
+### 🔗 Key Pages
+
+- **Home**: [http://localhost:3000](http://localhost:3000) - Landing page
+- **Dashboard**: [http://localhost:3000/dashboard](http://localhost:3000/dashboard) - Main dashboard (requires auth)
+- **SA2 Insights**: [http://localhost:3000/insights](http://localhost:3000/insights) - SA2 analytics platform
 
 ## 🚀 Deployment
 
