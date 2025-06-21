@@ -190,6 +190,42 @@ export default function SA2AnalyticsPage() {
     }
   }, []);
 
+  // Helper function to shorten long metric names for display
+  const getDisplayName = (metric: string): string => {
+    const shortNames: { [key: string]: string } = {
+      "Socio-economic indexes for areas (SEIFA) - rank within Australia - Census | SEIFA Index of relative socio-economic advantage and disadvantage (IRSAD) - rank within Australia (decile)": "SEIFA Advantage/Disadvantage Index (IRSAD) - Decile",
+      "Socio-economic indexes for areas (SEIFA) - rank within Australia - Census | SEIFA Index of relative socio-economic disadvantage (IRSD) - rank within Australia (decile)": "SEIFA Disadvantage Index (IRSD) - Decile",
+      "Personal income in Australia - year ended 30 June | Median employee income ($)": "Median Employee Income ($)",
+      "Personal income in Australia - year ended 30 June | Median superannuation and annuity income ($)": "Median Superannuation Income ($)",
+      "Residential property transfers - year ended 30 June | Median price of attached dwelling transfers ($)": "Median Attached Dwelling Price ($)",
+      "Rent and mortgage payments - Occupied private dwellings - Census | Median weekly household rental payment ($)": "Median Weekly Rent ($)",
+      "Tenure type - Occupied private dwellings - Census | Owned outright (%)": "Owned Outright (%)",
+      "Tenure type - Occupied private dwellings - Census | Owned outright (no.)": "Owned Outright (no.)",
+      "Labour force status - Census | % of total Census responding population employed": "Employment Rate (%)",
+      "Labour force status - Persons aged 15 years and over - Census | Unemployment rate (%)": "Unemployment Rate (%)",
+      "Core activity need for assistance - Census | Persons who have need for assistance with core activities (%)": "Need Core Activity Assistance (%)",
+      "Core activity need for assistance - Census | Persons who have need for assistance with core activities (no.)": "Need Core Activity Assistance (no.)",
+      "Household composition - Occupied private dwellings - Census | Lone person households (no.)": "Lone Person Households (no.)",
+      "Unpaid assistance to a person with a disability - Census | Provided unpaid assistance (%)": "Provided Unpaid Assistance (%)",
+      "Long-term health conditions - Census | Mental health condition (including depression or anxiety) (%)": "Mental Health Conditions (%)",
+      "Long-term health conditions - Census | Heart disease (including heart attack or angina) (%)": "Heart Disease (%)",
+      "Long-term health conditions - Census | Diabetes (excluding gestational diabetes) (%)": "Diabetes (%)",
+      "Long-term health conditions - Census | Cancer (including remission) (%)": "Cancer (%)",
+      "Long-term health conditions - Census | Dementia (including Alzheimer's) (%)": "Dementia (%)",
+      "Long-term health conditions - Census | Lung condition (including COPD or emphysema) (%)": "Lung Conditions (%)",
+      "Long-term health conditions - Census | No long-term health condition(s) (%)": "No Long-term Conditions (%)",
+      "Long-term health conditions - Census | Other long-term health condition(s) (%)": "Other Long-term Conditions (%)"
+    };
+    
+    // If we have a short name, use it
+    if (shortNames[metric]) {
+      return shortNames[metric];
+    }
+    
+    // Otherwise, remove the prefix and return the metric name
+    return metric.replace(/^[^|]*\|\s*/, '');
+  };
+
   // Calculate enhanced statistics (min, max, Q1, Q3, percentiles)
   const calculateEnhancedStatistics = async (sa2Data: Record<string, SA2Data>, metrics: string[]) => {
     try {
@@ -1339,7 +1375,7 @@ export default function SA2AnalyticsPage() {
                           return (
                             <SA2BoxPlot
                               key={metric}
-                              metricName={metric.replace(/^[^|]*\|\s*/, '')}
+                              metricName={getDisplayName(metric)}
                               currentValue={currentValue}
                               statistics={stats}
                               width={380}
@@ -1383,7 +1419,7 @@ export default function SA2AnalyticsPage() {
                           return (
                             <SA2BoxPlot
                               key={metric}
-                              metricName={metric.replace(/^[^|]*\|\s*/, '')}
+                              metricName={getDisplayName(metric)}
                               currentValue={currentValue}
                               statistics={stats}
                               width={380}
@@ -1436,7 +1472,7 @@ export default function SA2AnalyticsPage() {
                           return (
                             <SA2BoxPlot
                               key={metric}
-                              metricName={metric.replace(/^[^|]*\|\s*/, '')}
+                              metricName={getDisplayName(metric)}
                               currentValue={currentValue}
                               statistics={stats}
                               width={380}
@@ -1487,7 +1523,7 @@ export default function SA2AnalyticsPage() {
                           return (
                             <SA2BoxPlot
                               key={metric}
-                              metricName={metric.replace(/^[^|]*\|\s*/, '')}
+                              metricName={getDisplayName(metric)}
                               currentValue={currentValue}
                               statistics={stats}
                               width={380}
