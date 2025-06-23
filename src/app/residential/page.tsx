@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft } from 'lucide-react';
+import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Scale, CheckSquare, Square, Eye, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InlineBoxPlot from '@/components/residential/InlineBoxPlot';
+import ComparisonTable from '@/components/residential/ComparisonTable';
+import HistoryPanel from '@/components/residential/HistoryPanel';
 import { getCurrentUser } from '../../lib/auth';
 import { 
   saveResidentialFacility, 
@@ -152,6 +154,13 @@ export default function ResidentialPage() {
   const [selectedScope, setSelectedScope] = useState<'nationwide' | 'state' | 'postcode' | 'locality'>('nationwide');
   const [showBoxPlots, setShowBoxPlots] = useState(true);
 
+  // NEW: Comparison functionality state
+  const [selectedForComparison, setSelectedForComparison] = useState<ResidentialFacility[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
+  const [showSelectedList, setShowSelectedList] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(true);
+
   // Load current user and saved facilities from Supabase on component mount
   useEffect(() => {
     const loadUserAndSavedFacilities = async () => {
@@ -287,6 +296,49 @@ export default function ResidentialPage() {
   const isFacilitySaved = (facility: ResidentialFacility) => {
     const facilityId = `${facility["Service Name"]}_${facility.provider_abn || Date.now()}`;
     return savedFacilities.some(saved => saved.facility_id === facilityId);
+  };
+
+  // NEW: Comparison functionality helpers
+  const toggleFacilitySelection = (facility: ResidentialFacility) => {
+    setSelectedForComparison(prev => {
+      const isSelected = prev.some(f => f["Service Name"] === facility["Service Name"]);
+      if (isSelected) {
+        // Remove from selection
+        return prev.filter(f => f["Service Name"] !== facility["Service Name"]);
+      } else {
+        // Add to selection (max 5)
+        if (prev.length < 5) {
+          return [...prev, facility];
+        } else {
+          // Replace the oldest selection
+          return [...prev.slice(1), facility];
+        }
+      }
+    });
+  };
+
+  const isFacilitySelected = (facility: ResidentialFacility) => {
+    return selectedForComparison.some(f => f["Service Name"] === facility["Service Name"]);
+  };
+
+  const startComparison = () => {
+    if (selectedForComparison.length >= 2) {
+      setShowComparison(true);
+    }
+  };
+
+  const addToSearchHistory = (term: string) => {
+    if (term.trim() && !searchHistory.includes(term.trim())) {
+      setSearchHistory(prev => [term.trim(), ...prev.slice(0, 9)]); // Keep last 10 searches
+    }
+  };
+
+  // Track search term changes for history
+  const handleSearchChange = (newSearchTerm: string) => {
+    setSearchTerm(newSearchTerm);
+    if (newSearchTerm.trim().length > 2) {
+      addToSearchHistory(newSearchTerm);
+    }
   };
 
   const renderStarRating = (rating?: number) => {
@@ -543,18 +595,116 @@ export default function ResidentialPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* History Panel with Hide/Show functionality */}
+      {isHistoryPanelVisible ? (
+        <div className="w-80 bg-white border-r border-gray-200 flex-shrink-0 transition-all duration-300">
+          <HistoryPanel
+            searchHistory={searchHistory}
+            comparisonHistory={[]} // TODO: Implement comparison history storage
+            isOpen={true}
+            onClose={() => {}}
+            onHide={() => setIsHistoryPanelVisible(false)}
+            onSearchSelect={(searchTerm) => {
+              handleSearchChange(searchTerm);
+            }}
+            onComparisonSelect={(comparison) => {
+              // TODO: Load comparison
+            }}
+            onClearSearchHistory={() => setSearchHistory([])}
+            onClearComparisonHistory={() => {
+              // TODO: Clear comparison history
+            }}
+          />
+        </div>
+      ) : (
+        /* Simple History Tab when hidden */
+        <div className="w-8 flex-shrink-0 transition-all duration-300">
+          <div className="h-full flex flex-col items-center justify-start pt-6">
+            <button
+              onClick={() => setIsHistoryPanelVisible(true)}
+              className="group p-2 hover:bg-gray-100 transition-colors duration-200 rounded"
+              title="Show History Panel"
+            >
+              <History className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors duration-200" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content Area */}
+      <div className="flex-1 min-w-0">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <Building className="w-8 h-8 text-blue-600" />
               <h1 className="text-3xl font-bold text-gray-900">Residential Aged Care Facilities</h1>
             </div>
             
-            {/* Back to Main Menu and Toggle buttons */}
+            {/* Back to Main Menu and Comparison Counter */}
             <div className="flex items-center gap-2">
+              {/* Comparison Counter */}
+              <div className="flex items-center gap-2">
+                {selectedForComparison.length === 0 ? (
+                  <span className="flex items-center gap-2 px-4 py-2 text-gray-600 font-medium">
+                    <Scale className="w-4 h-4" />
+                    Compare (0 of 5)
+                  </span>
+                ) : (
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowSelectedList(!showSelectedList)}
+                      className="flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 border border-orange-200 rounded-lg hover:bg-orange-200 transition-colors font-medium"
+                    >
+                      <Scale className="w-4 h-4" />
+                      Compare ({selectedForComparison.length} of 5)
+                    </button>
+                    
+                    {/* Selected Facilities Dropdown */}
+                    {showSelectedList && (
+                      <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                        <div className="p-3 border-b border-gray-200">
+                          <h3 className="font-semibold text-gray-900">Selected for Comparison</h3>
+                        </div>
+                        <div className="max-h-60 overflow-y-auto">
+                          {selectedForComparison.map((facility, index) => (
+                            <div key={index} className="p-3 border-b border-gray-100 last:border-b-0 flex justify-between items-center">
+                              <div>
+                                <p className="font-medium text-gray-900 text-sm">{facility["Service Name"]}</p>
+                                <p className="text-xs text-gray-500">{facility.formatted_address}</p>
+                              </div>
+                              <button
+                                onClick={() => toggleFacilitySelection(facility)}
+                                className="text-red-600 hover:text-red-700 p-1"
+                                title="Remove from comparison"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {selectedForComparison.length >= 2 && (
+                          <div className="p-3 border-t border-gray-200">
+                            <button
+                              onClick={() => {
+                                setShowSelectedList(false);
+                                startComparison();
+                              }}
+                              className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                            >
+                              View Comparison
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              
               {/* Back to Main Menu Button */}
               <button
                 onClick={() => router.push('/main')}
@@ -600,7 +750,7 @@ export default function ResidentialPage() {
                   type="text"
                   placeholder="Search by facility name, address, locality, or provider..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -625,7 +775,7 @@ export default function ResidentialPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {!selectedFacility ? (
           /* Facility List */
           <div>
@@ -648,8 +798,42 @@ export default function ResidentialPage() {
                   /* Facility Results */
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredFacilities.map((facility, index) => (
-                      <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer"
+                      <Card key={index} className={`hover:shadow-lg transition-shadow cursor-pointer relative ${
+                        isFacilitySelected(facility) 
+                          ? 'ring-2 ring-orange-400 bg-orange-50' 
+                          : ''
+                      }`}
                             onClick={() => setSelectedFacility(facility)}>
+                        
+                        {/* Always-visible Comparison Selection Checkbox */}
+                        <div className="absolute top-2 right-2 z-10">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFacilitySelection(facility);
+                            }}
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center border-2 transition-colors ${
+                              isFacilitySelected(facility)
+                                ? 'bg-orange-600 border-orange-600 text-white'
+                                : 'bg-white border-gray-300 text-gray-400 hover:border-orange-400 hover:text-orange-600'
+                            }`}
+                            title="Select for comparison"
+                          >
+                            {isFacilitySelected(facility) ? (
+                              <CheckSquare className="w-5 h-5" />
+                            ) : (
+                              <Square className="w-5 h-5" />
+                            )}
+                          </button>
+                          {isFacilitySelected(facility) && (
+                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-600 rounded-full flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">
+                                {selectedForComparison.findIndex(f => f["Service Name"] === facility["Service Name"]) + 1}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
                         <CardHeader>
                           <CardTitle className="text-lg font-semibold text-gray-900">
                             {facility["Service Name"]}
@@ -687,6 +871,7 @@ export default function ResidentialPage() {
                               >
                                 View Details
                               </button>
+                              
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -1717,7 +1902,26 @@ export default function ResidentialPage() {
             </div>
           </div>
         )}
+        
+        {/* Comparison Table Modal */}
+        {showComparison && selectedForComparison.length >= 2 && (
+          <ComparisonTable
+            facilities={selectedForComparison}
+            onRemoveFacility={(facility) => {
+              setSelectedForComparison(prev => prev.filter(f => f["Service Name"] !== facility["Service Name"]));
+              if (selectedForComparison.length <= 2) {
+                setShowComparison(false);
+              }
+            }}
+            onClose={() => setShowComparison(false)}
+          />
+        )}
+        </div>
+      
+      {/* End Main Content Area */}
       </div>
+      
+      {/* End Main Flex Container */}
     </div>
   );
 } 
