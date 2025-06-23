@@ -357,6 +357,33 @@ export default function ResidentialPage() {
     setSelectedFacility(facility);
   };
 
+  // Handle clicking on a recent comparison to load those facilities for comparison
+  const handleComparisonSelect = (comparisonName: string) => {
+    // Parse the comparison name to extract facility names
+    // Format: "Facility A vs Facility B vs Facility C"
+    const facilityNames = comparisonName.split(' vs ').map(name => name.trim());
+    
+    // Find the actual facility objects from the facilities array
+    const facilitiesToSelect: ResidentialFacility[] = [];
+    
+    facilityNames.forEach(facilityName => {
+      const facility = facilities.find(f => f["Service Name"] === facilityName);
+      if (facility) {
+        facilitiesToSelect.push(facility);
+      }
+    });
+    
+    // Update the selected facilities for comparison
+    setSelectedForComparison(facilitiesToSelect);
+    
+    // Optionally show a message to the user about what was loaded
+    if (facilitiesToSelect.length > 0) {
+      console.log(`Loaded ${facilitiesToSelect.length} facilities for comparison from recent history`);
+    } else {
+      console.warn('Could not find any facilities matching the recent comparison');
+    }
+  };
+
   const renderStarRating = (rating?: number) => {
     if (!rating) return <span className="text-gray-400">No rating</span>;
     
@@ -624,9 +651,7 @@ export default function ResidentialPage() {
             onSearchSelect={(searchTerm) => {
               handleSearchChange(searchTerm);
             }}
-            onComparisonSelect={(comparison) => {
-              // TODO: Load comparison functionality if needed
-            }}
+            onComparisonSelect={handleComparisonSelect}
             onClearSearchHistory={() => setSearchHistory([])}
             onClearComparisonHistory={() => {
               setRecentComparisons([]);

@@ -3222,3 +3222,25 @@ The transformation is complete and ready for testing:
 5. ✅ Maintained all existing comparison functionality with zero regression
 
 **Current Status**: Both history systems are now fully functional and ready for testing at http://localhost:3001/residential
+
+
+---
+
+## LATEST ENHANCEMENT: Recent Comparison Selection - COMPLETED ✅
+
+**User Request Fulfilled**: Implemented functionality to load facilities for comparison when clicking on recent comparisons.
+
+**Key Changes Made:**
+1. ✅ Added handleComparisonSelect function to parse comparison names and find matching facilities
+2. ✅ Implemented facility name parsing from "Facility A vs Facility B vs Facility C" format
+3. ✅ Updated HistoryPanel onComparisonSelect to use the new handler
+4. ✅ Added automatic selection of facilities when recent comparison is clicked
+5. ✅ Maintained all existing functionality with zero regression
+
+**How it Works:**
+- When user clicks on a recent comparison, the system parses the facility names
+- Finds matching facilities from the loaded facilities array
+- Automatically selects those facilities for comparison
+- Updates the selectedForComparison state to reflect the selection
+
+**Current Status**: Recent comparison selection is now fully functional and ready for testing at http://localhost:3001/residential
