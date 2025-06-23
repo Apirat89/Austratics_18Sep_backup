@@ -158,6 +158,7 @@ export default function ResidentialPage() {
   const [selectedForComparison, setSelectedForComparison] = useState<ResidentialFacility[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [showSelectedList, setShowSelectedList] = useState(false);
+  const [recentComparisons, setRecentComparisons] = useState<string[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(true);
 
@@ -323,7 +324,16 @@ export default function ResidentialPage() {
 
   const startComparison = () => {
     if (selectedForComparison.length >= 2) {
+      // Add comparison to recent comparisons when "View Comparison" is pressed
+      const comparisonName = selectedForComparison.map(f => f["Service Name"]).join(" vs ");
+      addToRecentComparisons(comparisonName);
       setShowComparison(true);
+    }
+  };
+
+  const addToRecentComparisons = (comparisonName: string) => {
+    if (comparisonName.trim() && !recentComparisons.includes(comparisonName.trim())) {
+      setRecentComparisons(prev => [comparisonName.trim(), ...prev.slice(0, 9)]); // Keep last 10 comparisons
     }
   };
 
@@ -333,12 +343,18 @@ export default function ResidentialPage() {
     }
   };
 
-  // Track search term changes for history
+  // Handle search term changes (no history tracking here)
   const handleSearchChange = (newSearchTerm: string) => {
     setSearchTerm(newSearchTerm);
-    if (newSearchTerm.trim().length > 2) {
-      addToSearchHistory(newSearchTerm);
+  };
+
+  // Handle viewing facility details (track search history here)
+  const handleViewDetails = (facility: ResidentialFacility) => {
+    // Add current search term to history only when viewing details
+    if (searchTerm.trim().length > 2) {
+      addToSearchHistory(searchTerm);
     }
+    setSelectedFacility(facility);
   };
 
   const renderStarRating = (rating?: number) => {
@@ -601,7 +617,7 @@ export default function ResidentialPage() {
         <div className="w-80 bg-white border-r border-gray-200 flex-shrink-0 transition-all duration-300">
           <HistoryPanel
             searchHistory={searchHistory}
-            comparisonHistory={[]} // TODO: Implement comparison history storage
+            comparisonHistory={recentComparisons}
             isOpen={true}
             onClose={() => {}}
             onHide={() => setIsHistoryPanelVisible(false)}
@@ -609,11 +625,11 @@ export default function ResidentialPage() {
               handleSearchChange(searchTerm);
             }}
             onComparisonSelect={(comparison) => {
-              // TODO: Load comparison
+              // TODO: Load comparison functionality if needed
             }}
             onClearSearchHistory={() => setSearchHistory([])}
             onClearComparisonHistory={() => {
-              // TODO: Clear comparison history
+              setRecentComparisons([]);
             }}
           />
         </div>
@@ -803,7 +819,7 @@ export default function ResidentialPage() {
                           ? 'ring-2 ring-orange-400 bg-orange-50' 
                           : ''
                       }`}
-                            onClick={() => setSelectedFacility(facility)}>
+                            onClick={() => handleViewDetails(facility)}>
                         
                         {/* Always-visible Comparison Selection Checkbox */}
                         <div className="absolute top-2 right-2 z-10">
@@ -865,7 +881,7 @@ export default function ResidentialPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setSelectedFacility(facility);
+                                  handleViewDetails(facility);
                                 }}
                                 className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
                               >

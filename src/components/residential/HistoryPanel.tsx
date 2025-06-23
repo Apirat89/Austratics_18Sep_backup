@@ -49,7 +49,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
-        {/* Search History */}
+        {/* Recent Searches */}
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-medium text-gray-900 flex items-center gap-2">
@@ -67,85 +67,83 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
             )}
           </div>
             
-            {searchHistory.length === 0 ? (
-              <p className="text-sm text-gray-500 italic">No recent searches</p>
-            ) : (
-              <div className="space-y-2">
-                {searchHistory.map((search, index) => (
-                  <div
-                    key={index}
-                    className="p-2 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors border border-gray-200"
-                    onClick={() => onSearchSelect(search)}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-3 h-3 text-gray-400" />
-                      <span className="text-sm text-gray-700 truncate">{search}</span>
+          {searchHistory.length === 0 ? (
+            <div className="text-center py-8">
+              <Search className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-sm text-gray-500 mb-2">No recent searches</p>
+              <p className="text-xs text-gray-400">Search for facilities and click "View Details" to see them here</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {searchHistory.map((search, index) => (
+                <div
+                  key={index}
+                  className="p-3 bg-green-50 rounded-lg hover:bg-green-100 cursor-pointer transition-colors border border-green-200"
+                  onClick={() => onSearchSelect(search)}
+                >
+                  <div className="flex items-start gap-2">
+                    <Search className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-700 leading-relaxed break-words">
+                        {search}
+                      </p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Clock className="w-3 h-3 text-gray-400" />
+                        <span className="text-xs text-gray-500">Recently searched</span>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Recent Comparisons */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-medium text-gray-900 flex items-center gap-2">
+              <Scale className="w-4 h-4 text-blue-600" />
+              Recent Comparisons
+            </h3>
+            {comparisonHistory.length > 0 && (
+              <button
+                onClick={onClearComparisonHistory}
+                className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
+              >
+                <Trash2 className="w-3 h-3" />
+                Clear
+              </button>
             )}
           </div>
-
-          {/* Comparison History */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-medium text-gray-900 flex items-center gap-2">
-                <Scale className="w-4 h-4 text-blue-600" />
-                Saved Comparisons
-              </h3>
-              {comparisonHistory.length > 0 && (
-                <button
-                  onClick={onClearComparisonHistory}
-                  className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
-                >
-                  <Trash2 className="w-3 h-3" />
-                  Clear
-                </button>
-              )}
-            </div>
             
             {comparisonHistory.length === 0 ? (
-              <p className="text-sm text-gray-500 italic">No saved comparisons</p>
+              <div className="text-center py-8">
+                <Scale className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-sm text-gray-500 mb-2">No recent comparisons</p>
+                <p className="text-xs text-gray-400">Select facilities and click "View Comparison" to see them here</p>
+              </div>
             ) : (
-              <div className="space-y-3">
-                {comparisonHistory.map((comparison, index) => (
-                  <Card key={index} className="border border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
-                    <CardContent className="p-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-900 mb-1">
-                            {comparison.facilities?.length || 0} Facilities
-                          </div>
-                          <div className="text-xs text-gray-500 space-y-1">
-                            {comparison.facilities?.slice(0, 2).map((facility: any, idx: number) => (
-                              <div key={idx} className="truncate">
-                                • {facility["Service Name"]}
-                              </div>
-                            ))}
-                            {(comparison.facilities?.length || 0) > 2 && (
-                              <div className="text-gray-400">
-                                +{(comparison.facilities?.length || 0) - 2} more
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1 mt-2">
-                            <Clock className="w-3 h-3 text-gray-400" />
-                            <span className="text-xs text-gray-500">
-                              {comparison.createdAt ? new Date(comparison.createdAt).toLocaleDateString() : 'Unknown date'}
-                            </span>
-                          </div>
+              <div className="space-y-2">
+                {comparisonHistory.map((comparisonName, index) => (
+                  <div
+                    key={index}
+                    className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors border border-gray-200"
+                    onClick={() => onComparisonSelect(comparisonName)}
+                  >
+                    <div className="flex items-start gap-2">
+                      <Scale className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-700 leading-relaxed break-words">
+                          {comparisonName}
+                        </p>
+                        <div className="flex items-center gap-1 mt-1">
+                          <Clock className="w-3 h-3 text-gray-400" />
+                          <span className="text-xs text-gray-500">Recently viewed</span>
                         </div>
-                        <button
-                          onClick={() => onComparisonSelect(comparison)}
-                          className="p-1 hover:bg-blue-100 rounded text-blue-600 hover:text-blue-800"
-                          title="View comparison"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
@@ -155,8 +153,9 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
           <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
             <h4 className="text-sm font-medium text-blue-900 mb-1">💡 Tips</h4>
             <ul className="text-xs text-blue-800 space-y-1">
-              <li>• Click on recent searches to quickly repeat them</li>
-              <li>• Save comparisons to review them later</li>
+              <li>• Click "View Details" on search results to save to recent searches</li>
+              <li>• Select facilities with checkboxes for comparison</li>
+              <li>• Click "View Comparison" to save to recent comparisons</li>
               <li>• History is stored in your browser</li>
             </ul>
         </div>
