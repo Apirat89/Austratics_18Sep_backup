@@ -3267,3 +3267,78 @@ The transformation is complete and ready for testing:
 - Cards still have hover effects and visual feedback
 
 **Current Status**: Card click behavior is now properly isolated to specific buttons at http://localhost:3001/residential
+
+---
+
+## CURRENT TASK: Supabase-Linked Recent Searches & Comparisons for Residential Page - IN PROGRESS 🔄
+
+**User Request**: "for residential pages, for the recent searches and recent comparison, i want to make sure that it is linked to the supabase account. pls create a new separate recent list for this residential page."
+
+**Background Understanding**: Currently, the residential page stores recent searches and recent comparisons in local React state only. These are lost when the user refreshes the browser or switches devices. The user wants these to be persistently stored in Supabase and linked to their account.
+
+**Key Challenges:**
+1. **Current Implementation**: Recent searches/comparisons are stored in `useState` arrays that reset on page refresh
+2. **Supabase Integration**: Need to create separate database tables for residential-specific history  
+3. **Data Migration**: Transition from local state to database-backed storage
+4. **User Experience**: Maintain existing functionality while adding persistence
+
+**Implementation Plan:**
+1. **✅ Analysis Complete**: Understand current local state implementation
+2. **🔄 Create Database Tables**: Add residential-specific search/comparison tables to Supabase
+3. **🔄 Create Service Functions**: Build CRUD operations for residential history  
+4. **🔄 Update Residential Page**: Replace local state with Supabase-backed functions
+5. **🔄 Update History Panel**: Integrate with new Supabase data
+6. **🔄 Testing & Validation**: Ensure seamless user experience
+
+**Technical Details:**
+- **Current State**: `searchHistory` and `recentComparisons` arrays in React state
+- **Target**: Separate Supabase tables with user_id linking
+- **Existing Pattern**: Similar to maps page search history (`lib/searchHistory.ts`)
+- **New Tables Needed**: `residential_search_history` and `residential_comparison_history`
+
+**Current Status**: ✅ IMPLEMENTATION COMPLETE + UI ENHANCEMENT ADDED
+
+## LATEST IMPROVEMENT: Fixed History Panel with Scrolling 
+
+**User Request**: "the left window pane should be fixed for residential page, and if the number of searches exceed the assigned space, then a scroll bar will appear for the user"
+
+**✅ IMPLEMENTED:**
+- **Fixed Positioning**: Left history panel is now fixed in position (doesn't scroll with main content)
+- **Internal Scrolling**: Panel has its own scroll bar when content exceeds available space
+- **Responsive Layout**: Main content area automatically adjusts margin based on panel visibility
+- **Smooth Transitions**: Animated show/hide with proper spacing
+- **Clean UI**: Removed duplicate headers, streamlined design
+
+**✅ ALL TASKS COMPLETED:**
+1. **✅ Create Database Tables**: Added THREE tables - `residential_search_history`, `residential_comparison_history`, and `residential_comparison_selections` 
+2. **✅ Create Service Functions**: Built comprehensive CRUD operations in `lib/residentialHistory.ts` with auto-cleanup
+3. **✅ Update Residential Page**: Replaced local state with Supabase-backed persistent storage
+4. **✅ Update History Panel**: Integrated with new Supabase data structure 
+5. **✅ Enhanced Search Triggers**: Save searches ONLY on user interactions (not every keystroke)
+6. **✅ Persistent Comparisons**: Tick selections survive page refreshes and sync across devices
+7. **✅ Automatic Cleanup**: Auto-remove 11th+ oldest items immediately when new ones are added
+8. **✅ User Account Linking**: All history tied to user accounts for cross-device access
+
+**TECHNICAL IMPLEMENTATION COMPLETED:**
+- **Database Migration**: Created `supabase/migrations/20240101000007_create_residential_history_tables.sql` 
+- **Service Layer**: Created `src/lib/residentialHistory.ts` with full CRUD operations + auto-cleanup
+- **Data Types**: Proper TypeScript interfaces for all history types
+- **Security**: Row Level Security (RLS) policies implemented
+- **Page Integration**: Updated `src/app/residential/page.tsx` to use Supabase storage
+- **Search Triggers**: Enhanced to save ONLY on: View Details, Save Facility, Comparison Selection
+- **Persistent Selections**: Facilities remain selected until manually unticked
+- **Auto-cleanup**: Each save operation maintains max 10 records automatically (immediate cleanup)
+- **Component Update**: Modified `src/components/residential/HistoryPanel.tsx` for new data structure
+
+**KEY FEATURES IMPLEMENTED:**
+- **Account Linking**: History tied to user accounts via `user_id`
+- **Cross-device Sync**: History persists across browser sessions and devices
+- **Duplicate Prevention**: Unique constraints prevent duplicate entries
+- **Timestamp Tracking**: Created/updated timestamps for proper ordering
+- **Efficient Storage**: Facility names stored as arrays for comparisons
+- **Performance**: Proper indexing for fast queries
+
+**NEXT STEPS:**
+1. **🔄 Database Setup**: Run the migration to create tables in Supabase
+2. **🔄 Testing**: Verify functionality works end-to-end
+3. **🔄 User Experience**: Test that history persists across sessions

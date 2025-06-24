@@ -3,17 +3,18 @@
 import React from 'react';
 import { Search, History, Scale, Clock, X, Eye, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ResidentialSearchHistoryItem, ResidentialComparisonHistoryItem } from '@/lib/residentialHistory';
 
 interface HistoryPanelProps {
-  searchHistory: string[];
-  comparisonHistory: any[]; // TODO: Define proper type
+  searchHistory: ResidentialSearchHistoryItem[];
+  comparisonHistory: ResidentialComparisonHistoryItem[];
   isOpen: boolean;
   onClose: () => void;
   onHide?: () => void;
-  onSearchSelect: (searchTerm: string) => void;
-  onComparisonSelect: (comparison: any) => void;
-  onClearSearchHistory: () => void;
-  onClearComparisonHistory: () => void;
+  onSearchSelect: (search: ResidentialSearchHistoryItem) => void;
+  onComparisonSelect: (comparison: ResidentialComparisonHistoryItem) => void;
+  onClearSearchHistory: () => void | Promise<void>;
+  onClearComparisonHistory: () => void | Promise<void>;
 }
 
 const HistoryPanel: React.FC<HistoryPanelProps> = ({
@@ -30,25 +31,9 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="h-full flex flex-col bg-white">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <History className="w-5 h-5 text-blue-600" />
-          History
-        </h2>
-        {onHide && (
-          <button
-            onClick={onHide}
-            className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors text-gray-700"
-          >
-            Hide
-          </button>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+    <div className="h-full bg-white">
+      {/* Content - Now takes full height */}
+      <div className="h-full p-4 space-y-6">
         {/* Recent Searches */}
         <div>
           <div className="flex items-center justify-between mb-3">
@@ -77,7 +62,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
             <div className="space-y-2">
               {searchHistory.map((search, index) => (
                 <div
-                  key={index}
+                  key={search.id || index}
                   className="p-3 bg-green-50 rounded-lg hover:bg-green-100 cursor-pointer transition-colors border border-green-200"
                   onClick={() => onSearchSelect(search)}
                 >
@@ -85,11 +70,13 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
                     <Search className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-gray-700 leading-relaxed break-words">
-                        {search}
+                        {search.search_term}
                       </p>
                       <div className="flex items-center gap-1 mt-1">
                         <Clock className="w-3 h-3 text-gray-400" />
-                        <span className="text-xs text-gray-500">Recently searched</span>
+                        <span className="text-xs text-gray-500">
+                          {search.updated_at ? new Date(search.updated_at).toLocaleDateString() : 'Recently searched'}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -125,21 +112,23 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
               </div>
             ) : (
               <div className="space-y-2">
-                {comparisonHistory.map((comparisonName, index) => (
+                {comparisonHistory.map((comparison, index) => (
                   <div
-                    key={index}
+                    key={comparison.id || index}
                     className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors border border-gray-200"
-                    onClick={() => onComparisonSelect(comparisonName)}
+                    onClick={() => onComparisonSelect(comparison)}
                   >
                     <div className="flex items-start gap-2">
                       <Scale className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-gray-700 leading-relaxed break-words">
-                          {comparisonName}
+                          {comparison.comparison_name}
                         </p>
                         <div className="flex items-center gap-1 mt-1">
                           <Clock className="w-3 h-3 text-gray-400" />
-                          <span className="text-xs text-gray-500">Recently viewed</span>
+                          <span className="text-xs text-gray-500">
+                            {comparison.updated_at ? new Date(comparison.updated_at).toLocaleDateString() : 'Recently viewed'}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -156,7 +145,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
               <li>• Click "View Details" on search results to save to recent searches</li>
               <li>• Select facilities with checkboxes for comparison</li>
               <li>• Click "View Comparison" to save to recent comparisons</li>
-              <li>• History is stored in your browser</li>
+              <li>• History is synced to your account across devices</li>
             </ul>
         </div>
       </div>

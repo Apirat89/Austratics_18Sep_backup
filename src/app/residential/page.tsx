@@ -16,6 +16,22 @@ import {
   isResidentialFacilitySaved,
   type SavedResidentialFacility 
 } from '../../lib/savedResidentialFacilities';
+import {
+  saveResidentialSearchToHistory,
+  getResidentialSearchHistory,
+  clearResidentialSearchHistory,
+  saveResidentialComparisonToHistory,
+  getResidentialComparisonHistory,
+  clearResidentialComparisonHistory,
+  addResidentialComparisonSelection,
+  removeResidentialComparisonSelection,
+  getResidentialComparisonSelections,
+  clearResidentialComparisonSelections,
+  isResidentialFacilitySelected,
+  type ResidentialSearchHistoryItem,
+  type ResidentialComparisonHistoryItem,
+  type ResidentialComparisonSelection
+} from '../../lib/residentialHistory';
 
 interface ResidentialFacility {
   "Service Name": string;
@@ -157,13 +173,19 @@ export default function ResidentialPage() {
   // NEW: Comparison functionality state
   const [selectedForComparison, setSelectedForComparison] = useState<ResidentialFacility[]>([]);
   const [showSelectedList, setShowSelectedList] = useState(false);
-  const [recentComparisons, setRecentComparisons] = useState<string[]>([]);
-  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  
+  // NEW: Supabase-backed history state
+  const [recentComparisons, setRecentComparisons] = useState<ResidentialComparisonHistoryItem[]>([]);
+  const [searchHistory, setSearchHistory] = useState<ResidentialSearchHistoryItem[]>([]);
   const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(true);
+  
+  // NEW: Persistent comparison selections state
+  const [persistentSelections, setPersistentSelections] = useState<ResidentialComparisonSelection[]>([]);
+  const [selectionSyncLoading, setSelectionSyncLoading] = useState(false);
 
-  // Load current user and saved facilities from Supabase on component mount
+  // Load current user, saved facilities, and history from Supabase on component mount
   useEffect(() => {
-    const loadUserAndSavedFacilities = async () => {
+    const loadUserAndData = async () => {
       try {
         // Get current user
         const user = await getCurrentUser();
@@ -173,15 +195,31 @@ export default function ResidentialPage() {
           // Load saved facilities from Supabase
           const result = await getUserSavedResidentialFacilities(user.id);
           setSavedFacilities(result.facilities);
+          
+          // Load search history from Supabase
+          const searches = await getResidentialSearchHistory(user.id, 10);
+          setSearchHistory(searches);
+          
+          // Load comparison history from Supabase
+          const comparisons = await getResidentialComparisonHistory(user.id, 10);
+          setRecentComparisons(comparisons);
+          
+          // Load persistent comparison selections from Supabase
+          const selections = await getResidentialComparisonSelections(user.id);
+          setPersistentSelections(selections);
+          
+          // Sync selectedForComparison with persistent selections
+          const selectedFacilities = selections.map(selection => selection.facility_data);
+          setSelectedForComparison(selectedFacilities);
         }
       } catch (error) {
-        console.error('Error loading user and saved facilities:', error);
+        console.error('Error loading user and data:', error);
       } finally {
         setUserLoading(false);
       }
     };
     
-    loadUserAndSavedFacilities();
+    loadUserAndData();
   }, []);
 
   useEffect(() => {
@@ -228,7 +266,7 @@ export default function ResidentialPage() {
     }
   }, [searchTerm, facilities]);
 
-  // Toggle save facility function (save/unsave) - now using Supabase
+  // Toggle save facility function (save/unsave) - now using Supabase with search history
   const toggleSaveFacility = async (facility: ResidentialFacility) => {
     console.log('toggleSaveFacility called:', {
       currentUser: currentUser ? { id: currentUser.id, email: currentUser.email } : null,
@@ -239,6 +277,11 @@ export default function ResidentialPage() {
       alert('Please sign in to save facilities');
       router.push('/auth/signin');
       return;
+    }
+
+    // Save search to history when user saves a facility (user interaction trigger)
+    if (searchTerm.trim().length > 0) {
+      await addToSearchHistory(searchTerm);
     }
 
     const facilityId = `${facility["Service Name"]}_${facility.provider_abn || Date.now()}`;
@@ -298,50 +341,86 @@ export default function ResidentialPage() {
     return savedFacilities.some(saved => saved.facility_id === facilityId);
   };
 
-  // NEW: Comparison functionality helpers
-  const toggleFacilitySelection = (facility: ResidentialFacility) => {
-    setSelectedForComparison(prev => {
-      const isSelected = prev.some(f => f["Service Name"] === facility["Service Name"]);
+  // NEW: Enhanced comparison functionality helpers with persistent storage
+  const toggleFacilitySelection = async (facility: ResidentialFacility) => {
+    if (!currentUser) {
+      alert('Please sign in to use comparison features');
+      return;
+    }
+
+    setSelectionSyncLoading(true);
+    
+    try {
+      const facilityId = `${facility["Service Name"]}_${facility.provider_abn || Date.now()}`;
+      const isSelected = selectedForComparison.some(f => f["Service Name"] === facility["Service Name"]);
+      
       if (isSelected) {
-        // Remove from selection
-        return prev.filter(f => f["Service Name"] !== facility["Service Name"]);
+        // Remove from selection - both local state and Supabase
+        const success = await removeResidentialComparisonSelection(currentUser.id, facilityId);
+        if (success) {
+          setSelectedForComparison(prev => prev.filter(f => f["Service Name"] !== facility["Service Name"]));
+          setPersistentSelections(prev => prev.filter(s => s.facility_id !== facilityId));
+        }
       } else {
-        // Add to selection (max 5)
-        if (prev.length < 5) {
-          return [...prev, facility];
+        // Add to selection - max 5 facilities
+        if (selectedForComparison.length < 5) {
+          const success = await addResidentialComparisonSelection(
+            currentUser.id,
+            facilityId,
+            facility["Service Name"],
+            facility
+          );
+          if (success) {
+            setSelectedForComparison(prev => [...prev, facility]);
+            // Reload persistent selections to get the complete data with IDs
+            const updatedSelections = await getResidentialComparisonSelections(currentUser.id);
+            setPersistentSelections(updatedSelections);
+          }
         } else {
-          // Replace the oldest selection
-          return [...prev.slice(1), facility];
+          alert('Maximum 5 facilities can be selected for comparison');
         }
       }
-    });
+    } catch (error) {
+      console.error('Error toggling facility selection:', error);
+      alert('Error updating selection. Please try again.');
+    } finally {
+      setSelectionSyncLoading(false);
+    }
   };
 
   const isFacilitySelected = (facility: ResidentialFacility) => {
     return selectedForComparison.some(f => f["Service Name"] === facility["Service Name"]);
   };
 
-  const startComparison = () => {
-    if (selectedForComparison.length >= 2) {
+  const startComparison = async () => {
+    if (selectedForComparison.length >= 2 && currentUser) {
       // Add comparison to recent comparisons when "View Comparison" is pressed
       const comparisonName = selectedForComparison.map(f => f["Service Name"]).join(" vs ");
-      addToRecentComparisons(comparisonName);
+      const facilityNames = selectedForComparison.map(f => f["Service Name"]);
+      
+      // Save to Supabase
+      const saved = await saveResidentialComparisonToHistory(currentUser.id, comparisonName, facilityNames);
+      if (saved) {
+        // Reload comparison history from Supabase
+        const updatedComparisons = await getResidentialComparisonHistory(currentUser.id, 10);
+        setRecentComparisons(updatedComparisons);
+      }
       
       // Navigate to dedicated comparison page with facility names as URL parameters
-      const facilityNames = selectedForComparison.map(f => f["Service Name"]).join(',');
-      router.push(`/residential/compare?facilities=${encodeURIComponent(facilityNames)}`);
+      const encodedFacilityNames = facilityNames.join(',');
+      router.push(`/residential/compare?facilities=${encodeURIComponent(encodedFacilityNames)}`);
     }
   };
 
-  const addToRecentComparisons = (comparisonName: string) => {
-    if (comparisonName.trim() && !recentComparisons.includes(comparisonName.trim())) {
-      setRecentComparisons(prev => [comparisonName.trim(), ...prev.slice(0, 9)]); // Keep last 10 comparisons
-    }
-  };
-
-  const addToSearchHistory = (term: string) => {
-    if (term.trim() && !searchHistory.includes(term.trim())) {
-      setSearchHistory(prev => [term.trim(), ...prev.slice(0, 9)]); // Keep last 10 searches
+  const addToSearchHistory = async (term: string) => {
+    if (term.trim() && currentUser) {
+      // Save to Supabase
+      const saved = await saveResidentialSearchToHistory(currentUser.id, term.trim());
+      if (saved) {
+        // Reload search history from Supabase
+        const updatedSearches = await getResidentialSearchHistory(currentUser.id, 10);
+        setSearchHistory(updatedSearches);
+      }
     }
   };
 
@@ -351,23 +430,27 @@ export default function ResidentialPage() {
   };
 
   // Handle viewing facility details (track search history here)
-  const handleViewDetails = (facility: ResidentialFacility) => {
-    // Add current search term to history only when viewing details
-    if (searchTerm.trim().length > 2) {
-      addToSearchHistory(searchTerm);
+  const handleViewDetails = async (facility: ResidentialFacility) => {
+    // Save search to history when user views details (user interaction trigger)
+    if (searchTerm.trim().length > 0 && currentUser) {
+      await addToSearchHistory(searchTerm);
     }
     setSelectedFacility(facility);
   };
 
   // Handle clicking on a recent comparison to navigate directly to comparison page
-  const handleComparisonSelect = (comparisonName: string) => {
-    // Parse the comparison name to extract facility names
-    // Format: "Facility A vs Facility B vs Facility C"
-    const facilityNames = comparisonName.split(' vs ').map(name => name.trim());
+  const handleComparisonSelect = (comparison: ResidentialComparisonHistoryItem) => {
+    // Use the stored facility names from the comparison history item
+    const facilityNames = comparison.facility_names;
     
     // Navigate directly to comparison page
     const encodedFacilityNames = facilityNames.join(',');
     router.push(`/residential/compare?facilities=${encodeURIComponent(encodedFacilityNames)}`);
+  };
+
+  // Handle clicking on a recent search to populate search field
+  const handleSearchSelect = (search: ResidentialSearchHistoryItem) => {
+    setSearchTerm(search.search_term);
   };
 
   const renderStarRating = (rating?: number) => {
@@ -624,29 +707,56 @@ export default function ResidentialPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* History Panel with Hide/Show functionality */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Fixed History Panel with Hide/Show functionality */}
       {isHistoryPanelVisible ? (
-        <div className="w-80 bg-white border-r border-gray-200 flex-shrink-0 transition-all duration-300">
-          <HistoryPanel
-            searchHistory={searchHistory}
-            comparisonHistory={recentComparisons}
-            isOpen={true}
-            onClose={() => {}}
-            onHide={() => setIsHistoryPanelVisible(false)}
-            onSearchSelect={(searchTerm) => {
-              handleSearchChange(searchTerm);
-            }}
-            onComparisonSelect={handleComparisonSelect}
-            onClearSearchHistory={() => setSearchHistory([])}
-            onClearComparisonHistory={() => {
-              setRecentComparisons([]);
-            }}
-          />
+        <div className="fixed left-0 top-0 w-80 h-screen bg-white border-r border-gray-200 z-30 transition-all duration-300 flex flex-col">
+          {/* Panel Header */}
+          <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-white">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">History</h3>
+              <button
+                onClick={() => setIsHistoryPanelVisible(false)}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                title="Hide History Panel"
+              >
+                <X className="w-4 h-4 text-gray-500" />
+              </button>
+            </div>
+          </div>
+          
+          {/* Scrollable Panel Content */}
+          <div className="flex-1 overflow-y-auto">
+            <HistoryPanel
+              searchHistory={searchHistory}
+              comparisonHistory={recentComparisons}
+              isOpen={true}
+              onClose={() => {}}
+              onHide={() => setIsHistoryPanelVisible(false)}
+              onSearchSelect={handleSearchSelect}
+              onComparisonSelect={handleComparisonSelect}
+              onClearSearchHistory={async () => {
+                if (currentUser) {
+                  const cleared = await clearResidentialSearchHistory(currentUser.id);
+                  if (cleared) {
+                    setSearchHistory([]);
+                  }
+                }
+              }}
+              onClearComparisonHistory={async () => {
+                if (currentUser) {
+                  const cleared = await clearResidentialComparisonHistory(currentUser.id);
+                  if (cleared) {
+                    setRecentComparisons([]);
+                  }
+                }
+              }}
+            />
+          </div>
         </div>
       ) : (
-        /* Simple History Tab when hidden */
-        <div className="w-8 flex-shrink-0 transition-all duration-300">
+        /* Fixed History Tab when hidden */
+        <div className="fixed left-0 top-0 w-12 h-screen z-30 transition-all duration-300 bg-white border-r border-gray-200">
           <div className="h-full flex flex-col items-center justify-start pt-6">
             <button
               onClick={() => setIsHistoryPanelVisible(true)}
@@ -659,8 +769,10 @@ export default function ResidentialPage() {
         </div>
       )}
 
-      {/* Main Content Area */}
-      <div className="flex-1 min-w-0">
+      {/* Main Content Area with proper left margin */}
+      <div className={`min-h-screen transition-all duration-300 ${
+        isHistoryPanelVisible ? 'ml-80' : 'ml-12'
+      }`}>
         {/* Header */}
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -889,9 +1001,9 @@ export default function ResidentialPage() {
                             
                             <div className="flex gap-2 mt-4">
                               <button
-                                onClick={(e) => {
+                                onClick={async (e) => {
                                   e.stopPropagation();
-                                  handleViewDetails(facility);
+                                  await handleViewDetails(facility);
                                 }}
                                 className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
                               >
@@ -1035,9 +1147,9 @@ export default function ResidentialPage() {
                           </div>
                           
                           <button
-                            onClick={(e) => {
+                            onClick={async (e) => {
                               e.stopPropagation();
-                              handleViewDetails(savedItem.facility_data);
+                              await handleViewDetails(savedItem.facility_data);
                             }}
                             className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0"
                           >
