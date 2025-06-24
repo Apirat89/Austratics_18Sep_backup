@@ -102,7 +102,7 @@ export function generateDemographicsData(count: number = 50): SampleSA2Record[] 
     const template = SA2_TEMPLATES[i % SA2_TEMPLATES.length];
     const stateCode = template.state;
     
-    descriptions.forEach((desc, descIndex) => {
+    descriptions.forEach((desc) => {
       const sa2Id = generateSA2Id(stateCode, i + 1);
       const sa2Name = generateSuburbName();
       

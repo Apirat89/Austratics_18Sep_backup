@@ -96,6 +96,7 @@ interface MergedSA2File {
     totalMetrics: number;
     medians: { [key: string]: number };
     generatedAt: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   };
 }

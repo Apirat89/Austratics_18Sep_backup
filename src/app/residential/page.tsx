@@ -839,12 +839,11 @@ export default function ResidentialPage() {
                   /* Facility Results */
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredFacilities.map((facility, index) => (
-                      <Card key={index} className={`hover:shadow-lg transition-shadow cursor-pointer relative ${
+                      <Card key={index} className={`hover:shadow-lg transition-shadow relative ${
                         isFacilitySelected(facility) 
                           ? 'ring-2 ring-orange-400 bg-orange-50' 
                           : ''
-                      }`}
-                            onClick={() => handleViewDetails(facility)}>
+                      }`}>
                         
                         {/* Always-visible Comparison Selection Checkbox */}
                         <div className="absolute top-2 right-2 z-10">
@@ -973,9 +972,48 @@ export default function ResidentialPage() {
                   /* Saved Facility Results */
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {savedFacilities.map((savedItem) => (
-                      <Card key={savedItem.id} className="hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full"
-                            onClick={() => setSelectedFacility(savedItem.facility_data)}>
-                        <CardHeader className="flex-shrink-0">
+                      <Card key={savedItem.id} className={`hover:shadow-lg transition-shadow flex flex-col h-full relative ${
+                        isFacilitySelected(savedItem.facility_data) 
+                          ? 'ring-2 ring-orange-400 bg-orange-50' 
+                          : ''
+                      }`}>
+                        
+                        {/* Comparison Checkbox - Top Right */}
+                        <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={isFacilitySelected(savedItem.facility_data)}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                toggleFacilitySelection(savedItem.facility_data);
+                              }}
+                              className="w-4 h-4 text-orange-600 bg-white border-2 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                              title="Select for comparison"
+                            />
+                            {isFacilitySelected(savedItem.facility_data) && (
+                              <span className="ml-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                                {selectedForComparison.findIndex(f => f["Service Name"] === savedItem.facility_data["Service Name"]) + 1}
+                              </span>
+                            )}
+                          </div>
+                          
+                          {/* Delete Button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (savedItem.id) {
+                                deleteSavedFacility(savedItem.id);
+                              }
+                            }}
+                            className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded bg-white shadow-sm border border-gray-200"
+                            title="Delete saved facility"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <CardHeader className="flex-shrink-0 pr-16">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <CardTitle className="text-lg font-semibold text-gray-900">
@@ -988,18 +1026,6 @@ export default function ResidentialPage() {
                                 </div>
                               )}
                             </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (savedItem.id) {
-                                  deleteSavedFacility(savedItem.id);
-                                }
-                              }}
-                              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
-                              title="Delete saved facility"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
                           </div>
                           <div className="text-xs text-gray-500 mt-2">
                             Saved: {savedItem.created_at ? new Date(savedItem.created_at).toLocaleDateString() : 'Unknown'} at {savedItem.created_at ? new Date(savedItem.created_at).toLocaleTimeString() : 'Unknown'}
@@ -1025,7 +1051,7 @@ export default function ResidentialPage() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setSelectedFacility(savedItem.facility_data);
+                              handleViewDetails(savedItem.facility_data);
                             }}
                             className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0"
                           >

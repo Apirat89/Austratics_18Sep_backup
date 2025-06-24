@@ -31,6 +31,7 @@ interface DSSRecord extends SA2Record {
 }
 
 // Match exactly with HeatmapDataService - 53 total metrics
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const COMPREHENSIVE_METRICS = {
   // Healthcare - 18 metrics (3 programs × 6 metrics each)
   healthcare: {
@@ -208,7 +209,7 @@ function generateComprehensiveSA2Data() {
   let sa2Counter = 1;
 
   // Generate for each state/territory
-  Object.entries(stateRegions).forEach(([state, stateInfo]) => {
+  Object.entries(stateRegions).forEach(([, stateInfo]) => {
     stateInfo.regions.forEach((regionBase, regionIndex) => {
       // Generate multiple SA2s per region (suburbs/areas)
       const variations = ['North', 'South', 'East', 'West', 'Central', 'Inner', 'Outer'];

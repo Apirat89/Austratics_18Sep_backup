@@ -3244,3 +3244,25 @@ The transformation is complete and ready for testing:
 - Updates the selectedForComparison state to reflect the selection
 
 **Current Status**: Recent comparison selection is now fully functional and ready for testing at http://localhost:3001/residential
+
+
+---
+
+## LATEST FIX: Card Click Behavior - COMPLETED ✅
+
+**User Request Fulfilled**: Limited facility details opening to only when clicking the "View Details" button, not anywhere on the card.
+
+**Key Changes Made:**
+1. ✅ Removed onClick handler from facility cards in search results
+2. ✅ Removed onClick handler from facility cards in saved facilities list
+3. ✅ Removed cursor-pointer class from both card types
+4. ✅ Preserved all button functionality (View Details, Save, Comparison checkbox, Delete)
+5. ✅ Maintained zero regression - all existing functionality preserved
+
+**How it Works Now:**
+- Clicking anywhere on facility cards no longer opens details modal
+- Only clicking the "View Details" button opens facility details
+- All other buttons (save, comparison checkbox, delete) work independently
+- Cards still have hover effects and visual feedback
+
+**Current Status**: Card click behavior is now properly isolated to specific buttons at http://localhost:3001/residential
