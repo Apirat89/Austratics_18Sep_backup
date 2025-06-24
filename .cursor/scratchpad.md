@@ -450,7 +450,7 @@ The hybrid facility implementation is complete and ready for testing:
 ## Project Status Board
 
 ### In Progress
-- 🔄 **Residential Facilities Comparison Feature - PHASE 1 COMPLETED**: Add advanced comparison functionality for up to 5 residential facilities with full history management
+- 🔄 **Residential Facilities Comparison Enhancement - PHASE 2 INITIATED**: Transform comparison from popup modal to dedicated page with comprehensive variable display
   - ✅ **Phase 1: Core Comparison Infrastructure - COMPLETED**: 
     - ✅ Multi-select functionality on facility cards with comparison mode toggle
     - ✅ Facility selection management with visual indicators (X of 5 selected)
@@ -459,11 +459,12 @@ The hybrid facility implementation is complete and ready for testing:
     - ✅ Orange highlight system for selected facilities in comparison mode
     - ✅ Professional comparison table modal with color-coded performance indicators
     - ✅ Smart facility selection with max 5 limit and visual feedback
-  - 📋 **Phase 2: Advanced Comparison Features - PLANNED**:
-    - Tabbed comparison view matching existing 7-tab structure
-    - Visual enhancements: color coding, ranking indicators, performance highlighting
-    - Smart metric filtering to show significant differences
-    - Mobile-responsive comparison layout
+  - 🔄 **Phase 2: Dedicated Comparison Page - IN PROGRESS**:
+    - 📋 **Full Page Comparison**: Replace popup modal with dedicated `/residential/compare` page route
+    - 📋 **Comprehensive Variable Display**: Show ALL variables from ALL 7 tabs with proper labels
+    - 📋 **Tab-based Comparison Layout**: Organize comparison by the existing 7-tab structure
+    - 📋 **Enhanced Data Presentation**: Include all 120+ fields across all categories
+    - 📋 **Professional Page Design**: Full-screen layout with proper navigation and controls
   - ✅ **Phase 3: History Management System - BASIC IMPLEMENTATION**:
     - ✅ Save comparison functionality with Supabase integration (TODO: Complete)
     - ✅ Search history tracking and management (basic implementation completed)

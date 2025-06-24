@@ -6,7 +6,7 @@ import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InlineBoxPlot from '@/components/residential/InlineBoxPlot';
-import ComparisonTable from '@/components/residential/ComparisonTable';
+
 import HistoryPanel from '@/components/residential/HistoryPanel';
 import { getCurrentUser } from '../../lib/auth';
 import { 
@@ -156,7 +156,6 @@ export default function ResidentialPage() {
 
   // NEW: Comparison functionality state
   const [selectedForComparison, setSelectedForComparison] = useState<ResidentialFacility[]>([]);
-  const [showComparison, setShowComparison] = useState(false);
   const [showSelectedList, setShowSelectedList] = useState(false);
   const [recentComparisons, setRecentComparisons] = useState<string[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
@@ -327,7 +326,10 @@ export default function ResidentialPage() {
       // Add comparison to recent comparisons when "View Comparison" is pressed
       const comparisonName = selectedForComparison.map(f => f["Service Name"]).join(" vs ");
       addToRecentComparisons(comparisonName);
-      setShowComparison(true);
+      
+      // Navigate to dedicated comparison page with facility names as URL parameters
+      const facilityNames = selectedForComparison.map(f => f["Service Name"]).join(',');
+      router.push(`/residential/compare?facilities=${encodeURIComponent(facilityNames)}`);
     }
   };
 
@@ -357,31 +359,15 @@ export default function ResidentialPage() {
     setSelectedFacility(facility);
   };
 
-  // Handle clicking on a recent comparison to load those facilities for comparison
+  // Handle clicking on a recent comparison to navigate directly to comparison page
   const handleComparisonSelect = (comparisonName: string) => {
     // Parse the comparison name to extract facility names
     // Format: "Facility A vs Facility B vs Facility C"
     const facilityNames = comparisonName.split(' vs ').map(name => name.trim());
     
-    // Find the actual facility objects from the facilities array
-    const facilitiesToSelect: ResidentialFacility[] = [];
-    
-    facilityNames.forEach(facilityName => {
-      const facility = facilities.find(f => f["Service Name"] === facilityName);
-      if (facility) {
-        facilitiesToSelect.push(facility);
-      }
-    });
-    
-    // Update the selected facilities for comparison
-    setSelectedForComparison(facilitiesToSelect);
-    
-    // Optionally show a message to the user about what was loaded
-    if (facilitiesToSelect.length > 0) {
-      console.log(`Loaded ${facilitiesToSelect.length} facilities for comparison from recent history`);
-    } else {
-      console.warn('Could not find any facilities matching the recent comparison');
-    }
+    // Navigate directly to comparison page
+    const encodedFacilityNames = facilityNames.join(',');
+    router.push(`/residential/compare?facilities=${encodeURIComponent(encodedFacilityNames)}`);
   };
 
   const renderStarRating = (rating?: number) => {
@@ -1970,19 +1956,7 @@ export default function ResidentialPage() {
           </div>
         )}
         
-        {/* Comparison Table Modal */}
-        {showComparison && selectedForComparison.length >= 2 && (
-          <ComparisonTable
-            facilities={selectedForComparison}
-            onRemoveFacility={(facility) => {
-              setSelectedForComparison(prev => prev.filter(f => f["Service Name"] !== facility["Service Name"]));
-              if (selectedForComparison.length <= 2) {
-                setShowComparison(false);
-              }
-            }}
-            onClose={() => setShowComparison(false)}
-          />
-        )}
+
         </div>
       
       {/* End Main Content Area */}
