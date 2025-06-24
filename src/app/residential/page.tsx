@@ -296,7 +296,6 @@ export default function ResidentialPage() {
         const result = await deleteSavedResidentialFacility(currentUser.id, savedFacility.id);
         if (result.success) {
           setSavedFacilities(prev => prev.filter(saved => saved.facility_id !== facilityId));
-          alert('Facility removed from saved list!');
         } else {
           alert(`Failed to remove facility: ${result.message}`);
         }
@@ -314,7 +313,6 @@ export default function ResidentialPage() {
         // Reload saved facilities to get the new one with proper ID
         const updatedResult = await getUserSavedResidentialFacilities(currentUser.id);
         setSavedFacilities(updatedResult.facilities);
-        alert('Facility saved successfully!');
       } else {
         alert(`Failed to save facility: ${result.message}`);
       }
@@ -784,66 +782,6 @@ export default function ResidentialPage() {
             
             {/* Back to Main Menu and Comparison Counter */}
             <div className="flex items-center gap-2">
-              {/* Comparison Counter */}
-              <div className="flex items-center gap-2">
-                {selectedForComparison.length === 0 ? (
-                  <span className="flex items-center gap-2 px-4 py-2 text-gray-600 font-medium">
-                    <Scale className="w-4 h-4" />
-                    Compare (0 of 5)
-                  </span>
-                ) : (
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowSelectedList(!showSelectedList)}
-                      className="flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 border border-orange-200 rounded-lg hover:bg-orange-200 transition-colors font-medium"
-                    >
-                      <Scale className="w-4 h-4" />
-                      Compare ({selectedForComparison.length} of 5)
-                    </button>
-                    
-                    {/* Selected Facilities Dropdown */}
-                    {showSelectedList && (
-                      <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                        <div className="p-3 border-b border-gray-200">
-                          <h3 className="font-semibold text-gray-900">Selected for Comparison</h3>
-                        </div>
-                        <div className="max-h-60 overflow-y-auto">
-                          {selectedForComparison.map((facility, index) => (
-                            <div key={index} className="p-3 border-b border-gray-100 last:border-b-0 flex justify-between items-center">
-                              <div>
-                                <p className="font-medium text-gray-900 text-sm">{facility["Service Name"]}</p>
-                                <p className="text-xs text-gray-500">{facility.formatted_address}</p>
-                              </div>
-                              <button
-                                onClick={() => toggleFacilitySelection(facility)}
-                                className="text-red-600 hover:text-red-700 p-1"
-                                title="Remove from comparison"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                        
-                        {selectedForComparison.length >= 2 && (
-                          <div className="p-3 border-t border-gray-200">
-                            <button
-                              onClick={() => {
-                                setShowSelectedList(false);
-                                startComparison();
-                              }}
-                              className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium"
-                            >
-                              View Comparison
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-              
               {/* Back to Main Menu Button */}
               <button
                 onClick={() => router.push('/main')}
@@ -877,6 +815,61 @@ export default function ResidentialPage() {
                 <History className="w-4 h-4" />
                 Saved Facilities ({savedFacilities.length})
               </button>
+              
+              {/* Comparison Counter */}
+              <div className="relative">
+                <button
+                  onClick={() => selectedForComparison.length > 0 ? setShowSelectedList(!showSelectedList) : undefined}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                    selectedForComparison.length > 0
+                      ? 'bg-orange-100 text-orange-700 border border-orange-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <Scale className="w-4 h-4" />
+                  Compare ({selectedForComparison.length})
+                </button>
+                
+                {/* Selected Facilities Dropdown */}
+                {showSelectedList && selectedForComparison.length > 0 && (
+                  <div className="absolute top-full right-0 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <div className="p-3 border-b border-gray-200">
+                      <h3 className="font-semibold text-gray-900">Selected for Comparison</h3>
+                    </div>
+                    <div className="max-h-60 overflow-y-auto">
+                      {selectedForComparison.map((facility, index) => (
+                        <div key={index} className="p-3 border-b border-gray-100 last:border-b-0 flex justify-between items-center">
+                          <div>
+                            <p className="font-medium text-gray-900 text-sm">{facility["Service Name"]}</p>
+                            <p className="text-xs text-gray-500">{facility.formatted_address}</p>
+                          </div>
+                          <button
+                            onClick={() => toggleFacilitySelection(facility)}
+                            className="text-red-600 hover:text-red-700 p-1"
+                            title="Remove from comparison"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {selectedForComparison.length >= 2 && (
+                      <div className="p-3 border-t border-gray-200">
+                        <button
+                          onClick={() => {
+                            setShowSelectedList(false);
+                            startComparison();
+                          }}
+                          className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                        >
+                          View Comparison
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           
