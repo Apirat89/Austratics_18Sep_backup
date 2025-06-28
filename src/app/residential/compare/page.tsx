@@ -316,6 +316,48 @@ export default function ResidentialComparePage() {
     );
   };
 
+  // Enhanced function for nested financial data
+  const renderEnhancedFinancialRow = (label: string, fieldPath: string, isPercentage?: boolean) => {
+    // Helper function to get nested value using dot notation
+    const getNestedValue = (obj: any, path: string): any => {
+      return path.split('.').reduce((current, key) => current?.[key], obj);
+    };
+
+    // Check if any facility has a valid value for this field path
+    const hasAnyValue = facilities.some(facility => {
+      const value = getNestedValue(facility, fieldPath);
+      return hasValidValue(value);
+    });
+
+    if (!hasAnyValue) return null;
+
+    return (
+      <tr className="border-b border-gray-100">
+        <td className="p-4 font-medium text-gray-900 bg-gray-50 sticky left-0 z-10 min-w-[200px]">
+          {label}
+        </td>
+        {facilities.map((facility, index) => {
+          const value = getNestedValue(facility, fieldPath);
+          let displayValue = 'N/A';
+
+          if (value !== null && value !== undefined && typeof value === 'number') {
+            if (isPercentage) {
+              displayValue = `${value.toFixed(1)}%`;
+            } else {
+              displayValue = formatCurrency(value);
+            }
+          }
+
+          return (
+            <td key={index} className="p-4 text-center">
+              {displayValue}
+            </td>
+          );
+        })}
+      </tr>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -841,35 +883,100 @@ export default function ResidentialComparePage() {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="border-b border-gray-200 bg-red-50">
-                        <td colSpan={facilities.length + 1} className="p-4 font-semibold text-red-900">
-                          Expenditure (per day)
+                      <tr className="border-b border-gray-200 bg-blue-50">
+                        <td colSpan={facilities.length + 1} className="p-4 font-semibold text-blue-900">
+                          Total Daily Expenditure
                         </td>
                       </tr>
-                      {renderComparisonRow("Total Expenditure", "expenditure_total_per_day", false, true)}
-                      {renderComparisonRow("Care & Nursing", "expenditure_care_nursing", false, true)}
-                      {renderComparisonRow("Administration", "expenditure_administration", false, true)}
-                      {renderComparisonRow("Cleaning & Laundry", "expenditure_cleaning_laundry", false, true)}
-                      {renderComparisonRow("Accommodation & Maintenance", "expenditure_accommodation_maintenance", false, true)}
-                      {renderComparisonRow("Food & Catering", "expenditure_food_catering", false, true)}
-
-                      <tr className="border-b border-gray-200 bg-green-50">
-                        <td colSpan={facilities.length + 1} className="p-4 font-semibold text-green-900">
-                          Income (per day)
-                        </td>
-                      </tr>
-                      {renderComparisonRow("Total Income", "income_total_per_day", false, true)}
-                      {renderComparisonRow("Residents' Contribution", "income_residents_contribution", false, true)}
-                      {renderComparisonRow("Government Funding", "income_government_funding", false, true)}
-                      {renderComparisonRow("Other Income", "income_other", false, true)}
+                      {renderEnhancedFinancialRow("Total Daily Expenditure", "financials.expenditure.total_per_day.value")}
+                      {renderEnhancedFinancialRow("Sector Average", "financials.expenditure.total_per_day.sector_average")}
+                      {renderEnhancedFinancialRow("Variance %", "financials.expenditure.total_per_day.variance_percentage", true)}
 
                       <tr className="border-b border-gray-200 bg-blue-50">
                         <td colSpan={facilities.length + 1} className="p-4 font-semibold text-blue-900">
+                          Care & Nursing Expenditure
+                        </td>
+                      </tr>
+                      {renderEnhancedFinancialRow("Care & Nursing Total", "financials.expenditure.care_nursing.total.value")}
+                      {renderEnhancedFinancialRow("Registered Nurses", "financials.expenditure.care_nursing.breakdown.registered_nurses.value")}
+                      {renderEnhancedFinancialRow("Enrolled Nurses", "financials.expenditure.care_nursing.breakdown.enrolled_nurses.value")}
+                      {renderEnhancedFinancialRow("Personal Care Workers", "financials.expenditure.care_nursing.breakdown.personal_care_workers.value")}
+                      {renderEnhancedFinancialRow("Care Management Staff", "financials.expenditure.care_nursing.breakdown.care_management_staff.value")}
+                      {renderEnhancedFinancialRow("Allied Health", "financials.expenditure.care_nursing.breakdown.allied_health.value")}
+                      {renderEnhancedFinancialRow("Lifestyle Recreation", "financials.expenditure.care_nursing.breakdown.lifestyle_recreation.value")}
+                      {renderEnhancedFinancialRow("Other Care Expenses", "financials.expenditure.care_nursing.breakdown.other_care_expenses.value")}
+
+                      <tr className="border-b border-gray-200 bg-blue-50">
+                        <td colSpan={facilities.length + 1} className="p-4 font-semibold text-blue-900">
+                          Cleaning & Laundry Expenditure
+                        </td>
+                      </tr>
+                      {renderEnhancedFinancialRow("Cleaning & Laundry Total", "financials.expenditure.cleaning_laundry.total.value")}
+                      {renderEnhancedFinancialRow("Cleaning", "financials.expenditure.cleaning_laundry.breakdown.cleaning.value")}
+                      {renderEnhancedFinancialRow("Laundry", "financials.expenditure.cleaning_laundry.breakdown.laundry.value")}
+                      {renderEnhancedFinancialRow("COVID Infection Control", "financials.expenditure.cleaning_laundry.breakdown.covid_infection_control.value")}
+                      {renderEnhancedFinancialRow("Other Related", "financials.expenditure.cleaning_laundry.breakdown.other_related.value")}
+
+                      <tr className="border-b border-gray-200 bg-blue-50">
+                        <td colSpan={facilities.length + 1} className="p-4 font-semibold text-blue-900">
+                          Accommodation & Maintenance
+                        </td>
+                      </tr>
+                      {renderEnhancedFinancialRow("Accommodation & Maintenance Total", "financials.expenditure.accommodation_maintenance.total.value")}
+                      {renderEnhancedFinancialRow("Accommodation", "financials.expenditure.accommodation_maintenance.breakdown.accommodation.value")}
+                      {renderEnhancedFinancialRow("Maintenance", "financials.expenditure.accommodation_maintenance.breakdown.maintenance.value")}
+
+                      <tr className="border-b border-gray-200 bg-blue-50">
+                        <td colSpan={facilities.length + 1} className="p-4 font-semibold text-blue-900">
+                          Other Expenditure
+                        </td>
+                      </tr>
+                      {renderEnhancedFinancialRow("Administration", "financials.expenditure.administration.value")}
+                      {renderEnhancedFinancialRow("Food & Catering", "financials.expenditure.food_catering.value")}
+
+                      <tr className="border-b border-gray-200 bg-green-50">
+                        <td colSpan={facilities.length + 1} className="p-4 font-semibold text-green-900">
+                          Total Daily Income
+                        </td>
+                      </tr>
+                      {renderEnhancedFinancialRow("Total Daily Income", "financials.income.total_per_day.value")}
+                      {renderEnhancedFinancialRow("Sector Average", "financials.income.total_per_day.sector_average")}
+                      {renderEnhancedFinancialRow("Variance %", "financials.income.total_per_day.variance_percentage", true)}
+
+                      <tr className="border-b border-gray-200 bg-green-50">
+                        <td colSpan={facilities.length + 1} className="p-4 font-semibold text-green-900">
+                          Income Sources
+                        </td>
+                      </tr>
+                      {renderEnhancedFinancialRow("Residents' Contribution", "financials.income.residents_contribution.value")}
+                      {renderEnhancedFinancialRow("Government Funding", "financials.income.government_funding.value")}
+                      {renderEnhancedFinancialRow("Other Income", "financials.income.other.value")}
+
+                      <tr className="border-b border-gray-200 bg-purple-50">
+                        <td colSpan={facilities.length + 1} className="p-4 font-semibold text-purple-900">
                           Financial Performance
                         </td>
                       </tr>
-                      {renderComparisonRow("Budget Surplus/Deficit", "budget_surplus_per_day", false, true)}
-                      {renderComparisonRow("Care Staff Spending (Last Quarter)", "care_staff_spending_last_quarter", false, true)}
+                      {renderEnhancedFinancialRow("Budget Surplus/Deficit Per Day", "financials.budget_surplus_deficit_per_day.value")}
+                      
+                      <tr className="border-b border-gray-200 bg-orange-50">
+                        <td colSpan={facilities.length + 1} className="p-4 font-semibold text-orange-900">
+                          Care Staff Spending (Last Quarter)
+                        </td>
+                      </tr>
+                      {renderEnhancedFinancialRow("Care Staff Total", "financials.care_staff_last_quarter.total.value")}
+                      {renderEnhancedFinancialRow("Registered Nurses", "financials.care_staff_last_quarter.breakdown.registered_nurses.value")}
+                      {renderEnhancedFinancialRow("Enrolled Nurses", "financials.care_staff_last_quarter.breakdown.enrolled_nurses.value")}
+                      {renderEnhancedFinancialRow("Personal Care Workers", "financials.care_staff_last_quarter.breakdown.personal_care_workers.value")}
+                      {renderEnhancedFinancialRow("Care Management Staff", "financials.care_staff_last_quarter.breakdown.care_management_staff.value")}
+                      {renderEnhancedFinancialRow("Physiotherapists", "financials.care_staff_last_quarter.breakdown.physiotherapists.value")}
+                      {renderEnhancedFinancialRow("Occupational Therapists", "financials.care_staff_last_quarter.breakdown.occupational_therapists.value")}
+                      {renderEnhancedFinancialRow("Speech Pathologists", "financials.care_staff_last_quarter.breakdown.speech_pathologists.value")}
+                      {renderEnhancedFinancialRow("Podiatrists", "financials.care_staff_last_quarter.breakdown.podiatrists.value")}
+                      {renderEnhancedFinancialRow("Dietetics", "financials.care_staff_last_quarter.breakdown.dietetics.value")}
+                      {renderEnhancedFinancialRow("Allied Health Assistants", "financials.care_staff_last_quarter.breakdown.allied_health_assistants.value")}
+                      {renderEnhancedFinancialRow("Other Allied Health", "financials.care_staff_last_quarter.breakdown.other_allied_health.value")}
+                      {renderEnhancedFinancialRow("Lifestyle Recreation", "financials.care_staff_last_quarter.breakdown.lifestyle_recreation.value")}
                     </tbody>
                   </table>
                 </div>
