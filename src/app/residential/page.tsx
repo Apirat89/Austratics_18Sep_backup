@@ -324,6 +324,7 @@ export default function ResidentialPage() {
   // NEW: Comparison functionality state
   const [selectedForComparison, setSelectedForComparison] = useState<ResidentialFacility[]>([]);
   const [showSelectedList, setShowSelectedList] = useState(false);
+  const [showSavedFacilitiesDropdown, setShowSavedFacilitiesDropdown] = useState(false);
   
   // NEW: Supabase-backed history state
   const [recentComparisons, setRecentComparisons] = useState<ResidentialComparisonHistoryItem[]>([]);
@@ -403,6 +404,24 @@ export default function ResidentialPage() {
     loadStatistics();
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (showSavedFacilitiesDropdown && !target.closest('.saved-facilities-dropdown-container')) {
+        setShowSavedFacilitiesDropdown(false);
+      }
+      if (showSelectedList && !target.closest('.comparison-dropdown-container')) {
+        setShowSelectedList(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSavedFacilitiesDropdown, showSelectedList]);
+
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredFacilities([]); // Show no facilities when search is empty
@@ -477,7 +496,13 @@ export default function ResidentialPage() {
     if (confirm('Are you sure you want to delete this saved facility?')) {
       const result = await deleteSavedResidentialFacility(currentUser.id, facilityDbId);
       if (result.success) {
-        setSavedFacilities(prev => prev.filter(saved => saved.id !== facilityDbId));
+        const updatedFacilities = savedFacilities.filter(saved => saved.id !== facilityDbId);
+        setSavedFacilities(updatedFacilities);
+        
+        // Close dropdown if no more saved facilities
+        if (updatedFacilities.length === 0) {
+          setShowSavedFacilitiesDropdown(false);
+        }
       } else {
         alert(`Failed to delete facility: ${result.message}`);
       }
@@ -611,6 +636,7 @@ export default function ResidentialPage() {
         const result = await clearUserSavedResidentialFacilities(currentUser.id);
         if (result.success) {
           setSavedFacilities([]);
+          setShowSavedFacilitiesDropdown(false); // Close dropdown after clearing
           alert('All saved facilities have been cleared successfully.');
         } else {
           alert(result.message || 'Failed to clear saved facilities.');
@@ -1145,34 +1171,74 @@ export default function ResidentialPage() {
                 <Search className="w-4 h-4" />
                 Search Facilities
               </button>
-              <div className="flex items-center gap-2">
+              {/* Saved Facilities Dropdown */}
+              <div className="relative saved-facilities-dropdown-container">
                 <button
-                  onClick={() => setShowSavedFacilities(true)}
+                  onClick={() => savedFacilities.length > 0 ? setShowSavedFacilitiesDropdown(!showSavedFacilitiesDropdown) : undefined}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                    showSavedFacilities
+                    savedFacilities.length > 0
                       ? 'bg-blue-100 text-blue-700 border border-blue-200'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   <History className="w-4 h-4" />
-                  Saved Facilities ({savedFacilities.length})
+                  Saved ({savedFacilities.length})
                 </button>
                 
-                {/* Clear Saved Facilities Button */}
-                {savedFacilities.length > 0 && (
-                  <button
-                    onClick={handleClearSavedFacilities}
-                    className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1 px-2 py-1 rounded hover:bg-red-50"
-                    title="Clear all saved facilities"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    Clear All
-                  </button>
+                {/* Saved Facilities Dropdown */}
+                {showSavedFacilitiesDropdown && savedFacilities.length > 0 && (
+                  <div className="absolute top-full right-0 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <div className="p-3 border-b border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-gray-900">Saved Facilities</h3>
+                        <button
+                          onClick={handleClearSavedFacilities}
+                          className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
+                          title="Clear all saved facilities"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          Clear All
+                        </button>
+                      </div>
+                    </div>
+                    <div className="max-h-60 overflow-y-auto">
+                      {savedFacilities.map((savedFacility, index) => (
+                        <div key={index} className="p-3 border-b border-gray-100 last:border-b-0 flex justify-between items-center">
+                          <div className="cursor-pointer" onClick={() => {
+                            setShowSavedFacilitiesDropdown(false);
+                            handleViewDetails(savedFacility.facility_data);
+                          }}>
+                            <p className="font-medium text-gray-900 text-sm">{savedFacility.facility_name}</p>
+                            <p className="text-xs text-gray-500">{savedFacility.facility_data.formatted_address}</p>
+                          </div>
+                          <button
+                            onClick={() => deleteSavedFacility(savedFacility.id)}
+                            className="text-red-600 hover:text-red-700 p-1"
+                            title="Remove from saved"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="p-3 border-t border-gray-200">
+                      <button
+                        onClick={() => {
+                          setShowSavedFacilitiesDropdown(false);
+                          setShowSavedFacilities(true);
+                        }}
+                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                      >
+                        View Saved Facilities
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
               
               {/* Comparison Counter */}
-              <div className="relative">
+              <div className="relative comparison-dropdown-container">
                 <button
                   onClick={() => selectedForComparison.length > 0 ? setShowSelectedList(!showSelectedList) : undefined}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
