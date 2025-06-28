@@ -814,6 +814,36 @@ export default function ResidentialPage() {
     );
   };
 
+  // Helper function to render field with bold label and currency formatting
+  const renderFieldWithBoldLabel = (label: string, value: any, fieldName?: string, isCurrency: boolean = false) => {
+    if (value === null || value === undefined || value === '') return null;
+    
+    // Check if this is a numeric field that can have inline statistics
+    const isNumeric = typeof value === 'number';
+    const scopeStats = getStatisticsForScope();
+    const fieldStats = fieldName && scopeStats ? scopeStats.fields?.[fieldName] : null;
+    
+    // Format the display value
+    const displayValue = isCurrency && isNumeric ? formatCurrency(value) : value;
+    
+    return (
+      <div className="mb-3">
+        <dt className="text-sm font-semibold text-gray-900">{label}</dt>
+        <dd className="text-gray-900 flex items-center">
+          {displayValue}
+          {showBoxPlots && isNumeric && fieldName && !statsLoading && fieldStats && (
+            <InlineBoxPlot
+              fieldName={fieldName}
+              currentValue={value}
+              statistics={fieldStats}
+              scope={selectedScope}
+            />
+          )}
+        </dd>
+      </div>
+    );
+  };
+
   const hasValidValue = (value: any): boolean => {
     return value !== null && value !== undefined && value > 0;
   };
@@ -2089,7 +2119,7 @@ export default function ResidentialPage() {
                             <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">💰 Expenditure</h3>
                             
                             {/* Main Expenditure */}
-                            {renderField("Total Expenditure per Day", selectedFacility.financials.expenditure.total_per_day?.value, "financials.expenditure.total_per_day.value")}
+                            {renderFieldWithBoldLabel("Total Expenditure per Day", selectedFacility.financials.expenditure.total_per_day?.value, "financials.expenditure.total_per_day.value", true)}
                             
                             {/* Care & Nursing */}
                             <div className="bg-blue-50 p-4 rounded-lg">
@@ -2109,7 +2139,7 @@ export default function ResidentialPage() {
                             </div>
                             
                             {/* Administration */}
-                            {renderField("Administration", selectedFacility.financials.expenditure.administration?.value, "financials.expenditure.administration.value")}
+                            {renderFieldWithBoldLabel("Administration", selectedFacility.financials.expenditure.administration?.value, "financials.expenditure.administration.value", true)}
                             
                             {/* Cleaning & Laundry */}
                             <div className="bg-green-50 p-4 rounded-lg">
@@ -2138,22 +2168,22 @@ export default function ResidentialPage() {
                             </div>
                             
                             {/* Food & Catering */}
-                            {renderField("Food & Catering", selectedFacility.financials.expenditure.food_catering?.value, "financials.expenditure.food_catering.value")}
+                            {renderFieldWithBoldLabel("Food & Catering", selectedFacility.financials.expenditure.food_catering?.value, "financials.expenditure.food_catering.value", true)}
                           </div>
 
                           {/* Income Section */}
                           <div className="space-y-4">
                             <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">💵 Income</h3>
-                            {renderField("Total Income per Day", selectedFacility.financials.income.total_per_day?.value, "financials.income.total_per_day.value")}
-                            {renderField("Residents' Contribution", selectedFacility.financials.income.residents_contribution?.value, "financials.income.residents_contribution.value")}
-                            {renderField("Government Funding", selectedFacility.financials.income.government_funding?.value, "financials.income.government_funding.value")}
-                            {renderField("Other Income", selectedFacility.financials.income.other?.value, "financials.income.other.value")}
+                            {renderFieldWithBoldLabel("Total Income per Day", selectedFacility.financials.income.total_per_day?.value, "financials.income.total_per_day.value", true)}
+                            {renderFieldWithBoldLabel("Residents' Contribution", selectedFacility.financials.income.residents_contribution?.value, "financials.income.residents_contribution.value", true)}
+                            {renderFieldWithBoldLabel("Government Funding", selectedFacility.financials.income.government_funding?.value, "financials.income.government_funding.value", true)}
+                            {renderFieldWithBoldLabel("Other Income", selectedFacility.financials.income.other?.value, "financials.income.other.value", true)}
                           </div>
 
                           {/* Budget Summary */}
                           <div className="space-y-4">
                             <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">📊 Budget Summary</h3>
-                            {renderField("Budget Surplus/Deficit per Day", selectedFacility.financials.budget_surplus_deficit_per_day?.value, "financials.budget_surplus_deficit_per_day.value")}
+                            {renderFieldWithBoldLabel("Budget Surplus/Deficit per Day", selectedFacility.financials.budget_surplus_deficit_per_day?.value, "financials.budget_surplus_deficit_per_day.value", true)}
                           </div>
 
                           {/* Care Staff Spending */}
@@ -2163,7 +2193,7 @@ export default function ResidentialPage() {
                                 👥 Care Staff Spending ({selectedFacility.financials.care_staff_last_quarter.quarter_period || 'Last Quarter'})
                               </h3>
                               
-                              {renderField("Total Care Staff Spending", selectedFacility.financials.care_staff_last_quarter.total?.value, "financials.care_staff_last_quarter.total.value")}
+                              {renderFieldWithBoldLabel("Total Care Staff Spending", selectedFacility.financials.care_staff_last_quarter.total?.value, "financials.care_staff_last_quarter.total.value", true)}
                               
                               {selectedFacility.financials.care_staff_last_quarter.breakdown && (
                                 <div className="bg-purple-50 p-4 rounded-lg">
