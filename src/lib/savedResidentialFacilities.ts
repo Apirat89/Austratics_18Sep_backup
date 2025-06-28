@@ -75,7 +75,24 @@ export async function saveResidentialFacility(
       .single();
 
     if (error) {
-      console.error('Error saving facility:', error);
+      console.error('Error saving facility:', {
+        error,
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      
+      // Check if the table doesn't exist
+      if (error.message?.includes('relation "public.residential_saved_facilities" does not exist') || 
+          error.code === '42P01') {
+        console.error('The residential_saved_facilities table does not exist. Please run the database setup script.');
+        return { 
+          success: false, 
+          message: 'Database table not found. Please contact support to set up the saved facilities feature.' 
+        };
+      }
+      
       return { success: false, message: 'Failed to save facility' };
     }
 

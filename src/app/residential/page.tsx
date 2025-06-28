@@ -2058,13 +2058,13 @@ export default function ResidentialPage() {
                   </Card>
                 </TabsContent>
 
-                {/* Tab 7: Enhanced Finance & Operations */}
+                {/* Tab 7: Finance & Operations */}
                 <TabsContent value="finance">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <DollarSign className="w-5 h-5" />
-                        Enhanced Finance & Operations
+                        Finance & Operations
                       </CardTitle>
                       {selectedFacility.financial_year && (
                         <p className="text-sm text-gray-600">Financial Year: {selectedFacility.financial_year}</p>
@@ -2073,232 +2073,182 @@ export default function ResidentialPage() {
                         <p className="text-xs text-gray-500">Last Updated: {selectedFacility.last_updated_finance}</p>
                       )}
                     </CardHeader>
-                    <CardContent className="space-y-6">
-                      {/* Enhanced Financials Section */}
-                      {selectedFacility.financials ? (
-                        <>
-                          {/* Financial Overview */}
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <div className="p-4 bg-blue-50 rounded-lg text-center">
-                              <div className="text-2xl font-bold text-blue-900">
-                                {formatCurrency(selectedFacility.financials.expenditure.total_per_day.value)}
-                              </div>
-                              <div className="text-sm text-blue-700">Total Daily Expenditure</div>
-                              {selectedFacility.financials.expenditure.total_per_day.variance_percentage !== null && (
-                                <div className="mt-1">
-                                  {formatVariancePercentage(selectedFacility.financials.expenditure.total_per_day.variance_percentage)}
-                                  <span className="text-xs text-gray-600 ml-1">vs sector</span>
+                    <CardContent>
+                      {/* Enhanced Financial Structure */}
+                      {selectedFacility.financials && 
+                       selectedFacility.financials.expenditure && 
+                       selectedFacility.financials.income ? (
+                        <div className="space-y-6">
+                          {/* Basic Info */}
+                          {renderField("Service Name", selectedFacility["Service Name"])}
+                          {selectedFacility.financial_year && renderField("Financial Year", selectedFacility.financial_year)}
+                          {selectedFacility.last_updated_finance && renderField("Last Updated", selectedFacility.last_updated_finance)}
+
+                          {/* Expenditure Section */}
+                          <div className="space-y-4">
+                            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">💰 Expenditure</h3>
+                            
+                            {/* Main Expenditure */}
+                            {renderField("Total Expenditure per Day", selectedFacility.financials.expenditure.total_per_day?.value, "financials.expenditure.total_per_day.value")}
+                            
+                            {/* Care & Nursing */}
+                            <div className="bg-blue-50 p-4 rounded-lg">
+                              <h4 className="font-semibold text-blue-900 mb-3">Care & Nursing</h4>
+                              {renderField("Care & Nursing Total", selectedFacility.financials.expenditure.care_nursing?.total?.value, "financials.expenditure.care_nursing.total.value")}
+                              {selectedFacility.financials.expenditure.care_nursing?.breakdown && (
+                                <div className="ml-4 space-y-2 mt-3">
+                                  {renderField("Registered Nurses", selectedFacility.financials.expenditure.care_nursing.breakdown.registered_nurses?.value, "financials.expenditure.care_nursing.breakdown.registered_nurses.value")}
+                                  {renderField("Enrolled Nurses", selectedFacility.financials.expenditure.care_nursing.breakdown.enrolled_nurses?.value, "financials.expenditure.care_nursing.breakdown.enrolled_nurses.value")}
+                                  {renderField("Personal Care Workers", selectedFacility.financials.expenditure.care_nursing.breakdown.personal_care_workers?.value, "financials.expenditure.care_nursing.breakdown.personal_care_workers.value")}
+                                  {renderField("Care Management Staff", selectedFacility.financials.expenditure.care_nursing.breakdown.care_management_staff?.value, "financials.expenditure.care_nursing.breakdown.care_management_staff.value")}
+                                  {renderField("Allied Health", selectedFacility.financials.expenditure.care_nursing.breakdown.allied_health?.value, "financials.expenditure.care_nursing.breakdown.allied_health.value")}
+                                  {renderField("Lifestyle & Recreation", selectedFacility.financials.expenditure.care_nursing.breakdown.lifestyle_recreation?.value, "financials.expenditure.care_nursing.breakdown.lifestyle_recreation.value")}
+                                  {renderField("Other Care Expenses", selectedFacility.financials.expenditure.care_nursing.breakdown.other_care_expenses?.value, "financials.expenditure.care_nursing.breakdown.other_care_expenses.value")}
                                 </div>
                               )}
                             </div>
                             
-                            <div className="p-4 bg-green-50 rounded-lg text-center">
-                              <div className="text-2xl font-bold text-green-900">
-                                {formatCurrency(selectedFacility.financials.income.total_per_day.value)}
-                              </div>
-                              <div className="text-sm text-green-700">Total Daily Income</div>
-                              {selectedFacility.financials.income.total_per_day.variance_percentage !== null && (
-                                <div className="mt-1">
-                                  {formatVariancePercentage(selectedFacility.financials.income.total_per_day.variance_percentage)}
-                                  <span className="text-xs text-gray-600 ml-1">vs sector</span>
+                            {/* Administration */}
+                            {renderField("Administration", selectedFacility.financials.expenditure.administration?.value, "financials.expenditure.administration.value")}
+                            
+                            {/* Cleaning & Laundry */}
+                            <div className="bg-green-50 p-4 rounded-lg">
+                              <h4 className="font-semibold text-green-900 mb-3">Cleaning & Laundry</h4>
+                              {renderField("Cleaning & Laundry Total", selectedFacility.financials.expenditure.cleaning_laundry?.total?.value, "financials.expenditure.cleaning_laundry.total.value")}
+                              {selectedFacility.financials.expenditure.cleaning_laundry?.breakdown && (
+                                <div className="ml-4 space-y-2 mt-3">
+                                  {renderField("Cleaning", selectedFacility.financials.expenditure.cleaning_laundry.breakdown.cleaning?.value, "financials.expenditure.cleaning_laundry.breakdown.cleaning.value")}
+                                  {renderField("Laundry", selectedFacility.financials.expenditure.cleaning_laundry.breakdown.laundry?.value, "financials.expenditure.cleaning_laundry.breakdown.laundry.value")}
+                                  {renderField("COVID Infection Control", selectedFacility.financials.expenditure.cleaning_laundry.breakdown.covid_infection_control?.value, "financials.expenditure.cleaning_laundry.breakdown.covid_infection_control.value")}
+                                  {renderField("Other Related", selectedFacility.financials.expenditure.cleaning_laundry.breakdown.other_related?.value, "financials.expenditure.cleaning_laundry.breakdown.other_related.value")}
                                 </div>
                               )}
                             </div>
                             
-                            <div className="p-4 bg-purple-50 rounded-lg text-center">
-                              <div className="text-2xl font-bold text-purple-900">
-                                {formatCurrency(selectedFacility.financials.budget_surplus_deficit_per_day.value)}
-                              </div>
-                              <div className="text-sm text-purple-700">Daily Budget Surplus/Deficit</div>
-                              <div className="text-xs text-gray-600 mt-1">
-                                Sector avg: {formatCurrency(selectedFacility.financials.budget_surplus_deficit_per_day.sector_average)}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Detailed Expenditure Analysis */}
-                          <div>
-                            <h4 className="text-lg font-semibold text-gray-900 mb-4">💰 Expenditure Analysis</h4>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                              <div>
-                                {/* Total Expenditure */}
-                                {renderFinancialField(
-                                  "Total Daily Expenditure",
-                                  selectedFacility.financials.expenditure.total_per_day,
-                                  "financials.expenditure.total_per_day.value"
-                                )}
-                                
-                                {/* Care & Nursing */}
-                                {renderFinancialField(
-                                  "Care & Nursing (Total)",
-                                  selectedFacility.financials.expenditure.care_nursing.total,
-                                  "financials.expenditure.care_nursing.total.value"
-                                )}
-                                {renderBreakdown(
-                                  "Care & Nursing Breakdown",
-                                  selectedFacility.financials.expenditure.care_nursing.breakdown,
-                                  "financials.expenditure.care_nursing"
-                                )}
-                                
-                                {/* Administration */}
-                                {renderFinancialField(
-                                  "Administration",
-                                  selectedFacility.financials.expenditure.administration,
-                                  "financials.expenditure.administration.value"
-                                )}
-                              </div>
-                              
-                              <div>
-                                {/* Cleaning & Laundry */}
-                                {renderFinancialField(
-                                  "Cleaning & Laundry (Total)",
-                                  selectedFacility.financials.expenditure.cleaning_laundry.total,
-                                  "financials.expenditure.cleaning_laundry.total.value"
-                                )}
-                                {renderBreakdown(
-                                  "Cleaning & Laundry Breakdown",
-                                  selectedFacility.financials.expenditure.cleaning_laundry.breakdown,
-                                  "financials.expenditure.cleaning_laundry"
-                                )}
-                                
-                                {/* Accommodation & Maintenance */}
-                                {renderFinancialField(
-                                  "Accommodation & Maintenance (Total)",
-                                  selectedFacility.financials.expenditure.accommodation_maintenance.total,
-                                  "financials.expenditure.accommodation_maintenance.total.value"
-                                )}
-                                {renderBreakdown(
-                                  "Accommodation & Maintenance Breakdown",
-                                  selectedFacility.financials.expenditure.accommodation_maintenance.breakdown,
-                                  "financials.expenditure.accommodation_maintenance"
-                                )}
-                                
-                                {/* Food & Catering */}
-                                {renderFinancialField(
-                                  "Food & Catering",
-                                  selectedFacility.financials.expenditure.food_catering,
-                                  "financials.expenditure.food_catering.value"
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Income Analysis */}
-                          <div>
-                            <h4 className="text-lg font-semibold text-gray-900 mb-4">💵 Income Analysis</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              {renderFinancialField(
-                                "Total Daily Income",
-                                selectedFacility.financials.income.total_per_day,
-                                "financials.income.total_per_day.value"
-                              )}
-                              
-                              {renderFinancialField(
-                                "Residents' Contribution",
-                                selectedFacility.financials.income.residents_contribution,
-                                "financials.income.residents_contribution.value"
-                              )}
-                              
-                              {renderFinancialField(
-                                "Government Funding",
-                                selectedFacility.financials.income.government_funding,
-                                "financials.income.government_funding.value"
-                              )}
-                              
-                              {renderFinancialField(
-                                "Other Income",
-                                selectedFacility.financials.income.other,
-                                "financials.income.other.value"
+                            {/* Accommodation & Maintenance */}
+                            <div className="bg-yellow-50 p-4 rounded-lg">
+                              <h4 className="font-semibold text-yellow-900 mb-3">Accommodation & Maintenance</h4>
+                              {renderField("Accommodation & Maintenance Total", selectedFacility.financials.expenditure.accommodation_maintenance?.total?.value, "financials.expenditure.accommodation_maintenance.total.value")}
+                              {selectedFacility.financials.expenditure.accommodation_maintenance?.breakdown && (
+                                <div className="ml-4 space-y-2 mt-3">
+                                  {renderField("Accommodation", selectedFacility.financials.expenditure.accommodation_maintenance.breakdown.accommodation?.value, "financials.expenditure.accommodation_maintenance.breakdown.accommodation.value")}
+                                  {renderField("Maintenance", selectedFacility.financials.expenditure.accommodation_maintenance.breakdown.maintenance?.value, "financials.expenditure.accommodation_maintenance.breakdown.maintenance.value")}
+                                </div>
                               )}
                             </div>
+                            
+                            {/* Food & Catering */}
+                            {renderField("Food & Catering", selectedFacility.financials.expenditure.food_catering?.value, "financials.expenditure.food_catering.value")}
                           </div>
 
-                          {/* Quarterly Care Staff Spending */}
+                          {/* Income Section */}
+                          <div className="space-y-4">
+                            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">💵 Income</h3>
+                            {renderField("Total Income per Day", selectedFacility.financials.income.total_per_day?.value, "financials.income.total_per_day.value")}
+                            {renderField("Residents' Contribution", selectedFacility.financials.income.residents_contribution?.value, "financials.income.residents_contribution.value")}
+                            {renderField("Government Funding", selectedFacility.financials.income.government_funding?.value, "financials.income.government_funding.value")}
+                            {renderField("Other Income", selectedFacility.financials.income.other?.value, "financials.income.other.value")}
+                          </div>
+
+                          {/* Budget Summary */}
+                          <div className="space-y-4">
+                            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">📊 Budget Summary</h3>
+                            {renderField("Budget Surplus/Deficit per Day", selectedFacility.financials.budget_surplus_deficit_per_day?.value, "financials.budget_surplus_deficit_per_day.value")}
+                          </div>
+
+                          {/* Care Staff Spending */}
                           {selectedFacility.financials.care_staff_last_quarter && (
-                            <div>
-                              <h4 className="text-lg font-semibold text-gray-900 mb-4">👥 Care Staff Spending</h4>
-                              <div className="mb-4 p-3 bg-yellow-50 rounded-lg">
-                                <p className="text-sm font-medium text-yellow-900">
-                                  {selectedFacility.financials.care_staff_last_quarter.quarter_period}
-                                </p>
-                              </div>
+                            <div className="space-y-4">
+                              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                                👥 Care Staff Spending ({selectedFacility.financials.care_staff_last_quarter.quarter_period || 'Last Quarter'})
+                              </h3>
                               
-                              {renderFinancialField(
-                                "Total Care Staff Spending",
-                                selectedFacility.financials.care_staff_last_quarter.total,
-                                "financials.care_staff_last_quarter.total.value"
-                              )}
+                              {renderField("Total Care Staff Spending", selectedFacility.financials.care_staff_last_quarter.total?.value, "financials.care_staff_last_quarter.total.value")}
                               
-                              {renderBreakdown(
-                                "Care Staff Spending Breakdown",
-                                selectedFacility.financials.care_staff_last_quarter.breakdown,
-                                "financials.care_staff_last_quarter"
+                              {selectedFacility.financials.care_staff_last_quarter.breakdown && (
+                                <div className="bg-purple-50 p-4 rounded-lg">
+                                  <h4 className="font-semibold text-purple-900 mb-3">Staff Category Breakdown</h4>
+                                  <div className="ml-4 space-y-2">
+                                    {renderField("Registered Nurses", selectedFacility.financials.care_staff_last_quarter.breakdown.registered_nurses?.value, "financials.care_staff_last_quarter.breakdown.registered_nurses.value")}
+                                    {renderField("Enrolled Nurses", selectedFacility.financials.care_staff_last_quarter.breakdown.enrolled_nurses?.value, "financials.care_staff_last_quarter.breakdown.enrolled_nurses.value")}
+                                    {renderField("Personal Care Workers", selectedFacility.financials.care_staff_last_quarter.breakdown.personal_care_workers?.value, "financials.care_staff_last_quarter.breakdown.personal_care_workers.value")}
+                                    {renderField("Care Management Staff", selectedFacility.financials.care_staff_last_quarter.breakdown.care_management_staff?.value, "financials.care_staff_last_quarter.breakdown.care_management_staff.value")}
+                                    {renderField("Physiotherapists", selectedFacility.financials.care_staff_last_quarter.breakdown.physiotherapists?.value, "financials.care_staff_last_quarter.breakdown.physiotherapists.value")}
+                                    {renderField("Occupational Therapists", selectedFacility.financials.care_staff_last_quarter.breakdown.occupational_therapists?.value, "financials.care_staff_last_quarter.breakdown.occupational_therapists.value")}
+                                    {renderField("Speech Pathologists", selectedFacility.financials.care_staff_last_quarter.breakdown.speech_pathologists?.value, "financials.care_staff_last_quarter.breakdown.speech_pathologists.value")}
+                                    {renderField("Podiatrists", selectedFacility.financials.care_staff_last_quarter.breakdown.podiatrists?.value, "financials.care_staff_last_quarter.breakdown.podiatrists.value")}
+                                    {renderField("Dietetics", selectedFacility.financials.care_staff_last_quarter.breakdown.dietetics?.value, "financials.care_staff_last_quarter.breakdown.dietetics.value")}
+                                    {renderField("Allied Health Assistants", selectedFacility.financials.care_staff_last_quarter.breakdown.allied_health_assistants?.value, "financials.care_staff_last_quarter.breakdown.allied_health_assistants.value")}
+                                    {renderField("Other Allied Health", selectedFacility.financials.care_staff_last_quarter.breakdown.other_allied_health?.value, "financials.care_staff_last_quarter.breakdown.other_allied_health.value")}
+                                    {renderField("Lifestyle & Recreation", selectedFacility.financials.care_staff_last_quarter.breakdown.lifestyle_recreation?.value, "financials.care_staff_last_quarter.breakdown.lifestyle_recreation.value")}
+                                  </div>
+                                </div>
                               )}
                             </div>
                           )}
-                        </>
-                      ) : (
-                        /* Legacy Financial Data Fallback */
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div>
-                            <h4 className="font-medium text-gray-900 mb-3">Expenditure (per day)</h4>
-                            <dl className="space-y-2">
-                              {renderField("Service Name", selectedFacility["Service Name"])}
-                              {selectedFacility.expenditure_total_per_day && (
-                                <div className="mb-3">
-                                  <dt className="text-sm font-medium text-gray-500">Total Expenditure</dt>
-                                  <dd className="text-gray-900 flex items-center">
-                                    {formatCurrency(selectedFacility.expenditure_total_per_day)}
-                                    {showBoxPlots && !statsLoading && (() => {
-                                      const scopeStats = getStatisticsForScope();
-                                      const fieldStats = scopeStats ? scopeStats.fields?.["expenditure_total_per_day"] : null;
-                                      return fieldStats ? (
-                                        <InlineBoxPlot
-                                          fieldName="expenditure_total_per_day"
-                                          currentValue={selectedFacility.expenditure_total_per_day}
-                                          statistics={fieldStats}
-                                          scope={selectedScope}
-                                        />
-                                      ) : null;
-                                    })()}
-                                  </dd>
-                                </div>
-                              )}
-                              {/* Additional legacy fields would continue here */}
-                            </dl>
-                          </div>
-                          
-                          <div>
-                            <h4 className="font-medium text-gray-900 mb-3">Income (per day)</h4>
-                            <dl className="space-y-2">
-                              {selectedFacility.income_total_per_day && (
-                                <div className="mb-3">
-                                  <dt className="text-sm font-medium text-gray-500">Total Income</dt>
-                                  <dd className="text-gray-900 flex items-center">
-                                    {formatCurrency(selectedFacility.income_total_per_day)}
-                                    {showBoxPlots && !statsLoading && (() => {
-                                      const scopeStats = getStatisticsForScope();
-                                      const fieldStats = scopeStats ? scopeStats.fields?.["income_total_per_day"] : null;
-                                      return fieldStats ? (
-                                        <InlineBoxPlot
-                                          fieldName="income_total_per_day"
-                                          currentValue={selectedFacility.income_total_per_day}
-                                          statistics={fieldStats}
-                                          scope={selectedScope}
-                                        />
-                                      ) : null;
-                                    })()}
-                                  </dd>
-                                </div>
-                              )}
-                              {/* Additional legacy fields would continue here */}
-                            </dl>
-                          </div>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
+                      ) : (
+                          /* Legacy Financial Data Fallback */
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-3">Expenditure (per day)</h4>
+                              <dl className="space-y-2">
+                                {renderField("Service Name", selectedFacility["Service Name"])}
+                                {selectedFacility.expenditure_total_per_day && (
+                                  <div className="mb-3">
+                                    <dt className="text-sm font-medium text-gray-500">Total Expenditure</dt>
+                                    <dd className="text-gray-900 flex items-center">
+                                      {formatCurrency(selectedFacility.expenditure_total_per_day)}
+                                      {showBoxPlots && !statsLoading && (() => {
+                                        const scopeStats = getStatisticsForScope();
+                                        const fieldStats = scopeStats ? scopeStats.fields?.["expenditure_total_per_day"] : null;
+                                        return fieldStats ? (
+                                          <InlineBoxPlot
+                                            fieldName="expenditure_total_per_day"
+                                            currentValue={selectedFacility.expenditure_total_per_day}
+                                            statistics={fieldStats}
+                                            scope={selectedScope}
+                                          />
+                                        ) : null;
+                                      })()}
+                                    </dd>
+                                  </div>
+                                )}
+                                {/* Additional legacy fields would continue here */}
+                              </dl>
+                            </div>
+                            
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-3">Income (per day)</h4>
+                              <dl className="space-y-2">
+                                {selectedFacility.income_total_per_day && (
+                                  <div className="mb-3">
+                                    <dt className="text-sm font-medium text-gray-500">Total Income</dt>
+                                    <dd className="text-gray-900 flex items-center">
+                                      {formatCurrency(selectedFacility.income_total_per_day)}
+                                      {showBoxPlots && !statsLoading && (() => {
+                                        const scopeStats = getStatisticsForScope();
+                                        const fieldStats = scopeStats ? scopeStats.fields?.["income_total_per_day"] : null;
+                                        return fieldStats ? (
+                                          <InlineBoxPlot
+                                            fieldName="income_total_per_day"
+                                            currentValue={selectedFacility.income_total_per_day}
+                                            statistics={fieldStats}
+                                            scope={selectedScope}
+                                          />
+                                        ) : null;
+                                      })()}
+                                    </dd>
+                                  </div>
+                                )}
+                                {/* Additional legacy fields would continue here */}
+                              </dl>
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
               </Tabs>
             </div>
           </div>
