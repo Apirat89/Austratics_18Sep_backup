@@ -14,6 +14,7 @@ import {
   getUserSavedResidentialFacilities, 
   deleteSavedResidentialFacility, 
   isResidentialFacilitySaved,
+  clearUserSavedResidentialFacilities,
   type SavedResidentialFacility 
 } from '../../lib/savedResidentialFacilities';
 import {
@@ -601,6 +602,47 @@ export default function ResidentialPage() {
     setSearchTerm(search.search_term);
   };
 
+  // Clear all saved facilities
+  const handleClearSavedFacilities = async () => {
+    if (!currentUser) return;
+    
+    if (confirm('Are you sure you want to clear all saved facilities? This action cannot be undone.')) {
+      try {
+        const result = await clearUserSavedResidentialFacilities(currentUser.id);
+        if (result.success) {
+          setSavedFacilities([]);
+          alert('All saved facilities have been cleared successfully.');
+        } else {
+          alert(result.message || 'Failed to clear saved facilities.');
+        }
+      } catch (error) {
+        console.error('Error clearing saved facilities:', error);
+        alert('An error occurred while clearing saved facilities.');
+      }
+    }
+  };
+
+  // Clear all comparison selections
+  const handleClearComparisonSelections = async () => {
+    if (!currentUser) return;
+    
+    if (confirm('Are you sure you want to clear all selected facilities for comparison? This action cannot be undone.')) {
+      try {
+        const success = await clearResidentialComparisonSelections(currentUser.id);
+        if (success) {
+          setSelectedForComparison([]);
+          setShowSelectedList(false);
+          alert('All comparison selections have been cleared successfully.');
+        } else {
+          alert('Failed to clear comparison selections.');
+        }
+      } catch (error) {
+        console.error('Error clearing comparison selections:', error);
+        alert('An error occurred while clearing comparison selections.');
+      }
+    }
+  };
+
   const renderStarRating = (rating?: number) => {
     if (!rating) return <span className="text-gray-400">No rating</span>;
     
@@ -1103,17 +1145,31 @@ export default function ResidentialPage() {
                 <Search className="w-4 h-4" />
                 Search Facilities
               </button>
-              <button
-                onClick={() => setShowSavedFacilities(true)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                  showSavedFacilities
-                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                <History className="w-4 h-4" />
-                Saved Facilities ({savedFacilities.length})
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowSavedFacilities(true)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                    showSavedFacilities
+                      ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <History className="w-4 h-4" />
+                  Saved Facilities ({savedFacilities.length})
+                </button>
+                
+                {/* Clear Saved Facilities Button */}
+                {savedFacilities.length > 0 && (
+                  <button
+                    onClick={handleClearSavedFacilities}
+                    className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1 px-2 py-1 rounded hover:bg-red-50"
+                    title="Clear all saved facilities"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    Clear All
+                  </button>
+                )}
+              </div>
               
               {/* Comparison Counter */}
               <div className="relative">
@@ -1133,7 +1189,17 @@ export default function ResidentialPage() {
                 {showSelectedList && selectedForComparison.length > 0 && (
                   <div className="absolute top-full right-0 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                     <div className="p-3 border-b border-gray-200">
-                      <h3 className="font-semibold text-gray-900">Selected for Comparison</h3>
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-gray-900">Selected for Comparison</h3>
+                        <button
+                          onClick={handleClearComparisonSelections}
+                          className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
+                          title="Clear all selected facilities"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          Clear All
+                        </button>
+                      </div>
                     </div>
                     <div className="max-h-60 overflow-y-auto">
                       {selectedForComparison.map((facility, index) => (
