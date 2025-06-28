@@ -7,10 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ResidentialFacility {
+  // Enhanced Provider Information
+  provider_id?: string;
   "Service Name": string;
   provider_abn?: string;
   provider_name?: string;
   ownership_details?: string;
+  last_updated_finance?: string;
+  financial_year?: string;
+  previous_name?: string;
+  
+  // Enhanced Location & Contact Information
   overall_rating_stars?: number;
   overall_rating_text?: string;
   compliance_rating?: number;
@@ -21,18 +28,31 @@ interface ResidentialFacility {
   address_locality?: string;
   address_state?: string;
   address_postcode?: string;
+  address_street?: string;
   contact_phone?: string;
   contact_email?: string;
   contact_website?: string;
+  latitude?: number;
+  longitude?: number;
+  
+  // Enhanced Room Information
   specialized_care?: string[];
   features?: string[];
   residential_places?: number;
+  last_updated_rooms?: string;
+  currently_available?: boolean;
+  waitlist_available?: boolean;
   rooms_data?: {
     name: string;
     configuration: string;
     cost_per_day: number;
     room_size: string;
   }[];
+  
+  // Enhanced Food Information
+  food_cost_per_day?: number;
+  food_sector_average?: number;
+  food_resident_satisfaction?: number;
   "star_Compliance rating"?: number;
   "star_[C] Decision type"?: string;
   "star_[C] Date Decision Applied"?: string;
@@ -102,6 +122,69 @@ interface ResidentialFacility {
   "star_[S] Total Care Minutes - Target"?: number;
   "star_[S] Total Care Minutes - Actual"?: number;
   "star_[S] Total Care Minutes - % Achievement"?: number;
+  // NEW: Enhanced Financial Structure
+  financials?: {
+    expenditure: {
+      total_per_day: { value: number; sector_average: number; variance_percentage: number; };
+      care_nursing: {
+        total: { value: number; sector_average: number; variance_percentage: number; };
+        breakdown: {
+          registered_nurses: { value: number; sector_average: number; };
+          enrolled_nurses: { value: number; sector_average: number; };
+          personal_care_workers: { value: number; sector_average: number; };
+          care_management_staff: { value: number; sector_average: number; };
+          allied_health: { value: number; sector_average: number; };
+          lifestyle_recreation: { value: number; sector_average: number; };
+          other_care_expenses: { value: number; sector_average: number; };
+        };
+      };
+      administration: { value: number; sector_average: number | null; variance_percentage: number; };
+      cleaning_laundry: {
+        total: { value: number; sector_average: number; variance_percentage: number; };
+        breakdown: {
+          cleaning: { value: number; sector_average: number; };
+          laundry: { value: number; sector_average: number; };
+          covid_infection_control: { value: number; sector_average: number; };
+          other_related: { value: number; sector_average: number; };
+        };
+      };
+      accommodation_maintenance: {
+        total: { value: number; sector_average: number; variance_percentage: number; };
+        breakdown: {
+          accommodation: { value: number; sector_average: number; };
+          maintenance: { value: number; sector_average: number; };
+        };
+      };
+      food_catering: { value: number; sector_average: number | null; variance_percentage: number; };
+    };
+    income: {
+      total_per_day: { value: number; sector_average: number; variance_percentage: number; };
+      residents_contribution: { value: number; sector_average: number | null; variance_percentage: number; };
+      government_funding: { value: number; sector_average: number | null; variance_percentage: number; };
+      other: { value: number; sector_average: number | null; variance_percentage: number; };
+    };
+    budget_surplus_deficit_per_day: { value: number; sector_average: number; };
+    care_staff_last_quarter: {
+      quarter_period: string;
+      total: { value: number; sector_average: number | null; variance_percentage: number | null; };
+      breakdown: {
+        registered_nurses: { value: number; sector_average: number; };
+        enrolled_nurses: { value: number; sector_average: number; };
+        personal_care_workers: { value: number; sector_average: number; };
+        care_management_staff: { value: number; sector_average: number; };
+        physiotherapists: { value: number; sector_average: number; };
+        occupational_therapists: { value: number; sector_average: number; };
+        speech_pathologists: { value: number; sector_average: number; };
+        podiatrists: { value: number; sector_average: number; };
+        dietetics: { value: number; sector_average: number; };
+        allied_health_assistants: { value: number; sector_average: number; };
+        other_allied_health: { value: number; sector_average: number; };
+        lifestyle_recreation: { value: number; sector_average: number; };
+      };
+    };
+  };
+  
+  // DEPRECATED: Old flat financial fields
   expenditure_total_per_day?: number;
   expenditure_care_nursing?: number;
   expenditure_administration?: number;
@@ -139,7 +222,7 @@ export default function ResidentialComparePage() {
       setLoading(true);
       
       // Load the residential data
-      const response = await fetch('/maps/abs_csv/Residential_May2025_ExcludeMPS_updated.json');
+      const response = await fetch('/maps/abs_csv/Residential_May2025_ExcludeMPS_updated_with_finance.json');
       const data = await response.json();
       
       // Find facilities by name

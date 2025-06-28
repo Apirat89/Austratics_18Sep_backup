@@ -93,7 +93,7 @@ class HybridFacilityService {
       // Load both data sources in parallel
       const [healthcareResponse, residentialResponse] = await Promise.all([
         fetch('/maps/healthcare.geojson'),
-        fetch('/maps/abs_csv/Residential_May2025_ExcludeMPS_updated.json')
+        fetch('/maps/abs_csv/Residential_May2025_ExcludeMPS_updated_with_finance.json')
       ]);
 
       if (!healthcareResponse.ok) {

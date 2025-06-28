@@ -176,7 +176,7 @@ export default function ResidentialPage() {
   useEffect(() => {
     const loadFacilities = async () => {
       try {
-        const response = await fetch('/maps/abs_csv/Residential_May2025_ExcludeMPS_updated.json');
+        const response = await fetch('/maps/abs_csv/Residential_May2025_ExcludeMPS_updated_with_finance.json');
         const data = await response.json();
         setFacilities(data);
         setFilteredFacilities([]); // Start with empty list

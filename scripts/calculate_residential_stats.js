@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Read the residential data
-const dataPath = 'public/maps/abs_csv/Residential_May2025_ExcludeMPS_updated.json';
+const dataPath = '../public/maps/abs_csv/Residential_May2025_ExcludeMPS_updated_with_finance.json';
 const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
 console.log(`Loaded ${data.length} residential facilities`);
@@ -47,6 +47,96 @@ function extractRoomCostStats(facility) {
   };
 }
 
+// NEW: Function to extract nested financial values for flat access patterns
+function extractNestedValue(obj, path) {
+  return path.split('.').reduce((current, key) => {
+    return current && current[key] !== undefined ? current[key] : null;
+  }, obj);
+}
+
+// NEW: Function to flatten financial data for statistical analysis
+function flattenFinancialData(facility) {
+  const flattened = { ...facility };
+  
+  if (!facility.financials) {
+    return flattened;
+  }
+  
+  // Extract all nested financial values using dot notation
+  const financialPaths = [
+    'financials.expenditure.total_per_day.value',
+    'financials.expenditure.total_per_day.sector_average',
+    'financials.expenditure.total_per_day.variance_percentage',
+    'financials.expenditure.care_nursing.total.value',
+    'financials.expenditure.care_nursing.total.sector_average',
+    'financials.expenditure.care_nursing.total.variance_percentage',
+    'financials.expenditure.care_nursing.breakdown.registered_nurses.value',
+    'financials.expenditure.care_nursing.breakdown.enrolled_nurses.value',
+    'financials.expenditure.care_nursing.breakdown.personal_care_workers.value',
+    'financials.expenditure.care_nursing.breakdown.care_management_staff.value',
+    'financials.expenditure.care_nursing.breakdown.allied_health.value',
+    'financials.expenditure.care_nursing.breakdown.lifestyle_recreation.value',
+    'financials.expenditure.care_nursing.breakdown.other_care_expenses.value',
+    'financials.expenditure.administration.value',
+    'financials.expenditure.administration.sector_average',
+    'financials.expenditure.administration.variance_percentage',
+    'financials.expenditure.cleaning_laundry.total.value',
+    'financials.expenditure.cleaning_laundry.total.sector_average',
+    'financials.expenditure.cleaning_laundry.total.variance_percentage',
+    'financials.expenditure.cleaning_laundry.breakdown.cleaning.value',
+    'financials.expenditure.cleaning_laundry.breakdown.laundry.value',
+    'financials.expenditure.cleaning_laundry.breakdown.covid_infection_control.value',
+    'financials.expenditure.cleaning_laundry.breakdown.other_related.value',
+    'financials.expenditure.accommodation_maintenance.total.value',
+    'financials.expenditure.accommodation_maintenance.total.sector_average',
+    'financials.expenditure.accommodation_maintenance.total.variance_percentage',
+    'financials.expenditure.accommodation_maintenance.breakdown.accommodation.value',
+    'financials.expenditure.accommodation_maintenance.breakdown.maintenance.value',
+    'financials.expenditure.food_catering.value',
+    'financials.expenditure.food_catering.sector_average',
+    'financials.expenditure.food_catering.variance_percentage',
+    'financials.income.total_per_day.value',
+    'financials.income.total_per_day.sector_average',
+    'financials.income.total_per_day.variance_percentage',
+    'financials.income.residents_contribution.value',
+    'financials.income.residents_contribution.sector_average',
+    'financials.income.residents_contribution.variance_percentage',
+    'financials.income.government_funding.value',
+    'financials.income.government_funding.sector_average',
+    'financials.income.government_funding.variance_percentage',
+    'financials.income.other.value',
+    'financials.income.other.sector_average',
+    'financials.income.other.variance_percentage',
+    'financials.budget_surplus_deficit_per_day.value',
+    'financials.budget_surplus_deficit_per_day.sector_average',
+    'financials.care_staff_last_quarter.total.value',
+    'financials.care_staff_last_quarter.total.sector_average',
+    'financials.care_staff_last_quarter.total.variance_percentage',
+    'financials.care_staff_last_quarter.breakdown.registered_nurses.value',
+    'financials.care_staff_last_quarter.breakdown.enrolled_nurses.value',
+    'financials.care_staff_last_quarter.breakdown.personal_care_workers.value',
+    'financials.care_staff_last_quarter.breakdown.care_management_staff.value',
+    'financials.care_staff_last_quarter.breakdown.physiotherapists.value',
+    'financials.care_staff_last_quarter.breakdown.occupational_therapists.value',
+    'financials.care_staff_last_quarter.breakdown.speech_pathologists.value',
+    'financials.care_staff_last_quarter.breakdown.podiatrists.value',
+    'financials.care_staff_last_quarter.breakdown.dietetics.value',
+    'financials.care_staff_last_quarter.breakdown.allied_health_assistants.value',
+    'financials.care_staff_last_quarter.breakdown.other_allied_health.value',
+    'financials.care_staff_last_quarter.breakdown.lifestyle_recreation.value'
+  ];
+  
+  // Add flattened financial fields
+  financialPaths.forEach(path => {
+    const value = extractNestedValue(facility, path);
+    if (value !== null) {
+      flattened[path] = value;
+    }
+  });
+  
+  return flattened;
+}
+
 // Function to scan all numeric fields in the dataset
 function scanAllNumericFields(data) {
   const numericFields = new Set();
@@ -75,7 +165,85 @@ const predefinedFields = [
   'room_cost_max', 
   'room_cost_median',
   
-  // Financial Variables
+  // Enhanced Provider Fields
+  'provider_id',
+  'food_cost_per_day',
+  'food_sector_average',
+  'food_resident_satisfaction',
+  'latitude',
+  'longitude',
+  
+  // NEW: Enhanced Financial Fields - Flat Access Patterns for Box Plots
+  'financials.expenditure.total_per_day.value',
+  'financials.expenditure.total_per_day.sector_average',
+  'financials.expenditure.total_per_day.variance_percentage',
+  
+  'financials.expenditure.care_nursing.total.value',
+  'financials.expenditure.care_nursing.total.sector_average',
+  'financials.expenditure.care_nursing.total.variance_percentage',
+  'financials.expenditure.care_nursing.breakdown.registered_nurses.value',
+  'financials.expenditure.care_nursing.breakdown.enrolled_nurses.value',
+  'financials.expenditure.care_nursing.breakdown.personal_care_workers.value',
+  'financials.expenditure.care_nursing.breakdown.care_management_staff.value',
+  'financials.expenditure.care_nursing.breakdown.allied_health.value',
+  'financials.expenditure.care_nursing.breakdown.lifestyle_recreation.value',
+  'financials.expenditure.care_nursing.breakdown.other_care_expenses.value',
+  
+  'financials.expenditure.administration.value',
+  'financials.expenditure.administration.sector_average',
+  'financials.expenditure.administration.variance_percentage',
+  
+  'financials.expenditure.cleaning_laundry.total.value',
+  'financials.expenditure.cleaning_laundry.total.sector_average',
+  'financials.expenditure.cleaning_laundry.total.variance_percentage',
+  'financials.expenditure.cleaning_laundry.breakdown.cleaning.value',
+  'financials.expenditure.cleaning_laundry.breakdown.laundry.value',
+  'financials.expenditure.cleaning_laundry.breakdown.covid_infection_control.value',
+  'financials.expenditure.cleaning_laundry.breakdown.other_related.value',
+  
+  'financials.expenditure.accommodation_maintenance.total.value',
+  'financials.expenditure.accommodation_maintenance.total.sector_average',
+  'financials.expenditure.accommodation_maintenance.total.variance_percentage',
+  'financials.expenditure.accommodation_maintenance.breakdown.accommodation.value',
+  'financials.expenditure.accommodation_maintenance.breakdown.maintenance.value',
+  
+  'financials.expenditure.food_catering.value',
+  'financials.expenditure.food_catering.sector_average',
+  'financials.expenditure.food_catering.variance_percentage',
+  
+  'financials.income.total_per_day.value',
+  'financials.income.total_per_day.sector_average',
+  'financials.income.total_per_day.variance_percentage',
+  'financials.income.residents_contribution.value',
+  'financials.income.residents_contribution.sector_average',
+  'financials.income.residents_contribution.variance_percentage',
+  'financials.income.government_funding.value',
+  'financials.income.government_funding.sector_average',
+  'financials.income.government_funding.variance_percentage',
+  'financials.income.other.value',
+  'financials.income.other.sector_average',
+  'financials.income.other.variance_percentage',
+  
+  'financials.budget_surplus_deficit_per_day.value',
+  'financials.budget_surplus_deficit_per_day.sector_average',
+  
+  'financials.care_staff_last_quarter.total.value',
+  'financials.care_staff_last_quarter.total.sector_average',
+  'financials.care_staff_last_quarter.total.variance_percentage',
+  'financials.care_staff_last_quarter.breakdown.registered_nurses.value',
+  'financials.care_staff_last_quarter.breakdown.enrolled_nurses.value',
+  'financials.care_staff_last_quarter.breakdown.personal_care_workers.value',
+  'financials.care_staff_last_quarter.breakdown.care_management_staff.value',
+  'financials.care_staff_last_quarter.breakdown.physiotherapists.value',
+  'financials.care_staff_last_quarter.breakdown.occupational_therapists.value',
+  'financials.care_staff_last_quarter.breakdown.speech_pathologists.value',
+  'financials.care_staff_last_quarter.breakdown.podiatrists.value',
+  'financials.care_staff_last_quarter.breakdown.dietetics.value',
+  'financials.care_staff_last_quarter.breakdown.allied_health_assistants.value',
+  'financials.care_staff_last_quarter.breakdown.other_allied_health.value',
+  'financials.care_staff_last_quarter.breakdown.lifestyle_recreation.value',
+  
+  // Legacy Financial Variables (for backward compatibility)
   'expenditure_total_per_day',
   'expenditure_care_nursing', 
   'expenditure_administration',
@@ -95,11 +263,6 @@ const predefinedFields = [
   'quality_measures_rating',
   'residents_experience_rating',
   'staffing_rating',
-  
-  // Food Service Variables
-  'food_cost_per_day',
-  'food_sector_average',
-  'food_resident_satisfaction',
   
   // Capacity Variables
   'residential_places',
@@ -186,17 +349,18 @@ const uniqueNumericFields = [...new Set(numericFields)].sort();
 
 console.log(`Processing ${uniqueNumericFields.length} total numeric fields (including room cost statistics)`);
 
-// Enhance facility data with room cost statistics
-console.log('Calculating room cost statistics for each facility...');
+// Enhance facility data with room cost statistics and flattened financial data
+console.log('Calculating room cost statistics and flattening financial data for each facility...');
 const enhancedData = data.map(facility => {
   const roomCostStats = extractRoomCostStats(facility);
+  const flattenedFinancialData = flattenFinancialData(facility);
   return {
-    ...facility,
+    ...flattenedFinancialData,
     ...roomCostStats
   };
 });
 
-console.log('Room cost statistics added to all facilities');
+console.log('Room cost statistics and financial data flattening completed for all facilities');
 
 // Function to calculate statistics for an array of values
 function calculateStats(values) {
@@ -410,12 +574,12 @@ const results = {
 const outputFilename = 'Residential_Statistics_Analysis.json';
 
 // Save to non-public folder
-const nonPublicPath = path.join('Maps_ABS_CSV', outputFilename);
+const nonPublicPath = path.join('..', 'Maps_ABS_CSV', outputFilename);
 fs.writeFileSync(nonPublicPath, JSON.stringify(results, null, 2));
 console.log(`✅ Statistics saved to non-public folder: ${nonPublicPath}`);
 
 // Save to public folder
-const publicPath = path.join('public', 'maps', 'abs_csv', outputFilename);
+const publicPath = path.join('..', 'public', 'maps', 'abs_csv', outputFilename);
 fs.writeFileSync(publicPath, JSON.stringify(results, null, 2));
 console.log(`✅ Statistics saved to public folder: ${publicPath}`);
 

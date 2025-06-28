@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Read the residential data
-const dataPath = 'Maps_ABS_CSV/Residential_May2025_ExcludeMPS_updated.json';
+const dataPath = 'Maps_ABS_CSV/Residential_May2025_ExcludeMPS_updated_with_finance.json';
 const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
 console.log(`Loaded ${data.length} residential facilities`);
