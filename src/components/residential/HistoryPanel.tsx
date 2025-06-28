@@ -15,6 +15,8 @@ interface HistoryPanelProps {
   onComparisonSelect: (comparison: ResidentialComparisonHistoryItem) => void;
   onClearSearchHistory: () => void | Promise<void>;
   onClearComparisonHistory: () => void | Promise<void>;
+  onDeleteSearchItem: (itemId: number) => void | Promise<void>;
+  onDeleteComparisonItem: (itemId: number) => void | Promise<void>;
 }
 
 const HistoryPanel: React.FC<HistoryPanelProps> = ({
@@ -27,7 +29,32 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
   onComparisonSelect,
   onClearSearchHistory,
   onClearComparisonHistory,
+  onDeleteSearchItem,
+  onDeleteComparisonItem,
 }) => {
+  // Handle clear all with confirmation
+  const handleClearSearchHistory = () => {
+    if (confirm('Are you sure you want to clear all search history? This action cannot be undone.')) {
+      onClearSearchHistory();
+    }
+  };
+
+  const handleClearComparisonHistory = () => {
+    if (confirm('Are you sure you want to clear all comparison history? This action cannot be undone.')) {
+      onClearComparisonHistory();
+    }
+  };
+
+  // Handle individual item deletion (no confirmation needed)
+  const handleDeleteSearchItem = (e: React.MouseEvent, itemId: number) => {
+    e.stopPropagation(); // Prevent triggering onSearchSelect
+    onDeleteSearchItem(itemId);
+  };
+
+  const handleDeleteComparisonItem = (e: React.MouseEvent, itemId: number) => {
+    e.stopPropagation(); // Prevent triggering onComparisonSelect
+    onDeleteComparisonItem(itemId);
+  };
   if (!isOpen) return null;
 
   return (
@@ -43,7 +70,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
             </h3>
             {searchHistory.length > 0 && (
               <button
-                onClick={onClearSearchHistory}
+                onClick={handleClearSearchHistory}
                 className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
               >
                 <Trash2 className="w-3 h-3" />
@@ -79,6 +106,15 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
                         </span>
                       </div>
                     </div>
+                    {search.id && (
+                      <button
+                        onClick={(e) => handleDeleteSearchItem(e, search.id!)}
+                        className="text-gray-400 hover:text-red-600 p-1 rounded-md hover:bg-red-50 transition-colors flex-shrink-0"
+                        title="Delete this search"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -95,7 +131,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
             </h3>
             {comparisonHistory.length > 0 && (
               <button
-                onClick={onClearComparisonHistory}
+                onClick={handleClearComparisonHistory}
                 className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
               >
                 <Trash2 className="w-3 h-3" />
@@ -131,6 +167,15 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
                           </span>
                         </div>
                       </div>
+                      {comparison.id && (
+                        <button
+                          onClick={(e) => handleDeleteComparisonItem(e, comparison.id!)}
+                          className="text-gray-400 hover:text-red-600 p-1 rounded-md hover:bg-red-50 transition-colors flex-shrink-0"
+                          title="Delete this comparison"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

@@ -21,9 +21,11 @@ import {
   saveResidentialSearchToHistory,
   getResidentialSearchHistory,
   clearResidentialSearchHistory,
+  deleteResidentialSearchHistoryItem,
   saveResidentialComparisonToHistory,
   getResidentialComparisonHistory,
   clearResidentialComparisonHistory,
+  deleteResidentialComparisonHistoryItem,
   addResidentialComparisonSelection,
   removeResidentialComparisonSelection,
   getResidentialComparisonSelections,
@@ -489,23 +491,21 @@ export default function ResidentialPage() {
     }
   };
 
-  // Delete saved facility function - now using Supabase
+  // Delete saved facility function - now using Supabase (no confirmation needed)
   const deleteSavedFacility = async (facilityDbId: number) => {
     if (!currentUser) return;
     
-    if (confirm('Are you sure you want to delete this saved facility?')) {
-      const result = await deleteSavedResidentialFacility(currentUser.id, facilityDbId);
-      if (result.success) {
-        const updatedFacilities = savedFacilities.filter(saved => saved.id !== facilityDbId);
-        setSavedFacilities(updatedFacilities);
-        
-        // Close dropdown if no more saved facilities
-        if (updatedFacilities.length === 0) {
-          setShowSavedFacilitiesDropdown(false);
-        }
-      } else {
-        alert(`Failed to delete facility: ${result.message}`);
+    const result = await deleteSavedResidentialFacility(currentUser.id, facilityDbId);
+    if (result.success) {
+      const updatedFacilities = savedFacilities.filter(saved => saved.id !== facilityDbId);
+      setSavedFacilities(updatedFacilities);
+      
+      // Close dropdown if no more saved facilities
+      if (updatedFacilities.length === 0) {
+        setShowSavedFacilitiesDropdown(false);
       }
+    } else {
+      alert(`Failed to delete facility: ${result.message}`);
     }
   };
 
@@ -666,6 +666,40 @@ export default function ResidentialPage() {
         console.error('Error clearing comparison selections:', error);
         alert('An error occurred while clearing comparison selections.');
       }
+    }
+  };
+
+  // Delete individual search history item
+  const handleDeleteSearchItem = async (itemId: number) => {
+    if (!currentUser) return;
+    
+    try {
+      const deleted = await deleteResidentialSearchHistoryItem(currentUser.id, itemId);
+      if (deleted) {
+        setSearchHistory(prev => prev.filter(item => item.id !== itemId));
+      } else {
+        alert('Failed to delete search history item.');
+      }
+    } catch (error) {
+      console.error('Error deleting search history item:', error);
+      alert('An error occurred while deleting the search history item.');
+    }
+  };
+
+  // Delete individual comparison history item
+  const handleDeleteComparisonItem = async (itemId: number) => {
+    if (!currentUser) return;
+    
+    try {
+      const deleted = await deleteResidentialComparisonHistoryItem(currentUser.id, itemId);
+      if (deleted) {
+        setRecentComparisons(prev => prev.filter(item => item.id !== itemId));
+      } else {
+        alert('Failed to delete comparison history item.');
+      }
+    } catch (error) {
+      console.error('Error deleting comparison history item:', error);
+      alert('An error occurred while deleting the comparison history item.');
     }
   };
 
@@ -1116,6 +1150,8 @@ export default function ResidentialPage() {
                   }
                 }
               }}
+              onDeleteSearchItem={handleDeleteSearchItem}
+              onDeleteComparisonItem={handleDeleteComparisonItem}
             />
           </div>
         </div>
