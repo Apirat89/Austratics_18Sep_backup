@@ -57,7 +57,7 @@ interface FacilityData {
   facilityType: 'residential' | 'mps' | 'home' | 'retirement';
 }
 
-type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality';
+type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality' | 'acpr' | 'mmm';
 type MapStyleType = 'basic' | 'topo' | 'satellite' | 'terrain' | 'streets';
 
 export default function MapsPage() {

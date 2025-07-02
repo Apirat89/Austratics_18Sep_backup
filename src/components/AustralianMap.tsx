@@ -22,7 +22,7 @@ interface FacilityTypes {
   retirement: boolean;
 }
 
-type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality';
+type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality' | 'acpr' | 'mmm';
 type MapStyleType = 'basic' | 'topo' | 'satellite' | 'terrain' | 'streets';
 
 interface FacilityData {
@@ -1137,6 +1137,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       case 'sa3': return 'sa3_code_2021';
       case 'sa4': return 'sa4_code_2021';
       case 'locality': return 'SAL_CODE21';
+      case 'acpr': return 'ACPR_Code';
+      case 'mmm': return 'MMM_CODE23';
       default: return 'id';
     }
   };
@@ -1150,6 +1152,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       case 'sa3': return properties?.sa3_name_2021 || `SA3 ${properties?.sa3_code_2021}`;
       case 'sa4': return properties?.sa4_name_2021 || `SA4 ${properties?.sa4_code_2021}`;
       case 'locality': return properties?.SAL_NAME21 || `Locality ${properties?.SAL_CODE21}`;
+      case 'acpr': return properties?.ACPR_Name || `ACPR ${properties?.ACPR_Code}`;
+      case 'mmm': return properties?.MMM_NAME23 || `MMM ${properties?.MMM_CODE23}`;
       default: return `${(layerType as string).toUpperCase()}: ${properties?.[getPropertyField(layerType)]}`;
     }
   };
@@ -1157,13 +1161,13 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   const clearHighlight = useCallback(() => {
     if (!map.current) return;
 
-    const layerTypes: GeoLayerType[] = ['sa2', 'sa3', 'sa4', 'lga', 'postcode', 'locality'];
+    const layerTypes: GeoLayerType[] = ['sa2', 'sa3', 'sa4', 'lga', 'postcode', 'locality', 'acpr', 'mmm'];
     
     layerTypes.forEach(type => {
       const highlightLayerId = `${type}-highlight`;
       try {
         if (map.current!.getLayer(highlightLayerId)) {
-          map.current!.setFilter(highlightLayerId, ['==', ['get', getPropertyField(type)], '']);
+          map.current!.setFilter(highlightLayerId, ['==', ['get', getPropertyField(type)], '__HIDDEN__']);
         }
       } catch (error) {
         console.warn(`Failed to clear highlight for ${type}:`, error);
@@ -1232,7 +1236,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             'sa2': 0.001,       // ~100m tolerance for SA2
             'sa3': 0,           // No tolerance for SA3 (larger boundaries)
             'sa4': 0,           // No tolerance for SA4 (larger boundaries)
-            'lga': 0            // No tolerance for LGA (larger boundaries)
+            'lga': 0,           // No tolerance for LGA (larger boundaries)
+            'acpr': 0,          // No tolerance for ACPR (large care provider regions)
+            'mmm': 0            // No tolerance for MMM (modified monash model areas)
           }[currentGeoLayer] || 0;
           
           const result = isPointInGeometryWithTolerance(clickPoint, feature.geometry, tolerance);
@@ -1363,7 +1369,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       'lga': 7,
       'sa2': 8,
       'postcode': 9,
-      'locality': 11
+      'locality': 11,
+      'acpr': 6,        // ACPR regions are large, similar zoom to SA3
+      'mmm': 7          // MMM areas are medium size, similar to LGA
     };
 
     const targetZoom = minZoomForLayer[layerType];
@@ -1402,7 +1410,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
 
     try {
       // Remove all existing boundary layers first
-      const boundaryTypes: GeoLayerType[] = ['sa2', 'sa3', 'sa4', 'lga', 'postcode', 'locality'];
+      const boundaryTypes: GeoLayerType[] = ['sa2', 'sa3', 'sa4', 'lga', 'postcode', 'locality', 'acpr', 'mmm'];
       
       boundaryTypes.forEach(type => {
         const sourceId = `${type}-source`;
@@ -1450,7 +1458,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           'sa2': 'SA2.geojson',
           'sa3': 'SA3.geojson',
           'sa4': 'SA4.geojson',
-          'locality': 'SAL.geojson'
+          'locality': 'SAL.geojson',
+          'acpr': 'DOH_simplified.geojson',
+          'mmm': 'MMM_simplified.geojson'
         };
 
         const fileName = fileMap[layerType];
@@ -1536,8 +1546,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         type: 'fill',
         source: sourceId,
         paint: {
-          'fill-color': 'rgba(30, 58, 138, 0.2)', // Deep blue for better click detection
-          'fill-opacity': 0.2 // Increased opacity for more reliable click detection on complex polygons
+          'fill-color': 'rgba(30, 58, 138, 0.0)', // Transparent for clean appearance
+          'fill-opacity': 0.0 // Invisible but still detects clicks
         }
       });
 
@@ -1547,7 +1557,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         id: `${layerType}-highlight`,
         type: 'fill',
         source: sourceId,
-        filter: ['==', ['get', getPropertyField(layerType)], ''], // Initially hide all
+        filter: ['==', ['get', getPropertyField(layerType)], '__HIDDEN__'], // Initially hide all
         paint: {
           'fill-color': '#1E3A8A',
           'fill-opacity': 0.15 // Slightly more visible for highlights
@@ -1581,20 +1591,22 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     console.log('🚀 Starting preload of ALL boundary data...');
     setPreloadingData(true);
     
-    const allBoundaryTypes: GeoLayerType[] = ['postcode', 'lga', 'sa2', 'sa3', 'sa4', 'locality'];
+    const allBoundaryTypes: GeoLayerType[] = ['postcode', 'lga', 'sa2', 'sa3', 'sa4', 'locality', 'acpr', 'mmm'];
     const fileMap: Record<GeoLayerType, string> = {
       'postcode': 'POA.geojson',
       'lga': 'LGA.geojson', 
       'sa2': 'SA2.geojson',
       'sa3': 'SA3.geojson',
       'sa4': 'SA4.geojson',
-      'locality': 'SAL.geojson'
+      'locality': 'SAL.geojson',
+      'acpr': 'DOH_simplified.geojson',
+      'mmm': 'MMM_simplified.geojson'
     };
     
     setPreloadProgress({ current: 0, total: allBoundaryTypes.length });
     
     // Load files in optimal order (smallest to largest)
-    const orderedTypes: GeoLayerType[] = ['postcode', 'lga', 'locality', 'sa4', 'sa3', 'sa2'];
+    const orderedTypes: GeoLayerType[] = ['postcode', 'lga', 'locality', 'mmm', 'acpr', 'sa4', 'sa3', 'sa2'];
     
     for (let i = 0; i < orderedTypes.length; i++) {
       const layerType = orderedTypes[i];

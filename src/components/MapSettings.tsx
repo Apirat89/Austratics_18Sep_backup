@@ -5,7 +5,7 @@ import { Settings, ChevronDown, ChevronUp, Map, Check, Building, Home, Mail, Bui
 import BoundaryControls from './BoundaryControls';
 
 type MapStyleType = 'basic' | 'topo' | 'satellite' | 'terrain' | 'streets';
-type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality';
+type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality' | 'acpr' | 'mmm';
 
 interface FacilityTypes {
   residential: boolean;

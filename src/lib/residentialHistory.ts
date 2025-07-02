@@ -195,6 +195,33 @@ export async function getResidentialSearchHistory(
   }
 }
 
+// Delete individual residential search history item
+export async function deleteResidentialSearchHistoryItem(
+  userId: string, 
+  itemId: number
+): Promise<boolean> {
+  try {
+    const supabase = createBrowserSupabaseClient();
+    
+    const { error } = await supabase
+      .from('residential_search_history')
+      .delete()
+      .eq('id', itemId)
+      .eq('user_id', userId); // Ensure user can only delete their own items
+
+    if (error) {
+      console.error('Error deleting residential search history item:', error.message || error);
+      return false;
+    }
+
+    console.log('Residential search history item deleted:', itemId);
+    return true;
+  } catch (error) {
+    console.error('Error deleting residential search history item:', error);
+    return false;
+  }
+}
+
 // Clear all residential search history for a user
 export async function clearResidentialSearchHistory(userId: string): Promise<boolean> {
   try {
@@ -319,6 +346,33 @@ export async function getResidentialComparisonHistory(
   } catch (error) {
     console.error('Error fetching residential comparison history:', error);
     return [];
+  }
+}
+
+// Delete individual residential comparison history item
+export async function deleteResidentialComparisonHistoryItem(
+  userId: string, 
+  itemId: number
+): Promise<boolean> {
+  try {
+    const supabase = createBrowserSupabaseClient();
+    
+    const { error } = await supabase
+      .from('residential_comparison_history')
+      .delete()
+      .eq('id', itemId)
+      .eq('user_id', userId); // Ensure user can only delete their own items
+
+    if (error) {
+      console.error('Error deleting residential comparison history item:', error.message || error);
+      return false;
+    }
+
+    console.log('Residential comparison history item deleted:', itemId);
+    return true;
+  } catch (error) {
+    console.error('Error deleting residential comparison history item:', error);
+    return false;
   }
 }
 

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 
-type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality';
+type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality' | 'acpr' | 'mmm';
 
 interface BoundaryControlsProps {
   selectedGeoLayer: GeoLayerType;
@@ -19,12 +19,14 @@ export default function BoundaryControls({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const geoLayers = [
-    { value: 'sa2' as const, label: 'SA2 Areas' },
-    { value: 'sa3' as const, label: 'SA3 Areas' },
-    { value: 'sa4' as const, label: 'SA4 Areas' },
-    { value: 'lga' as const, label: 'Local Government Areas' },
+    { value: 'sa2' as const, label: 'SA2 - Statistical Areas Level 2' },
+    { value: 'sa3' as const, label: 'SA3 - Statistical Areas Level 3' },
+    { value: 'sa4' as const, label: 'SA4 - Statistical Areas Level 4' },
+    { value: 'lga' as const, label: 'LGA - Local Government Areas' },
     { value: 'postcode' as const, label: 'Postcode Areas' },
-    { value: 'locality' as const, label: 'Localities' }
+    { value: 'locality' as const, label: 'Localities (Suburbs)' },
+    { value: 'acpr' as const, label: 'ACPR - Care Provider Regions' },
+    { value: 'mmm' as const, label: 'MMM - Modified Monash Model' }
   ];
 
   const getLayerDisplayName = () => {

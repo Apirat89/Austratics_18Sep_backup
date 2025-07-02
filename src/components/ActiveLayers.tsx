@@ -10,7 +10,7 @@ interface FacilityTypes {
   mps: boolean;
 }
 
-type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality';
+type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality' | 'acpr' | 'mmm';
 type MapStyleType = 'basic' | 'topo' | 'satellite' | 'terrain' | 'streets';
 
 interface ActiveLayersProps {
@@ -57,7 +57,9 @@ export default function ActiveLayers({
       'sa4': 'SA4 Boundaries',
       'lga': 'LGA Boundaries',
       'locality': 'Locality Boundaries',
-      'postcode': 'Postcode Areas'
+      'postcode': 'Postcode Areas',
+      'acpr': 'ACPR - Care Provider Regions',
+      'mmm': 'MMM - Modified Monash Model'
     };
     return boundaryMap[selectedGeoLayer] || 'Unknown';
   };
