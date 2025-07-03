@@ -15,6 +15,9 @@ import { globalLoadingCoordinator } from './MapLoadingCoordinator';
 // Add import for race condition fix
 import { LayerRequestQueue } from '../lib/LayerRequestQueue';
 
+// Add import for layer cleanup fix
+import { LayerCleanupManager } from '../lib/LayerCleanupManager';
+
 // MapTiler API key - you'll need to add this to your environment variables
 const MAPTILER_API_KEY = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || 'YOUR_MAPTILER_API_KEY';
 
@@ -257,6 +260,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // Race condition fix: Layer request queue
   const layerRequestQueue = useRef<LayerRequestQueue>(new LayerRequestQueue());
   
+  // Layer cleanup fix: Event-driven cleanup manager
+  const layerCleanupManager = useRef<LayerCleanupManager>(new LayerCleanupManager());
+  
   // Cache for boundary data to avoid re-downloading
   const boundaryDataCache = useRef<Map<GeoLayerType, any>>(new Map());
   const [preloadingData, setPreloadingData] = useState(false);
@@ -345,6 +351,12 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     map.current.on('load', () => {
       setIsLoaded(true);
       
+      // Initialize cleanup manager with map reference
+      if (map.current) {
+        layerCleanupManager.current.setMap(map.current);
+        console.log('🧹 LayerCleanupManager initialized with map reference');
+      }
+      
       // Add click handler
       if (map.current) {
         map.current.on('click', handleMapClick);
@@ -367,6 +379,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       
       // Cancel all pending queue requests
       layerRequestQueue.current.cancelAllRequests();
+      
+      // Destroy cleanup manager
+      layerCleanupManager.current.destroy();
       
       isChangingStyleRef.current = false;
       boundaryLoadingRef.current = false;
@@ -1407,39 +1422,17 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         setBoundaryLoading(true);
         setBoundaryError(null);
 
-        // Remove all existing boundary layers first
+        // EVENT-DRIVEN CLEANUP: Use LayerCleanupManager instead of manual cleanup
         const boundaryTypes: GeoLayerType[] = ['sa2', 'sa3', 'sa4', 'lga', 'postcode', 'locality', 'acpr', 'mmm'];
         
-        boundaryTypes.forEach(type => {
-          const sourceId = `${type}-source`;
-          const layerId = `${type}-layer`;
-          const fillLayerId = `${type}-fill`;
-          const highlightLayerId = `${type}-highlight`;
-          
-          // Remove layers in reverse order of creation
-          [highlightLayerId, fillLayerId, layerId].forEach(id => {
-            try {
-              if (map.current!.getLayer(id)) {
-                console.log(`Removing layer: ${id}`);
-                map.current!.removeLayer(id);
-              }
-            } catch (error) {
-              console.warn(`Error removing layer ${id}:`, error);
-            }
-          });
-          
-          try {
-            if (map.current!.getSource(sourceId)) {
-              console.log(`Removing source: ${sourceId}`);
-              map.current!.removeSource(sourceId);
-            }
-          } catch (error) {
-            console.warn(`Error removing source ${sourceId}:`, error);
-          }
-        });
-
-        // Small delay to ensure cleanup is complete
-        await new Promise(resolve => setTimeout(resolve, 100));
+        try {
+          const cleanupOperationId = await layerCleanupManager.current.performLayerCleanup(layerType, boundaryTypes);
+          console.log(`🧹 Layer cleanup completed with operation ID: ${cleanupOperationId}`);
+        } catch (cleanupError) {
+          console.error(`❌ Layer cleanup failed, proceeding with caution:`, cleanupError);
+          // Continue with layer loading even if cleanup had issues
+          // The cleanup manager provides better error resilience than the old manual approach
+        }
 
         // Check cache first
         let geojsonData = boundaryDataCache.current.get(layerType);

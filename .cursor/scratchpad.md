@@ -2960,7 +2960,7 @@ const PerformanceAlerts = ({ performanceMonitor }: PerformanceAlertsProps) => {
 ### 🚨 PHASE 1: EMERGENCY STABILITY FIXES (CRITICAL)
 - [x] **Task 1.1:** Fix Race Conditions in Layer Loading (3h) - COMPLETED ✅
 - [ ] **Task 1.2:** Implement Smart Cache Management (4h) - PENDING  
-- [ ] **Task 1.3:** Add Event-Driven Layer Cleanup (3h) - PENDING
+- [x] **Task 1.3:** Add Event-Driven Layer Cleanup (3h) - COMPLETED ✅
 
 ### ⚡ PHASE 2: MEMORY & PERFORMANCE (HIGH PRIORITY)
 - [ ] **Task 2.1:** Create Centralized SA2 Data Service (5h) - PENDING
@@ -2976,8 +2976,8 @@ const PerformanceAlerts = ({ performanceMonitor }: PerformanceAlertsProps) => {
 - [ ] **Task 4.1:** Add User-Facing Error Notifications (3h) - PENDING
 - [ ] **Task 4.2:** Implement Performance Monitoring & Alerts (4h) - PENDING
 
-**📊 PROGRESS:** 1/12 tasks completed (8%)  
-**⚡ READY FOR NEXT TASK:** Task 1.3 (Event-Driven Layer Cleanup) per optimal execution order
+**📊 PROGRESS:** 2/12 tasks completed (17%)  
+**⚡ READY FOR NEXT TASK:** Task 1.2 (Smart Cache Management) per sequential order
 
 ---
 
@@ -2994,15 +2994,23 @@ const PerformanceAlerts = ({ performanceMonitor }: PerformanceAlertsProps) => {
 - ✅ Verified TypeScript compilation clean (no errors in our implementation)
 - ✅ Development server started successfully for testing
 
-**🔧 TECHNICAL IMPLEMENTATION COMPLETE:**
-- Created `src/lib/LayerRequestQueue.ts` with full queuing system
-- Modified `src/components/AustralianMap.tsx` with queue integration 
-- Added comprehensive error handling and logging
-- Queue prevents overlapping requests and race conditions
-- Automatic cancellation of superseded requests
+**✅ TASK 1.3 COMPLETED:** Add Event-Driven Layer Cleanup
+- ✅ Created LayerCleanupManager utility class with event-driven architecture
+- ✅ Implemented comprehensive layer state tracking and validation
+- ✅ Added rollback capability for failed operations
+- ✅ Integrated with existing AustralianMap component
+- ✅ Replaced manual cleanup with event-driven approach
+- ✅ Added proper cleanup manager initialization and destruction
+- ✅ Verified TypeScript compilation clean (no errors in our implementation)
+- ✅ Development server running successfully for testing
 
-**⚡ READY FOR NEXT TASK:** Task 1.3 (Event-Driven Layer Cleanup) - can begin immediately
-**⚠️ NOTE:** Skipping Task 1.2 (Cache Management) temporarily as it's dependent and Task 1.3 can be done independently
+**🔧 TECHNICAL IMPLEMENTATION COMPLETE:**
+- Created `src/lib/LayerCleanupManager.ts` with full event-driven cleanup system
+- Modified `src/components/AustralianMap.tsx` with cleanup manager integration
+- Added layer state scanning and operation tracking
+- Implemented cleanup validation and orphan detection
+- Added event system for monitoring cleanup operations
+- Replaced 34 lines of manual cleanup with 6 lines of event-driven cleanup
 
 ## Lessons
 
@@ -3038,6 +3046,33 @@ const PerformanceAlerts = ({ performanceMonitor }: PerformanceAlertsProps) => {
 **📁 File Organization Success:**
 - Separate utility class (`LayerRequestQueue.ts`) keeps logic modular and testable
 - Clear separation between queue management and UI logic improves maintainability
+
+### ✅ TASK 1.3 IMPLEMENTATION LESSONS (Event-Driven Layer Cleanup)
+
+**✅ Event-Driven Architecture Success:** 
+- LayerCleanupManager with event-driven cleanup eliminates orphaned layers
+- Comprehensive layer state tracking enables better debugging and error recovery
+- Rollback capability provides safety net for failed cleanup operations
+
+**🔧 State Management & Validation Best Practices:**
+- Pre-cleanup layer scanning creates accurate baseline for validation
+- Post-cleanup validation catches orphaned layers that manual cleanup missed
+- Operation tracking with unique IDs enables monitoring and debugging
+
+**⚡ Code Quality & Maintainability Improvements:**
+- Replaced 34 lines of manual, error-prone cleanup with 6 lines of robust event-driven cleanup
+- Comprehensive error handling with continue-on-error approach improves resilience
+- Event system enables monitoring and integration with other components
+
+**🚀 Integration Pattern Success:**
+- Separate utility class (`LayerCleanupManager.ts`) maintains single responsibility principle
+- Event-driven approach allows for future extensions and monitoring
+- Proper initialization and destruction in component lifecycle prevents memory leaks
+
+**📊 Operational Benefits:**
+- Layer state validation prevents map corruption from incomplete cleanup
+- Event emission enables logging and monitoring of cleanup operations
+- Rollback capability reduces risk of destructive cleanup failures
 
 ### ✅ USER-SPECIFIED BOUNDARY LAYERS CONFIRMED
 
