@@ -18,6 +18,9 @@ import { LayerRequestQueue } from '../lib/LayerRequestQueue';
 // Add import for layer cleanup fix
 import { LayerCleanupManager } from '../lib/LayerCleanupManager';
 
+// Add import for smart cache management fix
+import { LRUCache } from '../lib/LRUCache';
+
 // MapTiler API key - you'll need to add this to your environment variables
 const MAPTILER_API_KEY = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || 'YOUR_MAPTILER_API_KEY';
 
@@ -263,8 +266,13 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // Layer cleanup fix: Event-driven cleanup manager
   const layerCleanupManager = useRef<LayerCleanupManager>(new LayerCleanupManager());
   
-  // Cache for boundary data to avoid re-downloading
-  const boundaryDataCache = useRef<Map<GeoLayerType, any>>(new Map());
+  // Smart cache management fix: LRU cache with memory monitoring
+  const boundaryDataCache = useRef<LRUCache>(new LRUCache({
+    maxItems: 8, // Support all 8 boundary layer types
+    maxMemoryMB: 400, // 400MB limit to prevent SA2 data duplication issue
+    ttlMs: 45 * 60 * 1000, // 45 minutes TTL for geographic data
+    cleanupIntervalMs: 10 * 60 * 1000 // 10 minutes cleanup interval
+  }));
   const [preloadingData, setPreloadingData] = useState(false);
   const [preloadProgress, setPreloadProgress] = useState({ current: 0, total: 0 });
   const preloadCompleteRef = useRef<boolean>(false);
@@ -382,6 +390,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       
       // Destroy cleanup manager
       layerCleanupManager.current.destroy();
+      
+      // Destroy LRU cache
+      boundaryDataCache.current.destroy();
       
       isChangingStyleRef.current = false;
       boundaryLoadingRef.current = false;
@@ -1434,7 +1445,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           // The cleanup manager provides better error resilience than the old manual approach
         }
 
-        // Check cache first
+        // Check LRU cache first
         let geojsonData = boundaryDataCache.current.get(layerType);
         
         if (geojsonData) {
@@ -1479,9 +1490,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           const parseTime = Date.now() - parseStartTime;
           console.log(`Parsed ${fileName} in ${parseTime}ms, features count:`, geojsonData.features?.length || 0);
           
-          // Cache the data for future use
+          // Cache the data using LRU cache
           boundaryDataCache.current.set(layerType, geojsonData);
-          console.log(`💾 Cached boundary data for: ${layerType}`);
+          console.log(`💾 LRU cached boundary data for: ${layerType}`);
         }
         
         // Additional data quality checks
@@ -1627,7 +1638,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           ? `${Math.round(parseInt(response.headers.get('content-length')!) / 1024 / 1024)}MB` 
           : 'unknown size';
         
-        // Cache the data
+        // Cache the data using LRU cache
         boundaryDataCache.current.set(layerType, geojsonData);
         
         console.log(`✅ Preloaded ${layerType} in ${loadTime}ms (${sizeInfo}, ${geojsonData.features?.length || 0} features)`);
@@ -1647,8 +1658,17 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     setPreloadingData(false);
     setPreloadProgress({ current: orderedTypes.length, total: orderedTypes.length });
     console.log('🎉 ALL boundary data preloaded successfully!');
-    console.log(`📊 Cache contains: ${Array.from(boundaryDataCache.current.keys()).join(', ')}`);
-    console.log(`💾 Total cache size: ${boundaryDataCache.current.size} files`);
+    
+    // LRU cache analytics
+    const cacheStats = boundaryDataCache.current.getStats();
+    const debugInfo = boundaryDataCache.current.getDebugInfo();
+    console.log(`📊 LRU Cache contains: ${debugInfo.entries.map((e: any) => e.key).join(', ')}`);
+    console.log(`💾 LRU Cache stats:`, {
+      totalItems: cacheStats.totalEntries,
+      totalMemoryMB: cacheStats.totalMemoryMB.toFixed(2),
+      hitRate: `${cacheStats.hitRate}%`,
+      memoryUtilization: `${cacheStats.memoryUtilization}%`
+    });
     
   }, []);
 
