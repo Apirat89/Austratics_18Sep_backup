@@ -254,6 +254,59 @@ if (sourceExists && !layerExists && !facilityLoading) {
 
 **🚀 STATUS:** **REAL FIX IMPLEMENTED** - Ready for user testing
 
+### 🎯 **COMPREHENSIVE SOLUTION: Integrated Heatmap Layer Management**
+
+**USER INSIGHT:** "The boundary layer used to have similar issues but we solved it previously. Maybe if we can learn how the separation works from this experience we can apply it to heat map."
+
+**💡 KEY DISCOVERY:** The boundary layer system works because it's **centrally managed** in the main map component with **style change awareness** and **automatic restoration**. The heatmap was failing because it was **independent** and **unaware of style changes**.
+
+**✅ FINAL IMPLEMENTATION:**
+
+**Phase 6: Complete Integration with Boundary System**
+
+1. **🎯 Centralized Heatmap Management** - Moved heatmap layer creation to main AustralianMap component
+2. **🔄 Style Change Integration** - Heatmap layers now get restored automatically during style changes  
+3. **🤝 Source Reuse** - Heatmap now uses main 'sa2-source' instead of duplicate 'sa2-heatmap-source'
+4. **⚡ Elimination of Duplicate Loading** - No more separate 170MB SA2 data loading for heatmap
+5. **🛡️ Automatic Restoration** - Heatmap layers restored using same pattern as boundary layers
+
+**🔧 TECHNICAL IMPLEMENTATION:**
+
+**File: `src/components/AustralianMap.tsx`**
+- Added `createHeatmapLayer()` function following boundary layer patterns
+- Added `heatmapLayerExists` state tracking
+- Integrated heatmap restoration in both cached and standard style change handlers  
+- Added effect to create/update heatmap when conditions are met
+- Removed dependency on separate HeatmapBackgroundLayer component
+- Heatmap now uses main 'sa2-source' (no more duplication)
+
+**Removed Dependencies:**
+- HeatmapBackgroundLayer component no longer used
+- Eliminated duplicate SA2 boundary loading
+- Removed conflicting boundary management systems
+
+**🎯 ARCHITECTURE IMPROVEMENT:**
+```typescript
+// OLD: Separate component with independent boundary loading
+<HeatmapBackgroundLayer sa2HeatmapData={data} /> // 170MB duplicate loading
+
+// NEW: Integrated with main boundary system  
+const createHeatmapLayer = () => {
+  // Reuse main 'sa2-source' 
+  // Automatic restoration during style changes
+  // Centralized state management
+}
+```
+
+**🎉 EXPECTED RESULTS:**
+1. ✅ Heatmap works seamlessly during facility changes
+2. ✅ No more unexpected preload screens
+3. ✅ 170MB memory savings (no duplicate SA2 loading)
+4. ✅ Automatic layer recovery from any map style changes
+5. ✅ Perfect coordination between all map systems
+
+**🚀 STATUS:** **COMPREHENSIVE ARCHITECTURAL FIX COMPLETED** - Ready for user testing
+
 **🔧 SPECIFIC CHANGES IMPLEMENTED:**
 - Fixed `stableFacilityTypes` dependency array to include `facilityTypes.mps`
 - Added `facilityLoading` state for operation coordination

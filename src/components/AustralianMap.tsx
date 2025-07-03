@@ -8,7 +8,7 @@ import '@maptiler/sdk/dist/maptiler-sdk.css';
 import { saveSearchToSavedSearches, isSearchSaved, type LocationData } from '../lib/savedSearches';
 
 // Add imports for heatmap functionality  
-import HeatmapBackgroundLayer from './HeatmapBackgroundLayer';
+// import HeatmapBackgroundLayer from './HeatmapBackgroundLayer'; // Now handled directly in main component
 import HeatmapDataService, { SA2HeatmapData, RankedSA2Data } from './HeatmapDataService';
 import { globalLoadingCoordinator } from './MapLoadingCoordinator';
 
@@ -289,6 +289,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // ✅ PHASE 3: Add error recovery monitoring
   const [facilityError, setFacilityError] = useState<string | null>(null);
   const facilityRetryCountRef = useRef<number>(0);
+  
+  // ✅ PHASE 5: Add heatmap layer state tracking
+  const [heatmapLayerExists, setHeatmapLayerExists] = useState(false);
 
   // Handle heatmap data processing with coordination
   const handleHeatmapDataProcessed = useCallback((data: SA2HeatmapData | null, selectedOption: string) => {
@@ -1655,6 +1658,88 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     }
   }, [setBoundaryLoading, setBoundaryError]);
 
+  // ✅ PHASE 5: Add heatmap layer creation/restoration function
+  const createHeatmapLayer = useCallback(() => {
+    if (!map.current || !isLoaded || !heatmapVisible || !heatmapData || !heatmapDataReady) {
+      return;
+    }
+
+    const heatmapLayerId = 'sa2-heatmap-background';
+    const sa2SourceId = 'sa2-source'; // Reuse main boundary source
+
+    // Check if main SA2 source exists (boundary layer must be loaded first)
+    if (!map.current.getSource(sa2SourceId)) {
+      console.log('🔴 HeatmapLayer: Main SA2 source not available, skipping heatmap creation');
+      return;
+    }
+
+    // Remove existing heatmap layer if it exists
+    if (map.current.getLayer(heatmapLayerId)) {
+      console.log('🗑️ HeatmapLayer: Removing existing heatmap layer');
+      map.current.removeLayer(heatmapLayerId);
+    }
+
+    // Create heatmap layer using main SA2 source
+    const data = heatmapData;
+    const dataEntries = Object.entries(data);
+    
+    if (dataEntries.length === 0) {
+      console.log('📊 HeatmapLayer: No heatmap data to display');
+      setHeatmapLayerExists(false);
+      return;
+    }
+
+    // Find min and max values for normalization
+    const values = dataEntries.map(([_, value]) => value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const valueRange = maxValue - minValue;
+
+    console.log(`🗺️ HeatmapLayer: Creating heatmap with ${dataEntries.length} data points`);
+    console.log(`📊 HeatmapLayer: Value range: ${minValue} - ${maxValue}`);
+
+    // Create data-driven heatmap expression
+    const caseExpression: any[] = ['case'];
+    
+    for (const [sa2Id, value] of dataEntries) {
+      // Normalize value to 0-1 range
+      const normalizedValue = valueRange > 0 ? (value - minValue) / valueRange : 0;
+      
+      // Calculate opacity (0 minimum, 0.8 maximum)
+      const opacity = normalizedValue * 0.8;
+      
+      // Add condition and color
+      caseExpression.push(
+        ['==', ['get', 'sa2_code_2021'], sa2Id],
+        `rgba(239, 68, 68, ${opacity})` // Red with calculated opacity
+      );
+    }
+    
+    // Default case: transparent for SA2s without data
+    caseExpression.push('rgba(0,0,0,0)');
+
+    // Add heatmap layer using main SA2 source
+    map.current.addLayer({
+      id: heatmapLayerId,
+      type: 'fill',
+      source: sa2SourceId, // Use main boundary source
+      paint: {
+        'fill-color': caseExpression as any,
+        'fill-opacity': 0.7
+      },
+      layout: {
+        'visibility': 'visible'
+      }
+    });
+
+    console.log('✅ HeatmapLayer: Heatmap layer created successfully');
+    setHeatmapLayerExists(true);
+    
+    // Notify parent about min/max values
+    onHeatmapMinMaxCalculated?.(minValue, maxValue);
+    
+  }, [map, isLoaded, heatmapVisible, heatmapData, heatmapDataReady, onHeatmapMinMaxCalculated]);
+
   // Preload all boundary data to prevent loading during style changes
   const preloadAllBoundaryData = useCallback(async () => {
     if (preloadCompleteRef.current) return;
@@ -1833,6 +1918,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     // Always store current state before any style change (cached or not)
     const currentGeoLayer = selectedGeoLayerRef.current;
     const hadBoundaryLayer = currentGeoLayer && map.current.getSource(`${currentGeoLayer}-source`);
+    const hadHeatmapLayer = heatmapLayerExists && heatmapVisible && heatmapData && heatmapDataReady;
     const currentMarkers = [...markersRef.current];
     
     // Use cached style if available, otherwise fallback to setStyle
@@ -1854,6 +1940,12 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
               if (hadBoundaryLayer) {
                 console.log('🔄 Restoring boundary layer after cached style:', currentGeoLayer);
                 handleBoundaryLayer(currentGeoLayer);
+              }
+              
+              // Re-add heatmap layer if it existed (after boundary restoration)
+              if (hadHeatmapLayer && currentGeoLayer === 'sa2') {
+                console.log('🔄 Restoring heatmap layer after cached style');
+                setTimeout(() => createHeatmapLayer(), 100); // Small delay after boundary
               }
               
               // Re-add facility markers if they existed
@@ -1906,6 +1998,12 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                 handleBoundaryLayer(currentGeoLayer);
               }
               
+              // Re-add heatmap layer if it existed (after boundary restoration)
+              if (hadHeatmapLayer && currentGeoLayer === 'sa2') {
+                console.log('🔄 Restoring heatmap layer after standard style');
+                setTimeout(() => createHeatmapLayer(), 100); // Small delay after boundary
+              }
+              
               // Re-add facility markers if they existed
               if (currentMarkers.length > 0) {
                 console.log('🔄 Restoring facility markers');
@@ -1940,6 +2038,27 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     }
     
   }, [selectedMapStyle, isLoaded, handleBoundaryLayer, addHealthcareFacilities, stableFacilityTypes]);
+
+  // ✅ PHASE 5: Effect to create/update heatmap layer when conditions are met
+  useEffect(() => {
+    if (!map.current || !isLoaded) return;
+    
+    // Only create heatmap if we're on SA2 layer (heatmap requires SA2 boundaries)
+    if (selectedGeoLayerRef.current === 'sa2' && heatmapVisible && heatmapData && heatmapDataReady) {
+      console.log('🌡️ Creating/updating heatmap layer');
+      // Small delay to ensure boundary layer is ready
+      setTimeout(() => createHeatmapLayer(), 200);
+    } else if (!heatmapVisible) {
+      // Remove heatmap layer if not visible
+      const heatmapLayerId = 'sa2-heatmap-background';
+      if (map.current.getLayer(heatmapLayerId)) {
+        console.log('🗑️ Removing heatmap layer (not visible)');
+        map.current.removeLayer(heatmapLayerId);
+        setHeatmapLayerExists(false);
+        onHeatmapMinMaxCalculated?.(undefined, undefined);
+      }
+    }
+  }, [isLoaded, heatmapVisible, heatmapData, heatmapDataReady, createHeatmapLayer, onHeatmapMinMaxCalculated]);
 
   // Effect to load default boundary layer on initial map load
   useEffect(() => {
@@ -2135,16 +2254,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         </div>
       )}
 
-      {/* Heatmap Background Layer */}
-      <HeatmapBackgroundLayer
-        map={map.current}
-        sa2HeatmapData={heatmapData}
-        sa2HeatmapVisible={heatmapVisible}
-        dataReady={heatmapDataReady}
-        mapLoaded={isLoaded}
-        facilityLoading={facilityLoading}
-        onMinMaxCalculated={onHeatmapMinMaxCalculated}
-      />
+      {/* Heatmap now handled directly in main map component for better coordination */}
 
       {/* Heatmap Data Service */}
       <HeatmapDataService
