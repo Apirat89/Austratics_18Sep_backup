@@ -15,6 +15,7 @@ interface HeatmapBackgroundLayerProps {
   dataReady?: boolean;
   mapLoaded?: boolean;
   facilityLoading?: boolean;
+  styleChangeNotification?: number;
   className?: string;
   onMinMaxCalculated?: (minValue: number | undefined, maxValue: number | undefined) => void;
 }
@@ -26,6 +27,7 @@ export default function HeatmapBackgroundLayer({
   dataReady = false,
   mapLoaded = false,
   facilityLoading = false,
+  styleChangeNotification = 0,
   onMinMaxCalculated
 }: HeatmapBackgroundLayerProps) {
   const [boundaryLoaded, setBoundaryLoaded] = useState(false);
@@ -337,6 +339,17 @@ export default function HeatmapBackgroundLayer({
     
     return () => clearInterval(layerMonitor);
   }, [map, mapLoaded, boundaryLoaded, dataReady, facilityLoading, updateHeatmap]);
+
+  // ✅ PHASE 7: Listen for style change notifications and recreate layer
+  useEffect(() => {
+    if (styleChangeNotification > 0) {
+      console.log('🎨 HeatmapBackgroundLayer: Style change detected, recreating layer...');
+      // Small delay to ensure style change is complete
+      setTimeout(() => {
+        updateHeatmap();
+      }, 300);
+    }
+  }, [styleChangeNotification, updateHeatmap]);
 
   // Update heatmap when data or visibility changes
   useEffect(() => {
