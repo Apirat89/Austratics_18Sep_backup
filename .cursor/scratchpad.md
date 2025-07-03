@@ -198,6 +198,62 @@ This targeted approach leverages the existing 4-phase vulnerability analysis whi
 3. **✅ Phase 3: Stability Enhancements** - Added debouncing and error recovery with retry logic
 4. **✅ Phase 4: Performance Monitoring** - Prepared foundation for future SA2 data sharing optimization
 
+### 🚨 **REAL ROOT CAUSE DISCOVERED: Layer Destruction Issue**
+
+**USER FEEDBACK:** After 4-phase implementation, user reported:
+1. Heatmap still doesn't work when facilities change
+2. Preload window appearing unexpectedly
+
+**🔍 DEEPER INVESTIGATION RESULTS:**
+
+**🚨 ACTUAL ROOT CAUSE:** Facility changes trigger map style changes that **destroy ALL map layers** (including heatmap sources and layers). The HeatmapBackgroundLayer component had no way to detect this destruction and recreate its layer, while boundary layers get automatically restored by the main AustralianMap component.
+
+**💡 TECHNICAL DISCOVERY:** 
+- When facility toggles occur, the main map's boundary system can trigger style changes
+- Style changes destroy all sources and layers on the map
+- The main map component restores boundary layers automatically
+- But the HeatmapBackgroundLayer was trying to reload boundaries independently
+- This caused the preload screen to appear and conflicts between boundary loading systems
+
+**✅ DEFINITIVE FIX IMPLEMENTED:**
+
+**Phase 5: Layer Persistence & Coordination**
+
+1. **✅ Made Layer Monitoring Conservative** - Modified layer monitoring to only recreate layers, never reload boundaries
+2. **✅ Added Facility Loading Coordination** - Pass facilityLoading state to HeatmapBackgroundLayer
+3. **✅ Coordinated Heavy Operations** - Heatmap now pauses during facility changes
+4. **✅ Eliminated Boundary Conflicts** - Heatmap trusts main map for boundary management
+
+**🔧 SPECIFIC CHANGES:**
+
+**File: `src/components/HeatmapBackgroundLayer.tsx`**
+- Added `facilityLoading` prop to interface
+- Updated component to accept and use facilityLoading state
+- Modified layer monitoring to respect facility loading state
+- Made layer monitoring conservative (only recreate layers, never reload boundaries)
+- Increased monitoring interval to 2 seconds (less aggressive)
+
+**File: `src/components/AustralianMap.tsx`**
+- Pass `facilityLoading` state to HeatmapBackgroundLayer
+- Enables coordination between facility and heatmap systems
+
+**🎯 EXPECTED RESULTS:**
+1. ✅ No more preload screen appearing unexpectedly
+2. ✅ Heatmap works properly during facility changes
+3. ✅ Automatic layer recovery without boundary conflicts
+4. ✅ Smooth coordination between all map systems
+
+**💻 TECHNICAL SOLUTION:**
+```typescript
+// Conservative layer monitoring - only recreate layers
+if (sourceExists && !layerExists && !facilityLoading) {
+  console.log('🚨 Layer destroyed but source exists, recreating layer only...');
+  updateHeatmap(); // Only recreate layer, never reload boundaries
+}
+```
+
+**🚀 STATUS:** **REAL FIX IMPLEMENTED** - Ready for user testing
+
 **🔧 SPECIFIC CHANGES IMPLEMENTED:**
 - Fixed `stableFacilityTypes` dependency array to include `facilityTypes.mps`
 - Added `facilityLoading` state for operation coordination

@@ -14,6 +14,7 @@ interface HeatmapBackgroundLayerProps {
   sa2HeatmapVisible?: boolean;
   dataReady?: boolean;
   mapLoaded?: boolean;
+  facilityLoading?: boolean;
   className?: string;
   onMinMaxCalculated?: (minValue: number | undefined, maxValue: number | undefined) => void;
 }
@@ -24,6 +25,7 @@ export default function HeatmapBackgroundLayer({
   sa2HeatmapVisible = true,
   dataReady = false,
   mapLoaded = false,
+  facilityLoading = false,
   onMinMaxCalculated
 }: HeatmapBackgroundLayerProps) {
   const [boundaryLoaded, setBoundaryLoaded] = useState(false);
@@ -182,11 +184,13 @@ export default function HeatmapBackgroundLayer({
     });
 
     // ENHANCED READINESS CHECK: Map + boundaries + data must all be ready
-    if (!map || !mapLoaded || !boundaryLoaded) {
-      console.log('❌ HeatmapBackgroundLayer: Map not ready or boundaries not loaded:', {
+    // Also avoid conflicts during facility loading
+    if (!map || !mapLoaded || !boundaryLoaded || facilityLoading) {
+      console.log('❌ HeatmapBackgroundLayer: Map not ready, boundaries not loaded, or facility loading:', {
         mapExists: !!map,
         mapLoaded,
-        boundaryLoaded
+        boundaryLoaded,
+        facilityLoading
       });
       return;
     }
@@ -305,36 +309,34 @@ export default function HeatmapBackgroundLayer({
     }
   }, [map, mapLoaded, dataReady, boundaryLoaded, onMinMaxCalculated]);
 
-  // ✅ REAL FIX: Monitor for layer destruction and auto-recreate
+  // ✅ CONSERVATIVE FIX: Only recreate layer, never reload boundaries
   useEffect(() => {
-    if (!map || !mapLoaded || !boundaryLoaded) return;
+    if (!map || !mapLoaded || !boundaryLoaded || !dataReady || facilityLoading) return;
     
     const heatmapLayerId = 'sa2-heatmap-background';
     const sa2SourceId = 'sa2-heatmap-source';
     
     // Set up interval to check if our layer still exists
     const layerMonitor = setInterval(() => {
-      // Check if our source and layer still exist
-      const sourceExists = !!map.getSource(sa2SourceId);
-      const layerExists = !!map.getLayer(heatmapLayerId);
-      
-      // If we had data and visibility, but layer is missing, recreate it
+      // Only check if we should have a visible heatmap and facilities aren't changing
       if (sa2HeatmapVisibleRef.current && sa2HeatmapDataRef.current && 
-          Object.keys(sa2HeatmapDataRef.current).length > 0) {
+          Object.keys(sa2HeatmapDataRef.current).length > 0 && !facilityLoading) {
         
-        if (!sourceExists) {
-          console.log('🚨 HeatmapBackgroundLayer: Heatmap source destroyed, reloading boundaries...');
-          setBoundaryLoaded(false);
-          loadSA2Boundaries();
-        } else if (!layerExists && dataReady) {
-          console.log('🚨 HeatmapBackgroundLayer: Heatmap layer destroyed, recreating...');
+        // Check if our source and layer still exist
+        const sourceExists = !!map.getSource(sa2SourceId);
+        const layerExists = !!map.getLayer(heatmapLayerId);
+        
+        // CONSERVATIVE: Only recreate layer if source exists but layer is missing
+        // Never trigger boundary reload - trust the main map to handle that
+        if (sourceExists && !layerExists) {
+          console.log('🚨 HeatmapBackgroundLayer: Layer destroyed but source exists, recreating layer only...');
           updateHeatmap();
         }
       }
-    }, 1000); // Check every second
+    }, 2000); // Check every 2 seconds (less aggressive)
     
     return () => clearInterval(layerMonitor);
-  }, [map, mapLoaded, boundaryLoaded, dataReady, loadSA2Boundaries, updateHeatmap]);
+  }, [map, mapLoaded, boundaryLoaded, dataReady, facilityLoading, updateHeatmap]);
 
   // Update heatmap when data or visibility changes
   useEffect(() => {

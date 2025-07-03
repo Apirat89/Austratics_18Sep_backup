@@ -2142,6 +2142,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         sa2HeatmapVisible={heatmapVisible}
         dataReady={heatmapDataReady}
         mapLoaded={isLoaded}
+        facilityLoading={facilityLoading}
         onMinMaxCalculated={onHeatmapMinMaxCalculated}
       />
 
