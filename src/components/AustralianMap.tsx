@@ -8,7 +8,7 @@ import '@maptiler/sdk/dist/maptiler-sdk.css';
 import { saveSearchToSavedSearches, isSearchSaved, type LocationData } from '../lib/savedSearches';
 
 // Add imports for heatmap functionality  
-import HeatmapBackgroundLayer from './HeatmapBackgroundLayer';
+import LayerManager from './LayerManager';
 import HeatmapDataService, { SA2HeatmapData, RankedSA2Data } from './HeatmapDataService';
 import { globalLoadingCoordinator } from './MapLoadingCoordinator';
 
@@ -291,7 +291,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   const facilityRetryCountRef = useRef<number>(0);
   
   // ✅ PHASE 7: Add style change notification for heatmap
-  const [styleChangeNotification, setStyleChangeNotification] = useState(0);
+  // Style change notification system removed - LayerManager handles this directly
 
   // Handle heatmap data processing with coordination
   const handleHeatmapDataProcessed = useCallback((data: SA2HeatmapData | null, selectedOption: string) => {
@@ -1862,8 +1862,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                 handleBoundaryLayer(currentGeoLayer);
               }
               
-              // ✅ PHASE 7: Notify heatmap about style change
-              setStyleChangeNotification(prev => prev + 1);
+              // LayerManager handles style change notification automatically
               
               // Re-add facility markers if they existed
               if (currentMarkers.length > 0) {
@@ -1915,8 +1914,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                 handleBoundaryLayer(currentGeoLayer);
               }
               
-              // ✅ PHASE 7: Notify heatmap about style change
-              setStyleChangeNotification(prev => prev + 1);
+              // LayerManager handles style change notification automatically
               
               // Re-add facility markers if they existed
               if (currentMarkers.length > 0) {
@@ -2149,17 +2147,18 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         </div>
       )}
 
-      {/* Heatmap Background Layer - Restored with style change awareness */}
-      <HeatmapBackgroundLayer
-        map={map.current}
-        sa2HeatmapData={heatmapData}
-        sa2HeatmapVisible={heatmapVisible}
-        dataReady={heatmapDataReady}
-        mapLoaded={isLoaded}
-        facilityLoading={facilityLoading}
-        styleChangeNotification={styleChangeNotification}
-        onMinMaxCalculated={onHeatmapMinMaxCalculated}
-      />
+      {/* Centralized Layer Manager - Handles all layers with unified lifecycle */}
+      {map.current && (
+        <LayerManager
+          map={map.current}
+          sa2HeatmapData={heatmapData}
+          sa2HeatmapVisible={heatmapVisible}
+          heatmapDataReady={heatmapDataReady}
+          mapLoaded={isLoaded}
+          facilityLoading={facilityLoading}
+          onHeatmapMinMaxCalculated={onHeatmapMinMaxCalculated}
+        />
+      )}
 
       {/* Heatmap Data Service */}
       <HeatmapDataService

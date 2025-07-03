@@ -198,6 +198,400 @@ This targeted approach leverages the existing 4-phase vulnerability analysis whi
 3. **✅ Phase 3: Stability Enhancements** - Added debouncing and error recovery with retry logic
 4. **✅ Phase 4: Performance Monitoring** - Prepared foundation for future SA2 data sharing optimization
 
+## 🔍 **DETAILED FACILITY CHANGE FLOW ANALYSIS**
+
+**USER REQUEST:** Understand what happens when there is a facility change and provide detailed summary + code snippets + key points for consultation.
+
+### 📋 **COMPLETE FACILITY CHANGE SEQUENCE**
+
+#### **1. 🖱️ USER INTERACTION TRIGGER**
+```typescript
+// Location: src/components/MapSettings.tsx lines 161-183
+<div className="space-y-1">
+  {Object.entries(facilityTypes).map(([type, enabled]) => {
+    const FacilityIcon = facilityTypeIcons[type as keyof typeof facilityTypeIcons];
+    return (
+      <button
+        key={type}
+        onClick={() => onToggleFacilityType(type as keyof FacilityTypes)}
+        className={`w-full flex items-center gap-3 p-2 rounded-lg transition-colors ${
+          enabled ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+        }`}
+      >
+        <FacilityIcon className={`h-4 w-4 ${facilityTypeColors[type as keyof typeof facilityTypeColors]}`} />
+        <span className="text-sm font-medium">{facilityTypeLabels[type as keyof typeof facilityTypeLabels]}</span>
+      </button>
+    );
+  })}
+</div>
+```
+
+**🔑 KEY POINT:** User clicks facility toggle → `onToggleFacilityType` callback triggered → State flows to AustralianMap component
+
+#### **2. 🔄 STATE FLOW TO MAIN MAP COMPONENT**
+```typescript
+// AustralianMap receives facilityTypes prop and processes changes
+const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
+  className = "",
+  facilityTypes,  // ← State flows here from parent
+  selectedGeoLayer,
+  selectedMapStyle,
+  // ... other props
+}, ref) => {
+```
+
+#### **3. 🧮 FACILITY STATE STABILIZATION**
+```typescript
+// Location: src/components/AustralianMap.tsx lines 316-323
+// ✅ CRITICAL FIX: Ensure ALL facility types are in dependency array
+const stableFacilityTypes = useMemo(() => facilityTypes, [
+  facilityTypes.residential,
+  facilityTypes.mps,        // ✅ FIXED: Was missing, causing state desync
+  facilityTypes.home,
+  facilityTypes.retirement
+]);
+
+// ✅ PHASE 3: Add debouncing for rapid facility changes (300ms delay)
+const debouncedFacilityTypes = useDebounce(stableFacilityTypes, 300);
+```
+
+**🔑 KEY POINT:** State is stabilized and debounced to prevent rapid fire updates that could overwhelm the system
+
+#### **4. 🏥 FACILITY LOADING EFFECT TRIGGER**
+```typescript
+// Location: src/components/AustralianMap.tsx lines 1148-1215
+// ✅ PHASE 2: Effect to handle facility type changes with heatmap coordination
+useEffect(() => {
+  if (!map.current || !isLoaded || facilityLoading) return;
+  
+  // CRITICAL: Coordinate with heatmap operations - avoid interference
+  if (heatmapDataReady && !heatmapVisible) {
+    console.log('⏸️ AustralianMap: Facility update paused - heatmap transitioning');
+    return;
+  }
+  
+  const updateFacilities = async () => {
+    console.log('🏥 AustralianMap: Starting coordinated facility update');
+    setFacilityLoading(true);
+    
+    try {
+      // Clear existing markers
+      clearAllMarkers();
+      
+      // Add healthcare facilities if any are enabled
+      if (Object.values(debouncedFacilityTypes).some(Boolean)) {
+        await addHealthcareFacilities(debouncedFacilityTypes);
+        console.log('✅ AustralianMap: Facility update completed successfully');
+        
+        // ✅ PHASE 3: Reset error state on success
+        setFacilityError(null);
+        facilityRetryCountRef.current = 0;
+      } else {
+        console.log('✅ AustralianMap: All facilities cleared');
+      }
+    } catch (error) {
+      console.error('❌ AustralianMap: Error during facility update:', error);
+      
+      // ✅ PHASE 3: Implement retry logic for facility failures
+      facilityRetryCountRef.current++;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown facility error';
+      setFacilityError(`Facility loading failed (attempt ${facilityRetryCountRef.current}): ${errorMessage}`);
+      
+      // Auto-retry up to 3 times with exponential backoff
+      if (facilityRetryCountRef.current < 3) {
+        const retryDelay = Math.pow(2, facilityRetryCountRef.current) * 1000; // 2s, 4s, 8s
+        console.log(`⏰ AustralianMap: Retrying facility load in ${retryDelay}ms (attempt ${facilityRetryCountRef.current + 1}/3)`);
+        
+        setTimeout(() => {
+          console.log('🔄 AustralianMap: Retrying facility update after error');
+          updateFacilities();
+        }, retryDelay);
+      } else {
+        console.error('💥 AustralianMap: Max facility retry attempts reached. Manual intervention required.');
+      }
+    } finally {
+      setFacilityLoading(false);
+    }
+  };
+  
+  updateFacilities();
+}, [isLoaded, debouncedFacilityTypes, clearAllMarkers, addHealthcareFacilities, facilityLoading, heatmapDataReady, heatmapVisible]);
+```
+
+**🔑 KEY POINTS:**
+- **Coordination Check**: Waits for heatmap to finish transitions before proceeding
+- **Error Recovery**: Implements exponential backoff retry (3 attempts: 2s, 4s, 8s delays)
+- **Resource Management**: Sets loading flags to prevent concurrent operations
+
+#### **5. 🏗️ FACILITY LOADING PROCESS**
+```typescript
+// Location: src/components/AustralianMap.tsx lines 485-1146
+const addHealthcareFacilities = useCallback(async (types: FacilityTypes) => {
+  if (!map.current) return;
+
+  try {
+    console.log('🏥 Loading hybrid facility data...');
+    
+    // Import and use the hybrid facility service
+    const { hybridFacilityService } = await import('../lib/HybridFacilityService');
+    const enhancedFacilities = await hybridFacilityService.loadAllFacilities();
+    
+    console.log('🏥 Enhanced facility data loaded:', { 
+      totalFacilities: enhancedFacilities.length
+    });
+    
+    // Process each enabled facility type
+    Object.entries(types).forEach(([type, enabled]) => {
+      if (!enabled) return;
+
+      const typeKey = type as keyof typeof careTypeMapping;
+      
+      // Filter facilities based on facility type
+      const filteredFacilities = enhancedFacilities.filter((facility) => {
+        return facility.facilityType === typeKey;
+      });
+
+      // Add markers for filtered facilities
+      filteredFacilities.forEach((facility, index: number) => {
+        // ... marker creation and popup setup code
+        
+        // Create and add marker
+        const marker = new maptilersdk.Marker({ 
+          element: markerElement,
+          anchor: 'center'
+        })
+        .setLngLat([lng, lat])
+        .setPopup(popup)
+        .addTo(map.current!);
+
+        markersRef.current.push(marker);
+      });
+    });
+
+  } catch (error) {
+    console.error('❌ Error loading healthcare facilities:', error);
+  }
+}, []);
+```
+
+**🔑 KEY POINTS:**
+- **Heavy Operation**: Loads entire facility dataset (can be 10MB+)
+- **Marker Creation**: Creates individual DOM elements for each facility
+- **Memory Impact**: Stores all markers in markersRef for cleanup
+
+#### **6. 🎨 POTENTIAL STYLE CHANGE TRIGGER**
+```typescript
+// Location: src/components/AustralianMap.tsx lines 1833-1967
+// NON-DESTRUCTIVE style change handler using cached styles
+useEffect(() => {
+  if (!map.current || !isLoaded) return;
+  
+  // Block style changes during boundary loading
+  if (boundaryLoadingRef.current) {
+    console.log('🚫 Style change blocked - boundary loading in progress');
+    return;
+  }
+  
+  // Always store current state before any style change
+  const currentGeoLayer = selectedGeoLayerRef.current;
+  const hadBoundaryLayer = currentGeoLayer && map.current.getSource(`${currentGeoLayer}-source`);
+  const currentMarkers = [...markersRef.current];
+  
+  // Use cached style if available
+  const cachedStyle = styleCache.current[selectedMapStyle];
+  
+  if (cachedStyle) {
+    console.log('🎨 Using CACHED style for instant change:', selectedMapStyle);
+    
+    try {
+      // Use cached style for instant change (still destroys layers!)
+      map.current.setStyle(cachedStyle);
+      console.log('✅ Cached style applied - now restoring layers...');
+      
+      // Even cached styles destroy layers, so we need to restore them
+      const handleCachedStyleLoad = () => {
+        setTimeout(() => {
+          try {
+            // Re-add boundary layers if they existed
+            if (hadBoundaryLayer) {
+              console.log('🔄 Restoring boundary layer after cached style:', currentGeoLayer);
+              handleBoundaryLayer(currentGeoLayer);
+            }
+            
+            // ✅ PHASE 7: Notify heatmap about style change
+            setStyleChangeNotification(prev => prev + 1);
+            
+            // Re-add facility markers if they existed
+            if (currentMarkers.length > 0) {
+              console.log('🔄 Restoring facility markers after cached style');
+              addHealthcareFacilities(stableFacilityTypes);
+            }
+            
+          } catch (error) {
+            console.error('❌ Error restoring layers after cached style:', error);
+          }
+        }, 100); // Shorter delay for cached styles
+      };
+      
+      map.current.once('styledata', handleCachedStyleLoad);
+      
+    } catch (error) {
+      console.error('❌ Error applying cached style, falling back to standard method:', error);
+    }
+  } else {
+    // Standard style change process with layer restoration
+    // ... similar restoration logic
+  }
+}, [selectedMapStyle, isLoaded, handleBoundaryLayer, addHealthcareFacilities, stableFacilityTypes]);
+```
+
+**🔑 KEY POINTS:**
+- **Layer Destruction**: Any style change destroys ALL map layers including heatmap
+- **Restoration Process**: Style effect restores boundary layers and facility markers
+- **Notification System**: Increments `styleChangeNotification` to alert heatmap
+
+#### **7. 🌡️ HEATMAP NOTIFICATION RESPONSE**
+```typescript
+// Location: src/components/HeatmapBackgroundLayer.tsx lines 383-391
+// ✅ PHASE 7: Listen for style change notifications and recreate layer
+useEffect(() => {
+  if (styleChangeNotification > 0) {
+    console.log('🎨 HeatmapBackgroundLayer: Style change detected, recreating layer...');
+    // Small delay to ensure style change is complete
+    setTimeout(() => {
+      updateHeatmap();
+    }, 300);
+  }
+}, [styleChangeNotification, updateHeatmap]);
+```
+
+**🔑 KEY POINTS:**
+- **Reactive Response**: Heatmap component listens for style change notifications
+- **Delayed Recreation**: 300ms delay ensures style change is fully complete
+- **Layer Rebuilding**: Calls updateHeatmap() to recreate the heatmap layer
+
+#### **8. 🚨 DISCOVERED ISSUES WITH CURRENT IMPLEMENTATION**
+
+Based on the analysis, here are the key issues:
+
+**🔴 ISSUE 1: Notification Timing Problem**
+```typescript
+// The notification is sent immediately after style change
+setStyleChangeNotification(prev => prev + 1);
+
+// But heatmap may not be ready to receive it yet
+// If boundaries are still loading, heatmap recreation fails
+```
+
+**🔴 ISSUE 2: Layer Monitoring Conflicts**
+```typescript
+// Location: src/components/HeatmapBackgroundLayer.tsx lines 346-365
+// Layer monitor checks every 2 seconds but might be too aggressive
+const layerMonitor = setInterval(() => {
+  if (sa2HeatmapVisibleRef.current && sa2HeatmapDataRef.current && 
+      Object.keys(sa2HeatmapDataRef.current).length > 0 && !facilityLoading) {
+    
+    const sourceExists = !!map.getSource(sa2SourceId);
+    const layerExists = !!map.getLayer(heatmapLayerId);
+    
+    if (sourceExists && !layerExists) {
+      console.log('🚨 Layer destroyed but source exists, recreating...');
+      updateHeatmap();
+    }
+  }
+}, 2000);
+```
+
+**🔴 ISSUE 3: Coordination Gap**
+```typescript
+// Facility loading respects heatmap state:
+if (heatmapDataReady && !heatmapVisible) {
+  console.log('⏸️ Facility update paused - heatmap transitioning');
+  return;
+}
+
+// But heatmap doesn't fully respect facility loading state
+// facilityLoading check exists but coordination is incomplete
+```
+
+### 🎯 **IDENTIFIED ROOT CAUSES**
+
+1. **Notification Timing**: Style change notifications are sent before all systems are ready
+2. **Layer Recreation Race**: Heatmap tries to recreate layers while boundaries are still loading
+3. **Incomplete Coordination**: Facility and heatmap coordination is partial, not comprehensive
+
+### 💡 **RECOMMENDED SOLUTION APPROACH**
+
+**Option A: Enhanced Notification System**
+- Add readiness checks before sending notifications
+- Implement acknowledgment system between systems
+- Queue notifications until all systems are ready
+
+**Option B: Centralized Layer Management**
+- Move heatmap management to main map component
+- Eliminate separate layer monitoring
+- Use single source of truth for layer state
+
+**Option C: Conservative Monitoring**
+- Reduce monitoring frequency
+- Add more comprehensive readiness checks
+- Implement smarter recreation logic
+
+### 🔧 **NEXT STEPS FOR INVESTIGATION**
+
+1. **Test Current Implementation**: Verify if the conservative approach (Phase 7) resolves the issue
+2. **Monitor Logs**: Check browser console for specific failure patterns
+3. **Measure Timing**: Determine exact timing of notifications vs. readiness
+4. **Evaluate Options**: Choose between enhanced notification vs. centralized management
+
+**This analysis provides the detailed facility change flow and identifies the specific disconnection points where the heatmap system fails to properly coordinate with facility changes.**
+
+## 🎯 **EXECUTOR MODE: IMPLEMENTING PATH A - FULL CENTRALIZATION**
+
+**USER DECISION:** Proceed with Path A (LayerManager approach) for complete architectural fix
+
+### **✅ IMPLEMENTATION PLAN**
+
+**Phase 1: Foundation Utilities** 
+- ✅ Create mapBusy semaphore utility
+- ✅ Create waitForStyleAndIdle helper
+
+**Phase 2: LayerManager Component**
+- ✅ Build centralized LayerManager component
+- ✅ Integrate heatmap management 
+- ✅ Integrate facility coordination
+
+**Phase 3: Integration & Cleanup**
+- ✅ Mount LayerManager in AustralianMap
+- ✅ Remove HeatmapBackgroundLayer.tsx
+- ✅ Remove styleChangeNotification system
+- ✅ Clean up polling loops (automatic via LayerManager)
+
+**Phase 4: Testing & Validation**
+- ⏳ Test facility toggle functionality
+- ⏳ Test style change behavior
+- ⏳ Verify no race conditions remain
+
+### **🚀 EXECUTION STATUS**
+
+**CURRENT TASK:** Testing and validating the centralized LayerManager implementation
+
+**✅ COMPLETED PHASE 1:** Foundation utilities created
+- `src/lib/mapBusy.ts` - Semaphore for coordinating map operations
+- `src/lib/mapboxEvents.ts` - Event-driven utilities for reliable layer operations
+
+**✅ COMPLETED PHASE 2:** LayerManager component created
+- `src/components/LayerManager.tsx` - Centralized layer management with event-driven coordination
+- Handles both SA2 boundaries and heatmap layers in unified lifecycle
+- Uses mapBusy semaphore to prevent race conditions
+- Automatically restores layers after style changes
+
+**✅ COMPLETED PHASE 3:** Integration and cleanup complete
+- Replaced HeatmapBackgroundLayer with LayerManager in AustralianMap
+- Removed styleChangeNotification system (handled automatically by LayerManager)
+- Deleted `src/components/HeatmapBackgroundLayer.tsx` file
+- Cleaned up old polling loops - LayerManager handles this centrally
+
 ### 🚨 **REAL ROOT CAUSE DISCOVERED: Layer Destruction Issue**
 
 **USER FEEDBACK:** After 4-phase implementation, user reported:
