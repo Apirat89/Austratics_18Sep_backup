@@ -15,6 +15,18 @@ import { globalLoadingCoordinator } from './MapLoadingCoordinator';
 // MapTiler API key - you'll need to add this to your environment variables
 const MAPTILER_API_KEY = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || 'YOUR_MAPTILER_API_KEY';
 
+// ✅ PHASE 3: Debounce hook utility for stability
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  
+  return debouncedValue;
+}
+
 interface FacilityTypes {
   residential: boolean;
   mps: boolean;
@@ -270,6 +282,13 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   const [heatmapData, setHeatmapData] = useState<SA2HeatmapData | null>(null);
   const [selectedHeatmapOption, setSelectedHeatmapOption] = useState<string>('');
   const [heatmapDataReady, setHeatmapDataReady] = useState<boolean>(false);
+  
+  // ✅ PHASE 2: Add facility loading coordination state
+  const [facilityLoading, setFacilityLoading] = useState<boolean>(false);
+  
+  // ✅ PHASE 3: Add error recovery monitoring
+  const [facilityError, setFacilityError] = useState<string | null>(null);
+  const facilityRetryCountRef = useRef<number>(0);
 
   // Handle heatmap data processing with coordination
   const handleHeatmapDataProcessed = useCallback((data: SA2HeatmapData | null, selectedOption: string) => {
@@ -296,9 +315,13 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // Stabilize facilityTypes to prevent unnecessary re-renders
   const stableFacilityTypes = useMemo(() => facilityTypes, [
     facilityTypes.residential,
+    facilityTypes.mps,        // ✅ FIXED: Added missing MPS dependency
     facilityTypes.home,
     facilityTypes.retirement
   ]);
+  
+  // ✅ PHASE 3: Add debouncing for rapid facility changes (300ms delay)
+  const debouncedFacilityTypes = useDebounce(stableFacilityTypes, 300);
 
   // Map style mapping
   const getMapStyle = (style: MapStyleType) => {
@@ -461,6 +484,10 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
 
     try {
       console.log('🏥 Loading hybrid facility data...');
+      
+      // ✅ PHASE 4: Performance optimization - future SA2 data sharing
+      // TODO: Implement SA2 data sharing between facility and heatmap systems
+      // This would eliminate the 170MB data duplication (340MB → 170MB)
       
       // Import and use the hybrid facility service
       const { hybridFacilityService } = await import('../lib/HybridFacilityService');
@@ -1115,18 +1142,62 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     }
   }, []);
 
-  // Effect to handle facility type changes
+  // ✅ PHASE 2: Effect to handle facility type changes with heatmap coordination
   useEffect(() => {
-    if (!map.current || !isLoaded) return;
+    if (!map.current || !isLoaded || facilityLoading) return;
     
-    // Clear existing markers
-    clearAllMarkers();
-    
-    // Add healthcare facilities
-    if (Object.values(stableFacilityTypes).some(Boolean)) {
-      addHealthcareFacilities(stableFacilityTypes);
+    // CRITICAL: Coordinate with heatmap operations - avoid interference
+    if (heatmapDataReady && !heatmapVisible) {
+      console.log('⏸️ AustralianMap: Facility update paused - heatmap transitioning');
+      return;
     }
-  }, [isLoaded, stableFacilityTypes, clearAllMarkers, addHealthcareFacilities]);
+    
+    const updateFacilities = async () => {
+      console.log('🏥 AustralianMap: Starting coordinated facility update');
+      setFacilityLoading(true);
+      
+      try {
+        // Clear existing markers
+        clearAllMarkers();
+        
+        // Add healthcare facilities if any are enabled
+        if (Object.values(debouncedFacilityTypes).some(Boolean)) {
+          await addHealthcareFacilities(debouncedFacilityTypes);
+          console.log('✅ AustralianMap: Facility update completed successfully');
+          
+          // ✅ PHASE 3: Reset error state on success
+          setFacilityError(null);
+          facilityRetryCountRef.current = 0;
+        } else {
+          console.log('✅ AustralianMap: All facilities cleared');
+        }
+      } catch (error) {
+        console.error('❌ AustralianMap: Error during facility update:', error);
+        
+        // ✅ PHASE 3: Implement retry logic for facility failures
+        facilityRetryCountRef.current++;
+        const errorMessage = error instanceof Error ? error.message : 'Unknown facility error';
+        setFacilityError(`Facility loading failed (attempt ${facilityRetryCountRef.current}): ${errorMessage}`);
+        
+        // Auto-retry up to 3 times with exponential backoff
+        if (facilityRetryCountRef.current < 3) {
+          const retryDelay = Math.pow(2, facilityRetryCountRef.current) * 1000; // 2s, 4s, 8s
+          console.log(`⏰ AustralianMap: Retrying facility load in ${retryDelay}ms (attempt ${facilityRetryCountRef.current + 1}/3)`);
+          
+          setTimeout(() => {
+            console.log('🔄 AustralianMap: Retrying facility update after error');
+            updateFacilities();
+          }, retryDelay);
+        } else {
+          console.error('💥 AustralianMap: Max facility retry attempts reached. Manual intervention required.');
+        }
+      } finally {
+        setFacilityLoading(false);
+      }
+    };
+    
+    updateFacilities();
+  }, [isLoaded, debouncedFacilityTypes, clearAllMarkers, addHealthcareFacilities, facilityLoading, heatmapDataReady, heatmapVisible]);
 
   // Helper function to get the right property field for each layer type
   const getPropertyField = (layerType: GeoLayerType): string => {

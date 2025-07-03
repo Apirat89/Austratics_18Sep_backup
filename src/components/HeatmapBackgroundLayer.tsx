@@ -305,6 +305,37 @@ export default function HeatmapBackgroundLayer({
     }
   }, [map, mapLoaded, dataReady, boundaryLoaded, onMinMaxCalculated]);
 
+  // ✅ REAL FIX: Monitor for layer destruction and auto-recreate
+  useEffect(() => {
+    if (!map || !mapLoaded || !boundaryLoaded) return;
+    
+    const heatmapLayerId = 'sa2-heatmap-background';
+    const sa2SourceId = 'sa2-heatmap-source';
+    
+    // Set up interval to check if our layer still exists
+    const layerMonitor = setInterval(() => {
+      // Check if our source and layer still exist
+      const sourceExists = !!map.getSource(sa2SourceId);
+      const layerExists = !!map.getLayer(heatmapLayerId);
+      
+      // If we had data and visibility, but layer is missing, recreate it
+      if (sa2HeatmapVisibleRef.current && sa2HeatmapDataRef.current && 
+          Object.keys(sa2HeatmapDataRef.current).length > 0) {
+        
+        if (!sourceExists) {
+          console.log('🚨 HeatmapBackgroundLayer: Heatmap source destroyed, reloading boundaries...');
+          setBoundaryLoaded(false);
+          loadSA2Boundaries();
+        } else if (!layerExists && dataReady) {
+          console.log('🚨 HeatmapBackgroundLayer: Heatmap layer destroyed, recreating...');
+          updateHeatmap();
+        }
+      }
+    }, 1000); // Check every second
+    
+    return () => clearInterval(layerMonitor);
+  }, [map, mapLoaded, boundaryLoaded, dataReady, loadSA2Boundaries, updateHeatmap]);
+
   // Update heatmap when data or visibility changes
   useEffect(() => {
     updateHeatmap();
