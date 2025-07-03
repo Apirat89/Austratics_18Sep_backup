@@ -1149,11 +1149,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   useEffect(() => {
     if (!map.current || !isLoaded || facilityLoading) return;
     
-    // CRITICAL: Coordinate with heatmap operations - avoid interference
-    if (heatmapDataReady && !heatmapVisible) {
-      console.log('⏸️ AustralianMap: Facility update paused - heatmap transitioning');
-      return;
-    }
+    // Removed problematic coordination that created deadlock
+    // The LayerManager now handles heatmap coordination properly
     
     const updateFacilities = async () => {
       console.log('🏥 AustralianMap: Starting coordinated facility update');
