@@ -693,6 +693,71 @@ useEffect(() => {
 
 **Expected Result**: When `facilityLoading` changes from `true` to `false`, the heatmap useEffect will re-run and call `ensureHeatmapLayer()` to restore the heatmap layer.
 
+### **✅ CONSULTANT FIX DEPLOYED:**
+
+**Commit**: `8ff14b1` - "fix: Add facilityLoading dependency to LayerManager heatmap effect"
+**Branch**: `development` 
+**Status**: 🚀 **READY FOR USER TESTING**
+
+### **🧪 TESTING INSTRUCTIONS:**
+
+1. **Load Page**: Verify heatmap loads on initial page load ✅ (was working)
+2. **Toggle Facilities**: Go to map settings, uncheck/check aged care facilities  
+3. **Verify Heatmap**: Heatmap should remain functional throughout facility changes ✅ (this fix)
+
+**Technical Expectation**: 
+- When facilities change, `facilityLoading` goes `true` → `false`
+- This change now triggers heatmap restoration via dependency array
+- No more missing/broken heatmap after facility operations
+
+### **🚨 REGRESSION DISCOVERED:**
+
+**Problem**: Heatmap no longer works on initial load after adding `facilityLoading` dependency
+**Likely Cause**: `facilityLoading` might be `true` initially, blocking heatmap creation
+
+### **🔍 INVESTIGATION NEEDED:**
+
+1. **Initial State**: What is the initial value of `facilityLoading`?
+2. **Timing**: When does `facilityLoading` get set during component lifecycle?
+3. **Guard Logic**: Is `ensureHeatmapLayer` being blocked by `facilityLoading` check?
+
+### **🧪 HYPOTHESIS:**
+
+The `ensureHeatmapLayer` function has this guard:
+```typescript
+if (!map || !boundaryLoaded || mapBusy.isBusy || facilityLoading) {
+  return; // BLOCKS execution if facilityLoading is true
+}
+```
+
+If `facilityLoading` is initially `true` or becomes `true` early, the heatmap never gets created.
+
+### **🔧 REGRESSION FIX IMPLEMENTED:**
+
+**Root Cause**: The `facilityLoading` check in `ensureHeatmapLayer` guard clause was blocking heatmap creation during initial load when facilities start loading.
+
+**Solution Applied**:
+1. **Removed `facilityLoading` from guard clause** - No longer blocks heatmap execution
+2. **Kept `facilityLoading` in dependency array** - Still triggers re-execution when facility loading completes
+3. **Updated logging** - Shows facilityLoading status for debugging without blocking
+
+**Technical Fix**:
+```typescript
+// OLD (blocking):
+if (!map || !boundaryLoaded || mapBusy.isBusy || facilityLoading) {
+  return; // ❌ Blocked heatmap when facilityLoading was true
+}
+
+// NEW (non-blocking):
+if (!map || !boundaryLoaded || mapBusy.isBusy) {
+  return; // ✅ Only blocks on actual technical constraints
+}
+```
+
+**Expected Result**: 
+- ✅ Heatmap loads on initial page load (regression fixed)
+- ✅ Heatmap restores after facility changes (original fix preserved)
+
 **✅ COMPLETED PHASE 1:** Foundation utilities created
 - `src/lib/mapBusy.ts` - Semaphore for coordinating map operations
 - `src/lib/mapboxEvents.ts` - Event-driven utilities for reliable layer operations

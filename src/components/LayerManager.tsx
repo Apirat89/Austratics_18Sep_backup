@@ -113,12 +113,12 @@ export default function LayerManager({
 
   // Create or update heatmap layer
   const ensureHeatmapLayer = useCallback(async () => {
-    if (!map || !boundaryLoaded || mapBusy.isBusy || facilityLoading) {
+    if (!map || !boundaryLoaded || mapBusy.isBusy) {
       console.log('⏸️ LayerManager: Heatmap paused - not ready or busy', {
         mapExists: !!map,
         boundaryLoaded,
         mapBusy: mapBusy.isBusy,
-        facilityLoading
+        facilityLoading: facilityLoading ? 'true (coordination only)' : 'false'
       });
       return;
     }
@@ -205,7 +205,7 @@ export default function LayerManager({
         onHeatmapMinMaxCalculated?.(undefined, undefined);
       }
     }, 'heatmap layer creation');
-  }, [map, boundaryLoaded, heatmapDataReady, facilityLoading, onHeatmapMinMaxCalculated]);
+  }, [map, boundaryLoaded, heatmapDataReady, onHeatmapMinMaxCalculated]);
 
   // Restore all layers after style changes (centralized restoration)
   const restoreAllLayers = useCallback(async () => {
