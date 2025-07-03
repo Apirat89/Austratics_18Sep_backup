@@ -12,15 +12,6 @@ import HeatmapBackgroundLayer from './HeatmapBackgroundLayer';
 import HeatmapDataService, { SA2HeatmapData, RankedSA2Data } from './HeatmapDataService';
 import { globalLoadingCoordinator } from './MapLoadingCoordinator';
 
-// Add import for race condition fix
-import { LayerRequestQueue } from '../lib/LayerRequestQueue';
-
-// Add import for layer cleanup fix
-import { LayerCleanupManager } from '../lib/LayerCleanupManager';
-
-// Add import for smart cache management fix
-import { LRUCache } from '../lib/LRUCache';
-
 // MapTiler API key - you'll need to add this to your environment variables
 const MAPTILER_API_KEY = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || 'YOUR_MAPTILER_API_KEY';
 
@@ -260,19 +251,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   const boundaryLoadingRef = useRef<boolean>(false);
   const currentBoundaryLoadRef = useRef<AbortController | null>(null);
   
-  // Race condition fix: Layer request queue
-  const layerRequestQueue = useRef<LayerRequestQueue>(new LayerRequestQueue());
-  
-  // Layer cleanup fix: Event-driven cleanup manager
-  const layerCleanupManager = useRef<LayerCleanupManager>(new LayerCleanupManager());
-  
-  // Smart cache management fix: LRU cache with memory monitoring
-  const boundaryDataCache = useRef<LRUCache>(new LRUCache({
-    maxItems: 8, // Support all 8 boundary layer types
-    maxMemoryMB: 400, // 400MB limit to prevent SA2 data duplication issue
-    ttlMs: 45 * 60 * 1000, // 45 minutes TTL for geographic data
-    cleanupIntervalMs: 10 * 60 * 1000 // 10 minutes cleanup interval
-  }));
+  // Cache for boundary data to avoid re-downloading
+  const boundaryDataCache = useRef<Map<GeoLayerType, any>>(new Map());
   const [preloadingData, setPreloadingData] = useState(false);
   const [preloadProgress, setPreloadProgress] = useState({ current: 0, total: 0 });
   const preloadCompleteRef = useRef<boolean>(false);
@@ -359,12 +339,6 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     map.current.on('load', () => {
       setIsLoaded(true);
       
-      // Initialize cleanup manager with map reference
-      if (map.current) {
-        layerCleanupManager.current.setMap(map.current);
-        console.log('🧹 LayerCleanupManager initialized with map reference');
-      }
-      
       // Add click handler
       if (map.current) {
         map.current.on('click', handleMapClick);
@@ -384,16 +358,6 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       if (currentBoundaryLoadRef.current) {
         currentBoundaryLoadRef.current.abort();
       }
-      
-      // Cancel all pending queue requests
-      layerRequestQueue.current.cancelAllRequests();
-      
-      // Destroy cleanup manager
-      layerCleanupManager.current.destroy();
-      
-      // Destroy LRU cache
-      boundaryDataCache.current.destroy();
-      
       isChangingStyleRef.current = false;
       boundaryLoadingRef.current = false;
       
@@ -1420,173 +1384,205 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     return null; // No zoom change needed
   };
 
-  // RACE CONDITION FIX: Queue-based boundary layer handler
+  // Simple boundary layer handler - shows only outlines by default
   const handleBoundaryLayer = useCallback(async (layerType: GeoLayerType) => {
     if (!map.current) return;
     
-    console.log(`🔄 Queue-based boundary layer loading requested: ${layerType}`);
-    
-    try {
-      await layerRequestQueue.current.execute(layerType, async () => {
-        console.log(`🚀 Executing layer load operation for: ${layerType}`);
-        
-        setBoundaryLoading(true);
-        setBoundaryError(null);
+    // Prevent overlapping boundary loads
+    if (boundaryLoadingRef.current) {
+      console.log(`⚠️ Boundary loading already in progress, skipping: ${layerType}`);
+      return;
+    }
 
-        // EVENT-DRIVEN CLEANUP: Use LayerCleanupManager instead of manual cleanup
-        const boundaryTypes: GeoLayerType[] = ['sa2', 'sa3', 'sa4', 'lga', 'postcode', 'locality', 'acpr', 'mmm'];
+    // Cancel any existing boundary load
+    if (currentBoundaryLoadRef.current) {
+      currentBoundaryLoadRef.current.abort();
+    }
+
+    // Create new abort controller for this load
+    const abortController = new AbortController();
+    currentBoundaryLoadRef.current = abortController;
+
+    console.log(`Loading boundary layer: ${layerType}`);
+    boundaryLoadingRef.current = true;
+    setBoundaryLoading(true);
+    setBoundaryError(null);
+
+    try {
+      // Remove all existing boundary layers first
+      const boundaryTypes: GeoLayerType[] = ['sa2', 'sa3', 'sa4', 'lga', 'postcode', 'locality', 'acpr', 'mmm'];
+      
+      boundaryTypes.forEach(type => {
+        const sourceId = `${type}-source`;
+        const layerId = `${type}-layer`;
+        const fillLayerId = `${type}-fill`;
+        const highlightLayerId = `${type}-highlight`;
+        
+        // Remove layers in reverse order of creation
+        [highlightLayerId, fillLayerId, layerId].forEach(id => {
+          try {
+            if (map.current!.getLayer(id)) {
+              console.log(`Removing layer: ${id}`);
+              map.current!.removeLayer(id);
+            }
+          } catch (error) {
+            console.warn(`Error removing layer ${id}:`, error);
+          }
+        });
         
         try {
-          const cleanupOperationId = await layerCleanupManager.current.performLayerCleanup(layerType, boundaryTypes);
-          console.log(`🧹 Layer cleanup completed with operation ID: ${cleanupOperationId}`);
-        } catch (cleanupError) {
-          console.error(`❌ Layer cleanup failed, proceeding with caution:`, cleanupError);
-          // Continue with layer loading even if cleanup had issues
-          // The cleanup manager provides better error resilience than the old manual approach
+          if (map.current!.getSource(sourceId)) {
+            console.log(`Removing source: ${sourceId}`);
+            map.current!.removeSource(sourceId);
+          }
+        } catch (error) {
+          console.warn(`Error removing source ${sourceId}:`, error);
         }
-
-        // Check LRU cache first
-        let geojsonData = boundaryDataCache.current.get(layerType);
-        
-        if (geojsonData) {
-          console.log(`📦 Using cached boundary data for: ${layerType}`);
-        } else {
-          console.log(`📥 Loading boundary data for: ${layerType}`);
-          
-          // Load the new boundary data
-          const fileMap: Record<GeoLayerType, string> = {
-            'postcode': 'POA.geojson',
-            'lga': 'LGA.geojson',
-            'sa2': 'SA2.geojson',
-            'sa3': 'SA3.geojson',
-            'sa4': 'SA4.geojson',
-            'locality': 'SAL.geojson',
-            'acpr': 'DOH_simplified.geojson',
-            'mmm': 'MMM_simplified.geojson'
-          };
-
-          const fileName = fileMap[layerType];
-          console.log(`Fetching boundary file: /maps/${fileName}`);
-          
-          // Special handling for large files
-          if (layerType === 'sa2') {
-            console.log('⚠️  Loading SA2 boundaries - this is a large file (170MB) and may take time...');
-          }
-          
-          const startTime = Date.now();
-          const response = await fetch(`/maps/${fileName}`);
-          const fetchTime = Date.now() - startTime;
-          
-          console.log(`Fetch completed in ${fetchTime}ms for ${fileName}`);
-          
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-          
-          console.log(`Successfully fetched ${fileName} (${response.headers.get('content-length') ? Math.round(parseInt(response.headers.get('content-length')!) / 1024 / 1024) + 'MB' : 'unknown size'}), parsing JSON...`);
-          const parseStartTime = Date.now();
-          geojsonData = await response.json();
-          
-          const parseTime = Date.now() - parseStartTime;
-          console.log(`Parsed ${fileName} in ${parseTime}ms, features count:`, geojsonData.features?.length || 0);
-          
-          // Cache the data using LRU cache
-          boundaryDataCache.current.set(layerType, geojsonData);
-          console.log(`💾 LRU cached boundary data for: ${layerType}`);
-        }
-        
-        // Additional data quality checks
-        const sampleFeature = geojsonData.features?.[0];
-        if (sampleFeature) {
-          console.log(`📋 Sample ${layerType} feature structure:`, {
-            hasGeometry: !!sampleFeature.geometry,
-            geometryType: sampleFeature.geometry?.type,
-            hasProperties: !!sampleFeature.properties,
-            propertyKeys: Object.keys(sampleFeature.properties || {}),
-            sampleProperties: {
-              [getPropertyField(layerType)]: sampleFeature.properties?.[getPropertyField(layerType)],
-              objectid: sampleFeature.properties?.objectid
-            }
-          });
-        }
-        
-        // Add the new source and layers
-        const sourceId = `${layerType}-source`;
-        
-        // Ensure source doesn't exist before adding
-        if (map.current!.getSource(sourceId)) {
-          map.current!.removeSource(sourceId);
-        }
-        
-        console.log(`Adding source: ${sourceId}`);
-        map.current!.addSource(sourceId, {
-          type: 'geojson',
-          data: geojsonData,
-          generateId: true, // Let MapLibre generate unique IDs to avoid ID conflicts
-          promoteId: getPropertyField(layerType) // Use the boundary property field as feature ID
-        });
-
-        // Add outline layer
-        console.log(`Adding outline layer: ${layerType}-layer`);
-        map.current!.addLayer({
-          id: `${layerType}-layer`,
-          type: 'line',
-          source: sourceId,
-          paint: {
-            'line-color': '#1E3A8A',
-            'line-width': 1.5,
-            'line-opacity': 0.8
-          }
-        });
-
-        // Add invisible fill layer for click detection
-        console.log(`Adding fill layer: ${layerType}-fill`);
-        map.current!.addLayer({
-          id: `${layerType}-fill`,
-          type: 'fill',
-          source: sourceId,
-          paint: {
-            'fill-color': 'rgba(30, 58, 138, 0.0)', // Transparent for clean appearance
-            'fill-opacity': 0.0 // Invisible but still detects clicks
-          }
-        });
-
-        // Add highlight layer (initially hidden) - this should be on top
-        console.log(`Adding highlight layer: ${layerType}-highlight`);
-        map.current!.addLayer({
-          id: `${layerType}-highlight`,
-          type: 'fill',
-          source: sourceId,
-          filter: ['==', ['get', getPropertyField(layerType)], '__HIDDEN__'], // Initially hide all
-          paint: {
-            'fill-color': '#1E3A8A',
-            'fill-opacity': 0.15 // Slightly more visible for highlights
-          }
-        });
-
-        console.log(`✅ Successfully loaded ${layerType} boundary layer via queue`);
-        setBoundaryLoading(false);
-        
-        return geojsonData; // Return data for queue completion
       });
+
+      // Small delay to ensure cleanup is complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Check cache first
+      let geojsonData = boundaryDataCache.current.get(layerType);
+      
+      if (geojsonData) {
+        console.log(`📦 Using cached boundary data for: ${layerType}`);
+      } else {
+        console.log(`📥 Loading boundary data for: ${layerType}`);
+        
+        // Load the new boundary data
+        const fileMap: Record<GeoLayerType, string> = {
+          'postcode': 'POA.geojson',
+          'lga': 'LGA.geojson',
+          'sa2': 'SA2.geojson',
+          'sa3': 'SA3.geojson',
+          'sa4': 'SA4.geojson',
+          'locality': 'SAL.geojson',
+          'acpr': 'DOH_simplified.geojson',
+          'mmm': 'MMM_simplified.geojson'
+        };
+
+        const fileName = fileMap[layerType];
+        console.log(`Fetching boundary file: /maps/${fileName}`);
+        
+        // Special handling for large files
+        if (layerType === 'sa2') {
+          console.log('⚠️  Loading SA2 boundaries - this is a large file (170MB) and may take time...');
+        }
+        
+        const startTime = Date.now();
+        const response = await fetch(`/maps/${fileName}`, {
+          signal: abortController.signal
+        });
+        const fetchTime = Date.now() - startTime;
+        
+        console.log(`Fetch completed in ${fetchTime}ms for ${fileName}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        console.log(`Successfully fetched ${fileName} (${response.headers.get('content-length') ? Math.round(parseInt(response.headers.get('content-length')!) / 1024 / 1024) + 'MB' : 'unknown size'}), parsing JSON...`);
+        const parseStartTime = Date.now();
+        geojsonData = await response.json();
+        
+        const parseTime = Date.now() - parseStartTime;
+        console.log(`Parsed ${fileName} in ${parseTime}ms, features count:`, geojsonData.features?.length || 0);
+        
+        // Cache the data for future use
+        boundaryDataCache.current.set(layerType, geojsonData);
+        console.log(`💾 Cached boundary data for: ${layerType}`);
+      }
+      
+      // Additional data quality checks
+      const sampleFeature = geojsonData.features?.[0];
+      if (sampleFeature) {
+        console.log(`📋 Sample ${layerType} feature structure:`, {
+          hasGeometry: !!sampleFeature.geometry,
+          geometryType: sampleFeature.geometry?.type,
+          hasProperties: !!sampleFeature.properties,
+          propertyKeys: Object.keys(sampleFeature.properties || {}),
+          sampleProperties: {
+            [getPropertyField(layerType)]: sampleFeature.properties?.[getPropertyField(layerType)],
+            objectid: sampleFeature.properties?.objectid
+          }
+        });
+      }
+      
+      // Add the new source and layers
+      const sourceId = `${layerType}-source`;
+      
+      // Ensure source doesn't exist before adding
+      if (map.current!.getSource(sourceId)) {
+        map.current!.removeSource(sourceId);
+      }
+      
+      console.log(`Adding source: ${sourceId}`);
+      map.current!.addSource(sourceId, {
+        type: 'geojson',
+        data: geojsonData,
+        generateId: true, // Let MapLibre generate unique IDs to avoid ID conflicts
+        promoteId: getPropertyField(layerType) // Use the boundary property field as feature ID
+      });
+
+      // Add outline layer
+      console.log(`Adding outline layer: ${layerType}-layer`);
+      map.current!.addLayer({
+        id: `${layerType}-layer`,
+        type: 'line',
+        source: sourceId,
+        paint: {
+          'line-color': '#1E3A8A',
+          'line-width': 1.5,
+          'line-opacity': 0.8
+        }
+      });
+
+      // Add invisible fill layer for click detection
+      console.log(`Adding fill layer: ${layerType}-fill`);
+      map.current!.addLayer({
+        id: `${layerType}-fill`,
+        type: 'fill',
+        source: sourceId,
+        paint: {
+          'fill-color': 'rgba(30, 58, 138, 0.0)', // Transparent for clean appearance
+          'fill-opacity': 0.0 // Invisible but still detects clicks
+        }
+      });
+
+      // Add highlight layer (initially hidden) - this should be on top
+      console.log(`Adding highlight layer: ${layerType}-highlight`);
+      map.current!.addLayer({
+        id: `${layerType}-highlight`,
+        type: 'fill',
+        source: sourceId,
+        filter: ['==', ['get', getPropertyField(layerType)], '__HIDDEN__'], // Initially hide all
+        paint: {
+          'fill-color': '#1E3A8A',
+          'fill-opacity': 0.15 // Slightly more visible for highlights
+        }
+      });
+
+      console.log(`Successfully loaded ${layerType} boundary layer`);
+      boundaryLoadingRef.current = false;
+      setBoundaryLoading(false);
+      currentBoundaryLoadRef.current = null;
       
     } catch (error) {
-      // Handle queue cancellation and other errors
-      if (error instanceof Error && error.message.includes('Superseded')) {
-        console.log(`🔄 Layer load superseded for: ${layerType}`);
+      // Don't show error if it was aborted (user changed style rapidly)
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log(`🔄 Boundary load aborted for: ${layerType}`);
         return;
       }
       
-      if (error instanceof Error && error.message.includes('cancelled')) {
-        console.log(`🔄 Layer load cancelled for: ${layerType}`);
-        return;
-      }
-      
-      console.error(`❌ Queued layer load failed for ${layerType}:`, error);
+      console.error(`Error loading ${layerType} boundary data:`, error);
       setBoundaryError(`Failed to load ${layerType} boundaries: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      boundaryLoadingRef.current = false;
       setBoundaryLoading(false);
+      currentBoundaryLoadRef.current = null;
     }
-  }, [setBoundaryLoading, setBoundaryError, getPropertyField]);
+  }, [setBoundaryLoading, setBoundaryError]);
 
   // Preload all boundary data to prevent loading during style changes
   const preloadAllBoundaryData = useCallback(async () => {
@@ -1638,7 +1634,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           ? `${Math.round(parseInt(response.headers.get('content-length')!) / 1024 / 1024)}MB` 
           : 'unknown size';
         
-        // Cache the data using LRU cache
+        // Cache the data
         boundaryDataCache.current.set(layerType, geojsonData);
         
         console.log(`✅ Preloaded ${layerType} in ${loadTime}ms (${sizeInfo}, ${geojsonData.features?.length || 0} features)`);
@@ -1658,17 +1654,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     setPreloadingData(false);
     setPreloadProgress({ current: orderedTypes.length, total: orderedTypes.length });
     console.log('🎉 ALL boundary data preloaded successfully!');
-    
-    // LRU cache analytics
-    const cacheStats = boundaryDataCache.current.getStats();
-    const debugInfo = boundaryDataCache.current.getDebugInfo();
-    console.log(`📊 LRU Cache contains: ${debugInfo.entries.map((e: any) => e.key).join(', ')}`);
-    console.log(`💾 LRU Cache stats:`, {
-      totalItems: cacheStats.totalEntries,
-      totalMemoryMB: cacheStats.totalMemoryMB.toFixed(2),
-      hitRate: `${cacheStats.hitRate}%`,
-      memoryUtilization: `${cacheStats.memoryUtilization}%`
-    });
+    console.log(`📊 Cache contains: ${Array.from(boundaryDataCache.current.keys()).join(', ')}`);
+    console.log(`💾 Total cache size: ${boundaryDataCache.current.size} files`);
     
   }, []);
 
