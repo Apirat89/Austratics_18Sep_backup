@@ -568,13 +568,130 @@ if (heatmapDataReady && !heatmapVisible) {
 - ✅ Clean up polling loops (automatic via LayerManager)
 
 **Phase 4: Testing & Validation**
-- ⏳ Test facility toggle functionality
-- ⏳ Test style change behavior
-- ⏳ Verify no race conditions remain
+- ✅ Code implementation complete and committed
+- ✅ Pushed to development branch (commit bd1600a)
+- ✅ Ready for user testing
 
 ### **🚀 EXECUTION STATUS**
 
-**CURRENT TASK:** Testing and validating the centralized LayerManager implementation
+**❌ TESTING FAILED:** LayerManager implementation not working - need detailed diagnosis
+
+## 🚨 **DETAILED DIAGNOSIS: LayerManager Implementation Issues**
+
+### **🔍 POTENTIAL ROOT CAUSES:**
+
+#### **1. STATE COORDINATION PROBLEMS**
+- **Issue**: LayerManager may not be receiving proper state updates when facilities change
+- **Symptoms**: Heatmap doesn't update when facility toggles occur
+- **Root Cause**: React state updates may not be propagating correctly to LayerManager
+
+#### **2. MAP REFERENCE TIMING**
+- **Issue**: LayerManager receives map reference but it may not be properly initialized
+- **Symptoms**: LayerManager operations fail silently or with map not ready errors
+- **Root Cause**: Map reference passed before map is fully loaded or style is ready
+
+#### **3. MAPBUSY SEMAPHORE BLOCKING**
+- **Issue**: mapBusy semaphore may be preventing legitimate heatmap operations
+- **Symptoms**: Heatmap operations get blocked during facility changes
+- **Root Cause**: Semaphore never gets released or gets stuck in busy state
+
+#### **4. EVENT LISTENER CONFLICTS**
+- **Issue**: Multiple components listening to same map events causing conflicts
+- **Symptoms**: Layer restoration happens multiple times or in wrong order
+- **Root Cause**: AustralianMap and LayerManager both handling styledata events
+
+#### **5. ASYNC OPERATION COORDINATION**
+- **Issue**: Async boundary loading vs synchronous facility updates
+- **Symptoms**: Race conditions between boundary loading and heatmap rendering
+- **Root Cause**: waitForStyleAndIdle may not be working correctly
+
+### **🎯 KEY FILES FOR EXTERNAL CONSULTANT**
+
+#### **CORE IMPLEMENTATION FILES:**
+1. **`src/components/LayerManager.tsx`** - Main centralized layer management
+2. **`src/components/AustralianMap.tsx`** - Integration point and prop passing
+3. **`src/lib/mapBusy.ts`** - Semaphore coordination utility
+4. **`src/lib/mapboxEvents.ts`** - Event-driven utilities
+
+#### **SUPPORTING FILES:**
+5. **`src/components/HeatmapDataService.tsx`** - Data processing service
+6. **`src/components/MapLoadingCoordinator.tsx`** - Loading coordination
+7. **`.cursor/scratchpad.md`** - Complete implementation history and analysis
+
+#### **TESTING FILES:**
+8. **`src/components/MapSettings.tsx`** - UI controls that trigger facility changes
+9. **`src/app/maps/page.tsx`** - Page that uses AustralianMap component
+
+### **🔧 SPECIFIC DEBUGGING QUESTIONS FOR CONSULTANT:**
+
+#### **A. State Flow Analysis:**
+- Are facility state changes properly triggering LayerManager re-renders?
+- Is the `facilityLoading` state correctly preventing heatmap operations?
+- Are the heatmap props (`sa2HeatmapData`, `sa2HeatmapVisible`, `heatmapDataReady`) updating correctly?
+
+#### **B. Event Coordination:**
+- Are there multiple `styledata` event listeners causing conflicts?
+- Is the mapBusy semaphore getting stuck in busy state?
+- Are async operations completing before new ones start?
+
+#### **C. Map Reference Issues:**
+- Is the map reference valid when LayerManager tries to use it?
+- Are map operations happening before style is fully loaded?
+- Are sources and layers being properly cleaned up?
+
+#### **D. Console Error Analysis:**
+- What specific errors appear in browser console during facility toggles?
+- Are there any 'source already exists' or 'layer already exists' errors?
+- Any timing-related errors or warnings?
+
+### **🛠️ RECOMMENDED DIAGNOSTIC STEPS:**
+
+1. **Enable Detailed Logging**: Add console logs to track state changes and execution flow
+2. **Check Browser Console**: Look for specific errors during facility toggles
+3. **Verify Map State**: Confirm map is properly initialized when LayerManager operations run
+4. **Test Isolation**: Try heatmap operations without facility changes first
+5. **Semaphore Debugging**: Add logging to mapBusy operations to check for deadlocks
+
+### **🎯 MOST LIKELY CULPRITS:**
+
+1. **Props not updating correctly** - LayerManager not receiving facility state changes
+2. **mapBusy semaphore deadlock** - Semaphore preventing heatmap operations
+3. **Event listener conflicts** - Multiple components handling same events
+4. **Async timing issues** - Operations starting before previous ones complete
+
+## 🎯 **EXTERNAL CONSULTANT DIAGNOSIS & FIXES**
+
+### **✅ CONSULTANT IDENTIFIED TWO CRITICAL ISSUES:**
+
+#### **🔴 Issue #1: Event Listener Conflict**
+- **Problem**: Both `LayerManager` AND `AustralianMap` listening to `styledata` events
+- **Result**: Race condition causing layer restoration conflicts
+- **Solution**: Remove `styledata` listener from `AustralianMap.tsx`
+
+#### **🔴 Issue #2: Missing Dependency in LayerManager**
+- **Problem**: `facilityLoading` not in dependency array of heatmap update effect
+- **Result**: Heatmap never resumes after facility loading completes
+- **Solution**: Add `facilityLoading` to dependency array in `LayerManager.tsx`
+
+### **🚀 IMPLEMENTATION OF CONSULTANT FIXES:**
+
+**Fix #1**: ✅ CHECKED - No persistent styledata conflicts found in AustralianMap
+**Fix #2**: ✅ IMPLEMENTED - Added `facilityLoading` to dependency array in LayerManager
+
+### **🔧 CRITICAL FIX APPLIED:**
+
+```typescript
+// src/components/LayerManager.tsx - Line 292
+useEffect(() => {
+    if (!mapLoaded || !boundaryLoaded) return;
+    
+    console.log('🔄 LayerManager: Heatmap data/visibility/facility loading changed, updating layer...');
+    ensureHeatmapLayer();
+}, [sa2HeatmapData, sa2HeatmapVisible, heatmapDataReady, mapLoaded, boundaryLoaded, ensureHeatmapLayer, facilityLoading]);
+    //                                                                                                                   ^^^^^^^^^^^^^^^ ADDED THIS!
+```
+
+**Expected Result**: When `facilityLoading` changes from `true` to `false`, the heatmap useEffect will re-run and call `ensureHeatmapLayer()` to restore the heatmap layer.
 
 **✅ COMPLETED PHASE 1:** Foundation utilities created
 - `src/lib/mapBusy.ts` - Semaphore for coordinating map operations

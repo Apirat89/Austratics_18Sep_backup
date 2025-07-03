@@ -275,9 +275,9 @@ export default function LayerManager({
   useEffect(() => {
     if (!mapLoaded || !boundaryLoaded) return;
     
-    console.log('🔄 LayerManager: Heatmap data/visibility changed, updating layer...');
+    console.log('🔄 LayerManager: Heatmap data/visibility/facility loading changed, updating layer...');
     ensureHeatmapLayer();
-  }, [sa2HeatmapData, sa2HeatmapVisible, heatmapDataReady, mapLoaded, boundaryLoaded, ensureHeatmapLayer]);
+  }, [sa2HeatmapData, sa2HeatmapVisible, heatmapDataReady, mapLoaded, boundaryLoaded, ensureHeatmapLayer, facilityLoading]);
 
   // Return error UI if needed
   return (
