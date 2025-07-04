@@ -20,7 +20,7 @@ interface MapSettingsProps {
   selectedGeoLayer: GeoLayerType;
   onGeoLayerChange: (layer: GeoLayerType) => void;
   facilityTypes: FacilityTypes;
-  onToggleFacilityType: (type: keyof FacilityTypes) => void;
+  onToggleFacilityType?: (type: keyof FacilityTypes) => void; // Optional now
   className?: string;
   preloadingData?: boolean;
   preloadProgress?: { current: number; total: number };
@@ -148,13 +148,13 @@ export default function MapSettings({
               onGeoLayerChange={onGeoLayerChange}
             />
 
-            {/* 2. Aged Care Facilities - Second */}
+            {/* 2. Aged Care Facilities - Second (Fixed as Selected) */}
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <Building className="h-4 w-4 text-gray-600" />
                 <span className="text-sm font-medium text-gray-700">Aged Care Facilities</span>
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full ml-auto">
-                  {Object.values(facilityTypes).filter(Boolean).length} active
+                <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded-full ml-auto">
+                  All Active
                 </span>
               </div>
               
@@ -163,23 +163,19 @@ export default function MapSettings({
                   const Icon = facilityTypeIcons[key as keyof FacilityTypes];
                   const colorClass = facilityTypeColors[key as keyof FacilityTypes];
                   return (
-                    <button
+                    <div
                       key={key}
-                      onClick={() => onToggleFacilityType(key as keyof FacilityTypes)}
-                      className="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded text-left transition-colors"
+                      className="w-full flex items-center gap-3 p-2 bg-green-50 rounded text-left"
                     >
-                      <div className={`w-4 h-4 border-2 rounded flex items-center justify-center ${
-                        value ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
-                      }`}>
-                        {value && <Check className="h-3 w-3 text-white" />}
+                      <div className="w-4 h-4 border-2 rounded flex items-center justify-center bg-green-600 border-green-600">
+                        <Check className="h-3 w-3 text-white" />
                       </div>
-                      <Icon className={`h-4 w-4 ${value ? colorClass : 'text-gray-400'}`} />
-                      <span className={`text-sm ${
-                        value ? 'text-gray-900' : 'text-gray-500'
-                      }`}>
+                      <Icon className={`h-4 w-4 ${colorClass}`} />
+                      <span className="text-sm text-gray-900">
                         {facilityTypeLabels[key as keyof FacilityTypes]}
                       </span>
-                    </button>
+                      <span className="text-xs text-green-600 ml-auto">Always On</span>
+                    </div>
                   );
                 })}
               </div>

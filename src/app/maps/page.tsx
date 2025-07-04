@@ -252,12 +252,7 @@ export default function MapsPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const toggleFacilityType = useCallback((type: keyof FacilityTypes) => {
-    setFacilityTypes(prev => ({
-      ...prev,
-      [type]: !prev[type]
-    }));
-  }, []);
+  // toggleFacilityType removed - facility types are now fixed as always selected
 
   const handleSearch = (searchTerm: string, navigation?: { 
     center?: [number, number], 
@@ -680,7 +675,6 @@ export default function MapsPage() {
                 selectedGeoLayer={selectedGeoLayer}
                 onGeoLayerChange={setSelectedGeoLayer}
                 facilityTypes={facilityTypes}
-                onToggleFacilityType={toggleFacilityType}
                 className="border-b border-gray-200"
                 preloadingData={preloadingData}
                 preloadProgress={preloadProgress}
