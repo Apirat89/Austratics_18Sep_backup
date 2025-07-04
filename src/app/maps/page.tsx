@@ -674,7 +674,6 @@ export default function MapsPage() {
                 onMapStyleChange={setSelectedMapStyle}
                 selectedGeoLayer={selectedGeoLayer}
                 onGeoLayerChange={setSelectedGeoLayer}
-                facilityTypes={facilityTypes}
                 className="border-b border-gray-200"
                 preloadingData={preloadingData}
                 preloadProgress={preloadProgress}

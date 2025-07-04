@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Settings, ChevronDown, ChevronUp, Map, Check, Building, Home, Mail, Building2 } from 'lucide-react';
+import { Settings, ChevronDown, ChevronUp, Map } from 'lucide-react';
 import BoundaryControls from './BoundaryControls';
 
 type MapStyleType = 'basic' | 'topo' | 'satellite' | 'terrain' | 'streets';
@@ -19,8 +19,6 @@ interface MapSettingsProps {
   onMapStyleChange: (style: MapStyleType) => void;
   selectedGeoLayer: GeoLayerType;
   onGeoLayerChange: (layer: GeoLayerType) => void;
-  facilityTypes: FacilityTypes;
-  onToggleFacilityType?: (type: keyof FacilityTypes) => void; // Optional now
   className?: string;
   preloadingData?: boolean;
   preloadProgress?: { current: number; total: number };
@@ -33,8 +31,6 @@ export default function MapSettings({
   onMapStyleChange,
   selectedGeoLayer,
   onGeoLayerChange,
-  facilityTypes,
-  onToggleFacilityType,
   className = "",
   preloadingData = false,
   preloadProgress = { current: 0, total: 0 },
@@ -53,26 +49,7 @@ export default function MapSettings({
     { key: 'streets', label: 'Streets' }
   ];
 
-  const facilityTypeLabels = {
-    residential: 'Residential Care',
-    mps: 'Multi-Purpose Service',
-    home: 'Home Care',
-    retirement: 'Retirement Living'
-  };
-
-  const facilityTypeIcons = {
-    residential: Building,
-    mps: Building2,
-    home: Home,
-    retirement: Mail
-  };
-
-  const facilityTypeColors = {
-    residential: 'text-red-600',
-    mps: 'text-blue-600',
-    home: 'text-green-600', 
-    retirement: 'text-purple-600'
-  };
+  // Facility type definitions removed - all facility types always active
 
   const getMapStyleDisplayName = () => {
     const style = mapStyleOptions.find(s => s.key === selectedMapStyle);
@@ -148,38 +125,7 @@ export default function MapSettings({
               onGeoLayerChange={onGeoLayerChange}
             />
 
-            {/* 2. Aged Care Facilities - Second (Fixed as Selected) */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Building className="h-4 w-4 text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">Aged Care Facilities</span>
-                <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded-full ml-auto">
-                  All Active
-                </span>
-              </div>
-              
-              <div className="space-y-1">
-                {Object.entries(facilityTypes).map(([key, value]) => {
-                  const Icon = facilityTypeIcons[key as keyof FacilityTypes];
-                  const colorClass = facilityTypeColors[key as keyof FacilityTypes];
-                  return (
-                    <div
-                      key={key}
-                      className="w-full flex items-center gap-3 p-2 bg-green-50 rounded text-left"
-                    >
-                      <div className="w-4 h-4 border-2 rounded flex items-center justify-center bg-green-600 border-green-600">
-                        <Check className="h-3 w-3 text-white" />
-                      </div>
-                      <Icon className={`h-4 w-4 ${colorClass}`} />
-                      <span className="text-sm text-gray-900">
-                        {facilityTypeLabels[key as keyof FacilityTypes]}
-                      </span>
-                      <span className="text-xs text-green-600 ml-auto">Always On</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            {/* Aged Care Facilities section removed - all facility types always active */}
 
             {/* 3. Map Style - Third (Dropdown) */}
             <div>
