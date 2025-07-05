@@ -727,11 +727,15 @@ export default function SA2AnalyticsPage() {
           setSearchResults(sa2Suggestions);
         }
       } else {
-        // For other searches, show regular results (SA2s, postcodes, etc.)
+        // For other searches, show ALL results with SA2 proximity suggestions for non-SA2 types
         console.log('🔍 Regular search - all results:', enrichedResults.map(r => ({ name: r.name, type: r.type, code: r.code })));
         
+        // Separate SA2 and non-SA2 results
         const sa2Results = enrichedResults.filter(result => result.type === 'sa2');
+        const nonSA2Results = enrichedResults.filter(result => result.type !== 'sa2');
+        
         console.log('🔍 SA2 results found:', sa2Results.length);
+        console.log('🔍 Non-SA2 results found:', nonSA2Results.length, 'types:', nonSA2Results.map(r => r.type));
         
         // Enrich SA2 results with analytics data
         const enrichedSA2Results = sa2Results.map(sa2 => {
@@ -755,8 +759,46 @@ export default function SA2AnalyticsPage() {
           console.log('❌ No analytics data found for SA2:', sa2.name);
           return sa2;
         });
+
+        // For non-SA2 results with coordinates, find proximity SA2 suggestions
+        const proximitySuggestions: SearchResult[] = [];
         
-        setSearchResults(enrichedSA2Results.slice(0, 8));
+        for (const nonSA2Result of nonSA2Results) {
+          if (nonSA2Result.center && (nonSA2Result.type === 'sa3' || nonSA2Result.type === 'sa4' || nonSA2Result.type === 'lga')) {
+            console.log('🌍 Finding SA2 proximity suggestions for', nonSA2Result.type, ':', nonSA2Result.name);
+            
+            try {
+              const closestSA2s = await findClosestSA2Regions(nonSA2Result, 3); // Get top 3 closest SA2s
+              
+              console.log('✨ Found', closestSA2s.length, 'SA2 proximity suggestions for:', nonSA2Result.name);
+              
+              const sa2Suggestions = closestSA2s.map(sa2 => ({
+                ...sa2,
+                isProximitySuggestion: true,
+                proximityTo: nonSA2Result.name,
+                proximityDistance: sa2.proximityDistance
+              } as SearchResult));
+              
+              proximitySuggestions.push(...sa2Suggestions);
+            } catch (error) {
+              console.error('Error finding SA2 proximity suggestions for:', nonSA2Result.name, error);
+            }
+          }
+        }
+
+        // Combine all results: original non-SA2 results first, then SA2 results, then proximity suggestions
+        const allResults = [
+          ...nonSA2Results, // Show original SA3, SA4, LGA results
+          ...enrichedSA2Results, // Show SA2 results with analytics data
+          ...proximitySuggestions // Show proximity SA2 suggestions
+        ];
+        
+        console.log('📋 Final combined results:', allResults.length, 'total results');
+        console.log('   - Original non-SA2:', nonSA2Results.length);
+        console.log('   - SA2 with analytics:', enrichedSA2Results.length);
+        console.log('   - Proximity suggestions:', proximitySuggestions.length);
+        
+        setSearchResults(allResults.slice(0, 10)); // Show up to 10 results total
       }
     } catch (error) {
       console.error('Search error:', error);
@@ -766,20 +808,7 @@ export default function SA2AnalyticsPage() {
     }
   }, [allSA2Data, findClosestSA2Regions]);
 
-  // Debounced search handler
-  const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query);
-    
-    // Clear previous timeout
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
-    // Set new timeout for debounced search
-    searchTimeoutRef.current = setTimeout(() => {
-      performSearch(query);
-    }, 300);
-  }, [performSearch]);
+  // Debounced search handler - removed as we're using useEffect for debouncing instead
 
   // Handle location selection from search results
   const handleLocationSelect = (location: SearchResult) => {
@@ -963,14 +992,7 @@ export default function SA2AnalyticsPage() {
     }
   }, [user, selectedSA2]);
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, []);
+  // Cleanup timeout on unmount - removed as we're handling cleanup in the search useEffect
 
   // Load user and data on mount
   useEffect(() => {
@@ -1024,14 +1046,29 @@ export default function SA2AnalyticsPage() {
     checkSavedStatus();
   }, [user, selectedSA2]);
 
-  // Handle search input changes
+  // Handle search input changes with proper debouncing
   useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      handleSearch(searchQuery);
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Set new timeout for debounced search
+    searchTimeoutRef.current = setTimeout(() => {
+      if (searchQuery.trim()) {
+        performSearch(searchQuery);
+      } else {
+        setSearchResults([]);
+      }
     }, 300);
 
-    return () => clearTimeout(debounceTimer);
-  }, [searchQuery, handleSearch]);
+    // Cleanup on unmount or query change
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery, performSearch]);
 
   if (isLoading || !user) {
     return (
@@ -1226,7 +1263,7 @@ export default function SA2AnalyticsPage() {
                       type="text"
                       placeholder="Search regions (SA2/SA3/SA4/LGA), postcodes, localities, or facilities..."
                       value={searchQuery}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                       className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                     <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -1284,6 +1321,11 @@ export default function SA2AnalyticsPage() {
                                       {result.type === 'sa2' && result.analyticsData && (
                                         <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-medium">
                                           Analytics Available
+                                        </span>
+                                      )}
+                                      {result.type !== 'sa2' && !isProximitySuggestion && (
+                                        <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                                          No Direct Analytics
                                         </span>
                                       )}
                                       {isProximitySuggestion && (
