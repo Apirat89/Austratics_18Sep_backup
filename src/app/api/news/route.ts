@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchAllNews } from '../../../lib/rss-service';
 import { NewsResponse, NewsItem, NewsServiceError } from '../../../types/news';
-import NewsCacheService from '../../../lib/news-cache';
+import { NewsCacheService } from '../../../lib/news-cache';
 
 /**
  * API Route: /api/news
@@ -31,69 +31,98 @@ export async function GET(request: NextRequest) {
     const categoryFilter = searchParams.get('category');
     const refresh = searchParams.get('refresh') === 'true';
     
+    // INSTANT LOADING: Check cache first and return immediately if available
+    if (!refresh) {
+      const cachedData = await NewsCacheService.getCache();
+      if (cachedData) {
+        console.log('⚡ Instant cache response');
+        
+        // Apply filters to cached data
+        let filteredData = cachedData.items;
+        
+        if (sourceFilter) {
+          filteredData = filteredData.filter(item => item.source.id === sourceFilter);
+        }
+        
+        if (categoryFilter) {
+          filteredData = filteredData.filter(item => item.source.category === categoryFilter);
+        }
+        
+        // Apply pagination
+        const total = filteredData.length;
+        const paginatedData = filteredData.slice(offset, offset + limit);
+        
+        // Get unique sources from filtered data
+        const uniqueSources = Array.from(
+          new Map(filteredData.map(item => [item.source.id, item.source])).values()
+        );
+        
+        // Return instantly without expensive cache stats lookup
+        return NextResponse.json({
+          success: true,
+          items: paginatedData,
+          metadata: {
+            total,
+            limit,
+            offset,
+            lastUpdated: cachedData.lastUpdated,
+            sources: uniqueSources,
+            cached: true,
+            cacheExpires: undefined, // Skip expensive cache stats lookup
+          },
+          errors: cachedData.errors.length > 0 ? cachedData.errors : undefined,
+        });
+      }
+    }
+    
     console.log('📋 Query params:', { limit, offset, sourceFilter, categoryFilter, refresh });
     
-    // Check cache validity
-    const cacheValid = await NewsCacheService.isCacheValid();
-    
+    // FALLBACK: No cache or refresh requested - do full fetch
+    console.log('🔄 Fetching fresh news data from RSS sources...');
     let newsData: NewsItem[];
     let errors: NewsServiceError[];
     let lastUpdated: string;
-    
-    if (cacheValid && !refresh) {
-      console.log('✅ Using cached news data from Redis');
+      
+    try {
+      const startTime = Date.now();
+      const result = await fetchAllNews();
+      const fetchDuration = Date.now() - startTime;
+      
+      newsData = result.items;
+      errors = result.errors;
+      lastUpdated = new Date().toISOString();
+      
+      // Get unique sources from the data
+      const uniqueSources = Array.from(
+        new Map(newsData.map(item => [item.source.id, item.source])).values()
+      );
+      
+      // Update Redis cache
+      await NewsCacheService.setCache({
+        items: newsData,
+        errors,
+        lastUpdated,
+        sources: uniqueSources,
+        fetchDuration,
+      }, CACHE_DURATION);
+      
+      console.log(`✅ Successfully fetched ${newsData.length} news items with ${errors.length} errors in ${fetchDuration}ms`);
+    } catch (error) {
+      console.error('❌ Failed to fetch news data:', error);
+      
+      // Try to return cached data if available, otherwise error
       const cachedData = await NewsCacheService.getCache();
       if (cachedData) {
+        console.log('⚠️ Using stale cached data due to fetch error');
         newsData = cachedData.items;
-        errors = cachedData.errors;
+        errors = [...cachedData.errors, {
+          message: 'Failed to refresh news data, using cached version',
+          code: 'REFRESH_ERROR',
+          details: { error: error instanceof Error ? error.message : 'Unknown error' }
+        }];
         lastUpdated = cachedData.lastUpdated;
       } else {
-        throw new Error('Cache validation succeeded but no data found');
-      }
-    } else {
-      console.log('🔄 Fetching fresh news data from RSS sources...');
-      
-      try {
-        const startTime = Date.now();
-        const result = await fetchAllNews();
-        const fetchDuration = Date.now() - startTime;
-        
-        newsData = result.items;
-        errors = result.errors;
-        lastUpdated = new Date().toISOString();
-        
-        // Get unique sources from the data
-        const uniqueSources = Array.from(
-          new Map(newsData.map(item => [item.source.id, item.source])).values()
-        );
-        
-        // Update Redis cache
-        await NewsCacheService.setCache({
-          items: newsData,
-          errors,
-          lastUpdated,
-          sources: uniqueSources,
-          fetchDuration,
-        }, CACHE_DURATION);
-        
-        console.log(`✅ Successfully fetched ${newsData.length} news items with ${errors.length} errors in ${fetchDuration}ms`);
-      } catch (error) {
-        console.error('❌ Failed to fetch news data:', error);
-        
-        // Try to return cached data if available, otherwise error
-        const cachedData = await NewsCacheService.getCache();
-        if (cachedData) {
-          console.log('⚠️ Using stale cached data due to fetch error');
-          newsData = cachedData.items;
-          errors = [...cachedData.errors, {
-            message: 'Failed to refresh news data, using cached version',
-            code: 'REFRESH_ERROR',
-            details: { error: error instanceof Error ? error.message : 'Unknown error' }
-          }];
-          lastUpdated = cachedData.lastUpdated;
-        } else {
-          throw error;
-        }
+        throw error;
       }
     }
     
@@ -130,7 +159,7 @@ export async function GET(request: NextRequest) {
         offset,
         lastUpdated,
         sources: uniqueSources,
-        cached: cacheValid && !refresh,
+        cached: false,
         cacheExpires: cacheStats.expiresAt || undefined,
       },
     };

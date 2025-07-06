@@ -188,14 +188,7 @@ export const NEWS_SOURCES: NewsSource[] = [
     description: 'News and lifestyle content for Australians over 50',
     category: 'news',
   },
-  {
-    id: 'australian-seniors-news',
-    name: 'Australian Seniors News',
-    feedUrl: 'https://australianseniorsnews.com.au/feed/',
-    websiteUrl: 'https://australianseniorsnews.com.au',
-    description: 'News and information for Australian seniors',
-    category: 'news',
-  },
+
 ];
 
 export const DEFAULT_NEWS_CONFIG: NewsServiceConfig = {

@@ -1,6 +1,6 @@
 /**
- * Redis-based caching service for news data
- * Integrates with existing Upstash Redis configuration
+ * Hybrid caching service for news data
+ * Uses Redis with in-memory fallback for reliability
  */
 
 import { Redis } from '@upstash/redis';
@@ -10,6 +10,50 @@ const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
+
+// File-based cache fallback (persists across API route instances)
+import { writeFileSync, readFileSync, existsSync } from 'fs';
+import { join } from 'path';
+
+const CACHE_FILE = join(process.cwd(), 'tmp', 'news-cache.json');
+
+interface FileCacheData {
+  data: NewsCacheData | null;
+  metadata: any;
+  expiresAt: number;
+}
+
+function ensureCacheDir() {
+  const dir = join(process.cwd(), 'tmp');
+  try {
+    const { mkdirSync } = require('fs');
+    mkdirSync(dir, { recursive: true });
+  } catch (error) {
+    // Directory might already exist
+  }
+}
+
+function writeFileCache(cacheData: FileCacheData) {
+  try {
+    ensureCacheDir();
+    writeFileSync(CACHE_FILE, JSON.stringify(cacheData), 'utf8');
+  } catch (error) {
+    console.warn('Failed to write file cache:', error);
+  }
+}
+
+function readFileCache(): FileCacheData | null {
+  try {
+    if (!existsSync(CACHE_FILE)) {
+      return null;
+    }
+    const data = readFileSync(CACHE_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.warn('Failed to read file cache:', error);
+    return null;
+  }
+}
 
 export interface NewsCacheData {
   items: NewsItem[];
@@ -36,64 +80,84 @@ export class NewsCacheService {
   private static DEFAULT_TTL = 30 * 60; // 30 minutes in seconds
   
   /**
-   * Store news data in Redis cache
+   * Store news data in Redis cache with in-memory fallback
    * Gracefully handles Redis connection failures
    */
   static async setCache(data: NewsCacheData, ttl: number = this.DEFAULT_TTL): Promise<void> {
+    const cachePayload = {
+      ...data,
+      cachedAt: new Date().toISOString(),
+    };
+    
+    const metadata = {
+      lastUpdated: data.lastUpdated,
+      itemCount: data.items.length,
+      errorCount: data.errors.length,
+      sourceCount: data.sources.length,
+      cachedAt: cachePayload.cachedAt,
+      expiresAt: new Date(Date.now() + ttl * 1000).toISOString(),
+      ttl,
+    };
+
     try {
-      const cachePayload = {
-        ...data,
-        cachedAt: new Date().toISOString(),
-      };
-      
-      // Store main news data
+      // Try Redis first
       await redis.set(this.CACHE_KEY, JSON.stringify(cachePayload), { ex: ttl });
-      
-      // Store metadata for quick access
-      const metadata = {
-        lastUpdated: data.lastUpdated,
-        itemCount: data.items.length,
-        errorCount: data.errors.length,
-        sourceCount: data.sources.length,
-        cachedAt: cachePayload.cachedAt,
-        expiresAt: new Date(Date.now() + ttl * 1000).toISOString(),
-        ttl,
-      };
       await redis.set(this.METADATA_KEY, JSON.stringify(metadata), { ex: ttl });
-      
       console.log(`✅ News data cached in Redis: ${data.items.length} items for ${ttl}s`);
     } catch (error) {
-      console.error('⚠️ Failed to cache news data in Redis (continuing without cache):', error);
-      // Don't throw error - allow the service to continue without caching
+      console.error('⚠️ Redis cache failed, using file fallback:', error);
+      
+      // Fallback to file-based cache
+      writeFileCache({
+        data: cachePayload,
+        metadata,
+        expiresAt: Date.now() + ttl * 1000,
+      });
+      console.log(`✅ News data cached in file: ${data.items.length} items for ${ttl}s`);
     }
   }
   
   /**
-   * Retrieve news data from Redis cache
+   * Retrieve news data from Redis cache with in-memory fallback
    */
   static async getCache(): Promise<NewsCacheData | null> {
     try {
+      // Try Redis first
       const cachedData = await redis.get(this.CACHE_KEY);
       
-      if (!cachedData) {
-        console.log('🔍 No cached news data found in Redis');
-        return null;
+      if (cachedData) {
+        const parsedData = JSON.parse(cachedData as string) as NewsCacheData & { cachedAt: string };
+        console.log(`✅ Retrieved cached news data from Redis: ${parsedData.items.length} items`);
+        
+        return {
+          items: parsedData.items,
+          errors: parsedData.errors,
+          lastUpdated: parsedData.lastUpdated,
+          sources: parsedData.sources,
+          fetchDuration: parsedData.fetchDuration,
+        };
       }
       
-      const parsedData = JSON.parse(cachedData as string) as NewsCacheData & { cachedAt: string };
-      console.log(`✅ Retrieved cached news data: ${parsedData.items.length} items`);
-      
-      return {
-        items: parsedData.items,
-        errors: parsedData.errors,
-        lastUpdated: parsedData.lastUpdated,
-        sources: parsedData.sources,
-        fetchDuration: parsedData.fetchDuration,
-      };
+      console.log('🔍 No cached news data found in Redis');
     } catch (error) {
-      console.error('❌ Failed to retrieve news data from Redis:', error);
-      return null;
+      console.error('❌ Redis cache failed, checking file fallback:', error);
     }
+
+    // Check file-based cache fallback
+    const fileCache = readFileCache();
+    if (fileCache && fileCache.data && Date.now() < fileCache.expiresAt) {
+      console.log(`✅ Retrieved cached news data from file: ${fileCache.data.items.length} items`);
+      return {
+        items: fileCache.data.items,
+        errors: fileCache.data.errors,
+        lastUpdated: fileCache.data.lastUpdated,
+        sources: fileCache.data.sources,
+        fetchDuration: fileCache.data.fetchDuration,
+      };
+    }
+
+    console.log('🔍 No valid cached news data found');
+    return null;
   }
   
   /**

@@ -65,3 +65,4 @@ tasks/ ship-fast-ts/
 # Large map data files
 Maps_ABS_CSV/*.geojson
 public/maps/*.geojson
+tmp/

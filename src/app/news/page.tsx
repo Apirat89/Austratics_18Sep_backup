@@ -42,7 +42,7 @@ export default function NewsPage() {
     },
   });
 
-  const fetchNews = async (forceRefresh = false) => {
+  const fetchNews = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
@@ -53,10 +53,6 @@ export default function NewsPage() {
       
       if (state.filters.source) {
         params.append('source', state.filters.source);
-      }
-      
-      if (forceRefresh) {
-        params.append('refresh', 'true');
       }
       
       const response = await fetch(`/api/news?${params}`);
@@ -108,9 +104,7 @@ export default function NewsPage() {
     }));
   };
 
-  const handleRefresh = () => {
-    fetchNews(true);
-  };
+
 
   if (state.loading) {
     return <NewsLoadingState />;
@@ -140,38 +134,7 @@ export default function NewsPage() {
             </p>
           </div>
           
-          {/* Metadata */}
-          {state.metadata && (
-            <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <Badge variant="outline" className="text-sm">
-                    {state.metadata.total} articles
-                  </Badge>
-                  <Badge variant="outline" className="text-sm">
-                    {state.metadata.sources.length} sources
-                  </Badge>
-                  {state.metadata.cached && (
-                    <Badge variant="secondary" className="text-sm">
-                      Cached
-                    </Badge>
-                  )}
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-500">
-                    Last updated: {new Date(state.metadata.lastUpdated).toLocaleString()}
-                  </span>
-                  <button
-                    onClick={handleRefresh}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                  >
-                    Refresh
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+
         </div>
 
         {/* Filters */}
