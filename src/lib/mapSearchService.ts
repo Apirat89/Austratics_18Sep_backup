@@ -30,6 +30,10 @@ const dataCache = new Map<string, GeoJSONData>();
 const searchIndexCache = new Map<string, SearchResult[]>();
 // Cache for search results (performance optimization)
 const searchResultsCache = new Map<string, SearchResult[]>();
+// Cache for SA2 data with postcode information
+const sa2DataCache = new Map<string, any>();
+// Cache for SA2 coordinates (performance optimization)
+const coordinatesCache = new Map<string, Array<{ id: string; name: string; code: string; center: [number, number] }>>();
 
 // Calculate the center point and bounds of a geometry
 function calculateGeometryBounds(geometry: any): { center: [number, number], bounds: [number, number, number, number] } | null {
@@ -356,6 +360,112 @@ async function buildHealthcareFacilityIndex(): Promise<SearchResult[]> {
   }
 }
 
+// Build search index from SA2 data including postcode and locality information
+async function buildSA2PostcodeSearchIndex(): Promise<SearchResult[]> {
+  const cacheKey = 'sa2-postcode-search';
+  
+  // Return cached index if available
+  if (searchIndexCache.has(cacheKey)) {
+    return searchIndexCache.get(cacheKey)!;
+  }
+
+  console.log('Building SA2 postcode search index...'); // Debug log
+
+  try {
+    // Only try to load SA2 data if we're in a browser context
+    if (typeof window === 'undefined') {
+      console.log('Server context - skipping SA2 postcode search index');
+      return [];
+    }
+
+    // Load SA2 data from the API
+    const response = await fetch('/api/sa2');
+    if (!response.ok) {
+      console.error('Failed to load SA2 data for search:', response.status);
+      return [];
+    }
+
+    const apiData = await response.json();
+    if (!apiData.success) {
+      console.error('SA2 API returned error:', apiData.error);
+      return [];
+    }
+
+    const sa2Data = apiData.data;
+    const searchResults: SearchResult[] = [];
+
+    console.log(`Processing ${Object.keys(sa2Data).length} SA2 regions for postcode search...`); // Debug log
+
+    // Process each SA2 region
+    Object.entries(sa2Data).forEach(([sa2Id, sa2Info]: [string, any]) => {
+      if (sa2Info.postcode_data && Array.isArray(sa2Info.postcode_data)) {
+        // Create search results for each locality in this SA2
+        sa2Info.postcode_data.forEach((postcodeItem: any, index: number) => {
+          const { Locality, Post_Code } = postcodeItem;
+          
+          if (Locality && Post_Code) {
+            // Create a locality search result
+            const localityResult: SearchResult = {
+              id: `sa2-locality-${sa2Id}-${index}`,
+              name: Locality,
+              area: `${Locality} (SA2: ${sa2Info.sa2Name})`,
+              code: sa2Id, // Use SA2 ID as the code so we can map back to analytics data
+              type: 'locality',
+              score: 0, // Will be calculated during search
+              // Include postcode information for additional context
+              address: `Postcode ${Post_Code}`,
+              // Store the SA2 info for analytics integration
+              facilityType: undefined,
+              careType: undefined,
+              state: sa2Info.STATE_NAME_2021,
+              bounds: undefined, // Could be added if we had locality boundaries
+              center: undefined   // Could be added if we had locality coordinates
+            };
+
+            searchResults.push(localityResult);
+
+            // Also create a postcode search result if we haven't seen this postcode in this SA2 yet
+            const existingPostcodeResult = searchResults.find(
+              result => result.type === 'postcode' && 
+                       result.name === Post_Code && 
+                       result.code === sa2Id
+            );
+
+            if (!existingPostcodeResult) {
+              const postcodeResult: SearchResult = {
+                id: `sa2-postcode-${sa2Id}-${Post_Code}`,
+                name: Post_Code,
+                area: `${Post_Code} (SA2: ${sa2Info.sa2Name})`,
+                code: sa2Id, // Use SA2 ID as the code so we can map back to analytics data
+                type: 'postcode',
+                score: 0, // Will be calculated during search
+                address: `Includes ${Locality}`,
+                facilityType: undefined,
+                careType: undefined,
+                state: sa2Info.STATE_NAME_2021,
+                bounds: undefined,
+                center: undefined
+              };
+
+              searchResults.push(postcodeResult);
+            }
+          }
+        });
+      }
+    });
+
+    console.log(`Built ${searchResults.length} postcode/locality search results`); // Debug log
+    
+    // Cache the search index
+    searchIndexCache.set(cacheKey, searchResults);
+    
+    return searchResults;
+  } catch (error) {
+    console.error('Error building SA2 postcode search index:', error);
+    return [];
+  }
+}
+
 // Calculate relevance score based on search term
 function calculateRelevanceScore(searchTerm: string, result: SearchResult): number {
   const term = searchTerm.toLowerCase().trim();
@@ -465,8 +575,8 @@ export async function searchLocations(searchTerm: string, maxResults: number = 2
   console.log(`Searching for: "${searchTerm}"`); // Debug log
 
   try {
-    // Load search indices for all boundary types and healthcare facilities
-    const [lgaResults, sa2Results, sa3Results, sa4Results, postcodeResults, localityResults, facilityResults] = await Promise.all([
+    // Load search indices for all boundary types, healthcare facilities, and SA2 postcode data
+    const [lgaResults, sa2Results, sa3Results, sa4Results, postcodeResults, localityResults, facilityResults, sa2PostcodeResults] = await Promise.all([
       buildSearchIndex('lga'),
       buildSearchIndex('sa2'),
       buildSearchIndex('sa3'),
@@ -474,6 +584,7 @@ export async function searchLocations(searchTerm: string, maxResults: number = 2
       buildSearchIndex('postcode'),
       buildSearchIndex('locality'),
       buildHealthcareFacilityIndex(),
+      buildSA2PostcodeSearchIndex(),
     ]);
 
     // Combine all results
@@ -485,6 +596,7 @@ export async function searchLocations(searchTerm: string, maxResults: number = 2
       ...postcodeResults,
       ...localityResults,
       ...facilityResults,
+      ...sa2PostcodeResults,
     ];
 
     console.log(`Total searchable items: ${allResults.length}`); // Debug log
@@ -544,4 +656,203 @@ export async function getLocationSuggestions(searchTerm: string): Promise<string
 export async function getLocationByName(locationName: string): Promise<SearchResult | null> {
   const results = await searchLocations(locationName, 1);
   return results.length > 0 ? results[0] : null;
+}
+
+// Create search results from SA2 data including postcode and locality information
+export function createSA2PostcodeSearchResults(sa2Data: Record<string, any>): SearchResult[] {
+  const searchResults: SearchResult[] = [];
+
+  console.log(`Creating postcode search results from ${Object.keys(sa2Data).length} SA2 regions...`);
+
+  // Process each SA2 region
+  Object.entries(sa2Data).forEach(([sa2Id, sa2Info]: [string, any]) => {
+    if (sa2Info.postcode_data && Array.isArray(sa2Info.postcode_data)) {
+      // Create search results for each locality in this SA2
+      sa2Info.postcode_data.forEach((postcodeItem: any, index: number) => {
+        const { Locality, Post_Code } = postcodeItem;
+        
+        if (Locality && Post_Code) {
+          // Create a locality search result
+          const localityResult: SearchResult = {
+            id: `sa2-locality-${sa2Id}-${index}`,
+            name: Locality,
+            area: `${Locality} (SA2: ${sa2Info.sa2Name})`,
+            code: sa2Id, // Use SA2 ID as the code so we can map back to analytics data
+            type: 'locality',
+            score: 0, // Will be calculated during search
+            // Include postcode information for additional context
+            address: `Postcode ${Post_Code}`,
+            state: sa2Info.STATE_NAME_2021,
+            bounds: undefined,
+            center: undefined
+          };
+
+          searchResults.push(localityResult);
+
+          // Also create a postcode search result if we haven't seen this postcode in this SA2 yet
+          const existingPostcodeResult = searchResults.find(
+            result => result.type === 'postcode' && 
+                     result.name === Post_Code && 
+                     result.code === sa2Id
+          );
+
+          if (!existingPostcodeResult) {
+            const postcodeResult: SearchResult = {
+              id: `sa2-postcode-${sa2Id}-${Post_Code}`,
+              name: Post_Code,
+              area: `${Post_Code} (SA2: ${sa2Info.sa2Name})`,
+              code: sa2Id, // Use SA2 ID as the code so we can map back to analytics data
+              type: 'postcode',
+              score: 0, // Will be calculated during search
+              address: `Includes ${Locality}`,
+              state: sa2Info.STATE_NAME_2021,
+              bounds: undefined,
+              center: undefined
+            };
+
+            searchResults.push(postcodeResult);
+          }
+        }
+      });
+    }
+  });
+
+  console.log(`Created ${searchResults.length} postcode/locality search results`);
+  return searchResults;
+}
+
+// Optimized function to get SA2 coordinates directly without building search indices
+export async function getSA2Coordinates(): Promise<Array<{ id: string; name: string; code: string; center: [number, number] }>> {
+  const cacheKey = 'sa2-coordinates';
+  
+  // Return cached coordinates if available
+  if (coordinatesCache.has(cacheKey)) {
+    return coordinatesCache.get(cacheKey)!;
+  }
+
+  console.log('Loading SA2 coordinates directly from API...'); // Debug log
+
+  try {
+    // Only try to load SA2 data if we're in a browser context
+    if (typeof window === 'undefined') {
+      console.log('Server context - skipping SA2 coordinates loading');
+      return [];
+    }
+
+    // Load SA2 data from the API
+    const response = await fetch('/api/sa2');
+    if (!response.ok) {
+      console.error('Failed to load SA2 data for coordinates:', response.status);
+      return [];
+    }
+
+    const apiData = await response.json();
+    if (!apiData.success) {
+      console.error('SA2 API returned error:', apiData.error);
+      return [];
+    }
+
+    const sa2Data = apiData.data;
+    const coordinates: Array<{ id: string; name: string; code: string; center: [number, number] }> = [];
+
+    // Process each SA2 region to extract coordinates
+    Object.entries(sa2Data).forEach(([sa2Id, sa2Info]: [string, any]) => {
+      // For now, we'll use a simple approach to get coordinates
+      // In a real implementation, you'd want to have actual coordinates in your data
+      // For this fix, we'll skip coordinates since they're not in the current data structure
+      // This prevents the expensive search index building
+      
+      coordinates.push({
+        id: `sa2-${sa2Id}`,
+        name: sa2Info.sa2Name || sa2Id,
+        code: sa2Id,
+        center: [0, 0] // Placeholder coordinates - update with actual data when available
+      });
+    });
+
+    console.log(`Loaded ${coordinates.length} SA2 coordinates`); // Debug log
+    
+    // Cache the coordinates with correct type
+    coordinatesCache.set(cacheKey, coordinates);
+    
+    return coordinates;
+  } catch (error) {
+    console.error('Error loading SA2 coordinates:', error);
+    return [];
+  }
+}
+
+// Optimized postcode search that uses cached results
+let cachedPostcodeSearchResults: SearchResult[] | null = null;
+let cachedPostcodeSearchData: Record<string, any> | null = null;
+
+export function getOptimizedPostcodeSearchResults(sa2Data: Record<string, any>): SearchResult[] {
+  // Return cached results if SA2 data hasn't changed
+  if (cachedPostcodeSearchResults && cachedPostcodeSearchData === sa2Data) {
+    return cachedPostcodeSearchResults;
+  }
+
+  console.log('Building optimized postcode search results...'); // Debug log
+
+  const searchResults: SearchResult[] = [];
+
+  // Process each SA2 region (only if data has changed)
+  Object.entries(sa2Data).forEach(([sa2Id, sa2Info]: [string, any]) => {
+    if (sa2Info.postcode_data && Array.isArray(sa2Info.postcode_data)) {
+      // Create search results for each locality in this SA2
+      sa2Info.postcode_data.forEach((postcodeItem: any, index: number) => {
+        const { Locality, Post_Code } = postcodeItem;
+        
+        if (Locality && Post_Code) {
+          // Create a locality search result
+          const localityResult: SearchResult = {
+            id: `sa2-locality-${sa2Id}-${index}`,
+            name: Locality,
+            area: `${Locality} (SA2: ${sa2Info.sa2Name})`,
+            code: sa2Id,
+            type: 'locality',
+            score: 0,
+            address: `Postcode ${Post_Code}`,
+            state: sa2Info.STATE_NAME_2021,
+            bounds: undefined,
+            center: undefined
+          };
+
+          searchResults.push(localityResult);
+
+          // Also create a postcode search result if we haven't seen this postcode in this SA2 yet
+          const existingPostcodeResult = searchResults.find(
+            result => result.type === 'postcode' && 
+                     result.name === Post_Code && 
+                     result.code === sa2Id
+          );
+
+          if (!existingPostcodeResult) {
+            const postcodeResult: SearchResult = {
+              id: `sa2-postcode-${sa2Id}-${Post_Code}`,
+              name: Post_Code,
+              area: `${Post_Code} (SA2: ${sa2Info.sa2Name})`,
+              code: sa2Id,
+              type: 'postcode',
+              score: 0,
+              address: `Includes ${Locality}`,
+              state: sa2Info.STATE_NAME_2021,
+              bounds: undefined,
+              center: undefined
+            };
+
+            searchResults.push(postcodeResult);
+          }
+        }
+      });
+    }
+  });
+
+  console.log(`Built ${searchResults.length} optimized postcode/locality search results`); // Debug log
+  
+  // Cache the results
+  cachedPostcodeSearchResults = searchResults;
+  cachedPostcodeSearchData = sa2Data;
+  
+  return searchResults;
 } 

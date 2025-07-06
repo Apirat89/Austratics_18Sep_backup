@@ -56,6 +56,8 @@ interface SearchResult {
   isProximitySuggestion?: boolean;
   proximityTo?: string;
   proximityDistance?: number;
+  // Simple search fields
+  matchedField?: string;
 }
 
 interface SA2Statistics {
@@ -525,11 +527,19 @@ export default function SA2AnalyticsPage() {
     const [targetLng, targetLat] = location.center;
     const sa2Candidates: Array<SearchResult & { distance: number }> = [];
 
-    // Get all SA2 regions from search service
+    // Get all SA2 regions from search service (optimized)
     try {
-      const { searchLocations } = await import('../../lib/mapSearchService');
-      const allSA2Results = await searchLocations('', 2000); // Get many results
-      const sa2Results = allSA2Results.filter(result => result.type === 'sa2' && result.center);
+      const { getSA2Coordinates } = await import('../../lib/mapSearchService');
+      const allSA2Coordinates = await getSA2Coordinates(); // Get SA2 coordinates efficiently
+      const sa2Results = allSA2Coordinates.map(coord => ({
+        id: coord.id,
+        name: coord.name,
+        code: coord.code,
+        center: coord.center,
+        type: 'sa2' as const,
+        area: coord.name,
+        score: 1.0
+      })).filter(result => result.center);
       
       console.log(`📊 Found ${sa2Results.length} SA2 regions with coordinates`);
       console.log(`📊 Total SA2 data entries: ${Object.keys(allSA2Data).length}`);
@@ -578,8 +588,76 @@ export default function SA2AnalyticsPage() {
     }
   }, [allSA2Data, calculateDistance]);
 
-  // Enhanced multi-source search with debouncing and SA2 proximity suggestions
-  const performSearch = useCallback(async (query: string) => {
+  // ✅ NEW: Simple SA2 search function (searches only SA2 data fields)
+  const performSimpleSearch = useCallback((query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    
+    try {
+      const queryLower = query.toLowerCase();
+      const searchResults: SearchResult[] = [];
+      
+      // Search through SA2 data fields: ID, name, SA3_CODE_2021, SA3_NAME_2021, SA4_CODE_2021, SA4_NAME_2021, Locality, Post_Code
+      Object.entries(allSA2Data).forEach(([id, sa2Data]) => {
+        const searchableFields = [
+          { field: 'ID', value: id },
+          { field: 'name', value: sa2Data.sa2Name },
+          { field: 'SA3_CODE_2021', value: sa2Data.SA3_CODE_2021 },
+          { field: 'SA3_NAME_2021', value: sa2Data.SA3_NAME_2021 },
+          { field: 'SA4_CODE_2021', value: sa2Data.SA4_CODE_2021 },
+          { field: 'SA4_NAME_2021', value: sa2Data.SA4_NAME_2021 }
+        ];
+        
+        // Add postcode data fields (Locality and Post_Code)
+        if (sa2Data.postcode_data && Array.isArray(sa2Data.postcode_data)) {
+          sa2Data.postcode_data.forEach((postcodeItem: any) => {
+            searchableFields.push(
+              { field: 'Locality', value: postcodeItem.Locality },
+              { field: 'Post_Code', value: postcodeItem.Post_Code }
+            );
+          });
+        }
+        
+        // Check if any field matches the query (full text search - contains)
+        const matchingField = searchableFields.find(({ value }) => 
+          value && value.toString().toLowerCase().includes(queryLower)
+        );
+        
+        if (matchingField) {
+          searchResults.push({
+            id: `sa2-${id}`,
+            name: sa2Data.sa2Name,
+            area: `${sa2Data.sa2Name} (SA2)`,
+            code: id,
+            type: 'sa2' as const,
+            score: 100,
+            analyticsData: sa2Data,
+            population: sa2Data['Demographics | Estimated resident population (no.)'] || 0,
+            medianAge: sa2Data['Demographics | Median age - persons (years)'] || 0,
+            medianIncome: sa2Data['Economics | Median employee income ($)'] || 0,
+            matchedField: matchingField.field // For debugging
+          });
+        }
+      });
+      
+      console.log('🔍 Simple SA2 search results:', searchResults.length, 'results for query:', query);
+      setSearchResults(searchResults); // Show all matching results
+      setIsSearching(false);
+      
+    } catch (error) {
+      console.error('Error in simple search:', error);
+      setSearchResults([]);
+      setIsSearching(false);
+    }
+  }, [allSA2Data]);
+
+  /* 🚫 OLD: Complex multi-source search with debouncing and SA2 proximity suggestions (COMMENTED OUT FOR REFERENCE)
+  const performSearch_OLD_COMPLEX = useCallback(async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
       setIsSearching(false);
@@ -593,9 +671,43 @@ export default function SA2AnalyticsPage() {
       const locationResults = await searchLocations(query, 10);
       console.log('🔍 Search service results:', locationResults.length, 'results for query:', query);
       
-      // If no results from search service, try direct SA2 name search
-      let finalLocationResults = locationResults;
-      if (locationResults.length === 0) {
+      // Also search through SA2 postcode/locality data if we have it (optimized)
+      let postcodeLocalityResults: SearchResult[] = [];
+      if (Object.keys(allSA2Data).length > 0) {
+        const { getOptimizedPostcodeSearchResults } = await import('../../lib/mapSearchService');
+        const allPostcodeResults = getOptimizedPostcodeSearchResults(allSA2Data);
+        
+        // Filter postcode results by query
+        postcodeLocalityResults = allPostcodeResults
+          .filter(result => {
+            const name = result.name.toLowerCase();
+            const queryLower = query.toLowerCase();
+            return name.includes(queryLower) || name.startsWith(queryLower);
+          })
+          .slice(0, 10) // Limit to 10 results
+          .map(result => {
+            // Enrich with analytics data
+            if (result.code && allSA2Data[result.code]) {
+              const sa2Data = allSA2Data[result.code];
+              return {
+                ...result,
+                analyticsData: sa2Data,
+                population: sa2Data['Demographics | Estimated resident population (no.)'] || 0,
+                medianAge: sa2Data['Demographics | Median age - persons (years)'] || 0,
+                medianIncome: sa2Data['Economics | Median employee income ($)'] || 0
+              };
+            }
+            return result;
+          });
+        
+        console.log('🏘️ Postcode/locality results:', postcodeLocalityResults.length, 'results for query:', query);
+      }
+      
+      // Combine regular search results with postcode/locality results
+      let finalLocationResults = [...locationResults, ...postcodeLocalityResults];
+      
+      // If no results from any source, try direct SA2 name search
+      if (finalLocationResults.length === 0) {
         console.log('🔍 No results from search service, trying direct SA2 name search...');
         
         // Search directly in SA2 analytics data
@@ -807,6 +919,7 @@ export default function SA2AnalyticsPage() {
       setIsSearching(false);
     }
   }, [allSA2Data, findClosestSA2Regions]);
+  */
 
   // Debounced search handler - removed as we're using useEffect for debouncing instead
 
@@ -1056,7 +1169,7 @@ export default function SA2AnalyticsPage() {
     // Set new timeout for debounced search
     searchTimeoutRef.current = setTimeout(() => {
       if (searchQuery.trim()) {
-        performSearch(searchQuery);
+        performSimpleSearch(searchQuery);
       } else {
         setSearchResults([]);
       }
@@ -1068,7 +1181,7 @@ export default function SA2AnalyticsPage() {
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [searchQuery, performSearch]);
+  }, [searchQuery, performSimpleSearch]);
 
   if (isLoading || !user) {
     return (

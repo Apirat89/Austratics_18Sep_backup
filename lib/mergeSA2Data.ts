@@ -37,7 +37,11 @@ export interface SA2Row {
 
 export interface SA2Wide {
   sa2Name: string;
-  [metricKey: string]: string | number; // sa2Name is string, metrics are numbers
+  postcode_data?: Array<{
+    Locality: string;
+    Post_Code: string;
+  }>;
+  [metricKey: string]: string | number | Array<{Locality: string; Post_Code: string}> | undefined; // sa2Name is string, metrics are numbers, postcode_data is array
 }
 
 export type SA2DataWide = {
@@ -78,12 +82,16 @@ let cachedData: SA2DataWide | null = null;
 let cachedMetrics: string[] | null = null;
 let cachedMedians: { [key: string]: number } | null = null;
 
-// Interface for the merged comprehensive file
+// Interface for the merged comprehensive file with postcode data
 interface MergedSA2File {
   regions: Array<{
     id: string;
     name: string;
     metrics: { [key: string]: number };
+    postcode_data?: Array<{
+      Locality: string;
+      Post_Code: string;
+    }>;
     SA3_CODE_2021?: string;
     SA3_NAME_2021?: string;
     SA4_CODE_2021?: string;
@@ -191,7 +199,7 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
   
   try {
     // Load the single merged file
-    const filePath = path.join(process.cwd(), 'data', 'sa2', 'merged_sa2_data_comprehensive.json');
+    const filePath = path.join(process.cwd(), 'data', 'sa2', 'merged_sa2_data_with_postcodes.json');
     const fileContent = await fs.readFile(filePath, 'utf-8');
     const mergedFile: MergedSA2File = JSON.parse(fileContent);
     
@@ -206,6 +214,11 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
       
       // Convert metrics to expected format (with proper prefixes)
       const metrics: SA2Wide = { sa2Name };
+      
+      // Include postcode data for enhanced search functionality
+      if (region.postcode_data) {
+        metrics.postcode_data = region.postcode_data;
+      }
       
       // Include hierarchical fields for geographic comparisons
       if (region.SA3_CODE_2021) metrics.SA3_CODE_2021 = region.SA3_CODE_2021;

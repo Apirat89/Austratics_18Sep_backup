@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
         metricCount,
         medians,
         datasetSources: [
-          'merged_sa2_data_comprehensive.json (primary)',
+          'merged_sa2_data_with_postcodes.json (primary)',
           'Demographics_2023_comprehensive.json (fallback)', 
           'econ_stats_comprehensive.json (fallback)',
           'health_stats_comprehensive.json (fallback)',
