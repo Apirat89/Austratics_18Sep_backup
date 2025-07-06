@@ -7,27 +7,19 @@ import { Filter, X } from 'lucide-react';
 interface NewsFiltersProps {
   filters: {
     source: string | null;
-    category: string | null;
     limit: number;
     offset: number;
   };
   sources: NewsSource[];
   onFilterChange: (filters: {
     source?: string | null;
-    category?: string | null;
     limit?: number;
   }) => void;
 }
 
 export function NewsFilters({ filters, sources, onFilterChange }: NewsFiltersProps) {
-  const categories = Array.from(new Set(sources.map(source => source.category)));
-  
   const handleSourceChange = (sourceId: string | null) => {
     onFilterChange({ source: sourceId });
-  };
-
-  const handleCategoryChange = (category: string | null) => {
-    onFilterChange({ category: category });
   };
 
   const handleLimitChange = (limit: number) => {
@@ -35,10 +27,10 @@ export function NewsFilters({ filters, sources, onFilterChange }: NewsFiltersPro
   };
 
   const clearFilters = () => {
-    onFilterChange({ source: null, category: null });
+    onFilterChange({ source: null });
   };
 
-  const hasActiveFilters = filters.source || filters.category;
+  const hasActiveFilters = filters.source;
 
   return (
     <Card className="p-4">
@@ -92,37 +84,7 @@ export function NewsFilters({ filters, sources, onFilterChange }: NewsFiltersPro
           </div>
         </div>
 
-        {/* Category Filter */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Category
-          </label>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => handleCategoryChange(null)}
-              className={`px-3 py-1 rounded-full text-sm capitalize transition-colors ${
-                !filters.category
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              All Categories
-            </button>
-            {categories.map(category => (
-              <button
-                key={category}
-                onClick={() => handleCategoryChange(category)}
-                className={`px-3 py-1 rounded-full text-sm capitalize transition-colors ${
-                  filters.category === category
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
+
 
         {/* Items per page */}
         <div>
@@ -156,11 +118,6 @@ export function NewsFilters({ filters, sources, onFilterChange }: NewsFiltersPro
               {filters.source && (
                 <Badge variant="secondary" className="text-xs">
                   Source: {sources.find(s => s.id === filters.source)?.name || filters.source}
-                </Badge>
-              )}
-              {filters.category && (
-                <Badge variant="secondary" className="text-xs capitalize">
-                  Category: {filters.category}
                 </Badge>
               )}
             </div>

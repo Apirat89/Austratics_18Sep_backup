@@ -196,14 +196,6 @@ export const NEWS_SOURCES: NewsSource[] = [
     description: 'News and information for Australian seniors',
     category: 'news',
   },
-  {
-    id: 'cota-australia',
-    name: 'COTA Australia',
-    feedUrl: 'https://cota.org.au/feed',
-    websiteUrl: 'https://cota.org.au',
-    description: 'Peak body representing older Australians on aged care policy and advocacy',
-    category: 'government',
-  },
 ];
 
 export const DEFAULT_NEWS_CONFIG: NewsServiceConfig = {

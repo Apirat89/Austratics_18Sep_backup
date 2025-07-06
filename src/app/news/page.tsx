@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { NewsItem, NewsResponse, NewsSource } from '../../types/news';
-import { Card } from '../../components/ui/card';
+import { NewsItem, NewsSource } from '../../types/news';
 import { Badge } from '../../components/ui/badge';
 import BackToMainButton from '../../components/BackToMainButton';
 import { NewsCard } from '../../components/news/NewsCard';
@@ -25,7 +24,6 @@ interface NewsPageState {
   } | null;
   filters: {
     source: string | null;
-    category: string | null;
     limit: number;
     offset: number;
   };
@@ -39,7 +37,6 @@ export default function NewsPage() {
     metadata: null,
     filters: {
       source: null,
-      category: null,
       limit: 20,
       offset: 0,
     },
@@ -56,10 +53,6 @@ export default function NewsPage() {
       
       if (state.filters.source) {
         params.append('source', state.filters.source);
-      }
-      
-      if (state.filters.category) {
-        params.append('category', state.filters.category);
       }
       
       if (forceRefresh) {
