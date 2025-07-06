@@ -290,15 +290,42 @@ function cleanHtmlText(text: string): string {
   // Remove HTML tags
   const stripped = text.replace(/<[^>]*>/g, '');
   
-  // Decode common HTML entities
-  const decoded = stripped
+  // Decode numeric HTML entities (decimal format &#123;)
+  let decoded = stripped.replace(/&#(\d+);/g, (match, dec) => {
+    return String.fromCharCode(parseInt(dec, 10));
+  });
+  
+  // Decode hexadecimal HTML entities (&#x1A;)
+  decoded = decoded.replace(/&#x([0-9A-Fa-f]+);/g, (match, hex) => {
+    return String.fromCharCode(parseInt(hex, 16));
+  });
+  
+  // Decode common named HTML entities
+  decoded = decoded
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
     .replace(/&nbsp;/g, ' ')
-    .replace(/&hellip;/g, '...');
+    .replace(/&hellip;/g, '…')
+    .replace(/&mdash;/g, '—')
+    .replace(/&ndash;/g, '–')
+    .replace(/&ldquo;/g, '"')
+    .replace(/&rdquo;/g, '"')
+    .replace(/&lsquo;/g, "'")
+    .replace(/&rsquo;/g, "'")
+    .replace(/&bull;/g, '•')
+    .replace(/&middot;/g, '·')
+    .replace(/&trade;/g, '™')
+    .replace(/&copy;/g, '©')
+    .replace(/&reg;/g, '®')
+    .replace(/&deg;/g, '°')
+    .replace(/&plusmn;/g, '±')
+    .replace(/&frac12;/g, '½')
+    .replace(/&frac14;/g, '¼')
+    .replace(/&frac34;/g, '¾');
   
   // Clean up whitespace
   return decoded.replace(/\s+/g, ' ').trim();

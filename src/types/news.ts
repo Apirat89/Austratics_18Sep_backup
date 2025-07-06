@@ -164,6 +164,38 @@ export const NEWS_SOURCES: NewsSource[] = [
     description: 'Industry news and insights for aged care professionals',
     category: 'industry',
   },
+  {
+    id: 'aged-care-reviews',
+    name: 'Aged Care Reviews',
+    feedUrl: 'https://blog.agedcarereviews.com.au/feed/',
+    websiteUrl: 'https://blog.agedcarereviews.com.au',
+    description: 'Aged care reviews, guides and family decision-making resources',
+    category: 'industry',
+  },
+  {
+    id: 'australian-ageing-agenda',
+    name: 'Australian Ageing Agenda',
+    feedUrl: 'https://www.australianageingagenda.com.au/feed/',
+    websiteUrl: 'https://www.australianageingagenda.com.au',
+    description: 'Professional aged care industry news and insights',
+    category: 'industry',
+  },
+  {
+    id: 'australian-over-fifties',
+    name: 'Australian Over Fifties',
+    feedUrl: 'https://australianoverfifties.com.au/feed/',
+    websiteUrl: 'https://australianoverfifties.com.au',
+    description: 'News and lifestyle content for Australians over 50',
+    category: 'news',
+  },
+  {
+    id: 'australian-seniors-news',
+    name: 'Australian Seniors News',
+    feedUrl: 'https://australianseniorsnews.com.au/feed/',
+    websiteUrl: 'https://australianseniorsnews.com.au',
+    description: 'News and information for Australian seniors',
+    category: 'news',
+  },
 ];
 
 export const DEFAULT_NEWS_CONFIG: NewsServiceConfig = {
