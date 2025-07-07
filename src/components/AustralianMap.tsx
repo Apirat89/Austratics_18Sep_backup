@@ -107,6 +107,8 @@ export interface AustralianMapRef {
   };
   closeAllPopups: () => number;
   getOpenPopupsCount: () => number;
+  getFacilityTypeBreakdown: () => Record<string, number>;
+  saveAllOpenFacilities: () => Promise<{success: boolean; saved: number; total: number; errors: string[]}>;
 }
 
 // Helper function for point-in-polygon testing using ray casting algorithm
@@ -276,6 +278,23 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   
   // Track open facility popups for bulk close functionality
   const openPopupsRef = useRef<Set<maptilersdk.Popup>>(new Set());
+  
+  // Track facility types for each open popup
+  const openPopupFacilityTypesRef = useRef<Map<maptilersdk.Popup, string>>(new Map());
+  
+  // Track facility data for each open popup (for Save All functionality)
+  const openPopupFacilitiesRef = useRef<Map<maptilersdk.Popup, FacilityData>>(new Map());
+
+  // Function to get friendly facility type names for display
+  const getFacilityTypeDisplayName = (facilityType: string): string => {
+    switch (facilityType) {
+      case 'residential': return 'RESIDENTIAL CARE';
+      case 'mps': return 'MULTI-PURPOSE SERVICE';
+      case 'home': return 'HOME CARE';
+      case 'retirement': return 'RETIREMENT LIVING';
+      default: return facilityType.toUpperCase();
+    }
+  };
   
   // Track processed navigation to prevent repeated map movements
   const lastProcessedNavigationRef = useRef<string | null>(null);
@@ -475,6 +494,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     markersRef.current = [];
     // Also clear tracked popups when markers are cleared
     openPopupsRef.current.clear();
+    openPopupFacilityTypesRef.current.clear();
+    openPopupFacilitiesRef.current.clear();
   }, []);
 
   // Helper function to close all open facility popups
@@ -490,11 +511,109 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       }
     });
     
-    // Clear the tracking set
+    // Clear the tracking sets and maps
     openPopupsRef.current.clear();
+    openPopupFacilityTypesRef.current.clear();
+    openPopupFacilitiesRef.current.clear();
     
     return openPopupsRef.current.size; // Should be 0 after clearing
   }, []);
+
+  // Helper function to get facility type breakdown of open popups
+  const getFacilityTypeBreakdown = useCallback(() => {
+    const breakdown: Record<string, number> = {};
+    
+    // Count facility types from the tracking map
+    openPopupFacilityTypesRef.current.forEach((facilityType) => {
+      breakdown[facilityType] = (breakdown[facilityType] || 0) + 1;
+    });
+    
+    return breakdown;
+  }, []);
+
+  // Helper function to save all open facility popups
+  const saveAllOpenFacilities = useCallback(async () => {
+    if (!userId) {
+      throw new Error('Please sign in to save facilities');
+    }
+
+    const facilities = Array.from(openPopupFacilitiesRef.current.values());
+    console.log('💾 Saving all open facilities:', facilities.length);
+
+    if (facilities.length === 0) {
+      return { success: true, saved: 0, total: 0, errors: [] };
+    }
+
+    const results = [];
+    let savedCount = 0;
+    const errors: string[] = [];
+
+    // Import required functions
+    const { saveSearchToSavedSearches, isSearchSaved } = await import('../lib/savedSearches');
+
+    for (const facility of facilities) {
+      try {
+        // Check if already saved
+        const alreadySaved = await isSearchSaved(userId, facility.Service_Name);
+        if (alreadySaved) {
+          console.log(`⏭️ Skipping ${facility.Service_Name} - already saved`);
+          continue;
+        }
+
+        // Create location data for the facility
+        const facilityLocationData: LocationData = {
+          id: `facility-${facility.Service_Name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${facility.Longitude}-${facility.Latitude}`,
+          name: facility.Service_Name,
+          area: `${facility.Physical_State}${facility.Physical_Post_Code ? ' ' + facility.Physical_Post_Code : ''}`,
+          type: 'facility',
+          state: facility.Physical_State,
+          center: [facility.Longitude, facility.Latitude],
+          bounds: undefined,
+          address: facility.Physical_Address,
+          careType: facility.Care_Type,
+          facilityType: facility.facilityType
+        };
+
+        // Save the facility
+        const result = await saveSearchToSavedSearches(
+          userId,
+          facility.Service_Name,
+          facilityLocationData,
+          'facility'
+        );
+
+        if (result.success) {
+          savedCount++;
+          console.log(`✅ Saved: ${facility.Service_Name}`);
+          
+          // Trigger event for popup updates
+          window.dispatchEvent(new CustomEvent('facilitySaved', { 
+            detail: { facilityName: facility.Service_Name } 
+          }));
+        } else {
+          const errorMsg = result.error || 'Unknown error';
+          errors.push(`${facility.Service_Name}: ${errorMsg}`);
+          console.warn(`❌ Failed to save ${facility.Service_Name}: ${errorMsg}`);
+        }
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        errors.push(`${facility.Service_Name}: ${errorMsg}`);
+        console.error(`❌ Error saving ${facility.Service_Name}:`, error);
+      }
+    }
+
+    // Notify parent component
+    if (savedCount > 0) {
+      onSavedSearchAdded?.();
+    }
+
+    return {
+      success: errors.length === 0,
+      saved: savedCount,
+      total: facilities.length,
+      errors
+    };
+  }, [userId, onSavedSearchAdded]);
 
   // Helper function to handle facility hover
   const handleFacilityHover = useCallback((facility: any, markerElement: HTMLElement, isEntering: boolean) => {
@@ -805,33 +924,6 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           // Helper function to handle facility details modal
           const handleSeeDetails = () => {
             if (onFacilityDetailsClick) {
-              const facilityData: FacilityData = {
-                OBJECTID: facility.OBJECTID || 0,
-                Service_Name: serviceName,
-                Physical_Address: address,
-                Physical_Suburb: facility.Physical_Suburb || '',
-                Physical_State: state,
-                Physical_Post_Code: postcode || 0,
-                Care_Type: careType,
-                Residential_Places: residentialPlaces || null,
-                Home_Care_Places: facility.Home_Care_Places || null,
-                Home_Care_Max_Places: homeCareMaxPlaces || null,
-                Restorative_Care_Places: facility.Restorative_Care_Places || null,
-                Provider_Name: facility.Provider_Name || '',
-                Organisation_Type: facility.Organisation_Type || '',
-                ABS_Remoteness: facility.ABS_Remoteness || '',
-                Phone: phone || undefined,
-                Email: email || undefined,
-                Website: website || undefined,
-                Latitude: lat,
-                Longitude: lng,
-                F2019_Aged_Care_Planning_Region: facility.F2019_Aged_Care_Planning_Region || '',
-                F2016_SA2_Name: facility.F2016_SA2_Name || '',
-                F2016_SA3_Name: facility.F2016_SA3_Name || '',
-                F2016_LGA_Name: facility.F2016_LGA_Name || '',
-                facilityType: typeKey as 'residential' | 'mps' | 'home' | 'retirement'
-              };
-              
               onFacilityDetailsClick(facilityData);
             }
           };
@@ -850,7 +942,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             <div class="aged-care-popup" id="${popupId}">
               <div class="popup-header" style="background: linear-gradient(135deg, ${typeColors[typeKey]}20, ${typeColors[typeKey]}10); border-left: 4px solid ${typeColors[typeKey]};">
                 <h3 class="popup-title">${serviceName}</h3>
-                <span class="popup-type" style="background-color: ${typeColors[typeKey]}20; color: ${typeColors[typeKey]};">${careType}</span>
+                <span class="popup-type" style="background-color: ${typeColors[typeKey]}20; color: ${typeColors[typeKey]};">${getFacilityTypeDisplayName(typeKey)}</span>
               </div>
               
               <div class="popup-content">
@@ -1127,6 +1219,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             popup.on('close', () => {
               // Remove this popup from open tracking
               openPopupsRef.current.delete(popup);
+              openPopupFacilityTypesRef.current.delete(popup);
+              openPopupFacilitiesRef.current.delete(popup);
               delete (window as any)[functionName];
               delete (window as any)[updateFunctionName];
               if (showSeeDetailsButton) {
@@ -1146,14 +1240,46 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             popup.on('close', () => {
               // Remove this popup from open tracking
               openPopupsRef.current.delete(popup);
+              openPopupFacilityTypesRef.current.delete(popup);
+              openPopupFacilitiesRef.current.delete(popup);
               delete (window as any)[detailsFunctionName];
             });
           }
 
+          // Create facility data object for tracking
+          const facilityData: FacilityData = {
+            OBJECTID: facility.OBJECTID || 0,
+            Service_Name: serviceName,
+            Physical_Address: address,
+            Physical_Suburb: facility.Physical_Suburb || '',
+            Physical_State: state,
+            Physical_Post_Code: postcode || 0,
+            Care_Type: careType,
+            Residential_Places: residentialPlaces || null,
+            Home_Care_Places: facility.Home_Care_Places || null,
+            Home_Care_Max_Places: homeCareMaxPlaces || null,
+            Restorative_Care_Places: facility.Restorative_Care_Places || null,
+            Provider_Name: facility.Provider_Name || '',
+            Organisation_Type: facility.Organisation_Type || '',
+            ABS_Remoteness: facility.ABS_Remoteness || '',
+            Phone: phone || undefined,
+            Email: email || undefined,
+            Website: website || undefined,
+            Latitude: lat,
+            Longitude: lng,
+            F2019_Aged_Care_Planning_Region: facility.F2019_Aged_Care_Planning_Region || '',
+            F2016_SA2_Name: facility.F2016_SA2_Name || '',
+            F2016_SA3_Name: facility.F2016_SA3_Name || '',
+            F2016_LGA_Name: facility.F2016_LGA_Name || '',
+            facilityType: typeKey as 'residential' | 'mps' | 'home' | 'retirement'
+          };
+
           // Track popup open/close events for all popups
           popup.on('open', () => {
-            // Track this popup as open
+            // Track this popup as open with its facility type and data
             openPopupsRef.current.add(popup);
+            openPopupFacilityTypesRef.current.set(popup, typeKey);
+            openPopupFacilitiesRef.current.set(popup, facilityData);
           });
 
           // Add general close event listener for popups without save/details buttons
@@ -1161,6 +1287,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             popup.on('close', () => {
               // Remove this popup from open tracking
               openPopupsRef.current.delete(popup);
+              openPopupFacilityTypesRef.current.delete(popup);
+              openPopupFacilitiesRef.current.delete(popup);
             });
           }
 
@@ -2099,6 +2227,12 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     },
     getOpenPopupsCount: () => {
       return getOpenPopupsCount();
+    },
+    getFacilityTypeBreakdown: () => {
+      return getFacilityTypeBreakdown();
+    },
+    saveAllOpenFacilities: () => {
+      return saveAllOpenFacilities();
     }
   }));
 

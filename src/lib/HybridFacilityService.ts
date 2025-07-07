@@ -149,8 +149,8 @@ class HybridFacilityService {
       const properties = feature.properties;
       if (!properties) return;
 
-      // Determine facility type
-      const facilityType = this.determineFacilityType(properties.Care_Type);
+      // Determine facility type (check both Care_Type and Service_Name for retirement facilities)
+      const facilityType = this.determineFacilityType(properties.Care_Type, properties.Service_Name);
 
       // Create base facility data
       const facilityData: EnhancedFacilityData = {
@@ -232,7 +232,7 @@ class HybridFacilityService {
     return null;
   }
 
-  private determineFacilityType(careType: string): 'residential' | 'mps' | 'home' | 'retirement' {
+  private determineFacilityType(careType: string, serviceName?: string): 'residential' | 'mps' | 'home' | 'retirement' {
     if (!careType) return 'residential';
 
     const careTypeMapping = {
@@ -242,14 +242,22 @@ class HybridFacilityService {
       retirement: ['Retirement', 'Retirement Living', 'Retirement Village']
     };
 
-    // Check MPS first (most specific)
-    if (careTypeMapping.mps.some(ct => careType.includes(ct))) {
-      return 'mps';
+    // Check for retirement facilities first by checking both Care_Type and Service_Name
+    if (serviceName) {
+      const retirementKeywords = ['retirement', 'retirement living', 'retirement village', 'retirement home', 'retirement community'];
+      if (retirementKeywords.some(keyword => serviceName.toLowerCase().includes(keyword))) {
+        return 'retirement';
+      }
     }
     
-    // Then check residential (excluding MPS)
-    if (careTypeMapping.residential.some(ct => careType.includes(ct))) {
-      return 'residential';
+    // Also check Care_Type for retirement keywords
+    if (careTypeMapping.retirement.some(ct => careType.toLowerCase().includes(ct.toLowerCase()))) {
+      return 'retirement';
+    }
+
+    // Check MPS (most specific)
+    if (careTypeMapping.mps.some(ct => careType.includes(ct))) {
+      return 'mps';
     }
     
     // Check home care
@@ -257,9 +265,9 @@ class HybridFacilityService {
       return 'home';
     }
     
-    // Check retirement
-    if (careTypeMapping.retirement.some(ct => careType.toLowerCase().includes(ct.toLowerCase()))) {
-      return 'retirement';
+    // Then check residential (general category)
+    if (careTypeMapping.residential.some(ct => careType.includes(ct))) {
+      return 'residential';
     }
 
     return 'residential'; // default

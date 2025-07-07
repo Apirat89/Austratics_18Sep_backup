@@ -124,6 +124,7 @@ export default function MapsPage() {
   
   // Close All Popups state
   const [openPopupsCount, setOpenPopupsCount] = useState(0);
+  const [facilityBreakdown, setFacilityBreakdown] = useState<Record<string, number>>({});
   
   // Map reference for calling map methods
   const mapRef = useRef<AustralianMapRef>(null);
@@ -168,16 +169,18 @@ export default function MapsPage() {
     }
   }, [facilityModalOpen]);
 
-  // Track open popups count for Close All button visibility
+  // Track open popups count and facility breakdown for Close All button visibility
   useEffect(() => {
     const updatePopupCount = () => {
       if (mapRef.current) {
         const count = mapRef.current.getOpenPopupsCount();
+        const breakdown = mapRef.current.getFacilityTypeBreakdown();
         setOpenPopupsCount(count);
+        setFacilityBreakdown(breakdown);
       }
     };
 
-    // Poll every 500ms to keep track of popup count
+    // Poll every 500ms to keep track of popup count and breakdown
     const interval = setInterval(updatePopupCount, 500);
 
     // Cleanup interval on unmount
@@ -231,6 +234,17 @@ export default function MapsPage() {
     return 'residential'; // default
   };
 
+  // Function to get friendly facility type names
+  const getFacilityTypeName = (facilityType: string): string => {
+    switch (facilityType) {
+      case 'residential': return 'Residential Care';
+      case 'mps': return 'Multi-Purpose Service';
+      case 'home': return 'Home Care';
+      case 'retirement': return 'Retirement Living';
+      default: return facilityType;
+    }
+  };
+
   // Function to open facility details modal
   const openFacilityDetails = useCallback((facility: FacilityData) => {
     setSelectedFacility(facility);
@@ -259,8 +273,9 @@ export default function MapsPage() {
       const closedCount = mapRef.current.closeAllPopups();
       console.log(`🚪 Closed ${closedCount} facility popups`);
       
-      // Immediately update popup count to hide button
+      // Immediately update popup count and breakdown to hide button
       setOpenPopupsCount(0);
+      setFacilityBreakdown({});
     }
   }, []);
 
@@ -375,6 +390,43 @@ export default function MapsPage() {
       savedSearchesRef.current.refreshSavedSearches();
     }
   }, []);
+
+  // Function to save all facility popups
+  const handleSaveAllPopups = useCallback(async () => {
+    if (!mapRef.current || !user?.id) {
+      alert('Please sign in to save facilities');
+      return;
+    }
+
+    try {
+      console.log('💾 Starting save all facilities...');
+      const result = await mapRef.current.saveAllOpenFacilities();
+      
+      if (result.success) {
+        if (result.saved > 0) {
+          alert(`✅ Successfully saved ${result.saved} out of ${result.total} facilities to your saved locations!`);
+          // Refresh saved searches to show the new items
+          handleSavedSearchAdded();
+        } else {
+          alert('All open facilities are already saved to your locations.');
+        }
+      } else {
+        const errorMessage = result.errors.length > 0 
+          ? `Some facilities could not be saved:\n${result.errors.slice(0, 3).join('\n')}${result.errors.length > 3 ? '\n...' : ''}`
+          : 'Failed to save facilities.';
+        alert(`⚠️ ${errorMessage}`);
+        
+        if (result.saved > 0) {
+          alert(`✅ However, ${result.saved} out of ${result.total} facilities were successfully saved.`);
+          handleSavedSearchAdded();
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error saving all facilities:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`❌ Error: ${errorMessage}`);
+    }
+  }, [user?.id, handleSavedSearchAdded]);
 
   // Heatmap handlers
   const handleHeatmapToggle = useCallback((visible: boolean) => {
@@ -776,29 +828,77 @@ export default function MapsPage() {
             className="absolute top-4 left-4 z-50 w-80"
           />
 
-          {/* Close All Popups Button - Top Right */}
+          {/* Close All Popups Button with Breakdown - Top Right */}
           {openPopupsCount >= 2 && (
-            <button
-              onClick={handleCloseAllPopups}
-              className="absolute top-4 right-16 z-50 flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
-              title={`Close all ${openPopupsCount} facility popups`}
-            >
-              <svg 
-                className="w-4 h-4" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24" 
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth="2" 
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-              Close All ({openPopupsCount})
-            </button>
+            <div className="absolute top-4 right-16 z-50 space-y-2">
+              <div className="bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden">
+                {/* Main Close Button */}
+                <button
+                  onClick={handleCloseAllPopups}
+                  className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900 border-b border-gray-200"
+                  title={`Close all ${openPopupsCount} facility popups`}
+                >
+                  <svg 
+                    className="w-4 h-4" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth="2" 
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                  Close All ({openPopupsCount})
+                </button>
+                
+                {/* Breakdown Panel */}
+                <div className="p-3 bg-gray-50 min-w-[200px]">
+                  <div className="text-xs font-medium text-gray-600 mb-2">Open Facility Popups:</div>
+                  <div className="space-y-1">
+                    {Object.entries(facilityBreakdown).map(([facilityType, count]) => (
+                      <div key={facilityType} className="flex justify-between items-center text-sm">
+                        <span className="text-gray-700">{getFacilityTypeName(facilityType)}</span>
+                        <span className="font-medium text-gray-900 bg-white px-2 py-1 rounded text-xs">{count}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {Object.keys(facilityBreakdown).length === 0 && (
+                    <div className="text-sm text-gray-500 italic">Loading breakdown...</div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Save All Button */}
+              {user?.id && (
+                <div className="bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden">
+                  <button
+                    onClick={handleSaveAllPopups}
+                    className="w-full flex items-center gap-2 px-4 py-2 hover:bg-blue-50 transition-colors text-sm font-medium text-blue-700 hover:text-blue-900"
+                    title={`Save all ${openPopupsCount} facility popups to your saved locations`}
+                  >
+                    <svg 
+                      className="w-4 h-4" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24" 
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth="2" 
+                        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                      />
+                    </svg>
+                    Save All ({openPopupsCount})
+                  </button>
+                </div>
+              )}
+            </div>
           )}
 
           {/* Data Layers and Rankings Container - Bottom Left */}

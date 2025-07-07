@@ -1511,7 +1511,7 @@ export default function ResidentialPage() {
                       <div className="p-3 border-b border-gray-200 flex items-start justify-between">
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-900">Saved SA2 Regions</h3>
-                          <p className="text-xs text-gray-500">Filter facilities by region demographics</p>
+                          <p className="text-xs text-gray-500">Filter facilities by saved ABS S2 regions</p>
                         </div>
                         <button
                           onClick={(e) => {
