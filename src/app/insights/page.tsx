@@ -19,6 +19,7 @@ import {
   deleteSavedSA2Search, 
   deleteSavedSA2SearchBySA2Id,
   isSA2SearchSaved,
+  clearUserSavedSA2Searches,
   type SavedSA2Search 
 } from '../../lib/savedSA2Searches';
 
@@ -1084,6 +1085,25 @@ export default function SA2AnalyticsPage() {
     }
   };
 
+  // Clear all saved SA2 searches
+  const handleClearAllSavedSearches = async () => {
+    if (!user) return;
+
+    if (confirm('Are you sure you want to clear all saved SA2 searches? This action cannot be undone.')) {
+      try {
+        const result = await clearUserSavedSA2Searches(user.id);
+        if (result.success) {
+          console.log('All saved SA2 searches cleared successfully');
+          await loadSavedSA2Searches(); // Refresh the list
+        } else {
+          console.error('Failed to clear saved SA2 searches:', result.message);
+        }
+      } catch (error) {
+        console.error('Error clearing saved SA2 searches:', error);
+      }
+    }
+  };
+
   // Load saved SA2 search
   const loadSavedSA2Search = (savedSearch: SavedSA2Search) => {
     setSelectedSA2(savedSearch.sa2_data);
@@ -1387,7 +1407,7 @@ export default function SA2AnalyticsPage() {
                     )}
                   
                   {/* Search Results Dropdown */}
-                  {!selectedSA2 && (searchResults.length > 0 || (searchQuery.length >= 2 && !isSearching && searchResults.length === 0)) && (
+                  {(searchResults.length > 0 || (searchQuery.length >= 2 && !isSearching && searchResults.length === 0)) && (
                     <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-80 overflow-y-auto">
                       {searchResults.map((result, index) => {
                         // Get type-specific icon and info
@@ -1499,6 +1519,16 @@ export default function SA2AnalyticsPage() {
                   <History className="h-4 w-4 mr-2" />
                   Saved Searches ({savedSA2Searches.length})
                 </div>
+                {savedSA2Searches.length > 0 && (
+                  <button
+                    onClick={handleClearAllSavedSearches}
+                    className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
+                    title="Clear all saved searches"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    Clear All
+                  </button>
+                )}
               </CardTitle>
               <CardDescription>
                 Search and save SA2 regions to access them quickly

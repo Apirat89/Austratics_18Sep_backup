@@ -101,15 +101,10 @@ const SA2BoxPlot: React.FC<SA2BoxPlotProps> = ({
     const option: echarts.EChartsOption = {
       title: {
         text: metricName,
-        subtext: `vs ${comparisonName}`,
         left: 'center',
         textStyle: {
           fontSize: 12,
           fontWeight: 'normal'
-        },
-        subtextStyle: {
-          fontSize: 10,
-          color: '#666'
         }
       },
       tooltip: {
@@ -248,7 +243,12 @@ const SA2BoxPlot: React.FC<SA2BoxPlotProps> = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4">
+    <div className="bg-white border border-gray-200 rounded-lg p-4 relative">
+      {/* Comparison Level Indicator - Top Right Corner */}
+      <div className="absolute top-2 right-2 px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md border border-blue-200">
+        vs {comparisonName}
+      </div>
+      
       <div 
         ref={chartRef} 
         style={{ width: `${width}px`, height: `${height}px` }}

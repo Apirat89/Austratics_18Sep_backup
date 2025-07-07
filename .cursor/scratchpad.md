@@ -1,203 +1,126 @@
 # Project Scratchpad
 
-## 🎯 NEW REQUEST: Insights Page Postcode Data Integration
+## 🎯 NEW REQUEST: Fix Insights Page Search Behavior Inconsistency
 
-**USER REQUEST:** Update the insights page to use the new `merged_sa2_data_with_postcodes.json` file instead of `merged_sa2_data_comprehensive.json` to enable search by locality and postcode in addition to existing search functionality.
+**USER REQUEST:** Fix the search behavior on the insights page to ensure consistent search functionality. The search appears to be more limited when already viewing a location compared to the initial landing page search.
 
 **CURRENT SITUATION:**
-- New data file: `/data/sa2/merged_sa2_data_with_postcodes.json`
-- Current data file: `merged_sa2_data_comprehensive.json`
-- New file includes `postcode_data` field mapped to each record
-- Goal: Enable search by locality and postcode with relevant record names in suggested search results
+- Search works comprehensively on initial page load (landing state)
+- Search appears more limited when already viewing a location and searching again
+- Need to ensure consistent search behavior across all states
 
-**PLANNING MODE ACTIVE** 🎯
+**PLANNER MODE ACTIVE** 🎯
 
 ### Background and Motivation
 
-The insights page currently uses SA2 data for regional analytics. The user has created an enhanced dataset that includes postcode mappings, which will significantly improve the search experience by allowing users to search by familiar terms like locality names and postcodes instead of just SA2 codes.
+The insights page has an inconsistent search behavior that affects user experience. When the page first loads (no location selected), users see comprehensive search results when typing in the search bar. However, when already viewing a location (SA2 selected), the search results dropdown disappears entirely, making it appear as though search functionality is "more limited" or broken.
+
+This creates confusion because users expect consistent search behavior regardless of their current state on the page.
 
 ### Key Challenges and Analysis
 
-#### 1. Data Source Migration
-**File Path Updates**
-- Current data source needs to be identified and replaced
-- Ensure all references to the old file are updated
-- Verify the new file structure is compatible with existing code
+#### 1. Root Cause Identification
+**Conditional Rendering Issue**
+- Search results dropdown has condition: `{!selectedSA2 && (searchResults.length > 0 || ...)`
+- When `selectedSA2` is null (initial load): dropdown appears normally
+- When `selectedSA2` is set (viewing a location): dropdown is completely hidden
+- Search function still runs and populates results, but UI doesn't display them
 
-**Data Structure Compatibility**
-- Analyze the structure of `postcode_data` field in the new file
-- Ensure existing analytics functions continue to work
-- Identify any breaking changes in data format
+**User Experience Impact**
+- Users think search is "broken" when viewing a location
+- No way to search for other locations without first clearing current selection
+- Inconsistent behavior creates confusion and poor UX
 
-#### 2. Search Enhancement Implementation
-**Search Index Expansion**
-- Current search likely indexes SA2 names and codes
-- Need to expand to include localities and postcodes from `postcode_data`
-- Maintain search performance with larger search corpus
+#### 2. Technical Solution Requirements
+**Search Dropdown Behavior**
+- Remove the `!selectedSA2` condition from the dropdown rendering
+- Allow search results to appear regardless of current selection state
+- Maintain existing search functionality and result formatting
 
-**Search Result Display**
-- Users should see meaningful locality/postcode names in suggestions
-- Need to map search results back to SA2 records
-- Handle potential multiple postcodes per SA2 region
-
-#### 3. User Experience Considerations
-**Search Suggestion Clarity**
-- Users should understand what type of region they're selecting
-- Need clear indication of locality vs postcode vs SA2 name
-- Maintain existing search behavior while adding new capabilities
-
-**Performance Impact**
-- New file may be larger than current data
-- Search indexing might take longer
-- Need to ensure insights page load times remain optimal
+**User Workflow Improvement**
+- Enable seamless switching between locations via search
+- Preserve ability to search when already viewing analytics
+- Ensure search results properly replace current selection when clicked
 
 ### High-level Task Breakdown
 
-#### **Phase 1: Data Analysis and Migration Planning**
-**Priority**: High | **Estimated Duration**: 30-45 minutes
+#### **Task: Fix Search Dropdown Consistency Issue**
+**Priority**: High | **Estimated Duration**: 5-10 minutes
 
-**Task 1.1: Analyze New Data Structure**
-- **Objective**: Understand the structure of the new postcode data file
-- **Deliverables**:
-  - Document the schema of `postcode_data` field
-  - Identify all searchable fields (locality, postcode, SA2 name)
-  - Compare file size and structure with current data
-- **Success Criteria**:
-  - Complete understanding of data structure
-  - Confirmed compatibility with existing analytics
-  - Performance impact assessment
+**Objective**: Remove the conditional rendering that hides search results when viewing a location, ensuring consistent search behavior across all page states.
 
-**Task 1.2: Locate Current Data Usage**
-- **Objective**: Find all references to the current data file in the codebase
-- **Deliverables**:
-  - List of all components using `merged_sa2_data_comprehensive.json`
-  - Identify data loading patterns and file paths
-  - Document current search implementation
-- **Success Criteria**:
-  - Complete audit of data file usage
-  - Understanding of current search architecture
-  - Clear migration path identified
+**Deliverables**:
+- Remove `!selectedSA2 &&` condition from search dropdown rendering
+- Test search functionality when no location is selected (initial state)
+- Test search functionality when already viewing a location
+- Ensure search results properly update current selection when clicked
 
-#### **Phase 2: Data Source Migration**
-**Priority**: High | **Estimated Duration**: 45-60 minutes
-
-**Task 2.1: Update Data File References**
-- **Objective**: Replace all references to old data file with new file
-- **Deliverables**:
-  - Update file paths in all relevant components
-  - Verify data loading continues to work
-  - Update any static imports or file references
-- **Success Criteria**:
-  - New data file loads successfully
-  - No broken references to old file
-  - Existing functionality preserved
-
-**Task 2.2: Validate Data Compatibility**
-- **Objective**: Ensure existing analytics continue to work with new data
-- **Deliverables**:
-  - Test all existing insights page functionality
-  - Verify charts and visualizations work correctly
-  - Check for any data format breaking changes
-- **Success Criteria**:
-  - All existing features work with new data
-  - No regression in analytics functionality
-  - Performance remains acceptable
-
-#### **Phase 3: Enhanced Search Implementation**
-**Priority**: High | **Estimated Duration**: 1-2 hours
-
-**Task 3.1: Expand Search Index**
-- **Objective**: Enhance search to include locality and postcode data
-- **Deliverables**:
-  - Update search service to index `postcode_data` fields
-  - Create search terms from localities and postcodes
-  - Maintain existing SA2 search functionality
-- **Success Criteria**:
-  - Search includes SA2 names, localities, and postcodes
-  - Search performance remains good
-  - All data types are searchable
-
-**Task 3.2: Improve Search Results Display**
-- **Objective**: Show meaningful search suggestions with context
-- **Deliverables**:
-  - Update search suggestion component
-  - Add context indicators (locality/postcode/SA2)
-  - Improve search result formatting
-- **Success Criteria**:
-  - Users see clear, contextual search suggestions
-  - Easy to distinguish between different search types
-  - Maintains consistent UX with existing platform
-
-**Task 3.3: Enhanced Search Logic**
-- **Objective**: Implement intelligent search matching
-- **Deliverables**:
-  - Fuzzy search for locality names
-  - Exact match for postcodes
-  - Prefix search for SA2 codes
-  - Result ranking and deduplication
-- **Success Criteria**:
-  - Intuitive search behavior for all data types
-  - Relevant results ranked appropriately
-  - No duplicate or confusing results
-
-#### **Phase 4: Testing and Optimization**
-**Priority**: Medium | **Estimated Duration**: 30-45 minutes
-
-**Task 4.1: Comprehensive Testing**
-- **Objective**: Validate all search and analytics functionality
-- **Deliverables**:
-  - Test search by locality name
-  - Test search by postcode
-  - Test existing SA2 search
-  - Verify analytics continue to work
-- **Success Criteria**:
-  - All search types work correctly
-  - No performance degradation
-  - All insights page features functional
-
-**Task 4.2: Performance Optimization**
-- **Objective**: Ensure optimal performance with new data
-- **Deliverables**:
-  - Optimize search indexing if needed
-  - Implement lazy loading if file is large
-  - Add performance monitoring
-- **Success Criteria**:
-  - Page load times remain acceptable
-  - Search response times < 100ms
-  - Memory usage remains reasonable
+**Success Criteria**:
+- Search dropdown appears regardless of current selection state
+- Users can search for new locations while viewing current location
+- Search results behave consistently between initial load and when viewing locations
+- No regression in existing search functionality or result formatting
 
 ### Project Status Board
 
 | Task | Status | Priority | Dependencies | Notes |
 |------|--------|----------|--------------|-------|
-| 1.1: Analyze New Data Structure | ✅ Done | High | - | Data structure analysis complete |
-| 1.2: Locate Current Data Usage | ✅ Done | High | - | Current data usage identified |
-| 2.1: Update Data File References | ✅ Done | High | 1.1, 1.2 | ✅ Updated file path and interfaces |
-| 2.2: Validate Data Compatibility | ✅ Done | High | 2.1 | ✅ API works, postcode data loading correctly |
-| 3.1: Expand Search Index | ✅ Done | High | 2.2 | ✅ Added SA2 postcode/locality search integration |
-| 3.2: Improve Search Results Display | ✅ Done | High | 3.1 | ✅ Integrated postcode/locality search into insights page |
-| 3.3: Enhanced Search Logic | ✅ Done | High | 3.2 | ✅ Search functionality working correctly |
-| 4.1: Comprehensive Testing | ✅ Done | Medium | 3.3 | ✅ Page loads, API works, search functional |
-| 4.2: Performance Optimization | ✅ Done | Medium | 4.1 | ✅ Using efficient caching and filtering |
+| Fix Search Dropdown Consistency Issue | ✅ Done | High | - | ✅ Removed !selectedSA2 condition from dropdown rendering |
 
-**🎉 EXECUTOR MODE COMPLETE** - Implementation successful!
+**🎉 EXECUTOR MODE COMPLETE** - Search dropdown consistency fix implemented!
 
-### Data Structure Analysis (COMPLETED)
+### Implementation Details (COMPLETED)
 
-**✅ New File Structure Confirmed:**
-- **File Location:** `/data/sa2/merged_sa2_data_with_postcodes.json`
-- **Total Regions:** 2,454 SA2 regions
-- **Total Metrics:** 58 metrics (expanded from 34 in old file)
-- **Key Addition:** Each region now contains `postcode_data` field with locality and postcode mappings
+**✅ Search Dropdown Consistency Fixed:**
+- **Location**: Line 1409 in `src/app/insights/page.tsx`
+- **Change Made**: Removed `!selectedSA2 &&` condition from search dropdown rendering
+- **Before**: `{!selectedSA2 && (searchResults.length > 0 || ...) && (`
+- **After**: `{(searchResults.length > 0 || ...) && (`
+- **Impact**: Search dropdown now appears consistently in all page states
 
-**✅ Postcode Data Structure:**
-```json
-{
-  "regions": [
-    {
-      "id": "101021007",
-      "name": "SA2 Region Name",
-      "postcode_data": [
+**Expected Behavior Changes:**
+- ✅ Search dropdown appears on initial page load (no regression)
+- ✅ Search dropdown now appears when viewing a location (fixed!)
+- ✅ Users can search for new locations while viewing current analytics
+- ✅ Seamless location switching via search functionality
+
+### Analysis Findings (COMPLETED)
+
+**🔍 Issue Root Cause Identified:**
+- **Problem**: Search dropdown only appears when `!selectedSA2` condition is true
+- **Current Code**: Line 1409 has condition `{!selectedSA2 && (searchResults.length > 0 || ...)`
+- **Impact**: When viewing a location (`selectedSA2` is set), search dropdown completely disappears
+- **User Experience**: Creates illusion that search is "more limited" when really it's just hidden
+
+**📊 Current Behavior Analysis:**
+- **Initial Page Load**: `selectedSA2 = null` → `!selectedSA2 = true` → dropdown shows
+- **Viewing Location**: `selectedSA2 = SA2Object` → `!selectedSA2 = false` → dropdown hidden
+- **Search Function**: `performSimpleSearch()` still runs and populates `searchResults`
+- **UI Rendering**: Dropdown condition prevents results from being displayed
+
+**🎯 Solution Strategy:**
+- **Simple Fix**: Remove the `!selectedSA2 &&` condition from line 1409
+- **Expected Result**: Search dropdown appears consistently in all states
+- **Benefit**: Users can search for new locations while viewing current analytics
+- **Risk**: Minimal - existing search functionality remains unchanged
+
+### Executor's Feedback or Assistance Requests
+
+**Ready for Implementation** - Analysis complete, solution identified and straightforward to implement.
+
+**Implementation Notes:**
+- Single line change required: remove `!selectedSA2 &&` from line 1409
+- Should test both scenarios after implementation
+- No complex logic changes needed
+
+### Lessons
+
+- **UI Conditional Logic**: Be careful with conditional rendering that can hide important functionality
+- **User Testing**: What appears as "limited functionality" may actually be hidden UI elements  
+- **State-based UI**: When UI behavior changes based on state, ensure it matches user expectations
+- **Debugging Strategy**: Search for conditional rendering when users report inconsistent behavior
+- **Simple Fixes**: Sometimes major UX issues have very simple solutions - this was a one-line fix
+- **State Dependencies**: Conditional UI logic based on state should be carefully reviewed for edge cases
         {
           "Locality": "ARALUEN",
           "Post_Code": "2622"
@@ -301,7 +224,34 @@ The insights page currently uses SA2 data for regional analytics. The user has c
 - Search now works directly on SA2 data without external dependencies
 - **UPDATED**: Removed 10-result limit - now shows ALL matching search results
 
-**✅ PREVIOUS TASK COMPLETE** - All original postcode/locality search functionality was successfully implemented and tested.
+**✅ TASK COMPLETE: Comparison Indicators Moved to Right Corner**
+
+**USER REQUEST:** Move the "vs National", "vs SA2", "vs SA3", "vs State" comparison indicators from chart subtitles to the right-hand corner of all graphs in insights page sub-tabs.
+
+**IMPLEMENTATION COMPLETED SUCCESSFULLY** ✅
+
+**FINAL IMPLEMENTATION:**
+- ✅ **SA2BoxPlot**: Moved comparison indicator to top-right corner, removed from subtitle
+- ✅ **SA2RadarChart**: Added comparison indicator support with new props
+- ✅ **SA2RankingChart**: Added comparison indicator support with new props  
+- ✅ **SA2HeatmapChart**: Added comparison indicator support with new props
+- ✅ **Insights Page**: Already has correct props passed to components
+- ✅ **Testing**: Page loads successfully with updated components
+
+**VISUAL CHANGES:**
+- 🎯 **Blue badge indicator** positioned in top-right corner: `vs {comparisonName}`
+- 🎯 **Clean chart titles** without subtitle clutter
+- 🎯 **Consistent styling** across all chart types
+- 🎯 **Improved visual hierarchy** with comparison context clearly visible
+
+**TECHNICAL DETAILS:**
+- Used `relative` positioning on chart containers
+- Added `absolute` positioned comparison badges with blue styling
+- Removed ECharts subtitle configuration
+- Extended all chart component interfaces with comparison props
+- Maintained backward compatibility
+
+**✅ PREVIOUS TASK COMPLETE** - All original postcode/locality search functionality and simplified search were successfully implemented and deployed.
 
 ### Lessons
 

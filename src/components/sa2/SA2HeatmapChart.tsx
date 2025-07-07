@@ -30,6 +30,12 @@ interface SA2HeatmapChartProps {
   selectedMetrics: string[];
   width?: number;
   height?: number;
+  comparisonLevel?: 'national' | 'state' | 'sa4' | 'sa3';
+  sa2Info?: {
+    stateName?: string;
+    sa4Name?: string;
+    sa3Name?: string;
+  };
 }
 
 const SA2HeatmapChart: React.FC<SA2HeatmapChartProps> = ({
@@ -37,10 +43,24 @@ const SA2HeatmapChart: React.FC<SA2HeatmapChartProps> = ({
   data,
   selectedMetrics,
   width = 600,
-  height = 400
+  height = 400,
+  comparisonLevel = 'national',
+  sa2Info
 }) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
+
+  // Get comparison level display name
+  const getComparisonLevelName = (): string => {
+    switch (comparisonLevel) {
+      case 'state': return sa2Info?.stateName ? `${sa2Info.stateName} (State)` : 'State Level';
+      case 'sa4': return sa2Info?.sa4Name ? `${sa2Info.sa4Name} (SA4)` : 'SA4 Level';
+      case 'sa3': return sa2Info?.sa3Name ? `${sa2Info.sa3Name} (SA3)` : 'SA3 Level';
+      default: return 'National';
+    }
+  };
+
+  const comparisonName = getComparisonLevelName();
 
   useEffect(() => {
     if (!chartRef.current || data.length === 0 || selectedMetrics.length === 0) return;
@@ -219,7 +239,12 @@ const SA2HeatmapChart: React.FC<SA2HeatmapChartProps> = ({
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4">
+    <div className="bg-white border border-gray-200 rounded-lg p-4 relative">
+      {/* Comparison Level Indicator - Top Right Corner */}
+      <div className="absolute top-2 right-2 px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md border border-blue-200">
+        vs {comparisonName}
+      </div>
+      
       <div 
         ref={chartRef} 
         style={{ width: `${width}px`, height: `${height}px` }}
