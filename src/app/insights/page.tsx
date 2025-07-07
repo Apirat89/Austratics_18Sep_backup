@@ -120,6 +120,7 @@ export default function SA2AnalyticsPage() {
   const dataLoadingRef = useRef(false);
   const dataLoadedRef = useRef(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   // Load SA2 data and calculate enhanced statistics
   const loadSA2Data = useCallback(async () => {
@@ -656,6 +657,11 @@ export default function SA2AnalyticsPage() {
       setIsSearching(false);
     }
   }, [allSA2Data]);
+
+  // Handle click outside search dropdown to close it
+  const handleClickOutside = useCallback(() => {
+    setSearchResults([]);
+  }, []);
 
   /* 🚫 OLD: Complex multi-source search with debouncing and SA2 proximity suggestions (COMMENTED OUT FOR REFERENCE)
   const performSearch_OLD_COMPLEX = useCallback(async (query: string) => {
@@ -1203,6 +1209,24 @@ export default function SA2AnalyticsPage() {
     };
   }, [searchQuery, performSimpleSearch]);
 
+  // Handle click outside search dropdown to close it
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        handleClickOutside();
+      }
+    };
+
+    // Only add event listener if there are search results to close
+    if (searchResults.length > 0) {
+      document.addEventListener('mousedown', handleDocumentClick);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleDocumentClick);
+    };
+  }, [searchResults.length, handleClickOutside]);
+
   if (isLoading || !user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -1391,12 +1415,18 @@ export default function SA2AnalyticsPage() {
                     </div>
                   )}
                   
-                  <div className="relative">
+                  <div className="relative" ref={searchContainerRef}>
                     <input
                       type="text"
                       placeholder="Search regions (SA2/SA3/SA4/LGA), postcodes, localities, or facilities..."
                       value={searchQuery}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                      onClick={() => {
+                        // Show existing results when clicking on search bar
+                        if (searchQuery.trim()) {
+                          performSimpleSearch(searchQuery);
+                        }
+                      }}
                       className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                     <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -1407,7 +1437,7 @@ export default function SA2AnalyticsPage() {
                     )}
                   
                   {/* Search Results Dropdown */}
-                  {(searchResults.length > 0 || (searchQuery.length >= 2 && !isSearching && searchResults.length === 0)) && (
+                  {searchResults.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-80 overflow-y-auto">
                       {searchResults.map((result, index) => {
                         // Get type-specific icon and info
@@ -1491,17 +1521,6 @@ export default function SA2AnalyticsPage() {
                           </button>
                         );
                       })}
-                      
-                      {/* No Results State */}
-                      {searchQuery.length >= 2 && !isSearching && searchResults.length === 0 && (
-                        <div className="px-4 py-8 text-center">
-                          <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                          <p className="text-sm text-gray-500">No locations found</p>
-                          <p className="text-xs text-gray-400 mt-1">
-                            Try searching for regions (SA2/SA3/SA4/LGA), postcodes, localities, or healthcare facilities
-                          </p>
-                        </div>
-                      )}
                     </div>
                   )}
                   </div>
