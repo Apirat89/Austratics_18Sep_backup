@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Scale, CheckSquare, Square, Eye, X } from 'lucide-react';
+import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Scale, CheckSquare, Square, Eye, X, Filter, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InlineBoxPlot from '@/components/residential/InlineBoxPlot';
@@ -35,6 +35,10 @@ import {
   type ResidentialComparisonHistoryItem,
   type ResidentialComparisonSelection
 } from '../../lib/residentialHistory';
+import {
+  getUserSavedSA2Searches,
+  type SavedSA2Search
+} from '../../lib/savedSA2Searches';
 
 interface ResidentialFacility {
   // Enhanced Provider Information
@@ -337,6 +341,12 @@ export default function ResidentialPage() {
   const [persistentSelections, setPersistentSelections] = useState<ResidentialComparisonSelection[]>([]);
   const [selectionSyncLoading, setSelectionSyncLoading] = useState(false);
 
+  // NEW: SA2 Region Filtering state
+  const [savedSA2Regions, setSavedSA2Regions] = useState<SavedSA2Search[]>([]);
+  const [showSA2Dropdown, setShowSA2Dropdown] = useState(false);
+  const [selectedSA2Filter, setSelectedSA2Filter] = useState<SavedSA2Search | null>(null);
+  const [sa2LoadingError, setSA2LoadingError] = useState<string | null>(null);
+
   // Load current user, saved facilities, and history from Supabase on component mount
   useEffect(() => {
     const loadUserAndData = async () => {
@@ -365,6 +375,15 @@ export default function ResidentialPage() {
           // Sync selectedForComparison with persistent selections
           const selectedFacilities = selections.map(selection => selection.facility_data);
           setSelectedForComparison(selectedFacilities);
+          
+          // Load saved SA2 regions from Supabase
+          try {
+            const sa2Result = await getUserSavedSA2Searches(user.id);
+            setSavedSA2Regions(sa2Result.searches);
+          } catch (error) {
+            console.error('Error loading saved SA2 regions:', error);
+            setSA2LoadingError('Failed to load saved SA2 regions');
+          }
         }
       } catch (error) {
         console.error('Error loading user and data:', error);
@@ -416,27 +435,63 @@ export default function ResidentialPage() {
       if (showSelectedList && !target.closest('.comparison-dropdown-container')) {
         setShowSelectedList(false);
       }
+      if (showSA2Dropdown && !target.closest('.sa2-dropdown-container')) {
+        setShowSA2Dropdown(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showSavedFacilitiesDropdown, showSelectedList]);
+  }, [showSavedFacilitiesDropdown, showSelectedList, showSA2Dropdown]);
 
   useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setFilteredFacilities([]); // Show no facilities when search is empty
-    } else {
-      const filtered = facilities.filter(facility =>
-        facility["Service Name"]?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        facility.formatted_address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        facility.address_locality?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        facility.provider_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    // SA2-based filtering function
+    const filterBySA2 = (facilities: ResidentialFacility[], sa2Region: SavedSA2Search) => {
+      if (!sa2Region.sa2_data?.postcode_data) return [];
+      
+      const sa2Postcodes = sa2Region.sa2_data.postcode_data.map((pc: any) => pc.Post_Code);
+      const sa2Localities = sa2Region.sa2_data.postcode_data.map((pc: any) => pc.Locality.toLowerCase());
+      
+      return facilities.filter(facility => {
+        const facilityPostcode = facility.address_postcode;
+        const facilityLocality = facility.address_locality?.toLowerCase();
+        
+        return (facilityPostcode && sa2Postcodes.includes(facilityPostcode)) ||
+               (facilityLocality && sa2Localities.includes(facilityLocality));
+      });
+    };
+
+    // Search term filtering function
+    const filterBySearchTerm = (facilities: ResidentialFacility[], term: string) => {
+      return facilities.filter(facility =>
+        facility["Service Name"]?.toLowerCase().includes(term.toLowerCase()) ||
+        facility.formatted_address?.toLowerCase().includes(term.toLowerCase()) ||
+        facility.address_locality?.toLowerCase().includes(term.toLowerCase()) ||
+        facility.provider_name?.toLowerCase().includes(term.toLowerCase())
       );
+    };
+
+    let filtered = facilities;
+
+    // Apply SA2 filter first if selected
+    if (selectedSA2Filter) {
+      filtered = filterBySA2(filtered, selectedSA2Filter);
+    }
+
+    // Then apply search term filter if provided
+    if (searchTerm.trim() !== '') {
+      filtered = filterBySearchTerm(filtered, searchTerm);
+    }
+
+    // Only show results if there's a search term or SA2 filter applied
+    if (searchTerm.trim() === '' && !selectedSA2Filter) {
+      setFilteredFacilities([]);
+    } else {
       setFilteredFacilities(filtered);
     }
-  }, [searchTerm, facilities]);
+  }, [searchTerm, facilities, selectedSA2Filter]);
 
   // Toggle save facility function (save/unsave) - now using Supabase with search history
   const toggleSaveFacility = async (facility: ResidentialFacility) => {
@@ -700,6 +755,29 @@ export default function ResidentialPage() {
     } catch (error) {
       console.error('Error deleting comparison history item:', error);
       alert('An error occurred while deleting the comparison history item.');
+    }
+  };
+
+  // NEW: SA2 Region selection and filtering handlers
+  const handleSA2RegionSelect = (sa2Region: SavedSA2Search) => {
+    setSelectedSA2Filter(sa2Region);
+    setShowSA2Dropdown(false);
+    // Clear search term when SA2 filter is applied to avoid confusion
+    setSearchTerm('');
+  };
+
+  const handleClearSA2Filter = () => {
+    setSelectedSA2Filter(null);
+  };
+
+  // Handle navigate to insights page
+  const handleGoToInsights = () => {
+    router.push('/insights');
+  };
+
+  const handleToggleSA2Dropdown = () => {
+    if (savedSA2Regions.length > 0) {
+      setShowSA2Dropdown(!showSA2Dropdown);
     }
   };
 
@@ -1342,24 +1420,117 @@ export default function ResidentialPage() {
           
           {!showSavedFacilities && (
             <>
-              {/* Search Bar */}
-              <div className="relative max-w-2xl">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search by facility name, address, locality, or provider..."
-                  value={searchTerm}
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+              {/* Search Bar and SA2 Filter */}
+              <div className="flex gap-4 items-start">
+                {/* Search Bar */}
+                <div className="relative flex-1 max-w-2xl">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by facility name, address, locality, or provider..."
+                    value={searchTerm}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* SA2 Region Filter Dropdown */}
+                <div className="relative sa2-dropdown-container">
+                  <button
+                    onClick={handleToggleSA2Dropdown}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors min-w-48 ${
+                      selectedSA2Filter
+                        ? 'bg-green-100 text-green-700 border border-green-200'
+                        : savedSA2Regions.length > 0
+                        ? 'bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-200'
+                        : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                    }`}
+                    disabled={savedSA2Regions.length === 0}
+                    title={savedSA2Regions.length === 0 ? 'No saved SA2 regions available' : 'Filter by saved SA2 region'}
+                  >
+                    <Filter className="w-4 h-4" />
+                    {selectedSA2Filter ? (
+                      <span className="truncate">{selectedSA2Filter.sa2_name}</span>
+                    ) : (
+                      <span>SA2 Regions ({savedSA2Regions.length})</span>
+                    )}
+                    {selectedSA2Filter && (
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClearSA2Filter();
+                        }}
+                        className="text-green-700 hover:text-green-900 ml-1 cursor-pointer"
+                        title="Clear SA2 filter"
+                      >
+                        <X className="w-3 h-3" />
+                      </span>
+                    )}
+                  </button>
+                  
+                  {/* SA2 Dropdown */}
+                  {showSA2Dropdown && savedSA2Regions.length > 0 && (
+                    <div className="absolute top-full right-0 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                      <div className="p-3 border-b border-gray-200 flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900">Saved SA2 Regions</h3>
+                          <p className="text-xs text-gray-500">Filter facilities by region demographics</p>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleGoToInsights();
+                          }}
+                          className="ml-2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                          title="Go to Insights page"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="max-h-60 overflow-y-auto">
+                        {savedSA2Regions.map((sa2Region, index) => (
+                          <div key={index} className="p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer"
+                               onClick={() => handleSA2RegionSelect(sa2Region)}>
+                            <p className="font-medium text-gray-900 text-sm">{sa2Region.sa2_name}</p>
+                            <p className="text-xs text-gray-500">
+                              {sa2Region.sa2_data?.postcode_data?.length || 0} postcodes/localities
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              Saved {new Date(sa2Region.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               
-              <p className="mt-2 text-sm text-gray-600">
-                {searchTerm.trim() === '' 
-                  ? `Search through ${facilities.length} residential facilities using the search bar above`
-                  : `Showing ${filteredFacilities.length} of ${facilities.length} facilities`
-                }
-              </p>
+              <div className="mt-2 text-sm text-gray-600">
+                {selectedSA2Filter && (
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs">
+                      Filtered by: {selectedSA2Filter.sa2_name}
+                    </span>
+                    <button
+                      onClick={handleClearSA2Filter}
+                      className="text-green-700 hover:text-green-900 text-xs underline"
+                    >
+                      Clear filter
+                    </button>
+                  </div>
+                )}
+                <p>
+                  {searchTerm.trim() === '' && !selectedSA2Filter
+                    ? `Search through ${facilities.length} residential facilities using the search bar or SA2 region filter above`
+                    : selectedSA2Filter && searchTerm.trim() === ''
+                    ? `Showing ${filteredFacilities.length} facilities in ${selectedSA2Filter.sa2_name} region`
+                    : selectedSA2Filter && searchTerm.trim() !== ''
+                    ? `Showing ${filteredFacilities.length} facilities matching "${searchTerm}" in ${selectedSA2Filter.sa2_name} region`
+                    : `Showing ${filteredFacilities.length} of ${facilities.length} facilities matching "${searchTerm}"`
+                  }
+                </p>
+              </div>
             </>
           )}
           
@@ -1381,16 +1552,17 @@ export default function ResidentialPage() {
             {!showSavedFacilities ? (
               /* Search Results */
               <div>
-                {searchTerm.trim() === '' ? (
+                {searchTerm.trim() === '' && !selectedSA2Filter ? (
                   /* Empty State - No Search */
                   <div className="text-center py-12">
                     <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Search Residential Facilities</h3>
                     <p className="text-gray-600 mb-4">
-                      Use the search bar above to find residential aged care facilities by name, address, locality, or provider.
+                      Use the search bar above to find residential aged care facilities by name, address, locality, or provider. 
+                      Or filter by your saved SA2 regions from insights analysis.
                     </p>
                     <p className="text-sm text-gray-500">
-                      {facilities.length} facilities available to search through
+                      {facilities.length} facilities available • {savedSA2Regions.length} saved SA2 regions for filtering
                     </p>
                   </div>
                 ) : filteredFacilities.length > 0 ? (
@@ -1500,11 +1672,27 @@ export default function ResidentialPage() {
                     <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">No facilities found</h3>
                     <p className="text-gray-600 mb-4">
-                      No residential facilities match your search criteria.
+                      {selectedSA2Filter && searchTerm.trim() !== ''
+                        ? `No facilities match "${searchTerm}" in ${selectedSA2Filter.sa2_name} region.`
+                        : selectedSA2Filter
+                        ? `No facilities found in ${selectedSA2Filter.sa2_name} region.`
+                        : 'No residential facilities match your search criteria.'
+                      }
                     </p>
                     <p className="text-sm text-gray-500">
-                      Try adjusting your search terms or browse all {facilities.length} available facilities.
+                      {selectedSA2Filter
+                        ? 'Try clearing the SA2 filter or adjusting your search terms.'
+                        : `Try adjusting your search terms or browse all ${facilities.length} available facilities.`
+                      }
                     </p>
+                    {selectedSA2Filter && (
+                      <button
+                        onClick={handleClearSA2Filter}
+                        className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Clear SA2 Filter
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
