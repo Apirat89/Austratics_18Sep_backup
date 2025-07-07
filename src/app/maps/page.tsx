@@ -122,6 +122,9 @@ export default function MapsPage() {
   const [selectedFacility, setSelectedFacility] = useState<FacilityData | null>(null);
   const [facilityModalOpen, setFacilityModalOpen] = useState(false);
   
+  // Close All Popups state
+  const [openPopupsCount, setOpenPopupsCount] = useState(0);
+  
   // Map reference for calling map methods
   const mapRef = useRef<AustralianMapRef>(null);
   const savedSearchesRef = useRef<SavedSearchesRef>(null);
@@ -164,6 +167,22 @@ export default function MapsPage() {
       loadFacilityById(facilityId);
     }
   }, [facilityModalOpen]);
+
+  // Track open popups count for Close All button visibility
+  useEffect(() => {
+    const updatePopupCount = () => {
+      if (mapRef.current) {
+        const count = mapRef.current.getOpenPopupsCount();
+        setOpenPopupsCount(count);
+      }
+    };
+
+    // Poll every 500ms to keep track of popup count
+    const interval = setInterval(updatePopupCount, 500);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, []);
 
   // Function to load facility by ID and open modal
   const loadFacilityById = async (facilityId: string) => {
@@ -232,6 +251,17 @@ export default function MapsPage() {
     const url = new URL(window.location.href);
     url.searchParams.delete('facility');
     window.history.pushState({}, '', url.toString());
+  }, []);
+
+  // Function to close all facility popups
+  const handleCloseAllPopups = useCallback(() => {
+    if (mapRef.current) {
+      const closedCount = mapRef.current.closeAllPopups();
+      console.log(`🚪 Closed ${closedCount} facility popups`);
+      
+      // Immediately update popup count to hide button
+      setOpenPopupsCount(0);
+    }
   }, []);
 
   // Poll preload state from map
@@ -745,6 +775,31 @@ export default function MapsPage() {
             onClearCurrentlyShowing={handleClearCurrentlyShowing}
             className="absolute top-4 left-4 z-50 w-80"
           />
+
+          {/* Close All Popups Button - Top Right */}
+          {openPopupsCount >= 2 && (
+            <button
+              onClick={handleCloseAllPopups}
+              className="absolute top-4 right-16 z-50 flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
+              title={`Close all ${openPopupsCount} facility popups`}
+            >
+              <svg 
+                className="w-4 h-4" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth="2" 
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+              Close All ({openPopupsCount})
+            </button>
+          )}
 
           {/* Data Layers and Rankings Container - Bottom Left */}
           <div className="absolute bottom-4 left-4 z-40 flex gap-4">

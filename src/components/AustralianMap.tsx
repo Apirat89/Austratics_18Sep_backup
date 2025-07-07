@@ -105,6 +105,8 @@ export interface AustralianMapRef {
     stylesPreloaded: boolean;
     stylePreloadProgress: { current: number; total: number };
   };
+  closeAllPopups: () => number;
+  getOpenPopupsCount: () => number;
 }
 
 // Helper function for point-in-polygon testing using ray casting algorithm
@@ -271,6 +273,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   
   // Track markers with proper cleanup
   const markersRef = useRef<maptilersdk.Marker[]>([]);
+  
+  // Track open facility popups for bulk close functionality
+  const openPopupsRef = useRef<Set<maptilersdk.Popup>>(new Set());
   
   // Track processed navigation to prevent repeated map movements
   const lastProcessedNavigationRef = useRef<string | null>(null);
@@ -468,6 +473,27 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       }
     });
     markersRef.current = [];
+    // Also clear tracked popups when markers are cleared
+    openPopupsRef.current.clear();
+  }, []);
+
+  // Helper function to close all open facility popups
+  const closeAllPopups = useCallback(() => {
+    console.log('🚪 Closing all facility popups:', openPopupsRef.current.size);
+    
+    // Close all tracked popups
+    openPopupsRef.current.forEach((popup) => {
+      try {
+        popup.remove();
+      } catch (error) {
+        console.warn('Error closing popup:', error);
+      }
+    });
+    
+    // Clear the tracking set
+    openPopupsRef.current.clear();
+    
+    return openPopupsRef.current.size; // Should be 0 after clearing
   }, []);
 
   // Helper function to handle facility hover
@@ -1099,6 +1125,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             
             // Clean up when popup is closed
             popup.on('close', () => {
+              // Remove this popup from open tracking
+              openPopupsRef.current.delete(popup);
               delete (window as any)[functionName];
               delete (window as any)[updateFunctionName];
               if (showSeeDetailsButton) {
@@ -1116,7 +1144,23 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           } else if (showSeeDetailsButton) {
             // If only "See Details" button exists (no userId), still need cleanup
             popup.on('close', () => {
+              // Remove this popup from open tracking
+              openPopupsRef.current.delete(popup);
               delete (window as any)[detailsFunctionName];
+            });
+          }
+
+          // Track popup open/close events for all popups
+          popup.on('open', () => {
+            // Track this popup as open
+            openPopupsRef.current.add(popup);
+          });
+
+          // Add general close event listener for popups without save/details buttons
+          if (!userId && !showSeeDetailsButton) {
+            popup.on('close', () => {
+              // Remove this popup from open tracking
+              openPopupsRef.current.delete(popup);
             });
           }
 
@@ -2031,7 +2075,12 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     setLastSearchResult(null);
   }, []);
 
-  // Expose clearHighlight method to parent
+  // Helper function to get count of open popups
+  const getOpenPopupsCount = useCallback(() => {
+    return openPopupsRef.current.size;
+  }, []);
+
+  // Expose methods to parent
   useImperativeHandle(ref, () => ({
     clearHighlight: () => {
       clearHighlight();
@@ -2044,7 +2093,13 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       preloadProgress,
       stylesPreloaded,
       stylePreloadProgress
-    })
+    }),
+    closeAllPopups: () => {
+      return closeAllPopups();
+    },
+    getOpenPopupsCount: () => {
+      return getOpenPopupsCount();
+    }
   }));
 
   return (
