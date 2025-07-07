@@ -199,6 +199,481 @@ The insights page has a search functionality that displays suggestions when user
 
 **Next Steps**: Implement click outside detection using useRef and event listeners.
 
+---
+
+## 🎯 NEW COMPLETED: Added External Link Icon to Saved Searches
+
+**USER REQUEST:** Add a "door exit" icon to the saved searches in the insights page that allows users to navigate to the residential page to see homes in those SA2 areas.
+
+**IMPLEMENTATION COMPLETE** ✅
+
+### What Was Implemented:
+
+#### 1. **ExternalLink Icon Integration**
+- Added `ExternalLink` to lucide-react imports in insights page
+- Created navigation function `navigateToResidentialForSA2()` 
+- Passes SA2 name as URL parameter: `/residential?sa2=${encodeURIComponent(savedSearch.sa2_name)}`
+
+#### 2. **UI Enhancement in Saved Searches**
+- Added ExternalLink button next to trash icon for each saved search
+- Button has blue hover color (`hover:text-blue-600`) vs red for delete
+- Tooltip: "View residential homes in this SA2 region"
+- Wrapped both icons in flex container with gap-1 spacing
+
+#### 3. **Residential Page URL Parameter Handling**
+- Added `useSearchParams` import and hook to residential page
+- Added useEffect to detect and handle `sa2` URL parameter
+- Automatically sets SA2 filter when matching saved region is found
+- Includes null safety check for searchParams
+- Logs success/warning messages for debugging
+
+#### 4. **Complete Integration Flow**
+1. **User clicks ExternalLink icon** in insights saved searches
+2. **Navigation occurs** to `/residential?sa2=RegionName`
+3. **Residential page loads** and detects SA2 parameter
+4. **Auto-filters** to show only homes in that SA2 region
+5. **User sees filtered results** immediately upon page load
+
+### Technical Implementation Details:
+
+**Files Modified:**
+- `src/app/insights/page.tsx` - Added icon, navigation function, and UI changes
+- `src/app/residential/page.tsx` - Added URL parameter handling
+
+**Code Changes:**
+```jsx
+// Insights Page - Navigation Function
+const navigateToResidentialForSA2 = (savedSearch: SavedSA2Search) => {
+  router.push(`/residential?sa2=${encodeURIComponent(savedSearch.sa2_name)}`);
+};
+
+// Insights Page - UI Enhancement
+<div className="flex items-center gap-1">
+  <button onClick={() => navigateToResidentialForSA2(savedSearch)} ...>
+    <ExternalLink className="h-4 w-4" />
+  </button>
+  <button onClick={() => deleteSavedSA2SearchHandler(savedSearch.id)} ...>
+    <Trash2 className="h-4 w-4" />
+  </button>
+</div>
+
+// Residential Page - URL Parameter Handling  
+const searchParams = useSearchParams();
+
+useEffect(() => {
+  if (!searchParams) return;
+  const sa2Param = searchParams.get('sa2');
+  if (sa2Param && savedSA2Regions.length > 0 && !selectedSA2Filter) {
+    const matchingSA2 = savedSA2Regions.find(region => 
+      region.sa2_name.toLowerCase() === sa2Param.toLowerCase()
+    );
+    if (matchingSA2) {
+      setSelectedSA2Filter(matchingSA2);
+    }
+  }
+}, [searchParams, savedSA2Regions, selectedSA2Filter]);
+```
+
+**Benefits:**
+- ✅ **Seamless workflow** from insights analysis to residential facility browsing
+- ✅ **Context preservation** - users can directly see homes in analyzed regions
+- ✅ **Enhanced UX** - reduces manual searching and filtering steps
+- ✅ **Cross-page integration** - leverages existing SA2 filtering infrastructure
+
+**Ready for Testing and Deployment** - Feature implementation complete and integrated with existing residential page SA2 filtering system.
+
+---
+
+## 🔗 ADDITIONAL ENHANCEMENT: External Link Icon in SA2 Overview Card
+
+**USER REQUEST:** Add the "door exit" icon to the main SA2 Overview Card (where the red placeholder was marked) to allow direct navigation to residential page.
+
+**IMPLEMENTATION COMPLETE** ✅
+
+### What Was Added:
+
+#### 1. **SA2 Overview Card Header Enhancement**
+- Modified CardTitle from `flex items-center` to `flex items-center justify-between`
+- Wrapped existing content (MapPin icon + SA2 name) in a flex container
+- Added ExternalLink button on the right side with proper positioning
+
+#### 2. **Navigation Integration**
+- Button navigates to `/residential?sa2=${encodeURIComponent(selectedSA2.sa2Name)}`
+- Uses current SA2 data from `selectedSA2` state
+- Maintains consistency with saved searches external link functionality
+
+#### 3. **Styling and UX**
+- Blue color scheme matching other UI elements (`text-blue-600 hover:text-blue-800`)
+- Hover effects with background color change (`hover:bg-blue-50`)
+- Descriptive tooltip: "View residential aged care facilities in this SA2 region"
+- Proper padding and transitions for smooth interaction
+
+### Technical Implementation:
+
+**File Modified:** `src/app/insights/page.tsx`
+
+**Code Changes:**
+```jsx
+// Before:
+<CardTitle className="flex items-center">
+  <MapPin className="h-5 w-5 mr-2 text-blue-600" />
+  {selectedSA2.sa2Name}
+</CardTitle>
+
+// After:
+<CardTitle className="flex items-center justify-between">
+  <div className="flex items-center">
+    <MapPin className="h-5 w-5 mr-2 text-blue-600" />
+    {selectedSA2.sa2Name}
+  </div>
+  <button
+    onClick={() => {
+      router.push(`/residential?sa2=${encodeURIComponent(selectedSA2.sa2Name)}`);
+    }}
+    className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg p-1.5 transition-colors"
+    title="View residential aged care facilities in this SA2 region"
+  >
+    <ExternalLink className="h-4 w-4" />
+  </button>
+</CardTitle>
+```
+
+**Benefits:**
+- ✅ **Direct access** from main SA2 view to residential facilities
+- ✅ **Consistent UX** - matches saved searches external link behavior
+- ✅ **Intuitive placement** - positioned exactly where user indicated (red placeholder)
+- ✅ **Seamless integration** - leverages existing URL parameter handling in residential page
+
+**Complete Integration:** Users can now navigate to residential page from both:
+1. **Saved searches dropdown** (existing functionality)
+2. **Main SA2 overview card** (new functionality)
+
+Both navigation paths automatically apply the SA2 filter to show relevant residential facilities.
+
+---
+
+## 🔍 FIXED: Search Bar Not Populating from SA2 Navigation
+
+**USER ISSUE:** When navigating from SA2 details view to residential page, the SA2 filter was applied but the search bar remained empty, creating a disconnect between the visible filter and the search input.
+
+**IMPLEMENTATION FIX** ✅
+
+### Root Cause:
+The URL parameter handling was correctly setting `selectedSA2Filter` but not setting `searchTerm` in the search input field, causing the search bar to appear empty while the filter was active.
+
+### Technical Fix:
+
+**File Modified:** `src/app/residential/page.tsx`
+
+#### 1. **Enhanced URL Parameter Handling**
+```jsx
+// Before:
+if (matchingSA2) {
+  setSelectedSA2Filter(matchingSA2);
+  console.log('Auto-selected SA2 filter from URL:', matchingSA2.sa2_name);
+  urlParamProcessedRef.current = true;
+}
+
+// After:
+if (matchingSA2) {
+  setSelectedSA2Filter(matchingSA2);
+  setSearchTerm(matchingSA2.sa2_name); // Also populate the search bar
+  console.log('Auto-selected SA2 filter from URL:', matchingSA2.sa2_name);
+  urlParamProcessedRef.current = true;
+}
+```
+
+#### 2. **Synchronized Clear Function**
+```jsx
+// Enhanced clear function to maintain sync:
+const handleClearSA2Filter = () => {
+  setSelectedSA2Filter(null);
+  setSearchTerm(''); // Also clear the search bar
+  // Remove the SA2 parameter from URL
+  const newUrl = new URL(window.location.href);
+  newUrl.searchParams.delete('sa2');
+  router.replace(newUrl.pathname + newUrl.search);
+  urlParamProcessedRef.current = false;
+};
+```
+
+### Complete Flow Now:
+
+1. **User clicks external link** from SA2 details view in insights
+2. **Navigates to residential page** with `/residential?sa2=RegionName`
+3. **Residential page loads** and detects SA2 parameter
+4. **Sets SA2 filter** (`setSelectedSA2Filter(matchingSA2)`)
+5. **Populates search bar** (`setSearchTerm(matchingSA2.sa2_name)`)
+6. **Shows filtered results** with SA2 name visible in search bar
+7. **Clear button** clears both filter and search bar in sync
+
+### Benefits:
+- ✅ **Visual consistency** - Search bar shows the active filter
+- ✅ **User understanding** - Clear indication of what's being filtered
+- ✅ **Synchronized state** - Search bar and filter stay in sync
+- ✅ **Intuitive UX** - Users see exactly what region they're viewing
+
+**Ready for Testing** - Search bar now populates with SA2 name when navigating from insights page.
+
+---
+
+## 🔧 CRITICAL FIX: Search Bar Population Logic Correction
+
+**ISSUE IDENTIFIED:** The search bar population was dependent on finding the SA2 region in the user's saved searches, which meant it would only work if the user had previously saved that specific SA2 region.
+
+**ROOT CAUSE ANALYSIS:**
+- External link from SA2 overview card passes any SA2 name in URL parameter
+- Previous logic required the SA2 to exist in `savedSA2Regions` to populate search bar
+- Most users won't have every SA2 region saved, causing search bar to remain empty
+
+**CORRECTED IMPLEMENTATION** ✅
+
+### Enhanced Logic Flow:
+
+**Before (Broken):**
+```jsx
+if (sa2Param && savedSA2Regions.length > 0 && !selectedSA2Filter) {
+  const matchingSA2 = savedSA2Regions.find(/* match logic */);
+  if (matchingSA2) {
+    setSelectedSA2Filter(matchingSA2);
+    setSearchTerm(matchingSA2.sa2_name); // Only if found in saved
+  }
+}
+```
+
+**After (Fixed):**
+```jsx
+if (sa2Param) {
+  // ALWAYS populate search bar first
+  setSearchTerm(sa2Param);
+  
+  // OPTIONALLY apply SA2 filter if region is saved
+  if (savedSA2Regions.length > 0 && !selectedSA2Filter) {
+    const matchingSA2 = savedSA2Regions.find(/* match logic */);
+    if (matchingSA2) {
+      setSelectedSA2Filter(matchingSA2);
+    }
+  }
+}
+```
+
+### Key Changes:
+
+1. **Immediate Search Bar Population**: `setSearchTerm(sa2Param)` happens immediately for any SA2 parameter
+2. **Decoupled Logic**: Search bar population is now independent of saved regions
+3. **Optional Filter**: SA2 filter only applies if the region is found in saved searches
+4. **Enhanced Logging**: Better debugging messages for different scenarios
+
+### Benefits:
+
+- ✅ **Universal Compatibility**: Works for any SA2 region, saved or not
+- ✅ **Immediate Visual Feedback**: Search bar always shows the SA2 name from URL
+- ✅ **Enhanced UX**: Users immediately see what region they're viewing
+- ✅ **Preserved Functionality**: SA2 filtering still works for saved regions
+- ✅ **Robust Behavior**: No longer depends on user having saved the specific region
+
+### Complete Flow:
+
+1. **User clicks external link** from any SA2 overview card in insights
+2. **Navigates to residential page** with URL parameter
+3. **Search bar immediately populates** with SA2 name (regardless of saved status)
+4. **SA2 filter applies** if region is found in user's saved searches
+5. **Search results show** all facilities matching the search term
+6. **User sees clear indication** of what they're searching for
+
+**TESTING READY** - Search bar should now populate with SA2 name for any SA2 region, whether saved or not.
+
+---
+
+## 🔖 ADDED: Save Button in SA2 Overview Card
+
+**USER REQUEST:** Add a green "Saved" button to the SA2 overview card so users who navigate directly to a region (not via search) can still save that region to their saved searches.
+
+**IMPLEMENTATION COMPLETE** ✅
+
+### What Was Added:
+
+#### 1. **Save Button Integration**
+- Added save/unsave button next to the external link icon in SA2 overview card header
+- Button shows `BookmarkCheck` icon (green) when region is saved
+- Button shows `Bookmark` icon (gray) when region is not saved
+- Positioned in a flex container with the external link icon
+
+#### 2. **Dynamic Button States**
+- **Saved State**: Green color scheme (`text-green-600 hover:text-green-800 hover:bg-green-50`)
+- **Unsaved State**: Gray to green transition (`text-gray-600 hover:text-green-600 hover:bg-green-50`)
+- **Disabled State**: When user is not signed in, button is disabled with opacity and cursor styles
+
+#### 3. **Intelligent Tooltips**
+- **Not signed in**: "Sign in to save SA2 regions"
+- **Saved region**: "Remove from saved searches" 
+- **Unsaved region**: "Save this SA2 region to your searches"
+
+#### 4. **Leveraged Existing Infrastructure**
+- Uses existing `toggleSA2SaveHandler(selectedSA2)` function
+- Integrates with existing `currentSA2SavedStatus` state
+- Maintains consistency with saved searches functionality
+
+### Technical Implementation:
+
+**File Modified:** `src/app/insights/page.tsx`
+
+**Code Structure:**
+```jsx
+<div className="flex items-center gap-2">
+  <button
+    onClick={() => toggleSA2SaveHandler(selectedSA2)}
+    disabled={!user}
+    className={`rounded-lg p-1.5 transition-colors ${
+      currentSA2SavedStatus
+        ? 'text-green-600 hover:text-green-800 hover:bg-green-50'
+        : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+    } disabled:opacity-50 disabled:cursor-not-allowed`}
+    title={/* Dynamic tooltip based on state */}
+  >
+    {currentSA2SavedStatus ? (
+      <BookmarkCheck className="h-4 w-4" />
+    ) : (
+      <Bookmark className="h-4 w-4" />
+    )}
+  </button>
+  <button /* External link button */></button>
+</div>
+```
+
+### Enhanced User Experience:
+
+**Complete SA2 Overview Card Actions:**
+1. **📍 Region Info**: SA2 name and ID display
+2. **🔖 Save/Unsave**: Toggle region in saved searches (NEW)
+3. **🔗 External Link**: Navigate to residential facilities
+
+### Use Cases Solved:
+
+- ✅ **Direct Navigation**: Users arriving via bookmarks/links can save regions
+- ✅ **Search Independence**: Save functionality works regardless of how user reached the region
+- ✅ **Visual Consistency**: Button styling matches existing UI patterns
+- ✅ **State Synchronization**: Save button reflects current save status in real-time
+
+### Benefits:
+
+- ✅ **Universal Save Access**: Any SA2 region can be saved, not just searched ones
+- ✅ **Intuitive UX**: Clear visual indicators for saved vs unsaved states
+- ✅ **Consistent Behavior**: Uses existing save infrastructure and state management
+- ✅ **Accessibility**: Proper tooltips and disabled states for better UX
+
+**Ready for Testing** - Users can now save any SA2 region directly from the overview card, whether they found it through search or direct navigation.
+
+---
+
+## 🏢 ENHANCED: Residential Facility Icon in SA2 Overview Card
+
+**USER REQUEST:** Replace the generic "door exit" (ExternalLink) icon with the same red residential facility icon used on the maps page to create better visual consistency.
+
+**IMPLEMENTATION COMPLETE** ✅
+
+### What Was Changed:
+
+#### 1. **Icon Replacement**
+- **Before**: `<ExternalLink className="h-4 w-4" />` (generic door exit icon)
+- **After**: `<Building className="h-4 w-4" />` (same icon used for residential facilities)
+
+#### 2. **Color Scheme Update**
+- **Before**: Blue color scheme (`text-blue-600 hover:text-blue-800 hover:bg-blue-50`)
+- **After**: Red color scheme (`text-red-600 hover:text-red-800 hover:bg-red-50`)
+
+#### 3. **Visual Consistency**
+- **Matches Maps Page**: Uses the same `Building` icon that represents residential facilities
+- **Thematic Color**: Red color scheme aligns with residential care theme
+- **Clear Intent**: Building icon immediately communicates "residential facilities"
+
+### Technical Details:
+
+**File Modified:** `src/app/insights/page.tsx`
+
+**Import Already Available:** `Building` icon was already imported from lucide-react
+
+**Button Location:** SA2 Overview Card header, positioned next to the save/bookmark button
+
+**Functionality:** No change to navigation behavior - still navigates to `/residential?sa2=RegionName`
+
+### User Experience Improvement:
+
+- **Immediate Recognition**: Users now see a building icon instead of generic arrow
+- **Consistent Visual Language**: Matches the residential facility representation throughout the app
+- **Clear Expectation**: Red building icon clearly indicates residential aged care facilities
+- **Better Affordance**: Icon now matches the destination content type
+
+**TESTING READY** - Building icon should now appear in red color scheme matching residential facility theme.
+
+### **ADDITIONAL UPDATE: Saved Search Area Consistency**
+
+**USER FOLLOW-UP REQUEST:** Also replace the ExternalLink icon in the saved search area with the red Building icon for complete consistency.
+
+**IMPLEMENTATION COMPLETE** ✅
+
+#### **Saved Search Area Changes:**
+- **Before**: `<ExternalLink className="h-4 w-4" />` with blue hover (`hover:text-blue-600`)
+- **After**: `<Building className="h-4 w-4" />` with red hover (`hover:text-red-600`)
+
+#### **Complete Consistency Achieved:**
+- **SA2 Overview Card**: ✅ Red Building icon
+- **Saved Search Area**: ✅ Red Building icon  
+- **Visual Language**: ✅ Consistent residential facility representation
+- **Color Scheme**: ✅ Red theme throughout for residential navigation
+
+**TESTING READY** - Both SA2 overview card and saved search area now use consistent red Building icons for residential facility navigation.
+
+---
+
+## 🔧 BUG FIX: Fixed SA2 Filter Clear Functionality 
+
+**USER ISSUE:** When navigating from insights page to residential page via external link, the SA2 filter gets stuck and cannot be cleared.
+
+**ROOT CAUSE IDENTIFIED:**
+1. **URL Parameter Persistence**: When navigating with `/residential?sa2=RegionName`, the URL parameter remained even after clicking "Clear filter"
+2. **useEffect Re-triggering**: The useEffect that detects URL parameters had `selectedSA2Filter` in dependencies, causing it to re-run and re-apply the filter immediately after clearing
+
+**SOLUTION IMPLEMENTED:** ✅
+
+#### 1. **Enhanced Clear Function**
+```jsx
+const handleClearSA2Filter = () => {
+  setSelectedSA2Filter(null);
+  // Remove the SA2 parameter from URL to prevent re-applying the filter
+  const newUrl = new URL(window.location.href);
+  newUrl.searchParams.delete('sa2');
+  router.replace(newUrl.pathname + newUrl.search);
+};
+```
+
+#### 2. **Fixed useEffect Dependencies**
+```jsx
+// Before: Caused infinite re-triggering
+}, [searchParams, savedSA2Regions, selectedSA2Filter]);
+
+// After: Only runs on initial load and when regions are loaded
+}, [searchParams, savedSA2Regions]);
+```
+
+**Technical Changes:**
+- **URL Parameter Removal**: Clear function now removes `sa2` parameter from URL using `router.replace()`
+- **Dependency Fix**: Removed `selectedSA2Filter` from useEffect dependencies to prevent re-running after manual clear
+- **State Management**: Maintained existing clear functionality while preventing URL-based re-application
+
+**Expected Behavior Now:**
+1. ✅ **Navigate from insights** → SA2 filter automatically applied
+2. ✅ **Click "Clear filter"** → Filter removed AND URL parameter removed
+3. ✅ **Filter stays cleared** → No re-application from URL parameter
+4. ✅ **Normal filtering** → All existing functionality preserved
+
+**Testing Status:**
+- ✅ **Residential page loads** (HTTP 200)
+- ✅ **No TypeScript errors** in modified code
+- ✅ **Clear functionality** enhanced with URL parameter removal
+
+**Ready for User Testing** - The SA2 filter can now be properly cleared after navigating from insights page.
+
 ### Task 2 Implementation Complete ✅
 
 **Click Outside Detection Implementation:**
@@ -11762,3 +12237,76 @@ The enhanced Quality Measures tab is complete and ready for testing:
 - All work is reversible without affecting main branch
 
 🎉 **CRITICAL PROTECTION ACHIEVED:** No more risk of accidental damage to main branch - all future work isolated safely on development branch!
+
+---
+
+## 🔧 LATEST BUG FIX: Fixed useEffect Dependency Array Size Error
+
+**USER ISSUE:** Console error about useEffect dependency array changing size between renders.
+
+**ERROR MESSAGE:**
+```
+The final argument passed to useEffect changed size between renders. The order and size of this array must remain constant.
+Previous: [sa2=Mickleham+-+Yuroke, [object Object],[object Object], [object Object]]
+Incoming: [sa2=Mickleham+-+Yuroke, [object Object],[object Object]]
+```
+
+**ROOT CAUSE:**
+The useEffect dependency array included `savedSA2Regions` (full array), and when this array changed size between renders, React detected the dependency array itself changing size, causing the error.
+
+**SOLUTION IMPLEMENTED:** ✅
+
+#### 1. **Added useRef for State Tracking**
+- Added `urlParamProcessedRef = useRef(false)` to track if URL parameter has been processed
+- Added `useRef` to React imports
+
+#### 2. **Stable Dependencies**
+- Changed from `[searchParams, savedSA2Regions]` to `[searchParams, savedSA2Regions.length, selectedSA2Filter]`
+- Used `.length` instead of full array for stable dependency
+- Added ref check to prevent duplicate processing: `if (!searchParams || urlParamProcessedRef.current) return;`
+
+#### 3. **Enhanced Clear Function**
+- Updated `handleClearSA2Filter()` to reset `urlParamProcessedRef.current = false`
+- Allows URL parameter to be processed again if user navigates back
+
+**TECHNICAL DETAILS:**
+- **Before**: `useEffect(..., [searchParams, savedSA2Regions])` - array size varied
+- **After**: `useEffect(..., [searchParams, savedSA2Regions.length, selectedSA2Filter])` - stable primitives only
+- **Result**: No more React warnings about dependency array size changes
+
+**TESTING:** ✅ 
+- Server responds 200 OK
+- No TypeScript compilation errors
+- useEffect dependency array now uses stable primitives only
+
+**Status**: ✅ COMPLETE - React dependency array size error resolved
+
+---
+
+## 🏷️ NAMING UPDATE: Improved External Link Button Naming for Clarity
+
+**USER REQUEST:** Update the external link button naming to clearly differentiate from future home care button.
+
+**CONTEXT:** 
+- Current button navigates to residential aged care facilities
+- Future button will navigate to home care services  
+- Need clear differentiation between the two types of care
+
+**SOLUTION IMPLEMENTED:** ✅
+
+#### **Enhanced Tooltip Naming**
+- **Before**: `"View residential homes in this SA2 region"`
+- **After**: `"View residential aged care facilities in this SA2 region"`
+
+**Benefits:**
+- ✅ **Clear Differentiation**: Specifically mentions "aged care facilities" vs generic "homes"
+- ✅ **Future-Proof**: Sets up clear distinction for upcoming "home care services" button
+- ✅ **Professional Terminology**: Uses industry-standard "aged care facilities" terminology
+- ✅ **User Clarity**: Users will immediately understand this is for residential care vs home care
+
+**Future Implementation Ready:**
+- **Residential Care Button**: "View residential aged care facilities in this SA2 region" ✅
+- **Home Care Button** (future): "View home care services in this SA2 region" 
+- **Clear Distinction**: Users can easily differentiate between facility-based vs home-based care
+
+**Status**: ✅ COMPLETE - Naming updated for clarity and future differentiation

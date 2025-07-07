@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Scale, CheckSquare, Square, Eye, X, Filter, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -309,7 +309,9 @@ interface ResidentialFacility {
 
 export default function ResidentialPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [facilities, setFacilities] = useState<ResidentialFacility[]>([]);
+  const urlParamProcessedRef = useRef(false);
   const [filteredFacilities, setFilteredFacilities] = useState<ResidentialFacility[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
@@ -445,6 +447,34 @@ export default function ResidentialPage() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showSavedFacilitiesDropdown, showSelectedList, showSA2Dropdown]);
+
+  // Handle SA2 URL parameter for direct navigation from insights page (only on initial load)
+  useEffect(() => {
+    if (!searchParams || urlParamProcessedRef.current) return;
+    
+    const sa2Param = searchParams.get('sa2');
+    if (sa2Param) {
+      // Always populate the search bar with the SA2 name from URL
+      setSearchTerm(sa2Param);
+      console.log('Auto-populated search bar from URL:', sa2Param);
+      
+      // If we have saved SA2 regions, try to find and apply the filter
+      if (savedSA2Regions.length > 0 && !selectedSA2Filter) {
+        const matchingSA2 = savedSA2Regions.find(region => 
+          region.sa2_name.toLowerCase() === sa2Param.toLowerCase()
+        );
+        
+        if (matchingSA2) {
+          setSelectedSA2Filter(matchingSA2);
+          console.log('Auto-selected SA2 filter from URL:', matchingSA2.sa2_name);
+        } else {
+          console.log('SA2 region not in saved searches, but search bar populated:', sa2Param);
+        }
+      }
+      
+      urlParamProcessedRef.current = true; // Mark as processed
+    }
+  }, [searchParams, savedSA2Regions.length, selectedSA2Filter]); // Use .length for stable dependency
 
   useEffect(() => {
     // SA2-based filtering function
@@ -768,6 +798,13 @@ export default function ResidentialPage() {
 
   const handleClearSA2Filter = () => {
     setSelectedSA2Filter(null);
+    setSearchTerm(''); // Also clear the search bar
+    // Remove the SA2 parameter from URL to prevent re-applying the filter
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.delete('sa2');
+    router.replace(newUrl.pathname + newUrl.search);
+    // Reset the ref so URL parameter can be processed again if needed
+    urlParamProcessedRef.current = false;
   };
 
   // Handle navigate to insights page

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser } from '../../lib/auth';
 import BackToMainButton from '../../components/BackToMainButton';
-import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Globe, Building, Home } from 'lucide-react';
+import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Globe, Building, Home, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import SA2BoxPlot from '../../components/sa2/SA2BoxPlot';
@@ -1119,6 +1119,13 @@ export default function SA2AnalyticsPage() {
     setShowSavedSearches(false);
   };
 
+  // Navigate to residential page with SA2 filter
+  const navigateToResidentialForSA2 = (savedSearch: SavedSA2Search) => {
+    // Navigate to residential page with SA2 filter
+    // The residential page will filter by SA2 name
+    router.push(`/residential?sa2=${encodeURIComponent(savedSearch.sa2_name)}`);
+  };
+
   // Check if current SA2 is saved
   const isCurrentSA2Saved = useCallback(async () => {
     if (!user || !selectedSA2) return false;
@@ -1580,13 +1587,22 @@ export default function SA2AnalyticsPage() {
                             Saved {new Date(savedSearch.created_at).toLocaleDateString()}
                           </p>
                         </button>
-                        <button
-                          onClick={() => deleteSavedSA2SearchHandler(savedSearch.id)}
-                          className="ml-2 p-1 text-gray-400 hover:text-red-600 transition-colors"
-                          title="Delete saved search"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => navigateToResidentialForSA2(savedSearch)}
+                            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                            title="View residential aged care facilities in this SA2 region"
+                          >
+                            <Building className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => deleteSavedSA2SearchHandler(savedSearch.id)}
+                            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                            title="Delete saved search"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1635,9 +1651,44 @@ export default function SA2AnalyticsPage() {
             {/* SA2 Overview Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <MapPin className="h-5 w-5 mr-2 text-blue-600" />
-                  {selectedSA2.sa2Name}
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <MapPin className="h-5 w-5 mr-2 text-blue-600" />
+                    {selectedSA2.sa2Name}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => toggleSA2SaveHandler(selectedSA2)}
+                      disabled={!user}
+                      className={`rounded-lg p-1.5 transition-colors ${
+                        currentSA2SavedStatus
+                          ? 'text-green-600 hover:text-green-800 hover:bg-green-50'
+                          : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      title={
+                        !user 
+                          ? 'Sign in to save SA2 regions' 
+                          : currentSA2SavedStatus 
+                            ? 'Remove from saved searches' 
+                            : 'Save this SA2 region to your searches'
+                      }
+                    >
+                      {currentSA2SavedStatus ? (
+                        <BookmarkCheck className="h-4 w-4" />
+                      ) : (
+                        <Bookmark className="h-4 w-4" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => {
+                        router.push(`/residential?sa2=${encodeURIComponent(selectedSA2.sa2Name)}`);
+                      }}
+                      className="text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg p-1.5 transition-colors"
+                      title="View residential aged care facilities in this SA2 region"
+                    >
+                      <Building className="h-4 w-4" />
+                    </button>
+                  </div>
                 </CardTitle>
                 <CardDescription>
                   SA2 ID: {selectedSA2.sa2Id} • Comprehensive regional analysis with enhanced statistics
