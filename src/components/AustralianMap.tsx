@@ -109,6 +109,12 @@ export interface AustralianMapRef {
   getOpenPopupsCount: () => number;
   getFacilityTypeBreakdown: () => Record<string, number>;
   saveAllOpenFacilities: () => Promise<{success: boolean; saved: number; total: number; errors: string[]}>;
+  // Add viewport change callback method
+  onViewportChange: (callback: () => void) => void;
+  // Add method to get current map bounds
+  getBounds: () => { north: number; south: number; east: number; west: number } | null;
+  // Add method to get all facilities
+  getAllFacilities: () => FacilityData[];
 }
 
 // Helper function for point-in-polygon testing using ray casting algorithm
@@ -285,6 +291,12 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // Track facility data for each open popup (for Save All functionality)
   const openPopupFacilitiesRef = useRef<Map<maptilersdk.Popup, FacilityData>>(new Map());
 
+  // Add viewport change callback ref
+  const viewportChangeCallbackRef = useRef<(() => void) | null>(null);
+  
+  // Track all facilities for counting
+  const allFacilitiesRef = useRef<FacilityData[]>([]);
+
   // Function to get friendly facility type names for display
   const getFacilityTypeDisplayName = (facilityType: string): string => {
     switch (facilityType) {
@@ -392,6 +404,19 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       // Add click handler
       if (map.current) {
         map.current.on('click', handleMapClick);
+        
+        // Add viewport change event listeners
+        map.current.on('moveend', () => {
+          if (viewportChangeCallbackRef.current) {
+            viewportChangeCallbackRef.current();
+          }
+        });
+        
+        map.current.on('zoomend', () => {
+          if (viewportChangeCallbackRef.current) {
+            viewportChangeCallbackRef.current();
+          }
+        });
       }
       
       // Start preloading all boundary data and styles in background
@@ -641,6 +666,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       const { hybridFacilityService } = await import('../lib/HybridFacilityService');
       const enhancedFacilities = await hybridFacilityService.loadAllFacilities();
       
+      // Store all facilities for counting
+      allFacilitiesRef.current = enhancedFacilities;
+      
       console.log('🏥 Enhanced facility data loaded:', { 
         totalFacilities: enhancedFacilities.length
       });
@@ -732,6 +760,40 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
 
           // Create unique popup ID for this facility
           const popupId = `facility-popup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+          // Check for overlapping facilities (clustering logic)
+          const overlapTolerance = 0.001; // ~100m
+          const overlappingFacilities = filteredFacilities.filter(otherFacility => {
+            if (otherFacility === facility) return false;
+            const otherLat = otherFacility.Latitude;
+            const otherLng = otherFacility.Longitude;
+            if (!otherLat || !otherLng) return false;
+            
+            const latDiff = Math.abs(otherLat - lat);
+            const lngDiff = Math.abs(otherLng - lng);
+            return latDiff <= overlapTolerance && lngDiff <= overlapTolerance;
+          });
+
+          // If there are overlapping facilities, create cluster marker
+          if (overlappingFacilities.length > 0) {
+            const clusterSize = overlappingFacilities.length + 1; // Include current facility
+            
+            // Modify marker to show cluster count
+            markerElement.style.width = '25px';
+            markerElement.style.height = '25px';
+            markerElement.style.backgroundColor = '#ffffff';
+            markerElement.style.border = `3px solid ${typeColors[typeKey]}`;
+            markerElement.style.display = 'flex';
+            markerElement.style.alignItems = 'center';
+            markerElement.style.justifyContent = 'center';
+            markerElement.style.fontSize = '11px';
+            markerElement.style.fontWeight = 'bold';
+            markerElement.style.color = typeColors[typeKey];
+            markerElement.style.zIndex = '100';
+            markerElement.textContent = clusterSize.toString();
+            
+            console.log(`🎯 Cluster marker created: ${clusterSize} facilities at ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+          }
 
           // Helper function to handle facility saving
           const handleSaveFacility = async () => {
@@ -936,11 +998,11 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             offset: 25,
             closeButton: true,
             closeOnClick: false,
-            className: 'custom-popup'
+            className: 'custom-popup draggable-popup'
           })
           .setHTML(`
             <div class="aged-care-popup" id="${popupId}">
-              <div class="popup-header" style="background: linear-gradient(135deg, ${typeColors[typeKey]}20, ${typeColors[typeKey]}10); border-left: 4px solid ${typeColors[typeKey]};">
+              <div class="popup-header" style="background: linear-gradient(135deg, ${typeColors[typeKey]}20, ${typeColors[typeKey]}10); border-left: 4px solid ${typeColors[typeKey]}; cursor: move;">
                 <h3 class="popup-title">${serviceName}</h3>
                 <span class="popup-type" style="background-color: ${typeColors[typeKey]}20; color: ${typeColors[typeKey]};">${getFacilityTypeDisplayName(typeKey)}</span>
               </div>
@@ -1280,6 +1342,55 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             openPopupsRef.current.add(popup);
             openPopupFacilityTypesRef.current.set(popup, typeKey);
             openPopupFacilitiesRef.current.set(popup, facilityData);
+            
+            // Add draggable functionality
+            const popupElement = document.getElementById(popupId);
+            if (popupElement) {
+              const header = popupElement.querySelector('.popup-header') as HTMLElement;
+              if (header) {
+                let isDragging = false;
+                let startX = 0, startY = 0;
+                let currentX = 0, currentY = 0;
+
+                const handleMouseDown = (e: MouseEvent) => {
+                  isDragging = true;
+                  startX = e.clientX - currentX;
+                  startY = e.clientY - currentY;
+                  header.style.cursor = 'grabbing';
+                  e.preventDefault();
+                };
+
+                const handleMouseMove = (e: MouseEvent) => {
+                  if (!isDragging) return;
+                  currentX = e.clientX - startX;
+                  currentY = e.clientY - startY;
+                  
+                  // Convert screen coordinates to map coordinates
+                  if (map.current) {
+                    const newMapCoords = map.current.unproject([e.clientX, e.clientY]);
+                    popup.setLngLat(newMapCoords);
+                  }
+                };
+
+                const handleMouseUp = () => {
+                  if (isDragging) {
+                    isDragging = false;
+                    header.style.cursor = 'move';
+                  }
+                };
+
+                header.addEventListener('mousedown', handleMouseDown);
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+                
+                // Store cleanup function for later removal
+                (header as any).dragCleanup = () => {
+                  header.removeEventListener('mousedown', handleMouseDown);
+                  document.removeEventListener('mousemove', handleMouseMove);
+                  document.removeEventListener('mouseup', handleMouseUp);
+                };
+              }
+            }
           });
 
           // Add general close event listener for popups without save/details buttons
@@ -1289,17 +1400,31 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
               openPopupsRef.current.delete(popup);
               openPopupFacilityTypesRef.current.delete(popup);
               openPopupFacilitiesRef.current.delete(popup);
+              
+              // Clean up drag listeners
+              const popupElement = document.getElementById(popupId);
+              if (popupElement) {
+                const header = popupElement.querySelector('.popup-header') as HTMLElement;
+                if (header && (header as any).dragCleanup) {
+                  (header as any).dragCleanup();
+                }
+              }
             });
           }
 
-          // Create and add marker
+          // Create and add marker (with safety check)
+          if (!map.current) {
+            console.warn('🛑 Map instance is null when trying to add marker, aborting marker creation');
+            return;
+          }
+          
           const marker = new maptilersdk.Marker({ 
             element: markerElement,
             anchor: 'center'
           })
           .setLngLat([lng, lat])
           .setPopup(popup)
-          .addTo(map.current!);
+          .addTo(map.current);
 
           markersRef.current.push(marker);
         });
@@ -2233,6 +2358,22 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     },
     saveAllOpenFacilities: () => {
       return saveAllOpenFacilities();
+    },
+    onViewportChange: (callback: () => void) => {
+      viewportChangeCallbackRef.current = callback;
+    },
+    getBounds: () => {
+      if (!map.current) return null;
+      const bounds = map.current.getBounds();
+      return {
+        north: bounds.getNorth(),
+        south: bounds.getSouth(),
+        east: bounds.getEast(),
+        west: bounds.getWest()
+      };
+    },
+    getAllFacilities: () => {
+      return allFacilitiesRef.current;
     }
   }));
 

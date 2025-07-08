@@ -170,13 +170,18 @@ class RealLoadingCoordinator {
   
   // Check if initial loading is complete (for components to use)
   isInitialLoadingComplete(): boolean {
-    console.log('🔍 MapLoadingCoordinator.isInitialLoadingComplete():', this.initialLoadingComplete);
-    return this.initialLoadingComplete;
+    console.log('🔍 MapLoadingCoordinator.isInitialLoadingComplete():', this.initialLoadingComplete, 'stage:', this.currentState.stage);
+    return this.initialLoadingComplete && this.currentState.stage === 'complete';
   }
   
   // Check if currently in the initial loading sequence (vs post-load operations)
   isCurrentlyLoading(): boolean {
-    return !this.initialLoadingComplete;
+    return !this.initialLoadingComplete || this.currentState.stage !== 'complete';
+  }
+  
+  // Get current loading state (for debugging)
+  getCurrentState(): LoadingState {
+    return this.currentState;
   }
   
   // Manually trigger completion (used by sequential loading)
@@ -217,29 +222,44 @@ export default function MapLoadingCoordinator({
 
   const hasCompleted = useRef(false);
   const hasEverRun = useRef(false); // Prevent multiple loading sequences
+  const [isComplete, setIsComplete] = useState(false); // Local completion state
 
   // Subscribe to real loading events
   useEffect(() => {
+    // Skip subscription if we're already complete
+    if (isComplete) {
+      console.log('🎉 MapLoadingCoordinator: Already complete, skipping subscription');
+      return;
+    }
+
     const unsubscribe = globalLoadingCoordinator.subscribe((state) => {
+      console.log('🔔 MapLoadingCoordinator received state update:', state.stage, state.progress + '%');
       setLoadingState(state);
       
-      // Trigger completion when we reach the complete stage
-      if (state.stage === 'complete' && !hasCompleted.current) {
+      // Trigger completion when we reach the complete stage (only once)
+      if (state.stage === 'complete' && !hasCompleted.current && !isComplete) {
         hasCompleted.current = true;
+        setIsComplete(true); // Set local completion state
         console.log('🎉 MapLoadingCoordinator: All loading complete, showing map');
         
         // Brief delay to show completion state before hiding overlay
         setTimeout(() => {
           onLoadingComplete();
-        }, 150); // Reduced from 300ms to 150ms for smoother transition
+        }, 150);
       }
     });
 
     return unsubscribe;
-  }, [onLoadingComplete]);
+  }, [onLoadingComplete, isComplete]);
 
   // Trigger map initialization after mount (only once)
   useEffect(() => {
+    // Skip if we're already complete
+    if (isComplete) {
+      console.log('🎉 MapLoadingCoordinator: Already complete, skipping initialization');
+      return;
+    }
+
     // Only run loading sequence once per component mount (not session)
     if (!hasEverRun.current) {
       hasEverRun.current = true;
@@ -290,17 +310,24 @@ export default function MapLoadingCoordinator({
       
       runLoadingSequence();
     } else {
-      console.log('⏭️ MapLoadingCoordinator: Loading sequence already running in this component');
-      // Reset completion flag for this component instance
-      hasCompleted.current = false;
+      console.log('⏭️ MapLoadingCoordinator: Loading sequence already started, checking global state...');
+      // Check if loading is already complete globally
+      if (globalLoadingCoordinator.isInitialLoadingComplete()) {
+        console.log('🎉 Global loading already complete, setting local completion');
+        hasCompleted.current = true;
+        setIsComplete(true); // Set local completion state
+        // Don't call onLoadingComplete again if already called
+      } else {
+        console.log('🔄 Global loading still in progress, waiting for completion');
+        hasCompleted.current = false;
+      }
     }
-  }, [onLoadingComplete]);
-
-  // Removed stall check - let 20-second sequence run without interference
+  }, [onLoadingComplete, isComplete]);
 
   // Loading overlay component
   const LoadingOverlay = () => {
-    if (loadingState.stage === 'complete') return null;
+    // Use local completion state instead of global loading state
+    if (isComplete) return null;
 
     const getStageNumber = (stage: LoadingStage): number => {
       const stages: LoadingStage[] = [
@@ -314,7 +341,7 @@ export default function MapLoadingCoordinator({
     const totalStages = 10;
 
     return (
-      <div className="absolute inset-0 bg-white bg-opacity-95 flex items-center justify-center z-50">
+      <div className="absolute inset-0 bg-white flex items-center justify-center z-50">
         <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-8 max-w-md w-full mx-4">
           {/* Header */}
           <div className="text-center mb-6">
@@ -395,7 +422,8 @@ export default function MapLoadingCoordinator({
   return (
     <div className="relative w-full h-full">
       <LoadingOverlay />
-      {children}
+      {/* Only render the map after loading is complete - using local completion state */}
+      {isComplete && children}
     </div>
   );
 } 

@@ -14,7 +14,7 @@ import TopBottomPanel from '../../components/TopBottomPanel';
 import FacilityDetailsModal from '../../components/FacilityDetailsModal';
 import { RankedSA2Data } from '../../components/HeatmapDataService';
 import { getLocationByName } from '../../lib/mapSearchService';
-import { Map, Settings, User, Menu } from 'lucide-react';
+import { Map, Settings, User, Menu, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
 import MapLoadingCoordinator from '../../components/MapLoadingCoordinator';
 
 interface UserData {
@@ -126,6 +126,26 @@ export default function MapsPage() {
   const [openPopupsCount, setOpenPopupsCount] = useState(0);
   const [facilityBreakdown, setFacilityBreakdown] = useState<Record<string, number>>({});
   
+  // Facility Counter state
+  const [facilityCountsInViewport, setFacilityCountsInViewport] = useState<{
+    residential: number;
+    mps: number;
+    home: number;
+    retirement: number;
+    total: number;
+    loading: boolean;
+  }>({
+    residential: 0,
+    mps: 0,
+    home: 0,
+    retirement: 0,
+    total: 0,
+    loading: true
+  });
+  
+  // Facility Count collapsible state
+  const [facilityCountExpanded, setFacilityCountExpanded] = useState(true);
+  
   // Map reference for calling map methods
   const mapRef = useRef<AustralianMapRef>(null);
   const savedSearchesRef = useRef<SavedSearchesRef>(null);
@@ -169,7 +189,7 @@ export default function MapsPage() {
     }
   }, [facilityModalOpen]);
 
-  // Track open popups count and facility breakdown for Close All button visibility
+  // Update popup count and facility breakdown for Close All button visibility
   useEffect(() => {
     const updatePopupCount = () => {
       if (mapRef.current) {
@@ -180,12 +200,105 @@ export default function MapsPage() {
       }
     };
 
-    // Poll every 500ms to keep track of popup count and breakdown
     const interval = setInterval(updatePopupCount, 500);
-
-    // Cleanup interval on unmount
     return () => clearInterval(interval);
   }, []);
+
+  // Add facility counting functionality
+  const updateFacilityCounts = useCallback(() => {
+    if (!mapRef.current) {
+      console.log('🔢 Cannot update facility counts - map not available');
+      return;
+    }
+
+    console.log('🔢 Updating facility counts...');
+    
+    // Set loading state
+    setFacilityCountsInViewport(prev => ({ ...prev, loading: true }));
+    
+    try {
+      // Get current viewport bounds
+      const bounds = mapRef.current.getBounds();
+      if (!bounds) {
+        console.log('🔢 Cannot get map bounds');
+        setFacilityCountsInViewport(prev => ({ ...prev, loading: false }));
+        return;
+      }
+
+      // Get all facilities
+      const allFacilities = mapRef.current.getAllFacilities();
+      console.log('🔢 Total facilities available:', allFacilities.length);
+
+      // Filter facilities within viewport bounds
+      const facilitiesInViewport = allFacilities.filter(facility => {
+        const lat = facility.Latitude;
+        const lng = facility.Longitude;
+        
+        // Validate coordinates
+        if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+          return false;
+        }
+        
+        // Check if facility is within viewport bounds
+        return (
+          lng >= bounds.west && 
+          lng <= bounds.east && 
+          lat >= bounds.south && 
+          lat <= bounds.north
+        );
+      });
+
+      console.log('🔢 Facilities in viewport:', facilitiesInViewport.length);
+
+      // Count by facility type
+      const counts = facilitiesInViewport.reduce((acc, facility) => {
+        const type = facility.facilityType;
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      // Calculate total
+      const total = facilitiesInViewport.length;
+
+      // Update state
+      setFacilityCountsInViewport({
+        residential: counts.residential || 0,
+        mps: counts.mps || 0,
+        home: counts.home || 0,
+        retirement: counts.retirement || 0,
+        total: total,
+        loading: false
+      });
+
+      console.log('🔢 Facility counts updated:', {
+        residential: counts.residential || 0,
+        mps: counts.mps || 0,
+        home: counts.home || 0,
+        retirement: counts.retirement || 0,
+        total: total
+      });
+
+    } catch (error) {
+      console.error('🔢 Error updating facility counts:', error);
+      setFacilityCountsInViewport(prev => ({ ...prev, loading: false }));
+    }
+  }, []);
+
+  // Register viewport change callback and initial count
+  useEffect(() => {
+    if (mapRef.current && loadingComplete) {
+      console.log('🔢 Registering facility counting callback');
+      
+      // Register the callback with the map
+      mapRef.current.onViewportChange(updateFacilityCounts);
+      
+      // Perform initial count after a short delay to ensure facilities are loaded
+      setTimeout(() => {
+        console.log('🔢 Performing initial facility count');
+        updateFacilityCounts();
+      }, 1000);
+    }
+  }, [loadingComplete, updateFacilityCounts]);
 
   // Function to load facility by ID and open modal
   const loadFacilityById = async (facilityId: string) => {
@@ -765,7 +878,101 @@ export default function MapsPage() {
 
               {/* Data Layers - Removed from sidebar, now positioned on map */}
 
-              {/* Empty row between Map Settings and Active Layers */}
+              {/* Empty row between Map Settings and Select All Facilities */}
+              <div className="py-4 border-b border-gray-100"></div>
+
+              {/* Facility Count */}
+              <div className="border-b border-gray-200">
+                {/* Header */}
+                <button
+                  onClick={() => setFacilityCountExpanded(!facilityCountExpanded)}
+                  className="flex items-center gap-3 p-4 w-full hover:bg-gray-50 transition-colors text-left"
+                >
+                  <BarChart3 className="h-5 w-5 text-gray-600" />
+                  <span className="text-sm font-medium text-gray-900">Facility Count</span>
+                  {facilityCountExpanded ? (
+                    <ChevronUp className="h-4 w-4 text-gray-400 ml-auto" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-gray-400 ml-auto" />
+                  )}
+                </button>
+
+                {/* Content */}
+                {facilityCountExpanded && (
+                  <div className="px-4 pb-4">
+                    <div className="space-y-3">
+                      {/* Facility Type Counts */}
+                      <div className="space-y-2">
+                        {/* Residential Care */}
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <span className="text-sm text-gray-700">Residential Care</span>
+                          </div>
+                          <span className="text-sm font-medium text-gray-900">
+                            {facilityCountsInViewport.loading ? '...' : facilityCountsInViewport.residential.toLocaleString()}
+                          </span>
+                        </div>
+
+                        {/* Multi-Purpose Service */}
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                            <span className="text-sm text-gray-700">Multi-Purpose Service</span>
+                          </div>
+                          <span className="text-sm font-medium text-gray-900">
+                            {facilityCountsInViewport.loading ? '...' : facilityCountsInViewport.mps.toLocaleString()}
+                          </span>
+                        </div>
+
+                        {/* Home Care */}
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span className="text-sm text-gray-700">Home Care</span>
+                          </div>
+                          <span className="text-sm font-medium text-gray-900">
+                            {facilityCountsInViewport.loading ? '...' : facilityCountsInViewport.home.toLocaleString()}
+                          </span>
+                        </div>
+
+                        {/* Retirement Living */}
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                            <span className="text-sm text-gray-700">Retirement Living</span>
+                          </div>
+                          <span className="text-sm font-medium text-gray-900">
+                            {facilityCountsInViewport.loading ? '...' : facilityCountsInViewport.retirement.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Total Count */}
+                      <div className="border-t border-gray-200 pt-3">
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 border border-blue-200">
+                          <div className="flex items-center gap-3">
+                            <BarChart3 className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm font-medium text-blue-800">Total in View</span>
+                          </div>
+                          <span className="text-lg font-bold text-blue-900">
+                            {facilityCountsInViewport.loading ? '...' : facilityCountsInViewport.total.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Info */}
+                    <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="text-sm text-green-800">
+                        🔄 Counts update automatically as you zoom and pan the map.
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Empty row between Facility Count and Active Layers */}
               <div className="py-4 border-b border-gray-100"></div>
 
               {/* Active Layers - Bottom section */}
