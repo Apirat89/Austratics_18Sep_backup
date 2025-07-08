@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { globalLoadingCoordinator } from './MapLoadingCoordinator';
 
 // Define the structure of our DSS data (healthcare)
@@ -233,6 +233,141 @@ export const getFlattenedOptions = () => {
   return getFlattenedHealthcareOptions();
 };
 
+// Module-level cache for SA2 API data and processed metrics
+let cachedSA2Data: any = null;
+let cachedProcessedMetrics: { [key: string]: SA2HeatmapData } = {};
+
+/**
+ * Unified data service that uses SA2 API instead of separate JSON files
+ * Provides caching for both raw data and processed metric results
+ */
+class UnifiedSA2DataService {
+  private static instance: UnifiedSA2DataService;
+  private sa2Data: any = null;
+  private processedCache: { [key: string]: SA2HeatmapData } = {};
+  private loading = false;
+
+  static getInstance(): UnifiedSA2DataService {
+    if (!UnifiedSA2DataService.instance) {
+      UnifiedSA2DataService.instance = new UnifiedSA2DataService();
+    }
+    return UnifiedSA2DataService.instance;
+  }
+
+  /**
+   * Load SA2 data from API (cached)
+   */
+  async loadSA2Data(): Promise<any> {
+    // Return cached data if available
+    if (this.sa2Data) {
+      console.log('⚡ UnifiedSA2DataService: Using cached SA2 data');
+      return this.sa2Data;
+    }
+
+    // Prevent duplicate loading
+    if (this.loading) {
+      console.log('⏳ UnifiedSA2DataService: Already loading, waiting...');
+      // Wait for loading to complete
+      while (this.loading) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      return this.sa2Data;
+    }
+
+    console.log('📡 UnifiedSA2DataService: Loading SA2 data from API...');
+    this.loading = true;
+
+    try {
+      const startTime = performance.now();
+      const response = await fetch('/api/sa2');
+      
+      if (!response.ok) {
+        throw new Error(`SA2 API error: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      this.sa2Data = result.data;
+      
+      const loadTime = performance.now() - startTime;
+      console.log(`✅ UnifiedSA2DataService: SA2 data loaded in ${loadTime.toFixed(2)}ms`);
+      console.log(`📊 UnifiedSA2DataService: ${Object.keys(this.sa2Data).length} regions loaded`);
+      
+      return this.sa2Data;
+    } catch (error) {
+      console.error('❌ UnifiedSA2DataService: Failed to load SA2 data:', error);
+      throw error;
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  /**
+   * Get processed metric data (cached)
+   */
+  async getProcessedMetric(metricKey: string): Promise<SA2HeatmapData> {
+    // Check cache first
+    if (this.processedCache[metricKey]) {
+      console.log(`⚡ UnifiedSA2DataService: Using cached metric "${metricKey}"`);
+      return this.processedCache[metricKey];
+    }
+
+    console.log(`🔄 UnifiedSA2DataService: Processing metric "${metricKey}"`);
+    const processingStart = performance.now();
+
+    // Ensure SA2 data is loaded
+    const sa2Data = await this.loadSA2Data();
+    
+    // Process the metric
+    const result: SA2HeatmapData = {};
+    
+    for (const [sa2Id, regionData] of Object.entries(sa2Data)) {
+      const region = regionData as any;
+      if (region[metricKey] !== undefined && region[metricKey] !== null) {
+        result[sa2Id] = typeof region[metricKey] === 'number' 
+          ? region[metricKey] 
+          : parseFloat(String(region[metricKey])) || 0;
+      }
+    }
+
+    // Cache the result
+    this.processedCache[metricKey] = result;
+    
+    const processingTime = performance.now() - processingStart;
+    console.log(`✅ UnifiedSA2DataService: Processed "${metricKey}" in ${processingTime.toFixed(2)}ms`);
+    console.log(`📊 UnifiedSA2DataService: ${Object.keys(result).length} regions with data`);
+
+    return result;
+  }
+
+  /**
+   * Get available metrics from SA2 data
+   */
+  async getAvailableMetrics(): Promise<string[]> {
+    const sa2Data = await this.loadSA2Data();
+    
+    // Get metrics from first region that has data
+    for (const regionData of Object.values(sa2Data)) {
+      const region = regionData as any;
+      return Object.keys(region).filter(key => 
+        key !== 'sa2Name' && 
+        key !== 'postcode_data' &&
+        typeof region[key] === 'number'
+      );
+    }
+    
+    return [];
+  }
+
+  /**
+   * Clear all caches
+   */
+  clearCache(): void {
+    console.log('🗑️ UnifiedSA2DataService: Clearing all caches');
+    this.sa2Data = null;
+    this.processedCache = {};
+  }
+}
+
 export default function HeatmapDataService({ 
   selectedCategory,
   selectedSubcategory,
@@ -241,6 +376,10 @@ export default function HeatmapDataService({
   onRankedDataCalculated,
   loadingComplete = false
 }: HeatmapDataServiceProps) {
+  // 🚀 PERFORMANCE OPTIMIZATION: Toggle between old and new data service
+  const [useOptimizedService, setUseOptimizedService] = useState(false); // 🔧 FIX: Disabled by default until metric mapping is resolved
+  const unifiedService = UnifiedSA2DataService.getInstance();
+
   const [dssData, setDssData] = useState<DSSData[]>([]);
   const [demographicsData, setDemographicsData] = useState<DemographicsData[]>([]);
   const [economicStatsData, setEconomicStatsData] = useState<EconomicStatsData[]>([]);
@@ -273,6 +412,24 @@ export default function HeatmapDataService({
     }
     return skip;
   }, [loadingComplete, hasEverReportedToCoordinator]);
+
+  // 🚀 OPTIMIZED: Process data using SA2 API (new method)
+  const processDataOptimized = useCallback(async (category: string, subcategory: string): Promise<SA2HeatmapData> => {
+    console.log('🚀 HeatmapDataService: Using OPTIMIZED data processing');
+    
+    // Create metric key similar to existing format
+    const metricKey = `${category} | ${subcategory}`;
+    
+    try {
+      const result = await unifiedService.getProcessedMetric(metricKey);
+      console.log(`✅ Optimized processing complete for "${metricKey}": ${Object.keys(result).length} regions`);
+      return result;
+    } catch (error) {
+      console.error(`❌ Optimized processing failed for "${metricKey}":`, error);
+      // Fallback to empty result
+      return {};
+    }
+  }, [unifiedService]);
 
   // Load DSS healthcare data
   const loadDSSData = async () => {
@@ -402,99 +559,149 @@ export default function HeatmapDataService({
     }
   };
 
-  // Process healthcare data for selected category and subcategory
-  const processHealthcareData = useCallback((category: string, subcategory: string): SA2HeatmapData => {
-    console.log('🔄 HeatmapDataService: Processing healthcare data for:', category, '-', subcategory);
+  // 🚀 PERFORMANCE: Pre-built lookup table for healthcare data
+  const healthcareIndex = useMemo(() => {
+    console.log('⚡ Building healthcare index for fast lookup...');
+    const index: { [key: string]: SA2HeatmapData } = {};
     
-    const filteredData = dssData.filter(item => 
-      item.Type === category && item.Category === subcategory
-    );
-    
-    console.log('📊 HeatmapDataService: Filtered healthcare data:', filteredData.length, 'records');
-    
-    const result: SA2HeatmapData = {};
-    filteredData.forEach(item => {
-      if (item['SA2 ID'] && item.Amount) {
-        // Clean the amount string and convert to number
+    dssData.forEach(item => {
+      if (item.Type && item.Category && item['SA2 ID'] && item.Amount) {
+        const key = `${item.Type}|${item.Category}`;
+        
+        if (!index[key]) {
+          index[key] = {};
+        }
+        
+        // Clean the amount string and convert to number once during indexing
         const cleanAmount = typeof item.Amount === 'string' 
           ? parseFloat(item.Amount.replace(/[,\s]/g, ''))
           : item.Amount;
         
         if (!isNaN(cleanAmount)) {
-          result[item['SA2 ID']] = cleanAmount;
+          index[key][item['SA2 ID']] = cleanAmount;
         }
       }
     });
     
-    console.log('✅ HeatmapDataService: Processed healthcare SA2 data:', Object.keys(result).length, 'regions with data');
-    return result;
+    const indexKeys = Object.keys(index);
+    console.log(`⚡ Healthcare index built: ${indexKeys.length} category combinations indexed`);
+    console.log('🎯 Sample index keys:', indexKeys.slice(0, 5));
+    
+    return index;
   }, [dssData]);
 
-  // Process demographics data for selected category and subcategory  
-  const processDemographicsData = useCallback((category: string, subcategory: string): SA2HeatmapData => {
-    console.log('🔄 HeatmapDataService: Processing demographics data for:', category, '-', subcategory);
+  // Process healthcare data for selected category and subcategory (OPTIMIZED)
+  const processHealthcareData = useCallback((category: string, subcategory: string): SA2HeatmapData => {
+    console.log('🚀 HeatmapDataService: Fast lookup healthcare data for:', category, '-', subcategory);
     
-    const filteredData = demographicsData.filter(item => 
-      item.Description === subcategory
-    );
+    const lookupKey = `${category}|${subcategory}`;
+    const result = healthcareIndex[lookupKey] || {};
     
-    console.log('📊 HeatmapDataService: Filtered demographics data:', filteredData.length, 'records');
+    console.log(`⚡ HeatmapDataService: FAST healthcare lookup (${lookupKey}):`, Object.keys(result).length, 'regions with data');
+    return result;
+  }, [healthcareIndex]);
+
+  // 🚀 PERFORMANCE: Pre-built lookup table for demographics data
+  const demographicsIndex = useMemo(() => {
+    console.log('⚡ Building demographics index for fast lookup...');
+    const index: { [key: string]: SA2HeatmapData } = {};
     
-    const result: SA2HeatmapData = {};
-    filteredData.forEach(item => {
-      if (item['SA2 ID'] && item.Amount !== undefined && item.Amount !== null) {
-        const sa2Id = item['SA2 ID'].toString(); // Convert number to string for consistency
-        result[sa2Id] = item.Amount;
+    demographicsData.forEach(item => {
+      if (item.Description && item['SA2 ID'] && item.Amount !== undefined && item.Amount !== null) {
+        const key = item.Description;
+        
+        if (!index[key]) {
+          index[key] = {};
+        }
+        
+        const sa2Id = item['SA2 ID'].toString();
+        index[key][sa2Id] = item.Amount;
       }
     });
     
-    console.log('✅ HeatmapDataService: Processed demographics SA2 data:', Object.keys(result).length, 'regions with data');
-    return result;
+    const indexKeys = Object.keys(index);
+    console.log(`⚡ Demographics index built: ${indexKeys.length} descriptions indexed`);
+    
+    return index;
   }, [demographicsData]);
 
-  // Process economic statistics data for selected category and subcategory
-  const processEconomicData = useCallback((category: string, subcategory: string): SA2HeatmapData => {
-    console.log('🔄 HeatmapDataService: Processing economic statistics data for:', category, '-', subcategory);
+  // Process demographics data for selected category and subcategory (OPTIMIZED)
+  const processDemographicsData = useCallback((category: string, subcategory: string): SA2HeatmapData => {
+    console.log('🚀 HeatmapDataService: Fast lookup demographics data for:', category, '-', subcategory);
     
-    const filteredData = economicStatsData.filter(item => 
-      item.Description === subcategory
-    );
+    const result = demographicsIndex[subcategory] || {};
     
-    console.log('📊 HeatmapDataService: Filtered economic statistics data:', filteredData.length, 'records');
+    console.log(`⚡ HeatmapDataService: FAST demographics lookup (${subcategory}):`, Object.keys(result).length, 'regions with data');
+    return result;
+  }, [demographicsIndex]);
+
+  // 🚀 PERFORMANCE: Pre-built lookup table for economic statistics data
+  const economicIndex = useMemo(() => {
+    console.log('⚡ Building economic statistics index for fast lookup...');
+    const index: { [key: string]: SA2HeatmapData } = {};
     
-    const result: SA2HeatmapData = {};
-    filteredData.forEach(item => {
-      if (item['SA2 ID'] && item.Amount !== undefined && item.Amount !== null) {
-        const sa2Id = item['SA2 ID'].toString(); // Convert number to string for consistency
-        result[sa2Id] = item.Amount;
+    economicStatsData.forEach(item => {
+      if (item.Description && item['SA2 ID'] && item.Amount !== undefined && item.Amount !== null) {
+        const key = item.Description;
+        
+        if (!index[key]) {
+          index[key] = {};
+        }
+        
+        const sa2Id = item['SA2 ID'].toString();
+        index[key][sa2Id] = item.Amount;
       }
     });
     
-    console.log('✅ HeatmapDataService: Processed economic statistics SA2 data:', Object.keys(result).length, 'regions with data');
-    return result;
+    const indexKeys = Object.keys(index);
+    console.log(`⚡ Economic statistics index built: ${indexKeys.length} descriptions indexed`);
+    
+    return index;
   }, [economicStatsData]);
 
-  // Process health statistics data for selected category and subcategory
-  const processHealthStatsData = useCallback((category: string, subcategory: string): SA2HeatmapData => {
-    console.log('🔄 HeatmapDataService: Processing health statistics data for:', category, '-', subcategory);
+  // Process economic statistics data for selected category and subcategory (OPTIMIZED)
+  const processEconomicData = useCallback((category: string, subcategory: string): SA2HeatmapData => {
+    console.log('🚀 HeatmapDataService: Fast lookup economic statistics data for:', category, '-', subcategory);
     
-    const filteredData = healthStatsData.filter(item => 
-      item.Description === subcategory
-    );
+    const result = economicIndex[subcategory] || {};
     
-    console.log('📊 HeatmapDataService: Filtered health statistics data:', filteredData.length, 'records');
+    console.log(`⚡ HeatmapDataService: FAST economic statistics lookup (${subcategory}):`, Object.keys(result).length, 'regions with data');
+    return result;
+  }, [economicIndex]);
+
+  // 🚀 PERFORMANCE: Pre-built lookup table for health statistics data
+  const healthStatsIndex = useMemo(() => {
+    console.log('⚡ Building health statistics index for fast lookup...');
+    const index: { [key: string]: SA2HeatmapData } = {};
     
-    const result: SA2HeatmapData = {};
-    filteredData.forEach(item => {
-      if (item['SA2 ID'] && item.Amount !== undefined && item.Amount !== null) {
-        const sa2Id = item['SA2 ID'].toString(); // Convert number to string for consistency
-        result[sa2Id] = item.Amount;
+    healthStatsData.forEach(item => {
+      if (item.Description && item['SA2 ID'] && item.Amount !== undefined && item.Amount !== null) {
+        const key = item.Description;
+        
+        if (!index[key]) {
+          index[key] = {};
+        }
+        
+        const sa2Id = item['SA2 ID'].toString();
+        index[key][sa2Id] = item.Amount;
       }
     });
     
-    console.log('✅ HeatmapDataService: Processed health statistics SA2 data:', Object.keys(result).length, 'regions with data');
-    return result;
+    const indexKeys = Object.keys(index);
+    console.log(`⚡ Health statistics index built: ${indexKeys.length} descriptions indexed`);
+    
+    return index;
   }, [healthStatsData]);
+
+  // Process health statistics data for selected category and subcategory (OPTIMIZED)
+  const processHealthStatsData = useCallback((category: string, subcategory: string): SA2HeatmapData => {
+    console.log('🚀 HeatmapDataService: Fast lookup health statistics data for:', category, '-', subcategory);
+    
+    const result = healthStatsIndex[subcategory] || {};
+    
+    console.log(`⚡ HeatmapDataService: FAST health statistics lookup (${subcategory}):`, Object.keys(result).length, 'regions with data');
+    return result;
+  }, [healthStatsIndex]);
 
   // Unified process data function that handles all data types
   const processData = useCallback((category: string, subcategory: string, type: 'healthcare' | 'demographics' | 'economics' | 'health-statistics' = dataType): SA2HeatmapData => {
@@ -580,16 +787,49 @@ export default function HeatmapDataService({
 
   // Load data on component mount based on data type
   useEffect(() => {
-    if (dataType === 'healthcare') {
-      loadDSSData();
-    } else if (dataType === 'demographics') {
-      loadDemographicsData();
-    } else if (dataType === 'economics') {
-      loadEconomicData();
-    } else if (dataType === 'health-statistics') {
-      loadHealthStatsData();
+    // 🚀 OPTIMIZATION: Only load legacy data if not using optimized service
+    if (!useOptimizedService) {
+      console.log('🐌 HeatmapDataService: Loading legacy data for comparison');
+      if (dataType === 'healthcare') {
+        loadDSSData();
+      } else if (dataType === 'demographics') {
+        loadDemographicsData();
+      } else if (dataType === 'economics') {
+        loadEconomicData();
+      } else if (dataType === 'health-statistics') {
+        loadHealthStatsData();
+      }
+    } else {
+      console.log('🚀 HeatmapDataService: Skipping legacy data loading (optimized service enabled)');
     }
-  }, [dataType]);
+  }, [dataType]); // Fixed: Remove useOptimizedService from dependency array
+
+  // Separate effect for optimization service changes
+  useEffect(() => {
+    // 🚀 OPTIMIZATION: Reload data when switching between services
+    console.log(`🔄 HeatmapDataService: Service mode changed to ${useOptimizedService ? 'OPTIMIZED' : 'LEGACY'}`);
+    
+    // Clear existing data when switching to optimized service
+    if (useOptimizedService) {
+      console.log('🚀 HeatmapDataService: Switched to optimized service, clearing legacy data');
+      setDssData([]);
+      setDemographicsData([]);
+      setEconomicStatsData([]);
+      setHealthStatsData([]);
+    } else {
+      console.log('🐌 HeatmapDataService: Switched to legacy service, loading data...');
+      // Trigger data loading based on current dataType
+      if (dataType === 'healthcare') {
+        loadDSSData();
+      } else if (dataType === 'demographics') {
+        loadDemographicsData();
+      } else if (dataType === 'economics') {
+        loadEconomicData();
+      } else if (dataType === 'health-statistics') {
+        loadHealthStatsData();
+      }
+    }
+  }, [useOptimizedService]); // Stable dependency array with only useOptimizedService
 
   // Load SA2 names from boundary data for ranking display
   const loadSA2Names = useCallback(async () => {
@@ -719,10 +959,14 @@ export default function HeatmapDataService({
 
   // Process data when selection changes
   useEffect(() => {
+    // 🎯 PERFORMANCE PROFILING: Add timing measurements
+    const performanceStart = performance.now();
+    
     console.log('🔄 HeatmapDataService: useEffect triggered:', {
       selectedCategory,
       selectedSubcategory,
       dataType,
+      useOptimizedService, // 🚀 NEW: Log which service is being used
       dssDataLength: dssData.length,
       demographicsDataLength: demographicsData.length,
       economicStatsDataLength: economicStatsData.length,
@@ -730,7 +974,8 @@ export default function HeatmapDataService({
       hasOnDataProcessed: !!onDataProcessed,
       hasOnRankedDataCalculated: !!onRankedDataCalculated,
       loadingComplete,
-      hasEverReportedToCoordinator
+      hasEverReportedToCoordinator,
+      performanceStart: `${performanceStart}ms`
     });
 
     const hasDataForType = (dataType === 'healthcare' && dssData.length > 0) || 
@@ -738,64 +983,199 @@ export default function HeatmapDataService({
                           (dataType === 'economics' && economicStatsData.length > 0) ||
                           (dataType === 'health-statistics' && healthStatsData.length > 0);
 
-    if (selectedCategory && selectedSubcategory && hasDataForType) {
-      console.log('✅ HeatmapDataService: All conditions met, processing data...');
-      
-      // 🔧 FLICKERING FIX: Use centralized safety check for all coordinator calls
-      if (!shouldSkipCoordinator()) {
-        console.log('📡 HeatmapDataService: Reporting to coordinator (first time only)');
-        globalLoadingCoordinator.reportHeatmapRendering(10);
-        setHasEverReportedToCoordinator(true); // Set flag permanently
+    if (selectedCategory && selectedSubcategory) {
+      // 🚀 OPTIMIZED PATH: Use SA2 API service
+      if (useOptimizedService) {
+        console.log('🚀 HeatmapDataService: Using OPTIMIZED processing path');
+        
+        // 🎯 PERFORMANCE: Measure optimized processing time
+        const processingStart = performance.now();
+        
+        // 🔧 FLICKERING FIX: Use centralized safety check for all coordinator calls
+        if (!shouldSkipCoordinator()) {
+          console.log('📡 HeatmapDataService: Reporting to coordinator (first time only)');
+          globalLoadingCoordinator.reportHeatmapRendering(10);
+          setHasEverReportedToCoordinator(true); // Set flag permanently
+        }
+        
+        // Process data using optimized service
+        processDataOptimized(selectedCategory, selectedSubcategory)
+          .then(processedData => {
+            const processingEnd = performance.now();
+            const processingTime = processingEnd - processingStart;
+            
+            const label = `${selectedCategory} - ${selectedSubcategory}`;
+            
+            if (!shouldSkipCoordinator()) {
+              globalLoadingCoordinator.reportHeatmapRendering(50);
+            }
+            
+            console.log('📊 HeatmapDataService: About to call onDataProcessed with OPTIMIZED data:', {
+              dataKeys: Object.keys(processedData).length,
+              label,
+              sampleData: Object.entries(processedData).slice(0, 3),
+              processingTime: `${processingTime.toFixed(2)}ms`
+            });
+            
+            // 🎯 PERFORMANCE: Measure callback execution time  
+            const callbackStart = performance.now();
+            
+            // Call existing heatmap callback
+            onDataProcessed(processedData, label);
+            
+            const callbackEnd = performance.now();
+            const callbackTime = callbackEnd - callbackStart;
+            
+            if (!shouldSkipCoordinator()) {
+              globalLoadingCoordinator.reportHeatmapRendering(80);
+            }
+            
+            // Calculate and call ranking callback if available
+            if (onRankedDataCalculated) {
+              console.log('📊 HeatmapDataService: Calculating ranked data...');
+              const rankingStart = performance.now();
+              
+              const rankedData = calculateRankedData(processedData, label);
+              console.log('📊 HeatmapDataService: About to call onRankedDataCalculated with:', rankedData);
+              onRankedDataCalculated(rankedData);
+              
+              const rankingEnd = performance.now();
+              const rankingTime = rankingEnd - rankingStart;
+              
+              console.log(`⚡ PERFORMANCE: Ranking calculation took ${rankingTime.toFixed(2)}ms`);
+            }
+            
+            if (!shouldSkipCoordinator()) {
+              globalLoadingCoordinator.reportHeatmapRendering(100);
+            }
+            
+            // 🎯 PERFORMANCE: Total time measurement
+            const totalTime = performance.now() - performanceStart;
+            console.log(`🚀 OPTIMIZED PERFORMANCE SUMMARY for "${label}":
+              - Data Processing: ${processingTime.toFixed(2)}ms
+              - Callback Execution: ${callbackTime.toFixed(2)}ms  
+              - Total Time: ${totalTime.toFixed(2)}ms
+              - Data Points: ${Object.keys(processedData).length}
+              - Service: OPTIMIZED SA2 API
+            `);
+          })
+          .catch(error => {
+            console.error('❌ HeatmapDataService: Optimized processing failed:', error);
+            // Clear data on error
+            onDataProcessed(null, '');
+            if (onRankedDataCalculated) {
+              onRankedDataCalculated(null);
+            }
+          });
+        
+        return; // Early exit for optimized path
       }
-      
-      const processedData = getProcessedData(selectedCategory, selectedSubcategory);
-      const label = `${selectedCategory} - ${selectedSubcategory}`;
-      
-      if (!shouldSkipCoordinator()) {
-        globalLoadingCoordinator.reportHeatmapRendering(50);
-      }
-      
-      console.log('📊 HeatmapDataService: About to call onDataProcessed with:', {
-        dataKeys: Object.keys(processedData).length,
-        label,
-        sampleData: Object.entries(processedData).slice(0, 3)
-      });
-      
-      // Call existing heatmap callback
-      onDataProcessed(processedData, label);
-      
-      if (!shouldSkipCoordinator()) {
-        globalLoadingCoordinator.reportHeatmapRendering(80);
-      }
-      
-      // Calculate and call ranking callback if available
-      if (onRankedDataCalculated) {
-        console.log('📊 HeatmapDataService: Calculating ranked data...');
-        const rankedData = calculateRankedData(processedData, label);
-        console.log('📊 HeatmapDataService: About to call onRankedDataCalculated with:', rankedData);
-        onRankedDataCalculated(rankedData);
-      }
-      
-      if (!shouldSkipCoordinator()) {
-        globalLoadingCoordinator.reportHeatmapRendering(100);
+
+      // 🐌 LEGACY PATH: Use existing JSON file processing
+      if (hasDataForType) {
+        console.log('🐌 HeatmapDataService: Using LEGACY processing path');
+        console.log('✅ HeatmapDataService: All conditions met, processing data...');
+        
+        // 🎯 PERFORMANCE: Measure data processing time
+        const processingStart = performance.now();
+        
+        // 🔧 FLICKERING FIX: Use centralized safety check for all coordinator calls
+        if (!shouldSkipCoordinator()) {
+          console.log('📡 HeatmapDataService: Reporting to coordinator (first time only)');
+          globalLoadingCoordinator.reportHeatmapRendering(10);
+          setHasEverReportedToCoordinator(true); // Set flag permanently
+        }
+        
+        const processedData = getProcessedData(selectedCategory, selectedSubcategory);
+        const processingEnd = performance.now();
+        const processingTime = processingEnd - processingStart;
+        
+        const label = `${selectedCategory} - ${selectedSubcategory}`;
+        
+        if (!shouldSkipCoordinator()) {
+          globalLoadingCoordinator.reportHeatmapRendering(50);
+        }
+        
+        console.log('📊 HeatmapDataService: About to call onDataProcessed with LEGACY data:', {
+          dataKeys: Object.keys(processedData).length,
+          label,
+          sampleData: Object.entries(processedData).slice(0, 3),
+          processingTime: `${processingTime.toFixed(2)}ms`
+        });
+        
+        // 🎯 PERFORMANCE: Measure callback execution time  
+        const callbackStart = performance.now();
+        
+        // Call existing heatmap callback
+        onDataProcessed(processedData, label);
+        
+        const callbackEnd = performance.now();
+        const callbackTime = callbackEnd - callbackStart;
+        
+        if (!shouldSkipCoordinator()) {
+          globalLoadingCoordinator.reportHeatmapRendering(80);
+        }
+        
+        // Calculate and call ranking callback if available
+        if (onRankedDataCalculated) {
+          console.log('📊 HeatmapDataService: Calculating ranked data...');
+          const rankingStart = performance.now();
+          
+          const rankedData = calculateRankedData(processedData, label);
+          console.log('📊 HeatmapDataService: About to call onRankedDataCalculated with:', rankedData);
+          onRankedDataCalculated(rankedData);
+          
+          const rankingEnd = performance.now();
+          const rankingTime = rankingEnd - rankingStart;
+          
+          console.log(`⚡ PERFORMANCE: Ranking calculation took ${rankingTime.toFixed(2)}ms`);
+        }
+        
+        if (!shouldSkipCoordinator()) {
+          globalLoadingCoordinator.reportHeatmapRendering(100);
+        }
+        
+        // 🎯 PERFORMANCE: Total time measurement
+        const totalTime = performance.now() - performanceStart;
+        console.log(`🐌 LEGACY PERFORMANCE SUMMARY for "${label}":
+          - Data Processing: ${processingTime.toFixed(2)}ms
+          - Callback Execution: ${callbackTime.toFixed(2)}ms  
+          - Total Time: ${totalTime.toFixed(2)}ms
+          - Data Points: ${Object.keys(processedData).length}
+          - Service: LEGACY JSON Files
+        `);
+        
+      } else {
+        console.log('❌ HeatmapDataService: Conditions not met for legacy path, clearing data:', {
+          selectedCategory,
+          selectedSubcategory,
+          dataType,
+          hasDataForType,
+          useOptimizedService
+        });
+        // Clear both callbacks when no selection
+        onDataProcessed(null, '');
+        if (onRankedDataCalculated) {
+          onRankedDataCalculated(null);
+        }
+        
+        // 🎯 PERFORMANCE: Log when no processing needed
+        const totalTime = performance.now() - performanceStart;
+        console.log(`⚡ PERFORMANCE: No legacy processing needed - ${totalTime.toFixed(2)}ms`);
       }
     } else {
-      console.log('❌ HeatmapDataService: Conditions not met, clearing data:', {
-        selectedCategory,
-        selectedSubcategory,
-        dataType,
-        dssDataLength: dssData.length,
-        demographicsDataLength: demographicsData.length,
-        economicStatsDataLength: economicStatsData.length,
-        healthStatsDataLength: healthStatsData.length
-      });
+      console.log('❌ HeatmapDataService: No category/subcategory selected, clearing data');
       // Clear both callbacks when no selection
       onDataProcessed(null, '');
       if (onRankedDataCalculated) {
         onRankedDataCalculated(null);
       }
+      
+      // 🎯 PERFORMANCE: Log when no processing needed
+      const totalTime = performance.now() - performanceStart;
+      console.log(`⚡ PERFORMANCE: No selection - ${totalTime.toFixed(2)}ms`);
     }
-  }, [selectedCategory, selectedSubcategory, dataType, dssData, demographicsData, economicStatsData, healthStatsData, onDataProcessed, onRankedDataCalculated, loadingComplete, hasEverReportedToCoordinator]);
+  }, [selectedCategory, selectedSubcategory, dataType, useOptimizedService, dssData, demographicsData, economicStatsData, healthStatsData, onDataProcessed, onRankedDataCalculated, loadingComplete, hasEverReportedToCoordinator, processDataOptimized, getProcessedData, shouldSkipCoordinator, calculateRankedData]);
 
   // Combined loading state for user feedback
   const isPreloading = loading || loadingSA2Names || preloadingHeatmaps;
@@ -819,43 +1199,62 @@ export default function HeatmapDataService({
     });
   }
 
-  // Return loading/error state
   return (
-    <>
-      {/* Loading Status */}
+    <div>
+      {/* 🚀 PERFORMANCE TESTING: A/B Toggle for Service Comparison */}
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        background: 'rgba(0,0,0,0.8)',
+        color: 'white',
+        padding: '10px',
+        borderRadius: '5px',
+        fontSize: '12px',
+        zIndex: 1000,
+        fontFamily: 'monospace'
+      }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input
+            type="checkbox"
+            checked={useOptimizedService}
+            onChange={(e) => setUseOptimizedService(e.target.checked)}
+          />
+          <span>
+            {useOptimizedService ? '🚀 OPTIMIZED' : '🐌 LEGACY'} Data Service
+          </span>
+        </label>
+        <div style={{ fontSize: '10px', marginTop: '4px', opacity: 0.7 }}>
+          Compare performance in browser console
+        </div>
+      </div>
+
+      {/* Loading indicators only during initial load */}
       {shouldShowLoadingIndicators && (
-        <div className="absolute top-4 left-4 bg-blue-50 border border-blue-200 rounded-lg p-3 z-20">
-          <div className="flex items-center space-x-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-            <span className="text-sm text-blue-700">{preloadStatus}</span>
+        <div className="fixed top-4 left-4 bg-black bg-opacity-75 text-white p-3 rounded-lg z-50">
+          <div className="text-sm">Loading heatmap data...</div>
+          <div className="text-xs text-gray-300 mt-1">{preloadStatus}</div>
+        </div>
+      )}
+
+      {/* Error UI */}
+      {error && (
+        <div className="absolute top-4 left-4 bg-red-50 border border-red-200 rounded-lg p-3 z-20">
+          <div className="text-sm text-red-700">
+            <strong>Error:</strong> {error}
           </div>
         </div>
       )}
 
-      {/* Error Status */}
-      {(error || sa2NameError) && (
-        <div className="absolute top-4 left-4 bg-red-50 border border-red-200 rounded-lg p-3 z-20 max-w-xs">
-          <h4 className="text-sm font-medium text-red-900">Data Loading Error</h4>
-          <p className="text-sm text-red-700 mt-1">
-            {error || sa2NameError}
-          </p>
-          <button
-            onClick={() => {
-              if (error) {
-                setError(null);
-                loadDSSData();
-              }
-              if (sa2NameError) {
-                setSa2NameError(null);
-                loadSA2Names();
-              }
-            }}
-            className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
-          >
-            Retry
-          </button>
+      {/* SA2 Name Loading Error UI */}
+      {sa2NameError && (
+        <div className="absolute top-20 left-4 bg-orange-50 border border-orange-200 rounded-lg p-3 z-20">
+          <div className="text-sm text-orange-700">
+            <strong>Warning:</strong> {sa2NameError}
+          </div>
+          <div className="text-xs text-orange-600 mt-1">Rankings will show region IDs instead of names</div>
         </div>
       )}
-    </>
+    </div>
   );
 } 

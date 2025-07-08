@@ -644,10 +644,10 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   const handleFacilityHover = useCallback((facility: any, markerElement: HTMLElement, isEntering: boolean) => {
     if (isEntering) {
       markerElement.style.transform = 'scale(1.2)';
-      markerElement.style.zIndex = '1000';
+      markerElement.style.zIndex = '25'; // Below heatmap menus (z-30) but above normal markers
     } else {
       markerElement.style.transform = 'scale(1)';
-      markerElement.style.zIndex = '1';
+      markerElement.style.zIndex = '10'; // Base level for normal markers
     }
   }, []);
 
@@ -745,6 +745,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           markerElement.style.borderRadius = '50%';
           markerElement.style.cursor = 'pointer';
           markerElement.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+          markerElement.style.zIndex = '10'; // Base level for normal markers, below heatmap menus (z-30)
 
           // Extract facility details
           const serviceName = facility.Service_Name || 'Unknown Service';
@@ -789,7 +790,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             markerElement.style.fontSize = '11px';
             markerElement.style.fontWeight = 'bold';
             markerElement.style.color = typeColors[typeKey];
-            markerElement.style.zIndex = '100';
+            markerElement.style.zIndex = '20'; // Below heatmap menus (z-30) but above normal markers
             markerElement.textContent = clusterSize.toString();
             
             console.log(`🎯 Cluster marker created: ${clusterSize} facilities at ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
@@ -993,12 +994,13 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           // Determine if this facility should show "See Details" button (only homecare and residential)
           const showSeeDetailsButton = typeKey === 'residential' || typeKey === 'home' || typeKey === 'mps' || typeKey === 'retirement';
 
-          // Create beautiful popup with save button
+          // Create beautiful popup with save button  
           const popup = new maptilersdk.Popup({ 
-            offset: 25,
+            offset: [0, -120], // Position popup above marker: [horizontal, vertical] offset (increased to -120)
             closeButton: true,
             closeOnClick: false,
-            className: 'custom-popup draggable-popup'
+            className: 'custom-popup draggable-popup',
+            anchor: 'bottom' // Force popup to appear above marker
           })
           .setHTML(`
             <div class="aged-care-popup" id="${popupId}">
@@ -1411,6 +1413,34 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
               }
             });
           }
+
+          // 🔍 Z-INDEX DIAGNOSTIC: Add debugging when popup opens
+          popup.on('open', () => {
+            setTimeout(() => {
+              console.log('🔍 Z-INDEX DIAGNOSTIC - Popup opened, checking layers...');
+              
+              // Find the popup element in DOM
+              const popupElements = document.querySelectorAll('.maplibregl-popup');
+              const markerElements = document.querySelectorAll('.maplibregl-marker');
+              
+              console.log('📊 POPUP ELEMENTS:', popupElements.length);
+              popupElements.forEach((popup, index) => {
+                const computedStyle = window.getComputedStyle(popup);
+                console.log(`  Popup ${index + 1}: z-index = ${computedStyle.zIndex}, position = ${computedStyle.position}`);
+              });
+              
+              console.log('📍 MARKER ELEMENTS:', markerElements.length);
+              markerElements.forEach((marker, index) => {
+                const computedStyle = window.getComputedStyle(marker);
+                console.log(`  Marker ${index + 1}: z-index = ${computedStyle.zIndex}, position = ${computedStyle.position}`);
+              });
+              
+              // Find our specific marker element
+              console.log(`🎯 OUR MARKER: z-index = ${markerElement.style.zIndex || 'not set'}`);
+              console.log(`🎯 MARKER COMPUTED:`, window.getComputedStyle(markerElement));
+              
+            }, 100); // Small delay to ensure DOM is updated
+          });
 
           // Create and add marker (with safety check)
           if (!map.current) {
@@ -2412,6 +2442,22 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           .maplibregl-ctrl-bottom-right {
             margin-bottom: 2px !important;
             margin-right: 2px !important;
+          }
+          
+          /* 🔧 Z-INDEX FIX: Force popups above markers */
+          .maplibregl-popup {
+            z-index: 100 !important;
+          }
+          .maplibregl-popup-content {
+            z-index: 101 !important;
+          }
+          .maplibregl-popup-tip {
+            z-index: 101 !important;
+          }
+          
+          /* Ensure popup container is also properly layered */
+          .custom-popup, .draggable-popup {
+            z-index: 100 !important;
           }
         `
       }} />
