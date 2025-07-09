@@ -49,9 +49,12 @@ export async function saveSearchToSavedSearches(
   searchTerm: string, 
   locationData?: LocationData,
   searchType: 'location' | 'facility' | 'general' = 'location'
-): Promise<{ success: boolean; error?: string; atLimit?: boolean }> {
+): Promise<{ success: boolean; error?: string; atLimit?: boolean; skipped?: boolean }> {
   try {
     const supabase = createBrowserSupabaseClient();
+    
+    // ✅ Initialize table if needed (handles first-time setup)
+    await initializeSavedSearchesTable();
     
     // Check current count first
     const { count, error: countError } = await supabase
@@ -112,8 +115,28 @@ export async function saveSearchToSavedSearches(
       if (error.message?.includes('Maximum of 100 saved searches')) {
         return { success: false, error: 'You have reached the maximum of 100 saved searches. Please delete some searches first.', atLimit: true };
       }
-      console.error('Error inserting saved search:', error);
-      return { success: false, error: 'Failed to save search' };
+      
+      // ✅ Handle duplicate key constraint gracefully  
+      if (error.code === '23505' || error.message?.includes('duplicate key value violates unique constraint')) {
+        console.log(`⏭️ Facility "${searchTerm}" already saved - skipping duplicate`);
+        return { success: true, skipped: true }; // Return success to avoid error propagation
+      }
+      
+      // ✅ Enhanced error logging for debugging
+      console.error('Error inserting saved search - Full error object:', error);
+      console.error('Error message:', error.message);
+      console.error('Error code:', error.code);
+      console.error('Error details:', error.details);
+      console.error('Error hint:', error.hint);
+      console.error('Attempted insert data:', {
+        user_id: userId,
+        search_term: searchTerm,
+        search_display_name: displayName,
+        search_type: searchType,
+        location_data_length: locationData ? JSON.stringify(locationData).length : 0
+      });
+      
+      return { success: false, error: `Database error: ${error.message || 'Unknown error'}` };
     }
     
     return { success: true };

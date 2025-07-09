@@ -126,6 +126,12 @@ export default function MapsPage() {
   const [openPopupsCount, setOpenPopupsCount] = useState(0);
   const [facilityBreakdown, setFacilityBreakdown] = useState<Record<string, number>>({});
   
+  // Save All state - tracks if all open facilities are already saved
+  const [allFacilitiesSaved, setAllFacilitiesSaved] = useState(false);
+  
+  // Save All loading state
+  const [saveAllLoading, setSaveAllLoading] = useState(false);
+  
   // Facility Counter state
   const [facilityCountsInViewport, setFacilityCountsInViewport] = useState<{
     residential: number;
@@ -203,6 +209,13 @@ export default function MapsPage() {
     const interval = setInterval(updatePopupCount, 500);
     return () => clearInterval(interval);
   }, []);
+
+  // Reset Save All state when popup count changes
+  useEffect(() => {
+    if (openPopupsCount === 0) {
+      setAllFacilitiesSaved(false);
+    }
+  }, [openPopupsCount]);
 
   // Add facility counting functionality
   const updateFacilityCounts = useCallback(() => {
@@ -504,42 +517,130 @@ export default function MapsPage() {
     }
   }, []);
 
-  // Function to save all facility popups
+  // Function to check if all open facilities are saved
+  const checkAllFacilitiesSaved = useCallback(async () => {
+    if (!mapRef.current || !user?.id) return false;
+    
+    try {
+      // If no open facilities, return false
+      if (openPopupsCount === 0) return false;
+      
+      // For now, we'll track this state manually after save/unsave operations
+      // In a real implementation, we'd check each facility's saved status
+      return allFacilitiesSaved;
+    } catch (error) {
+      console.error('Error checking facility save status:', error);
+      return false;
+    }
+  }, [user?.id, openPopupsCount, allFacilitiesSaved]);
+
+  // Function to save OR unsave all facility popups
   const handleSaveAllPopups = useCallback(async () => {
     if (!mapRef.current || !user?.id) {
       alert('Please sign in to save facilities');
       return;
     }
 
+    if (saveAllLoading) return; // Prevent double-clicks
+    
+    setSaveAllLoading(true);
+
     try {
-      console.log('💾 Starting save all facilities...');
-      const result = await mapRef.current.saveAllOpenFacilities();
-      
-      if (result.success) {
-        if (result.saved > 0) {
-          alert(`✅ Successfully saved ${result.saved} out of ${result.total} facilities to your saved locations!`);
-          // Refresh saved searches to show the new items
-          handleSavedSearchAdded();
-        } else {
-          alert('All open facilities are already saved to your locations.');
-        }
-      } else {
-        const errorMessage = result.errors.length > 0 
-          ? `Some facilities could not be saved:\n${result.errors.slice(0, 3).join('\n')}${result.errors.length > 3 ? '\n...' : ''}`
-          : 'Failed to save facilities.';
-        alert(`⚠️ ${errorMessage}`);
+      if (allFacilitiesSaved) {
+        // UNSAVE ALL functionality
+        console.log('🗑️ Starting unsave all facilities...');
         
-        if (result.saved > 0) {
-          alert(`✅ However, ${result.saved} out of ${result.total} facilities were successfully saved.`);
-          handleSavedSearchAdded();
+        // Get saved searches to find matching facilities
+        const { getUserSavedSearches, deleteSavedSearch } = await import('../../lib/savedSearches');
+        const savedSearches = await getUserSavedSearches(user.id);
+        
+        if (!savedSearches || !savedSearches.searches) {
+          alert('❌ Failed to load saved searches');
+          return;
+        }
+        
+        // Delete all facility-type saved searches
+        let deletedCount = 0;
+        const errors: string[] = [];
+        
+        for (const search of savedSearches.searches) {
+          if (search.search_type === 'facility') {
+            try {
+              const result = await deleteSavedSearch(user.id, search.id!);
+              if (result.success) {
+                deletedCount++;
+              } else {
+                errors.push(`${search.search_display_name}: ${result.error}`);
+              }
+            } catch (error) {
+              const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+              errors.push(`${search.search_display_name}: ${errorMsg}`);
+            }
+          }
+        }
+        
+        // ✅ Update individual popup buttons to unsaved state
+        const saveButtons = document.querySelectorAll('[id*="save-btn"]');
+        saveButtons.forEach((button) => {
+          const saveButton = button as HTMLButtonElement;
+          saveButton.innerHTML = '📍 Save Location';
+          saveButton.style.backgroundColor = '#3B82F6';
+          saveButton.style.borderColor = '#3B82F6';
+          saveButton.style.color = 'white';
+          saveButton.style.pointerEvents = 'auto';
+        });
+        
+        // ✅ Single notification message
+        if (deletedCount > 0) {
+          alert(`🗑️ Successfully removed ${deletedCount} facilities from your saved locations!`);
+          handleSavedSearchAdded(); // Refresh saved searches
+          setAllFacilitiesSaved(false); // Update button state
+        } else if (errors.length > 0) {
+          alert(`⚠️ Failed to remove some facilities:\n${errors.slice(0, 3).join('\n')}${errors.length > 3 ? '\n...' : ''}`);
+        } else {
+          alert('No facility searches found to remove.');
+          setAllFacilitiesSaved(false); // Reset state anyway
+        }
+        
+      } else {
+        // SAVE ALL functionality (original)
+        console.log('💾 Starting save all facilities...');
+        const result = await mapRef.current.saveAllOpenFacilities();
+        
+        // ✅ Single notification message based on result
+        if (result.success) {
+          if (result.saved > 0) {
+            alert(`✅ Successfully saved ${result.saved} out of ${result.total} facilities to your saved locations!`);
+            setAllFacilitiesSaved(true); // Update button state
+          } else {
+            alert('All open facilities are already saved to your locations.');
+            setAllFacilitiesSaved(true); // Update button state
+          }
+          handleSavedSearchAdded(); // Refresh saved searches
+        } else {
+          let message = 'Failed to save facilities.';
+          if (result.errors.length > 0) {
+            message = `Some facilities could not be saved:\n${result.errors.slice(0, 3).join('\n')}${result.errors.length > 3 ? '\n...' : ''}`;
+          }
+          if (result.saved > 0) {
+            message += `\n\nHowever, ${result.saved} out of ${result.total} facilities were successfully saved.`;
+            handleSavedSearchAdded();
+            // Partial success - check if all are now saved
+            if (result.saved === result.total) {
+              setAllFacilitiesSaved(true);
+            }
+          }
+          alert(`⚠️ ${message}`);
         }
       }
     } catch (error) {
-      console.error('❌ Error saving all facilities:', error);
+      console.error('❌ Error saving/unsaving all facilities:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       alert(`❌ Error: ${errorMessage}`);
+    } finally {
+      setSaveAllLoading(false);
     }
-  }, [user?.id, handleSavedSearchAdded]);
+  }, [user?.id, handleSavedSearchAdded, allFacilitiesSaved, saveAllLoading]);
 
   // Heatmap handlers
   const handleHeatmapToggle = useCallback((visible: boolean) => {
@@ -1103,29 +1204,86 @@ export default function MapsPage() {
                 </div>
               </div>
               
-              {/* Save All Button */}
+              {/* Save All / Unsave All Button */}
               {user?.id && (
                 <div className="bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden">
                   <button
                     onClick={handleSaveAllPopups}
-                    className="w-full flex items-center gap-2 px-4 py-2 hover:bg-blue-50 transition-colors text-sm font-medium text-blue-700 hover:text-blue-900"
-                    title={`Save all ${openPopupsCount} facility popups to your saved locations`}
+                    disabled={saveAllLoading}
+                    className={`w-full flex items-center gap-2 px-4 py-2 transition-colors text-sm font-medium ${
+                      saveAllLoading
+                        ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                        : allFacilitiesSaved 
+                          ? 'bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-900 border-red-200' 
+                          : 'hover:bg-blue-50 text-blue-700 hover:text-blue-900'
+                    }`}
+                    title={saveAllLoading 
+                      ? 'Processing...'
+                      : allFacilitiesSaved 
+                        ? `Remove all ${openPopupsCount} facilities from your saved locations`
+                        : `Save all ${openPopupsCount} facility popups to your saved locations`
+                    }
                   >
-                    <svg 
-                      className="w-4 h-4" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24" 
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth="2" 
-                        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-                      />
-                    </svg>
-                    Save All ({openPopupsCount})
+                    {saveAllLoading ? (
+                      // Loading spinner
+                      <svg 
+                        className="w-4 h-4 animate-spin" 
+                        fill="none" 
+                        viewBox="0 0 24 24"
+                      >
+                        <circle 
+                          className="opacity-25" 
+                          cx="12" 
+                          cy="12" 
+                          r="10" 
+                          stroke="currentColor" 
+                          strokeWidth="4"
+                        />
+                        <path 
+                          className="opacity-75" 
+                          fill="currentColor" 
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                    ) : allFacilitiesSaved ? (
+                      // Unsave/Delete icon
+                      <svg 
+                        className="w-4 h-4" 
+                        fill="currentColor" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24" 
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth="2" 
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    ) : (
+                      // Save/Bookmark icon (filled when saved)
+                      <svg 
+                        className="w-4 h-4" 
+                        fill={allFacilitiesSaved ? "currentColor" : "none"} 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24" 
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth="2" 
+                          d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                        />
+                      </svg>
+                    )}
+                    {saveAllLoading 
+                      ? 'Processing...' 
+                      : allFacilitiesSaved 
+                        ? `Unsave All (${openPopupsCount})` 
+                        : `Save All (${openPopupsCount})`
+                    }
                   </button>
                 </div>
               )}
