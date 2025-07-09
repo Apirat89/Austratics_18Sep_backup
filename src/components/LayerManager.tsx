@@ -21,6 +21,8 @@ interface LayerManagerProps {
   facilityLoading?: boolean;
   // General map state
   mapLoaded?: boolean;
+  // ✅ NEW: Completion callback for real-time loading indicator
+  onHeatmapRenderComplete?: () => void;
 }
 
 export default function LayerManager({
@@ -30,7 +32,8 @@ export default function LayerManager({
   heatmapDataReady = false,
   onHeatmapMinMaxCalculated,
   facilityLoading = false,
-  mapLoaded = false
+  mapLoaded = false,
+  onHeatmapRenderComplete
 }: LayerManagerProps) {
   // Layer management state
   const [boundaryLoaded, setBoundaryLoaded] = useState(false);
@@ -40,15 +43,117 @@ export default function LayerManager({
   // Cache for boundary data to avoid reloading
   const boundaryDataCache = useRef<Map<string, any>>(new Map());
   
+  // ⚡ PERFORMANCE: Style expression cache to avoid recreating expressions
+  const styleExpressionCache = useRef<Map<string, any>>(new Map());
+  const minMaxCache = useRef<Map<string, { minValue: number; maxValue: number }>>(new Map());
+  
+  // ✅ MEMORY MANAGEMENT: Cache size limits to prevent memory leaks
+  const MAX_CACHE_SIZE = 50; // Limit cache to 50 entries
+  
+  // ✅ MEMORY MANAGEMENT: Cleanup old cache entries when limit is reached
+  const cleanupCache = useCallback(() => {
+    if (styleExpressionCache.current.size > MAX_CACHE_SIZE) {
+      const entries = Array.from(styleExpressionCache.current.entries());
+      const toKeep = entries.slice(-MAX_CACHE_SIZE / 2); // Keep most recent half
+      styleExpressionCache.current.clear();
+      toKeep.forEach(([key, value]) => styleExpressionCache.current.set(key, value));
+      console.log(`🧹 LayerManager: Cleaned style expression cache, kept ${toKeep.length} entries`);
+    }
+    
+    if (minMaxCache.current.size > MAX_CACHE_SIZE) {
+      const entries = Array.from(minMaxCache.current.entries());
+      const toKeep = entries.slice(-MAX_CACHE_SIZE / 2); // Keep most recent half
+      minMaxCache.current.clear();
+      toKeep.forEach(([key, value]) => minMaxCache.current.set(key, value));
+      console.log(`🧹 LayerManager: Cleaned min/max cache, kept ${toKeep.length} entries`);
+    }
+  }, []);
+  
   // Refs for stable data access
   const heatmapDataRef = useRef<SA2HeatmapData | null>(null);
   const heatmapVisibleRef = useRef<boolean>(false);
+  
+  // ✅ SAFETY: Add error boundary recovery for heatmap updates
+  const [consecutiveErrors, setConsecutiveErrors] = useState(0);
+  const MAX_CONSECUTIVE_ERRORS = 3;
   
   // Update refs when props change
   useEffect(() => {
     heatmapDataRef.current = sa2HeatmapData || null;
     heatmapVisibleRef.current = sa2HeatmapVisible;
   }, [sa2HeatmapData, sa2HeatmapVisible]);
+
+  // ⚡ PERFORMANCE: Generate cached style expression to avoid recreation
+  const generateCachedStyleExpression = useCallback((data: SA2HeatmapData): { 
+    expression: any[], 
+    minValue: number, 
+    maxValue: number 
+  } => {
+    const dataEntries = Object.entries(data);
+    
+    // Create cache key from data signature (SA2 count + sample values)
+    const sortedEntries = dataEntries.slice(0, 5).sort(); // Sample for cache key
+    const cacheKey = `${dataEntries.length}-${sortedEntries.map(([id, val]) => `${id}:${val}`).join('|')}`;
+    
+    // Check style expression cache first
+    const cachedExpression = styleExpressionCache.current.get(cacheKey);
+    const cachedMinMax = minMaxCache.current.get(cacheKey);
+    
+    if (cachedExpression && cachedMinMax) {
+      console.log(`⚡ LayerManager: Using cached style expression (${dataEntries.length} regions)`);
+      return {
+        expression: cachedExpression,
+        minValue: cachedMinMax.minValue,
+        maxValue: cachedMinMax.maxValue
+      };
+    }
+
+    // Generate new style expression
+    console.log(`🔧 LayerManager: Generating new style expression (${dataEntries.length} regions)`);
+    const expressionStart = performance.now();
+    
+    // Calculate min/max values for normalization
+    const values = dataEntries.map(([_, value]) => value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const valueRange = maxValue - minValue;
+
+    // Create data-driven heatmap expression
+    const caseExpression: (string | any[])[] = ['case'];
+    
+    for (const [sa2Id, value] of dataEntries) {
+      // Normalize value to 0-1 range
+      const normalizedValue = valueRange > 0 ? (value - minValue) / valueRange : 0;
+      
+      // Calculate opacity (0 minimum, 0.8 maximum)
+      const opacity = normalizedValue * 0.8;
+      
+      // Add condition and color
+      caseExpression.push(
+        ['==', ['get', 'sa2_code_2021'], sa2Id],
+        `rgba(239, 68, 68, ${opacity})` // Red with calculated opacity
+      );
+    }
+    
+    // Default case: transparent for SA2s without data
+    caseExpression.push('rgba(0,0,0,0)');
+
+    // Cache the results
+    styleExpressionCache.current.set(cacheKey, caseExpression);
+    minMaxCache.current.set(cacheKey, { minValue, maxValue });
+    
+    // ✅ MEMORY MANAGEMENT: Cleanup cache if it gets too large
+    cleanupCache();
+    
+    const expressionTime = performance.now() - expressionStart;
+    console.log(`⚡ LayerManager: Style expression generated and cached in ${expressionTime.toFixed(2)}ms`);
+
+    return {
+      expression: caseExpression,
+      minValue,
+      maxValue
+    };
+  }, []);
 
   // Load SA2 boundaries for heatmap (centralized)
   const loadSA2Boundaries = useCallback(async () => {
@@ -58,6 +163,13 @@ export default function LayerManager({
     mapBusy.acquire();
     setBoundaryLoading(true);
     setBoundaryError(null);
+
+    // ✅ SAFETY: Add timeout to prevent permanent deadlock
+    const timeoutId = setTimeout(() => {
+      console.warn('⚠️ LayerManager: SA2 boundary loading timeout, forcing release');
+      mapBusy.release();
+      setBoundaryLoading(false);
+    }, 30000); // 30 second timeout
 
     try {
       await waitForStyleAndIdle(map);
@@ -105,7 +217,14 @@ export default function LayerManager({
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('❌ LayerManager: Error loading SA2 boundaries:', errorMessage);
       setBoundaryError(errorMessage);
+      
+      // ✅ SAFETY: Force reset mapBusy if we're in an error state
+      if (mapBusy.isBusy) {
+        console.warn('⚠️ LayerManager: Force resetting mapBusy due to boundary loading error');
+        mapBusy.reset();
+      }
     } finally {
+      clearTimeout(timeoutId);
       setBoundaryLoading(false);
       mapBusy.release();
     }
@@ -127,6 +246,12 @@ export default function LayerManager({
     if (!heatmapDataReady || !heatmapDataRef.current || Object.keys(heatmapDataRef.current).length === 0) {
       console.log('📊 LayerManager: No heatmap data available');
       onHeatmapMinMaxCalculated?.(undefined, undefined);
+      
+      // Hide layer if it exists but has no data
+      const heatmapLayerId = 'sa2-heatmap-background';
+      if (map.getLayer(heatmapLayerId)) {
+        map.setLayoutProperty(heatmapLayerId, 'visibility', 'none');
+      }
       return;
     }
 
@@ -135,12 +260,7 @@ export default function LayerManager({
     await safeMapOperation(map, async () => {
       const heatmapLayerId = 'sa2-heatmap-background';
       const sa2SourceId = 'sa2-heatmap-source';
-
-      // Remove existing heatmap layer if it exists
-      if (map.getLayer(heatmapLayerId)) {
-        console.log('🗑️ LayerManager: Removing existing heatmap layer');
-        map.removeLayer(heatmapLayerId);
-      }
+      const layerExists = map.getLayer(heatmapLayerId);
 
       // If heatmap should be visible and we have data
       if (heatmapVisibleRef.current && heatmapDataRef.current) {
@@ -150,59 +270,54 @@ export default function LayerManager({
         if (dataEntries.length === 0) {
           console.log('📊 LayerManager: No heatmap data entries to display');
           onHeatmapMinMaxCalculated?.(undefined, undefined);
+          
+          // Hide layer if it exists but has no data
+          if (layerExists) {
+            map.setLayoutProperty(heatmapLayerId, 'visibility', 'none');
+          }
           return;
         }
 
-        // Find min and max values for normalization
-        const values = dataEntries.map(([_, value]) => value);
-        const minValue = Math.min(...values);
-        const maxValue = Math.max(...values);
-        const valueRange = maxValue - minValue;
+        // ⚡ PERFORMANCE: Use cached style expression generation
+        const { expression: caseExpression, minValue, maxValue } = generateCachedStyleExpression(data);
 
-        console.log(`🗺️ LayerManager: Rendering SA2 heatmap with ${dataEntries.length} data points`);
+        console.log(`🗺️ LayerManager: Updating SA2 heatmap with ${dataEntries.length} data points`);
         console.log(`📊 LayerManager: Value range: ${minValue} - ${maxValue}`);
 
         // Pass min/max values to parent component for legend display
         onHeatmapMinMaxCalculated?.(minValue, maxValue);
 
-                 // Create data-driven heatmap expression
-         const caseExpression: (string | any[])[] = ['case'];
-         
-         for (const [sa2Id, value] of dataEntries) {
-           // Normalize value to 0-1 range
-           const normalizedValue = valueRange > 0 ? (value - minValue) / valueRange : 0;
-           
-           // Calculate opacity (0 minimum, 0.8 maximum)
-           const opacity = normalizedValue * 0.8;
-           
-           // Add condition and color
-           caseExpression.push(
-             ['==', ['get', 'sa2_code_2021'], sa2Id],
-             `rgba(239, 68, 68, ${opacity})` // Red with calculated opacity
-           );
-         }
-         
-         // Default case: transparent for SA2s without data
-         caseExpression.push('rgba(0,0,0,0)');
+        if (layerExists) {
+          // ⚡ LAYER REUSE: Update existing layer paint properties
+          console.log('⚡ LayerManager: Reusing existing layer in ensureHeatmapLayer');
+          map.setPaintProperty(heatmapLayerId, 'fill-color', caseExpression as any);
+          map.setLayoutProperty(heatmapLayerId, 'visibility', 'visible');
+        } else {
+          // ✨ CREATE NEW: Layer doesn't exist, create it
+          console.log('✨ LayerManager: Creating new heatmap layer in ensureHeatmapLayer');
+          map.addLayer({
+            id: heatmapLayerId,
+            type: 'fill',
+            source: sa2SourceId,
+            paint: {
+              'fill-color': caseExpression as any,
+              'fill-opacity': 0.7
+            },
+            layout: {
+              'visibility': 'visible'
+            }
+          });
+        }
 
-         // Add heatmap layer
-         map.addLayer({
-           id: heatmapLayerId,
-           type: 'fill',
-           source: sa2SourceId,
-           paint: {
-             'fill-color': caseExpression as any,
-             'fill-opacity': 0.7
-           },
-           layout: {
-             'visibility': 'visible'
-           }
-         });
-
-        console.log('✅ LayerManager: Heatmap layer created successfully');
+        console.log('✅ LayerManager: Heatmap layer ensured successfully');
       } else {
-        console.log('📊 LayerManager: Heatmap not visible or no data, clearing min/max');
+        console.log('📊 LayerManager: Heatmap not visible or no data, hiding layer');
         onHeatmapMinMaxCalculated?.(undefined, undefined);
+        
+        // Hide layer instead of removing it
+        if (layerExists) {
+          map.setLayoutProperty(heatmapLayerId, 'visibility', 'none');
+        }
       }
     }, 'heatmap layer creation');
   }, [map, boundaryLoaded, heatmapDataReady, facilityLoading, onHeatmapMinMaxCalculated]);
@@ -273,54 +388,49 @@ export default function LayerManager({
 
   // Update heatmap layer when data or visibility changes
   useEffect(() => {
-    // 🎯 PERFORMANCE PROFILING: Add timing measurements
-    const layerUpdateStart = performance.now();
-    
     console.log('🗺️ LayerManager: Heatmap layer update triggered:', {
       hasHeatmapData: !!heatmapDataRef.current,
       dataLength: heatmapDataRef.current ? Object.keys(heatmapDataRef.current).length : 0,
       heatmapVisible: heatmapVisibleRef.current,
       heatmapDataReady,
       boundaryLoaded,
-      facilityLoading,
-      layerUpdateStart: `${layerUpdateStart}ms`
+      facilityLoading
     });
 
     // Early return if boundary data isn't loaded yet
     if (!boundaryLoaded) {
       console.log('⏳ LayerManager: Boundary data not loaded yet, skipping heatmap update');
-      const earlyReturnTime = performance.now() - layerUpdateStart;
-      console.log(`⚡ PERFORMANCE: Early return took ${earlyReturnTime.toFixed(2)}ms`);
       return;
     }
 
     // Don't update heatmap while facilities are loading to avoid interference
     if (facilityLoading) {
       console.log('⏳ LayerManager: Facilities are loading, skipping heatmap update');
-      const facilityWaitTime = performance.now() - layerUpdateStart;
-      console.log(`⚡ PERFORMANCE: Facility wait took ${facilityWaitTime.toFixed(2)}ms`);
       return;
     }
 
-    // 🎯 PERFORMANCE: Use async IIFE pattern to handle async operations in useEffect
-    (async () => {
-      // 🎯 PERFORMANCE: Measure layer operation time
-      const layerOperationStart = performance.now();
+    // ✅ SAFETY: Skip update if too many consecutive errors
+    if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+      console.error(`❌ LayerManager: Skipping heatmap update due to ${consecutiveErrors} consecutive errors. Manual intervention required.`);
+      // Force reset mapBusy if stuck
+      if (mapBusy.isBusy) {
+        console.warn('⚠️ LayerManager: Force resetting mapBusy due to consecutive errors');
+        mapBusy.reset();
+      }
+      return;
+    }
 
-      await safeMapOperation(map, async () => {
+    // ⚡ PERFORMANCE OPTIMIZATION: Use layer reuse instead of recreation
+    (async () => {
+      const performanceStart = performance.now();
+
+      try {
+        await safeMapOperation(map, async () => {
         const heatmapLayerId = 'sa2-heatmap-background';
         const sa2SourceId = 'sa2-heatmap-source';
 
-        // 🎯 PERFORMANCE: Measure layer removal time
-        const removalStart = performance.now();
-        
-        // Remove existing heatmap layer if it exists
-        if (map.getLayer(heatmapLayerId)) {
-          console.log('🗑️ LayerManager: Removing existing heatmap layer');
-          map.removeLayer(heatmapLayerId);
-        }
-        
-        const removalTime = performance.now() - removalStart;
+        // Check if layer exists
+        const layerExists = map.getLayer(heatmapLayerId);
 
         // If heatmap should be visible and we have data
         if (heatmapVisibleRef.current && heatmapDataRef.current) {
@@ -330,95 +440,116 @@ export default function LayerManager({
           if (dataEntries.length === 0) {
             console.log('📊 LayerManager: No heatmap data entries to display');
             onHeatmapMinMaxCalculated?.(undefined, undefined);
+            
+            // Hide layer if it exists but has no data
+            if (layerExists) {
+              map.setLayoutProperty(heatmapLayerId, 'visibility', 'none');
+            }
+            
+            // ✅ FIXED: Report completion even when no data
+            onHeatmapRenderComplete?.();
             return;
           }
 
-          // 🎯 PERFORMANCE: Measure data processing time
-          const dataProcessingStart = performance.now();
+          // ⚡ PERFORMANCE: Use cached style expression generation
+          const { expression: caseExpression, minValue, maxValue } = generateCachedStyleExpression(data);
 
-          // Find min and max values for normalization
-          const values = dataEntries.map(([_, value]) => value);
-          const minValue = Math.min(...values);
-          const maxValue = Math.max(...values);
-          const valueRange = maxValue - minValue;
-
-          console.log(`🗺️ LayerManager: Rendering SA2 heatmap with ${dataEntries.length} data points`);
+          console.log(`🗺️ LayerManager: Updating SA2 heatmap with ${dataEntries.length} data points`);
           console.log(`📊 LayerManager: Value range: ${minValue} - ${maxValue}`);
 
           // Pass min/max values to parent component for legend display
           onHeatmapMinMaxCalculated?.(minValue, maxValue);
 
-          // 🎯 PERFORMANCE: Measure style expression creation time
-          const expressionStart = performance.now();
+          if (layerExists) {
+            // ⚡ LAYER REUSE: Update existing layer paint properties instead of recreating
+            console.log('⚡ LayerManager: Reusing existing layer - updating paint properties');
+            map.setPaintProperty(heatmapLayerId, 'fill-color', caseExpression as any);
+            map.setLayoutProperty(heatmapLayerId, 'visibility', 'visible');
+          } else {
+            // ✨ CREATE NEW: Layer doesn't exist, create it
+            console.log('✨ LayerManager: Creating new heatmap layer');
+            map.addLayer({
+              id: heatmapLayerId,
+              type: 'fill',
+              source: sa2SourceId,
+              paint: {
+                'fill-color': caseExpression as any,
+                'fill-opacity': 0.7
+              },
+              layout: {
+                'visibility': 'visible'
+              }
+            });
+          }
 
-          // Create data-driven heatmap expression
-          const caseExpression: (string | any[])[] = ['case'];
+          console.log('✅ LayerManager: Heatmap layer updated successfully');
           
-          for (const [sa2Id, value] of dataEntries) {
-            // Normalize value to 0-1 range
-            const normalizedValue = valueRange > 0 ? (value - minValue) / valueRange : 0;
-            
-            // Calculate opacity (0 minimum, 0.8 maximum)
-            const opacity = normalizedValue * 0.8;
-            
-            // Add condition and color
-            caseExpression.push(
-              ['==', ['get', 'sa2_code_2021'], sa2Id],
-              `rgba(239, 68, 68, ${opacity})` // Red with calculated opacity
-            );
+          // ✅ FIXED: Report completion to DataLayers for real-time loading indicator
+          onHeatmapRenderComplete?.();
+          
+        } else {
+          console.log('📊 LayerManager: Heatmap not visible or no data, hiding layer');
+          onHeatmapMinMaxCalculated?.(undefined, undefined);
+          
+          // Hide layer instead of removing it
+          if (layerExists) {
+            console.log('👁️ LayerManager: Hiding existing heatmap layer');
+            map.setLayoutProperty(heatmapLayerId, 'visibility', 'none');
           }
           
-          // Default case: transparent for SA2s without data
-          caseExpression.push('rgba(0,0,0,0)');
-
-          const expressionTime = performance.now() - expressionStart;
-          const dataProcessingTime = performance.now() - dataProcessingStart;
-
-          // 🎯 PERFORMANCE: Measure layer creation time
-          const layerCreationStart = performance.now();
-
-          // Add heatmap layer
-          map.addLayer({
-            id: heatmapLayerId,
-            type: 'fill',
-            source: sa2SourceId,
-            paint: {
-              'fill-color': caseExpression as any,
-              'fill-opacity': 0.7
-            },
-            layout: {
-              'visibility': 'visible'
-            }
-          });
-
-          const layerCreationTime = performance.now() - layerCreationStart;
-
-          console.log('✅ LayerManager: Heatmap layer created successfully');
-          
-          // 🎯 PERFORMANCE: Detailed timing breakdown
-          console.log(`⚡ PERFORMANCE BREAKDOWN for heatmap rendering:
-            - Layer Removal: ${removalTime.toFixed(2)}ms
-            - Data Processing: ${dataProcessingTime.toFixed(2)}ms  
-            - Style Expression: ${expressionTime.toFixed(2)}ms
-            - Layer Creation: ${layerCreationTime.toFixed(2)}ms
-            - Data Points: ${dataEntries.length}
-          `);
-        } else {
-          console.log('📊 LayerManager: Heatmap not visible or no data, clearing min/max');
-          onHeatmapMinMaxCalculated?.(undefined, undefined);
+          // ✅ FIXED: Report completion even when hiding heatmap
+          onHeatmapRenderComplete?.();
         }
         
-        const layerOperationTime = performance.now() - layerOperationStart;
-        const totalTime = performance.now() - layerUpdateStart;
+          const totalTime = performance.now() - performanceStart;
+          console.log(`⚡ PERFORMANCE: LayerManager update completed in ${totalTime.toFixed(2)}ms`);
+          
+        }, 'heatmap layer update');
+      } catch (error) {
+        console.error('❌ LayerManager: Heatmap update error:', error);
+        setConsecutiveErrors(prev => prev + 1);
         
-        console.log(`⚡ PERFORMANCE TOTAL for LayerManager:
-          - Layer Operations: ${layerOperationTime.toFixed(2)}ms
-          - Total Update Time: ${totalTime.toFixed(2)}ms
-        `);
+        // ✅ SAFETY: Report completion even on error to prevent stuck loading indicators
+        onHeatmapRenderComplete?.();
         
-      }, 'heatmap layer creation');
+        // Force reset mapBusy if we're in an error state
+        if (mapBusy.isBusy) {
+          console.warn('⚠️ LayerManager: Force resetting mapBusy due to heatmap update error');
+          mapBusy.reset();
+        }
+      }
     })();
-  }, [map, boundaryLoaded, heatmapDataReady, facilityLoading, onHeatmapMinMaxCalculated]);
+  }, [map, boundaryLoaded, heatmapDataReady, facilityLoading, onHeatmapMinMaxCalculated, onHeatmapRenderComplete, cleanupCache, consecutiveErrors]);
+
+  // ✅ MEMORY MANAGEMENT: Cleanup caches when component unmounts
+  useEffect(() => {
+    return () => {
+      console.log('🧹 LayerManager: Cleaning up caches on unmount');
+      styleExpressionCache.current.clear();
+      minMaxCache.current.clear();
+      boundaryDataCache.current.clear();
+    };
+  }, []);
+
+  // ✅ SAFETY: Monitor and recover from stuck mapBusy states
+  useEffect(() => {
+    const monitorInterval = setInterval(() => {
+      if (mapBusy.isBusy) {
+        console.warn('⚠️ LayerManager: mapBusy has been stuck for potential deadlock detection');
+        // Don't auto-reset immediately, just log the warning
+        // Allow manual intervention or timeout mechanisms to handle it
+      }
+    }, 15000); // Check every 15 seconds
+
+    return () => clearInterval(monitorInterval);
+  }, []);
+
+  useEffect(() => {
+    // Reset error counter when data changes successfully  
+    if (heatmapDataReady && sa2HeatmapData) {
+      setConsecutiveErrors(0);
+    }
+  }, [heatmapDataReady, sa2HeatmapData]);
 
   // Return error UI if needed
   return (

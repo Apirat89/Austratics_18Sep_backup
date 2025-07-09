@@ -805,6 +805,17 @@ export default function MapsPage() {
     setLoadingComplete(true);
   }, []);
 
+  // ✅ NEW: Handle heatmap loading completion - stores callback to be called by LayerManager
+  const [heatmapCompletionCallback, setHeatmapCompletionCallback] = useState<(() => void) | null>(null);
+  
+  const handleHeatmapLoadingComplete = useCallback((callback: () => void) => {
+    console.log('📡 Maps Page: Received heatmap completion callback from DataLayers');
+    // ✅ FIXED: Store callback asynchronously to prevent setState during render
+    setTimeout(() => {
+      setHeatmapCompletionCallback(callback);
+    }, 0);
+  }, []);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -1123,6 +1134,7 @@ export default function MapsPage() {
               isExpanded={dataLayersExpanded}
               onExpandedChange={setDataLayersExpanded}
               heatmapDataType={heatmapDataType}
+              onHeatmapLoadingComplete={handleHeatmapLoadingComplete}
             />
 
             {/* Top/Bottom Rankings Panel - Next to Data Layers */}
@@ -1159,6 +1171,16 @@ export default function MapsPage() {
                 onRankedDataCalculated={handleRankedDataCalculated}
                 onFacilityDetailsClick={openFacilityDetails}
                 loadingComplete={loadingComplete}
+                onHeatmapRenderComplete={() => {
+                  console.log('🎉 Maps Page: Heatmap render complete, calling DataLayers callback');
+                  // ✅ FIXED: Add safety check and async execution to prevent setState during render
+                  if (heatmapCompletionCallback) {
+                    setTimeout(() => {
+                      heatmapCompletionCallback();
+                      setHeatmapCompletionCallback(null);
+                    }, 0);
+                  }
+                }}
               />
             </MapLoadingCoordinator>
           </div>

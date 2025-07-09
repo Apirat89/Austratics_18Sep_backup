@@ -16,6 +16,7 @@ interface DataLayersProps {
   isExpanded?: boolean;
   onExpandedChange?: (expanded: boolean) => void;
   heatmapDataType?: 'healthcare' | 'demographics' | 'economics' | 'health-statistics';
+  onHeatmapLoadingComplete?: (callback: () => void) => void;
 }
 
 export default function DataLayers({
@@ -29,7 +30,8 @@ export default function DataLayers({
   heatmapMaxValue,
   isExpanded = false,
   onExpandedChange,
-  heatmapDataType = 'healthcare'
+  heatmapDataType = 'healthcare',
+  onHeatmapLoadingComplete
 }: DataLayersProps) {
   // Use prop if provided, otherwise use internal state for backwards compatibility
   const [internalExpanded, setInternalExpanded] = useState(false);
@@ -38,6 +40,9 @@ export default function DataLayers({
   const [showDemographicsOptions, setShowDemographicsOptions] = useState(false);
   const [showEconomicsOptions, setShowEconomicsOptions] = useState(false);
   const [showHealthStatsOptions, setShowHealthStatsOptions] = useState(false);
+  
+  // 🔄 Loading state for heatmap changes
+  const [isHeatmapLoading, setIsHeatmapLoading] = useState(false);
 
   const dataCategories = [
     {
@@ -119,25 +124,57 @@ export default function DataLayers({
   // Handle healthcare option selection
   const handleHealthcareOptionSelect = (option: any) => {
     setShowHealthOptions(false);
+    setIsHeatmapLoading(true);
     onHeatmapDataSelect?.(option.category, option.subcategory, 'healthcare');
+    // ✅ FIXED: Call completion callback asynchronously AND make state update async
+    setTimeout(() => {
+      onHeatmapLoadingComplete?.(() => {
+        // ✅ CRITICAL FIX: Make state update asynchronous to prevent setState during render
+        setTimeout(() => setIsHeatmapLoading(false), 0);
+      });
+    }, 0);
   };
 
   // Handle demographics option selection
   const handleDemographicsOptionSelect = (option: any) => {
     setShowDemographicsOptions(false);
+    setIsHeatmapLoading(true);
     onHeatmapDataSelect?.(option.category, option.subcategory, 'demographics');
+    // ✅ FIXED: Call completion callback asynchronously AND make state update async
+    setTimeout(() => {
+      onHeatmapLoadingComplete?.(() => {
+        // ✅ CRITICAL FIX: Make state update asynchronous to prevent setState during render
+        setTimeout(() => setIsHeatmapLoading(false), 0);
+      });
+    }, 0);
   };
 
   // Handle economics option selection
   const handleEconomicsOptionSelect = (option: any) => {
     setShowEconomicsOptions(false);
+    setIsHeatmapLoading(true);
     onHeatmapDataSelect?.(option.category, option.subcategory, 'economics');
+    // ✅ FIXED: Call completion callback asynchronously AND make state update async
+    setTimeout(() => {
+      onHeatmapLoadingComplete?.(() => {
+        // ✅ CRITICAL FIX: Make state update asynchronous to prevent setState during render
+        setTimeout(() => setIsHeatmapLoading(false), 0);
+      });
+    }, 0);
   };
 
   // Handle health statistics option selection
   const handleHealthStatsOptionSelect = (option: any) => {
     setShowHealthStatsOptions(false);
+    setIsHeatmapLoading(true);
     onHeatmapDataSelect?.(option.category, option.subcategory, 'health-statistics');
+    // ✅ FIXED: Call completion callback asynchronously AND make state update async
+    setTimeout(() => {
+      onHeatmapLoadingComplete?.(() => {
+        // ✅ CRITICAL FIX: Make state update asynchronous to prevent setState during render
+        setTimeout(() => setIsHeatmapLoading(false), 0);
+      });
+    }, 0);
   };
 
   // Handle heatmap visibility toggle
@@ -149,44 +186,52 @@ export default function DataLayers({
   return (
     <div className={`bg-white rounded-lg shadow-lg border border-gray-200 ${className}`}>
       {/* Header */}
-      <div className="flex items-center gap-3 p-3 w-full border-b border-gray-100">
-        <button
-          onClick={() => {
-            const newExpanded = !expanded;
-            if (onExpandedChange) {
-              onExpandedChange(newExpanded);
-            } else {
-              setInternalExpanded(newExpanded);
-            }
-          }}
-          className="flex items-center gap-3 flex-1 hover:bg-gray-50 transition-colors text-left rounded p-2"
-        >
-          <Database className="h-4 w-4 text-gray-600" />
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-gray-900">Data Layers</span>
-            <span className="text-[10px] text-gray-500">[SA2 level only]</span>
-          </div>
-          <div className="ml-auto">
-            {expanded ? (
-              <ChevronUp className="h-3 w-3 text-gray-400" />
-            ) : (
-              <ChevronDown className="h-3 w-3 text-gray-400" />
-            )}
-          </div>
-        </button>
+      <button
+        onClick={() => {
+          const newExpanded = !expanded;
+          if (onExpandedChange) {
+            onExpandedChange(newExpanded);
+          } else {
+            setInternalExpanded(newExpanded);
+          }
+        }}
+        className="flex items-center gap-3 p-4 w-full hover:bg-gray-50 transition-colors text-left border-b border-gray-100"
+      >
+        <Database className="h-5 w-5 text-gray-600" />
+        <span className="text-sm font-medium text-gray-900">Data Layers</span>
         
-        {/* Visibility Toggle - separate button */}
-        <button
-          onClick={handleHeatmapToggle}
-          className="flex items-center gap-1 px-2 py-1 rounded bg-white border border-gray-300 hover:bg-gray-50 transition-colors"
-        >
-          {heatmapVisible ? (
-            <><Eye className="h-3 w-3 text-green-600" /><span className="text-xs text-green-600">Visible</span></>
-          ) : (
-            <><EyeOff className="h-3 w-3 text-gray-500" /><span className="text-xs text-gray-500">Hidden</span></>
-          )}
-        </button>
-      </div>
+        {/* 🔄 Heatmap Loading Indicator */}
+        {isHeatmapLoading && (
+          <div className="flex items-center gap-2 ml-auto">
+            <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+            <span className="text-xs text-blue-600 font-medium">Updating...</span>
+          </div>
+        )}
+        
+        {/* Heatmap Visibility Toggle */}
+        {!isHeatmapLoading && (
+          <div
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent header click
+              handleHeatmapToggle();
+            }}
+            className={`p-1 rounded-md transition-colors ml-auto ${
+              heatmapVisible 
+                ? 'text-blue-600 hover:bg-blue-50' 
+                : 'text-gray-400 hover:bg-gray-50'
+            }`}
+            title={heatmapVisible ? 'Hide heatmap' : 'Show heatmap'}
+          >
+            {heatmapVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+          </div>
+        )}
+        
+        {expanded ? (
+          <ChevronUp className="h-4 w-4 text-gray-400" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-gray-400" />
+        )}
+      </button>
 
       {/* Content */}
       {expanded && (

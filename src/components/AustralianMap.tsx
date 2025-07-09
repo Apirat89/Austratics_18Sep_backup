@@ -93,6 +93,8 @@ interface AustralianMapProps {
   onFacilityDetailsClick?: (facility: FacilityData) => void;
   // Add loading completion state for flickering fix
   loadingComplete?: boolean;
+  // ✅ NEW: Heatmap completion callback for real-time loading indicator
+  onHeatmapRenderComplete?: () => void;
 }
 
 // Expose methods to parent component
@@ -245,7 +247,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   onHeatmapMinMaxCalculated,
   onRankedDataCalculated,
   onFacilityDetailsClick,
-  loadingComplete = false
+  loadingComplete = false,
+  onHeatmapRenderComplete
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
@@ -391,10 +394,12 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       center: [133.7751, -25.2744], // Center of Australia
       zoom: 4,
       maxZoom: 18,
-      minZoom: 3
+      minZoom: 3,
+      // 🔧 DISABLE automatic attribution control to prevent UI clutter
+      attributionControl: false
     });
 
-    // Add controls
+    // 🔧 Add controls manually (single set only)
     map.current.addControl(new maptilersdk.NavigationControl(), 'top-right');
     map.current.addControl(new maptilersdk.ScaleControl(), 'bottom-right');
 
@@ -1345,53 +1350,70 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             openPopupFacilityTypesRef.current.set(popup, typeKey);
             openPopupFacilitiesRef.current.set(popup, facilityData);
             
-            // Add draggable functionality
+            // Add draggable functionality with smooth movement - entire popup draggable
             const popupElement = document.getElementById(popupId);
             if (popupElement) {
-              const header = popupElement.querySelector('.popup-header') as HTMLElement;
-              if (header) {
-                let isDragging = false;
-                let startX = 0, startY = 0;
-                let currentX = 0, currentY = 0;
+              let isDragging = false;
+              let initialPopupCoords: any = null;
+              let initialMouseX = 0, initialMouseY = 0;
 
-                const handleMouseDown = (e: MouseEvent) => {
-                  isDragging = true;
-                  startX = e.clientX - currentX;
-                  startY = e.clientY - currentY;
-                  header.style.cursor = 'grabbing';
-                  e.preventDefault();
-                };
+              // Set cursor style for entire popup
+              popupElement.style.cursor = 'move';
 
-                const handleMouseMove = (e: MouseEvent) => {
-                  if (!isDragging) return;
-                  currentX = e.clientX - startX;
-                  currentY = e.clientY - startY;
-                  
-                  // Convert screen coordinates to map coordinates
-                  if (map.current) {
-                    const newMapCoords = map.current.unproject([e.clientX, e.clientY]);
-                    popup.setLngLat(newMapCoords);
-                  }
-                };
+              const handleMouseDown = (e: MouseEvent) => {
+                // Prevent dragging if user clicks on buttons or interactive elements
+                const target = e.target as HTMLElement;
+                if (target.tagName === 'BUTTON' || target.closest('button') || target.tagName === 'A' || target.closest('a')) {
+                  return;
+                }
 
-                const handleMouseUp = () => {
-                  if (isDragging) {
-                    isDragging = false;
-                    header.style.cursor = 'move';
-                  }
-                };
+                isDragging = true;
+                // ✅ FIXED: Store popup's starting position and mouse starting position
+                initialPopupCoords = popup.getLngLat();
+                initialMouseX = e.clientX;
+                initialMouseY = e.clientY;
+                popupElement.style.cursor = 'grabbing';
+                e.preventDefault();
+                console.log('🎯 Popup drag started at:', initialPopupCoords);
+              };
 
-                header.addEventListener('mousedown', handleMouseDown);
-                document.addEventListener('mousemove', handleMouseMove);
-                document.addEventListener('mouseup', handleMouseUp);
+              const handleMouseMove = (e: MouseEvent) => {
+                if (!isDragging || !initialPopupCoords) return;
                 
-                // Store cleanup function for later removal
-                (header as any).dragCleanup = () => {
-                  header.removeEventListener('mousedown', handleMouseDown);
-                  document.removeEventListener('mousemove', handleMouseMove);
-                  document.removeEventListener('mouseup', handleMouseUp);
-                };
-              }
+                // ✅ FIXED: Calculate movement delta from initial click position
+                const deltaX = e.clientX - initialMouseX;
+                const deltaY = e.clientY - initialMouseY;
+                
+                // ✅ FIXED: Apply delta to initial popup position, not cursor position
+                if (map.current) {
+                  const initialScreenCoords = map.current.project(initialPopupCoords);
+                  const newScreenCoords: [number, number] = [
+                    initialScreenCoords.x + deltaX,
+                    initialScreenCoords.y + deltaY
+                  ];
+                  const newMapCoords = map.current.unproject(newScreenCoords);
+                  popup.setLngLat(newMapCoords);
+                }
+              };
+
+              const handleMouseUp = () => {
+                if (isDragging) {
+                  isDragging = false;
+                  popupElement.style.cursor = 'move';
+                  console.log('🎯 Popup drag completed at:', popup.getLngLat());
+                }
+              };
+
+              popupElement.addEventListener('mousedown', handleMouseDown);
+              document.addEventListener('mousemove', handleMouseMove);
+              document.addEventListener('mouseup', handleMouseUp);
+              
+              // Store cleanup function for later removal
+              (popupElement as any).dragCleanup = () => {
+                popupElement.removeEventListener('mousedown', handleMouseDown);
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+              };
             }
           });
 
@@ -1405,11 +1427,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
               
               // Clean up drag listeners
               const popupElement = document.getElementById(popupId);
-              if (popupElement) {
-                const header = popupElement.querySelector('.popup-header') as HTMLElement;
-                if (header && (header as any).dragCleanup) {
-                  (header as any).dragCleanup();
-                }
+              if (popupElement && (popupElement as any).dragCleanup) {
+                (popupElement as any).dragCleanup();
               }
             });
           }
@@ -2530,6 +2549,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           mapLoaded={isLoaded}
           facilityLoading={facilityLoading}
           onHeatmapMinMaxCalculated={onHeatmapMinMaxCalculated}
+          onHeatmapRenderComplete={onHeatmapRenderComplete}
         />
       )}
 
