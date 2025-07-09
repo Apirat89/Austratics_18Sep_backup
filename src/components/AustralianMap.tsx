@@ -587,6 +587,12 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         const alreadySaved = await isSearchSaved(userId, facility.Service_Name);
         if (alreadySaved) {
           console.log(`⏭️ Skipping ${facility.Service_Name} - already saved`);
+          
+          // ✅ CRITICAL FIX: Update button state for skipped facilities
+          window.dispatchEvent(new CustomEvent('facilitySaved', { 
+            detail: { facilityName: facility.Service_Name } 
+          }));
+          
           continue;
         }
 
@@ -811,10 +817,18 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             const saveButton = document.getElementById(`save-btn-${popupId}`);
             if (!saveButton) return;
 
-            // Check if this is a save or unsave operation
-            const isCurrentlySaved = saveButton.textContent?.includes('Remove') || saveButton.textContent?.includes('Saved');
-            
-            if (isCurrentlySaved) {
+            // ✅ CRITICAL FIX: Check actual backend state instead of button text
+            saveButton.innerHTML = '⏳ Checking...';
+            saveButton.style.pointerEvents = 'none';
+
+            try {
+              // Import the functions to check backend state and save facilities
+              const { isSearchSaved, saveSearchToSavedSearches } = await import('../lib/savedSearches');
+              
+              // ✅ Check actual backend state (not button state)
+              const isActuallySaved = await isSearchSaved(userId, serviceName);
+              
+              if (isActuallySaved) {
               // Unsave operation
               saveButton.innerHTML = '⏳ Removing...';
               saveButton.style.pointerEvents = 'none';
@@ -957,6 +971,22 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                   saveButton.style.pointerEvents = 'auto';
                 }, 3000);
               }
+            }
+            } catch (error) {
+              // ✅ Handle any errors in backend state checking
+              console.error('Error checking facility saved state:', error);
+              saveButton.innerHTML = '❌ Error';
+              saveButton.style.backgroundColor = '#EF4444';
+              saveButton.style.borderColor = '#EF4444';
+              alert('An error occurred while checking facility status');
+              
+              // Reset button after 3 seconds
+              setTimeout(() => {
+                saveButton.innerHTML = '📍 Save Location';
+                saveButton.style.backgroundColor = '#3B82F6';
+                saveButton.style.borderColor = '#3B82F6';
+                saveButton.style.pointerEvents = 'auto';
+              }, 3000);
             }
           };
 
