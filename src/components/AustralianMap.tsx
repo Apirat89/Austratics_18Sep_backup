@@ -294,6 +294,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // Track facility data for each open popup (for Save All functionality)
   const openPopupFacilitiesRef = useRef<Map<maptilersdk.Popup, FacilityData>>(new Map());
 
+  // ✅ NEW: Track cluster popup states for toggle behavior (Task 3.4)
+  const clusterPopupStatesRef = useRef<Map<string, { isOpen: boolean, popups: maptilersdk.Popup[] }>>(new Map());
+
   // Add viewport change callback ref
   const viewportChangeCallbackRef = useRef<(() => void) | null>(null);
   
@@ -778,6 +781,332 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     }
   }, []);
 
+  // ✅ NEW: Helper function to calculate smart popup positions around a marker
+  const calculatePopupPositions = useCallback((centerPos: [number, number], count: number): [number, number][] => {
+    const [centerLng, centerLat] = centerPos;
+    const baseOffset = 0.003; // ~330m spacing between popups (Task 3.5: increased for better separation)
+    
+    if (count === 1) {
+      return [centerPos]; // Single popup at marker position (current behavior)
+    } else if (count === 2) {
+      return [
+        [centerLng - baseOffset, centerLat], // Left
+        [centerLng + baseOffset, centerLat]  // Right
+      ];
+    } else if (count === 3) {
+      return [
+        [centerLng, centerLat + baseOffset],                // Top
+        [centerLng - baseOffset, centerLat - baseOffset/2], // Bottom Left
+        [centerLng + baseOffset, centerLat - baseOffset/2]  // Bottom Right
+      ];
+    } else {
+      // Circular arrangement for 4+ facilities
+      return Array.from({ length: count }, (_, i) => {
+        const angle = (2 * Math.PI * i) / count;
+        return [
+          centerLng + baseOffset * Math.cos(angle),
+          centerLat + baseOffset * Math.sin(angle)
+        ];
+      });
+    }
+  }, []);
+
+  // ✅ NEW: Helper function to create individual facility popup (extracted for reusability)
+  const createIndividualFacilityPopup = useCallback((
+    facility: any, 
+    popupPosition: [number, number], 
+    typeKey: string, 
+    typeColors: Record<string, string>
+  ) => {
+    // Extract facility details
+    const serviceName = facility.Service_Name || 'Unknown Service';
+    const address = facility.Physical_Address || 'Address not available';
+    const careType = facility.Care_Type || 'Unknown';
+    const state = facility.Physical_State || '';
+    const postcode = facility.Physical_Post_Code || '';
+    const phone = facility.Phone || '';
+    const email = facility.Email || '';
+    const website = facility.Website || '';
+    const residentialPlaces = facility.Residential_Places || 0;
+    const homeCareMaxPlaces = facility.Home_Care_Max_Places || 0;
+    const [lng, lat] = popupPosition;
+
+    // Create unique popup ID for this facility
+    const popupId = `facility-popup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    // Determine if this facility should show "See Details" button
+    const showSeeDetailsButton = typeKey === 'residential' || typeKey === 'home' || typeKey === 'mps' || typeKey === 'retirement';
+
+    // Create beautiful popup with save button  
+    const popup = new maptilersdk.Popup({ 
+      offset: [0, -120], // Position popup above marker
+      closeButton: true,
+      closeOnClick: false,
+      className: 'custom-popup draggable-popup',
+      anchor: 'bottom'
+    })
+    .setLngLat(popupPosition) // ✅ NEW: Set popup at calculated position
+    .setHTML(`
+      <div class="aged-care-popup" id="${popupId}">
+        <div class="popup-header" style="background: linear-gradient(135deg, ${typeColors[typeKey]}20, ${typeColors[typeKey]}10); border-left: 4px solid ${typeColors[typeKey]}; cursor: move;">
+          <h3 class="popup-title">${serviceName}</h3>
+          <span class="popup-type" style="background-color: ${typeColors[typeKey]}20; color: ${typeColors[typeKey]};">${getFacilityTypeDisplayName(typeKey)}</span>
+        </div>
+        
+        <div class="popup-content">
+          <div class="popup-section">
+            <div class="popup-icon">📍</div>
+            <div class="popup-text">
+              <strong>${address}</strong><br>
+              <span class="text-gray-500">${state}${postcode ? ' ' + postcode : ''}</span>
+            </div>
+          </div>
+          
+          ${residentialPlaces > 0 ? `
+          <div class="popup-section">
+            <div class="popup-icon">🏠</div>
+            <div class="popup-text">
+              <strong>${residentialPlaces}</strong> residential places
+            </div>
+          </div>
+          ` : ''}
+          
+          ${homeCareMaxPlaces > 0 ? `
+          <div class="popup-section">
+            <div class="popup-icon">🏥</div>
+            <div class="popup-text">
+              <strong>${homeCareMaxPlaces}</strong> home care places
+            </div>
+          </div>
+          ` : ''}
+          
+          ${phone ? `
+          <div class="popup-section">
+            <div class="popup-icon">📞</div>
+            <div class="popup-text">
+              <a href="tel:${phone}" class="popup-link">${phone}</a>
+            </div>
+          </div>
+          ` : ''}
+          
+          ${email ? `
+          <div class="popup-section">
+            <div class="popup-icon">✉️</div>
+            <div class="popup-text">
+              <a href="mailto:${email}" class="popup-link">${email}</a>
+            </div>
+          </div>
+          ` : ''}
+          
+          ${website ? `
+          <div class="popup-section">
+            <div class="popup-icon">🌐</div>
+            <div class="popup-text">
+              <a href="${website}" target="_blank" class="popup-link">Visit Website</a>
+            </div>
+          </div>
+          ` : ''}
+          
+          ${showSeeDetailsButton || userId ? `
+          <div class="popup-actions">
+            ${showSeeDetailsButton ? `
+            <button 
+              id="details-btn-${popupId}"
+              class="see-details-btn"
+              onclick="window.seeDetails_${popupId.replace(/-/g, '_')}?.()"
+              title="See details"
+            >
+              🚪 See Details
+            </button>
+            ` : ''}
+            ${userId ? `
+            <button 
+              id="save-btn-${popupId}"
+              class="save-facility-btn"
+              onclick="window.saveFacility_${popupId.replace(/-/g, '_')}?.()"
+            >
+              ⏳ Checking...
+            </button>
+            ` : ''}
+          </div>
+          ` : ''}
+          
+          <div class="popup-footer">
+            <small class="coordinates">📍 ${lng.toFixed(4)}, ${lat.toFixed(4)}</small>
+          </div>
+        </div>
+
+                 <style>
+          .aged-care-popup {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            max-width: 280px;
+            margin: 0;
+          }
+          
+          .popup-header {
+            padding: 12px 16px;
+            margin: -10px -10px 12px -10px;
+            border-radius: 8px 8px 0 0;
+          }
+          
+          .popup-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a202c;
+            margin: 0 0 4px 0;
+            line-height: 1.3;
+          }
+          
+          .popup-type {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 500;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .popup-content {
+            padding: 0;
+          }
+          
+          .popup-section {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding: 2px 0;
+          }
+          
+          .popup-icon {
+            font-size: 12px;
+            width: 16px;
+            flex-shrink: 0;
+            margin-top: 1px;
+          }
+          
+          .popup-text {
+            font-size: 12px;
+            line-height: 1.4;
+            color: #2d3748;
+            flex: 1;
+          }
+          
+          .popup-link {
+            color: #3182ce;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+          }
+          
+          .popup-link:hover {
+            border-bottom-color: #3182ce;
+          }
+          
+          .popup-actions {
+            margin: 16px 0 8px 0;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+          }
+          
+          .see-details-btn {
+            width: 100%;
+            padding: 8px 16px;
+            background-color: #10B981;
+            color: white;
+            border: 1px solid #10B981;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+          }
+          
+          .see-details-btn:hover {
+            background-color: #059669;
+            border-color: #059669;
+          }
+          
+          .see-details-btn:active {
+            transform: translateY(1px);
+          }
+          
+          .save-facility-btn {
+            width: 100%;
+            padding: 8px 16px;
+            background-color: #3B82F6;
+            color: white;
+            border: 1px solid #3B82F6;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+          }
+          
+          .save-facility-btn:hover {
+            background-color: #2563EB;
+            border-color: #2563EB;
+          }
+          
+          .save-facility-btn:active {
+            transform: translateY(1px);
+          }
+          
+          .popup-footer {
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid #e2e8f0;
+          }
+          
+          .coordinates {
+            font-size: 10px;
+            color: #718096;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+          }
+          
+          .text-gray-500 {
+            color: #718096;
+          }
+        </style>
+      </div>
+    `);
+
+    return { popup, popupId, facility, serviceName, typeKey };
+  }, [userId, onFacilityDetailsClick, getFacilityTypeDisplayName]);
+
+  // ✅ NEW: Helper function to create multiple popups for clustered facilities
+  const createClusterPopups = useCallback((
+    clusterFacilities: any[], 
+    basePosition: [number, number], 
+    typeKey: string, 
+    typeColors: Record<string, string>
+  ) => {
+    const positions = calculatePopupPositions(basePosition, clusterFacilities.length);
+    const createdPopups: Array<{popup: any, popupId: string, facility: any, serviceName: string, typeKey: string}> = [];
+    
+    clusterFacilities.forEach((facility, index) => {
+      const position = positions[index];
+      const popupData = createIndividualFacilityPopup(facility, position, typeKey, typeColors);
+      createdPopups.push(popupData);
+    });
+    
+    console.log(`🎯 Created ${createdPopups.length} cluster popups at positions:`, positions);
+    return createdPopups;
+  }, [calculatePopupPositions, createIndividualFacilityPopup]);
+
   // Load healthcare facilities with proper coordinate handling
   const addHealthcareFacilities = useCallback(async (types: FacilityTypes) => {
     if (!map.current) return;
@@ -889,7 +1218,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           // Create unique popup ID for this facility
           const popupId = `facility-popup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-          // Check for overlapping facilities (clustering logic)
+          // ✅ ENHANCED: Check for overlapping facilities (clustering logic with multi-popup support)
           const overlapTolerance = 0.001; // ~100m
           const overlappingFacilities = filteredFacilities.filter(otherFacility => {
             if (otherFacility === facility) return false;
@@ -902,9 +1231,15 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             return latDiff <= overlapTolerance && lngDiff <= overlapTolerance;
           });
 
+          // ✅ NEW: Store all cluster facility data for multi-popup creation
+          const allClusterFacilities = overlappingFacilities.length > 0 
+            ? [facility, ...overlappingFacilities] 
+            : [facility];
+          const isClusterMarker = overlappingFacilities.length > 0;
+
           // If there are overlapping facilities, create cluster marker
-          if (overlappingFacilities.length > 0) {
-            const clusterSize = overlappingFacilities.length + 1; // Include current facility
+          if (isClusterMarker) {
+            const clusterSize = allClusterFacilities.length;
             
             // Modify marker to show cluster count
             markerElement.style.width = '25px';
@@ -1617,10 +1952,158 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             element: markerElement,
             anchor: 'center'
           })
-          .setLngLat([lng, lat])
-          .setPopup(popup)
-          .addTo(map.current);
+          .setLngLat([lng, lat]);
 
+          // ✅ NEW: Enhanced click behavior for cluster vs single markers
+          if (isClusterMarker) {
+            // For cluster markers, add custom click handler with toggle behavior (Task 3.4)
+            markerElement.addEventListener('click', (e) => {
+              e.stopPropagation(); // Prevent map click
+              
+              // Create unique ID for this cluster marker
+              const markerId = `cluster-${lng.toFixed(6)}-${lat.toFixed(6)}`;
+              const currentState = clusterPopupStatesRef.current.get(markerId);
+              
+              if (currentState?.isOpen) {
+                // ✅ CLOSE: Remove all cluster popups (toggle off - like single marker second click)
+                console.log(`🚪 Cluster marker toggle OFF: Closing ${currentState.popups.length} popups`);
+                
+                currentState.popups.forEach((popup) => {
+                  popup.remove();
+                  // Remove from tracking
+                  openPopupsRef.current.delete(popup);
+                  openPopupFacilityTypesRef.current.delete(popup);
+                  openPopupFacilitiesRef.current.delete(popup);
+                });
+                
+                // Update state to closed
+                clusterPopupStatesRef.current.set(markerId, { isOpen: false, popups: [] });
+                console.log(`✅ Cluster toggle OFF complete: ${currentState.popups.length} popups closed`);
+                
+              } else {
+                // ✅ OPEN: Create and show cluster popups (toggle on - like single marker first click)
+                console.log(`🎯 Cluster marker toggle ON: Creating ${allClusterFacilities.length} popups`);
+                
+                // Create multiple popups positioned around the marker
+                const clusterPopups = createClusterPopups(allClusterFacilities, [lng, lat], typeKey, typeColors);
+                const createdPopups: maptilersdk.Popup[] = [];
+                
+                // Add all popups to the map
+                clusterPopups.forEach((popupData, index) => {
+                  console.log(`🎯 Adding cluster popup ${index + 1}/${clusterPopups.length}: ${popupData.serviceName}`);
+                  popupData.popup.addTo(map.current);
+                  createdPopups.push(popupData.popup);
+                  
+                  // Track all cluster popups as open
+                  openPopupsRef.current.add(popupData.popup);
+                  openPopupFacilityTypesRef.current.set(popupData.popup, popupData.typeKey);
+                  openPopupFacilitiesRef.current.set(popupData.popup, popupData.facility);
+                  
+                  // ✅ Add drag functionality to cluster popups (Task 3.2)
+                  setTimeout(() => {
+                    const popupElement = document.getElementById(popupData.popupId);
+                    if (popupElement) {
+                      let isDragging = false;
+                      let initialPopupCoords: any = null;
+                      let initialMouseX = 0, initialMouseY = 0;
+
+                      // Set cursor style for entire popup
+                      popupElement.style.cursor = 'move';
+
+                      const handleMouseDown = (e: MouseEvent) => {
+                        // Prevent dragging if user clicks on buttons or interactive elements
+                        const target = e.target as HTMLElement;
+                        if (target.tagName === 'BUTTON' || target.closest('button') || target.tagName === 'A' || target.closest('a')) {
+                          return;
+                        }
+
+                        isDragging = true;
+                        // Store popup's starting position and mouse starting position
+                        initialPopupCoords = popupData.popup.getLngLat();
+                        initialMouseX = e.clientX;
+                        initialMouseY = e.clientY;
+                        popupElement.style.cursor = 'grabbing';
+                        e.preventDefault();
+                        console.log(`🎯 Cluster popup drag started: ${popupData.serviceName}`, initialPopupCoords);
+                      };
+
+                      const handleMouseMove = (e: MouseEvent) => {
+                        if (!isDragging || !initialPopupCoords) return;
+                        
+                        // Calculate movement delta from initial click position
+                        const deltaX = e.clientX - initialMouseX;
+                        const deltaY = e.clientY - initialMouseY;
+                        
+                        // Apply delta to initial popup position
+                        if (map.current) {
+                          const initialScreenCoords = map.current.project(initialPopupCoords);
+                          const newScreenCoords: [number, number] = [
+                            initialScreenCoords.x + deltaX,
+                            initialScreenCoords.y + deltaY
+                          ];
+                          const newMapCoords = map.current.unproject(newScreenCoords);
+                          popupData.popup.setLngLat(newMapCoords);
+                        }
+                      };
+
+                      const handleMouseUp = () => {
+                        if (isDragging) {
+                          isDragging = false;
+                          popupElement.style.cursor = 'move';
+                          console.log(`🎯 Cluster popup drag completed: ${popupData.serviceName}`, popupData.popup.getLngLat());
+                        }
+                      };
+
+                      popupElement.addEventListener('mousedown', handleMouseDown);
+                      document.addEventListener('mousemove', handleMouseMove);
+                      document.addEventListener('mouseup', handleMouseUp);
+                      
+                      // Store cleanup function for later removal
+                      (popupElement as any).dragCleanup = () => {
+                        popupElement.removeEventListener('mousedown', handleMouseDown);
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        document.removeEventListener('mouseup', handleMouseUp);
+                      };
+                      
+                      console.log(`✅ Drag functionality added to cluster popup: ${popupData.serviceName}`);
+                    }
+                  }, 100); // Small delay to ensure DOM is ready
+                  
+                  // ✅ Add close event handler for cluster popups (individual close cleanup)
+                  popupData.popup.on('close', () => {
+                    // Remove this cluster popup from open tracking
+                    openPopupsRef.current.delete(popupData.popup);
+                    openPopupFacilityTypesRef.current.delete(popupData.popup);
+                    openPopupFacilitiesRef.current.delete(popupData.popup);
+                    
+                    // Clean up drag listeners
+                    const popupElement = document.getElementById(popupData.popupId);
+                    if (popupElement && (popupElement as any).dragCleanup) {
+                      (popupElement as any).dragCleanup();
+                    }
+                    
+                    // Update cluster state if all popups are closed manually
+                    const remainingPopups = createdPopups.filter(p => openPopupsRef.current.has(p));
+                    if (remainingPopups.length === 0) {
+                      clusterPopupStatesRef.current.set(markerId, { isOpen: false, popups: [] });
+                      console.log(`🚪 All cluster popups manually closed: ${popupData.serviceName} cluster`);
+                    }
+                    
+                    console.log(`🚪 Individual cluster popup closed: ${popupData.serviceName}`);
+                  });
+                });
+                
+                // Update state to open with all created popups
+                clusterPopupStatesRef.current.set(markerId, { isOpen: true, popups: createdPopups });
+                console.log(`✅ Cluster toggle ON complete: ${clusterPopups.length} popups opened`);
+              }
+            });
+          } else {
+            // For single markers, use standard popup behavior (existing functionality)
+            marker.setPopup(popup);
+          }
+
+          marker.addTo(map.current);
           markersRef.current.push(marker);
         });
 
