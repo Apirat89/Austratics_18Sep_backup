@@ -587,16 +587,25 @@ export async function searchLocations(searchTerm: string, maxResults: number = 2
       buildSA2PostcodeSearchIndex(),
     ]);
 
-    // Combine all results
+    // ✅ FIXED: Filter out SA2 API-based results that don't have coordinates
+    // Only include results that have center coordinates for navigation
+    const sa2PostcodeResultsWithCoords = sa2PostcodeResults.filter(result => 
+      result.center && result.center.length === 2 && 
+      typeof result.center[0] === 'number' && typeof result.center[1] === 'number'
+    );
+
+    console.log(`🔧 FIX: Filtered SA2 postcode results from ${sa2PostcodeResults.length} to ${sa2PostcodeResultsWithCoords.length} (removed results without coordinates)`);
+
+    // Combine all results, using filtered SA2 postcode results
     const allResults = [
       ...lgaResults,
-      ...sa2Results,
+      ...sa2Results,        // ✅ GeoJSON-based SA2 results with coordinates
       ...sa3Results,
       ...sa4Results,
       ...postcodeResults,
       ...localityResults,
       ...facilityResults,
-      ...sa2PostcodeResults,
+      ...sa2PostcodeResultsWithCoords,  // ✅ Only SA2 API results with coordinates (likely empty)
     ];
 
     console.log(`Total searchable items: ${allResults.length}`); // Debug log
