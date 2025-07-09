@@ -398,11 +398,12 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       zoom: 4,
       maxZoom: 18,
       minZoom: 3,
-      // 🔧 DISABLE automatic attribution control to prevent UI clutter
-      attributionControl: false
+      // 🔧 DISABLE automatic controls to prevent UI clutter and duplicates
+      attributionControl: false,    // Disable automatic attribution control
+      navigationControl: false      // Disable automatic navigation control (zoom buttons)
     });
 
-    // 🔧 Add controls manually (single set only)
+    // 🔧 Add controls manually - ensures single set only (disabled automatic defaults above)
     map.current.addControl(new maptilersdk.NavigationControl(), 'top-right');
     map.current.addControl(new maptilersdk.ScaleControl(), 'bottom-right');
 

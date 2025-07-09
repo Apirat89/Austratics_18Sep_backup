@@ -861,13 +861,8 @@ export default function HeatmapDataService({
 
   return (
     <div>
-      {/* Loading indicators only during initial load */}
-      {shouldShowLoadingIndicators && (
-        <div className="fixed top-4 left-4 bg-black bg-opacity-75 text-white p-3 rounded-lg z-50">
-          <div className="text-sm">Loading heatmap data...</div>
-          <div className="text-xs text-gray-300 mt-1">{preloadStatus}</div>
-        </div>
-      )}
+      {/* ✅ REMOVED: Black loading indicator that caused top-left flash (Option A) */}
+      {/* Loading feedback is already provided by MapLoadingCoordinator */}
 
       {/* Error UI */}
       {error && (
