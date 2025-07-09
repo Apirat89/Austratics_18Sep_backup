@@ -22,8 +22,14 @@ export default function TopBottomPanel({
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Handle region click
-  const handleRegionClick = (sa2Id: string, sa2Name: string) => {
-    console.log('🎯 Regional Rankings: Clicked region:', { sa2Id, sa2Name });
+  const handleRegionClick = (sa2Id: string, sa2Name: string, index: number, isTop: boolean) => {
+    console.log('🎯 Regional Rankings: Clicked region:', { 
+      sa2Id, 
+      sa2Name, 
+      index, 
+      isTop, 
+      position: isTop ? `#${index + 1} highest` : `#${index + 1} lowest` 
+    });
     onRegionClick?.(sa2Id, sa2Name);
   };
 
@@ -111,7 +117,7 @@ export default function TopBottomPanel({
               rankedData.topRegions.map((region, index) => (
                 <button
                   key={region.sa2Id}
-                  onClick={() => handleRegionClick(region.sa2Id, region.sa2Name)}
+                  onClick={() => handleRegionClick(region.sa2Id, region.sa2Name, index, true)}
                   className="w-full bg-green-50 border border-green-200 rounded-lg p-3 hover:bg-green-100 hover:border-green-300 transition-all duration-200 cursor-pointer text-left"
                   title={`Click to zoom to ${region.sa2Name}`}
                 >
@@ -149,7 +155,7 @@ export default function TopBottomPanel({
               rankedData.bottomRegions.map((region, index) => (
                 <button
                   key={region.sa2Id}
-                  onClick={() => handleRegionClick(region.sa2Id, region.sa2Name)}
+                  onClick={() => handleRegionClick(region.sa2Id, region.sa2Name, index, false)}
                   className="w-full bg-red-50 border border-red-200 rounded-lg p-3 hover:bg-red-100 hover:border-red-300 transition-all duration-200 cursor-pointer text-left"
                   title={`Click to zoom to ${region.sa2Name}`}
                 >

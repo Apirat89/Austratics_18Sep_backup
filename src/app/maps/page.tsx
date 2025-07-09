@@ -727,6 +727,11 @@ export default function MapsPage() {
   // Handle region click from TopBottomPanel
   const handleRegionClick = useCallback(async (sa2Id: string, sa2Name: string) => {
     console.log('🎯 Maps Page: Region clicked from rankings:', { sa2Id, sa2Name });
+    console.log('🔍 DEBUG: Current rankedData:', rankedData);
+    
+    // Check if this is the top-ranked item
+    const isTopRanked = rankedData?.topRegions[0]?.sa2Id === sa2Id;
+    console.log('🏆 Is this the #1 top-ranked region?', isTopRanked);
     
     // Switch to SA2 boundary layer if not already selected
     if (selectedGeoLayer !== 'sa2') {
@@ -738,10 +743,14 @@ export default function MapsPage() {
     
     try {
       // Try to find the location using the search service
+      console.log('📡 Calling getLocationByName with:', sa2Name);
       const locationResult = await getLocationByName(sa2Name);
+      console.log('📦 Location lookup result:', locationResult);
       
       if (locationResult && locationResult.center) {
         console.log('✅ Found location data:', locationResult);
+        console.log('🗺️ Location center coordinates:', locationResult.center);
+        console.log('📦 Location bounds:', locationResult.bounds);
         
         // Force the result type to be 'sa2' and ensure SA2 ID is in the code field
         const sa2SearchResult = {
@@ -761,10 +770,14 @@ export default function MapsPage() {
         console.log('🔄 Fallback: Trying search with SA2 ID:', sa2Id);
         
         // Fallback: try searching by SA2 ID instead
+        console.log('📡 Calling getLocationByName with SA2 ID:', sa2Id);
         const locationResultById = await getLocationByName(sa2Id);
+        console.log('📦 SA2 ID lookup result:', locationResultById);
         
         if (locationResultById && locationResultById.center) {
           console.log('✅ Found SA2 location data by ID:', locationResultById);
+          console.log('🗺️ ID lookup center coordinates:', locationResultById.center);
+          console.log('📦 ID lookup bounds:', locationResultById.bounds);
           
           // Force the result type to be 'sa2' and ensure SA2 ID is in the code field
           const sa2SearchResultById = {
@@ -797,7 +810,7 @@ export default function MapsPage() {
       // Fallback to basic search on error
       handleSearch(sa2Name);
     }
-  }, [selectedGeoLayer, handleSearch]);
+  }, [selectedGeoLayer, handleSearch, rankedData]);
 
   // Handle loading completion
   const handleLoadingComplete = useCallback(() => {
