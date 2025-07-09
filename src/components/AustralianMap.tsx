@@ -561,6 +561,66 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     return breakdown;
   }, []);
 
+  // ✅ NEW: Helper function to directly update all popup button states
+  const updateAllPopupButtonStates = useCallback(async () => {
+    if (!userId) return;
+
+    console.log('🔄 Updating all popup button states directly...');
+    
+    try {
+      // Import the function to check backend state
+      const { isSearchSaved } = await import('../lib/savedSearches');
+      
+      // Get all currently open facilities
+      const facilities = Array.from(openPopupFacilitiesRef.current.values());
+      let updated = 0;
+      
+      for (const facility of facilities) {
+        // Check actual backend state for this facility
+        const isActuallySaved = await isSearchSaved(userId, facility.Service_Name);
+        
+        // Find the save button for this facility using the service name
+        const saveButtons = document.querySelectorAll('[id*="save-btn"]');
+        let buttonFound = false;
+        
+        saveButtons.forEach((button) => {
+          const popup = button.closest('.mapboxgl-popup-content');
+          if (popup && popup.textContent?.includes(facility.Service_Name)) {
+            const saveButton = button as HTMLButtonElement;
+            
+            // ✅ Update button state based on actual backend reality
+            if (isActuallySaved) {
+              saveButton.innerHTML = '🗑️ Remove from Saved';
+              saveButton.style.backgroundColor = '#EF4444';
+              saveButton.style.borderColor = '#EF4444';
+              saveButton.style.color = 'white';
+            } else {
+              saveButton.innerHTML = '📍 Save Location';
+              saveButton.style.backgroundColor = '#3B82F6';
+              saveButton.style.borderColor = '#3B82F6';
+              saveButton.style.color = 'white';
+            }
+            
+            // Re-enable button (in case it was disabled)
+            saveButton.style.pointerEvents = 'auto';
+            buttonFound = true;
+            updated++;
+          }
+        });
+        
+        if (!buttonFound) {
+          console.warn(`⚠️ Could not find save button for: ${facility.Service_Name}`);
+        } else {
+          console.log(`✅ Updated button state for: ${facility.Service_Name} (saved: ${isActuallySaved})`);
+        }
+      }
+      
+      console.log(`🎯 Updated ${updated} popup buttons with backend state`);
+    } catch (error) {
+      console.error('❌ Error updating popup button states:', error);
+    }
+  }, [userId]);
+
   // Helper function to save all open facility popups
   const saveAllOpenFacilities = useCallback(async () => {
     if (!userId) {
@@ -587,12 +647,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         const alreadySaved = await isSearchSaved(userId, facility.Service_Name);
         if (alreadySaved) {
           console.log(`⏭️ Skipping ${facility.Service_Name} - already saved`);
-          
-          // ✅ CRITICAL FIX: Update button state for skipped facilities
-          window.dispatchEvent(new CustomEvent('facilitySaved', { 
-            detail: { facilityName: facility.Service_Name } 
-          }));
-          
+          // ✅ REMOVED: Unreliable event dispatching - will update all buttons at end
           continue;
         }
 
@@ -621,11 +676,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         if (result.success) {
           savedCount++;
           console.log(`✅ Saved: ${facility.Service_Name}`);
-          
-          // Trigger event for popup updates
-          window.dispatchEvent(new CustomEvent('facilitySaved', { 
-            detail: { facilityName: facility.Service_Name } 
-          }));
+          // ✅ REMOVED: Unreliable event dispatching - will update all buttons at end
         } else {
           const errorMsg = result.error || 'Unknown error';
           errors.push(`${facility.Service_Name}: ${errorMsg}`);
@@ -642,6 +693,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     if (savedCount > 0) {
       onSavedSearchAdded?.();
     }
+
+    // ✅ CRITICAL FIX: Update all popup button states directly (no unreliable events)
+    await updateAllPopupButtonStates();
 
     return {
       success: errors.length === 0,
