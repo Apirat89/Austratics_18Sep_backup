@@ -244,6 +244,29 @@ const handleMouseMove = (e: MouseEvent) => {
 
 **Ready for enhanced popup interaction!** 🎮
 
+### **🎉 GIT OPERATIONS COMPLETED** ✅
+**Status**: ✅ **SUCCESSFULLY SAVED TO GITHUB**
+**Branches Updated**: Both `development` and `main` branches
+**Commit Message**: `feat(maps): Implement smooth popup dragging from anywhere`
+
+**Git Operations Summary**:
+- ✅ **Staged all changes**: Added popup dragging improvements and related files
+- ✅ **Committed to development**: Comprehensive commit with detailed description
+- ✅ **Pushed to development branch**: Successfully uploaded to `origin/development`
+- ✅ **Merged to main**: Fast-forward merge from development to main
+- ✅ **Pushed to main branch**: Successfully uploaded to `origin/main`
+- ✅ **Returned to development**: Back to development branch for continued work
+
+**Files Updated**:
+- `src/components/AustralianMap.tsx` - Popup dragging implementation
+- `.cursor/scratchpad.md` - Documentation and task tracking
+- `src/app/maps/page.tsx` - Related map page updates
+- `src/components/DataLayers.tsx` - Component updates
+- `src/components/HeatmapDataService.tsx` - Service improvements
+- `src/components/LayerManager.tsx` - Layer management enhancements
+
+**Both branches now contain the enhanced popup dragging functionality!** 🚀
+
 ---
 
 ## 🎯 **NEW REQUEST: Real-time Facility Count by Type (Viewport-Based)**
