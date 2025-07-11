@@ -685,7 +685,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Ask about aged care regulations, CHSP requirements, home care packages, fees, or any regulatory question..."
-                    className="flex-1 resize-none border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32"
+                    className="flex-1 resize-none bg-white border-2 border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 max-h-32 shadow-sm"
                     rows={2}
                     disabled={isLoading}
                   />
