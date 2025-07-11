@@ -7,7 +7,7 @@ import {
   User, 
   MessageSquare,
   Map,
-  ClipboardCheck,
+  BookOpen,
   BarChart3,
   Building,
   Newspaper
@@ -75,9 +75,9 @@ export default function MainPage() {
       route: "/maps"
     },
     {
-      title: "Screener", 
-      icon: ClipboardCheck,
-      route: "/screener"
+      title: "Regulation", 
+      icon: BookOpen,
+      route: "/regulation"
     },
     {
       title: "Insights",
