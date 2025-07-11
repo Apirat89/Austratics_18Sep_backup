@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import RegulationHistoryPanel from '@/components/regulation/RegulationHistoryPanel';
 import { getCurrentUser } from '@/lib/auth';
+import { renderMarkdown } from '@/lib/markdownRenderer';
 import {
   RegulationSearchHistoryItem,
   RegulationBookmark,
@@ -459,14 +460,17 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
                         }`}
                       >
                         {/* Message Content */}
-                        <div className="whitespace-pre-wrap break-words">
+                        <div className="break-words">
                           {message.isLoading ? (
                             <div className="flex items-center space-x-2">
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
                               <span>{message.content}</span>
                             </div>
                           ) : (
-                            message.content
+                            <div 
+                              dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }}
+                              style={{ lineHeight: '1.6' }}
+                            />
                           )}
                         </div>
 

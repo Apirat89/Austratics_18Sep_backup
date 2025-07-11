@@ -13,6 +13,7 @@ import {
   clearRegulationBookmarks,
   updateRegulationBookmarkUsage
 } from '@/lib/regulationHistory';
+import { renderMarkdown } from '@/lib/markdownRenderer';
 
 interface RegulationHistoryPanelProps {
   searchHistory: RegulationSearchHistoryItem[];
@@ -197,9 +198,10 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
                         </p>
                         
                         {search.response_preview && (
-                          <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                            {search.response_preview}
-                          </p>
+                          <div 
+                            className="text-xs text-gray-600 mt-1 line-clamp-2"
+                            dangerouslySetInnerHTML={{ __html: renderMarkdown(search.response_preview) }}
+                          />
                         )}
                         
                         <div className="flex items-center gap-2 mt-2">
@@ -325,9 +327,10 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
                         )}
                         
                         {bookmark.response_preview && (
-                          <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                            {bookmark.response_preview}
-                          </p>
+                          <div 
+                            className="text-xs text-gray-600 mt-1 line-clamp-2"
+                            dangerouslySetInnerHTML={{ __html: renderMarkdown(bookmark.response_preview) }}
+                          />
                         )}
                         
                         <div className="flex items-center gap-2 mt-2">
