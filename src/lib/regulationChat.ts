@@ -197,8 +197,8 @@ export class RegulationChatService {
                                    "📄 LOWER RELEVANCE";
         
         return `[DOCUMENT ${index + 1}] ${relevanceIndicator}
-Document: "${citation.document_name}"
-Location: Page ${citation.page_number}${citation.section_title ? `, Section: ${citation.section_title}` : ''}
+Document: "${citation.document_name}"${citation.section_title ? `
+Section: ${citation.section_title}` : ''}
 Similarity: ${(citation.similarity_score * 100).toFixed(1)}%
 
 CONTENT:
@@ -215,10 +215,10 @@ ${'='.repeat(80)}`;
 🎯 PRIMARY GOAL: Provide comprehensive, helpful answers using the regulatory content available.
 
 📋 CITATION REQUIREMENTS:
-1. For page numbers shown as "Location: Page X" where X > 0 and X ≤ 50: Use [Document Name, Section X, Page X]
-2. For page numbers shown as "Location: Page 0": Use [Document Name, Section X] WITHOUT page numbers (page uncertain)
-3. For page numbers shown as "Location: Page X" where X > 50: Use [Document Name, Section X] WITHOUT page numbers (conservative approach)
-4. NEVER invent or estimate page numbers - only use what's explicitly shown
+1. NEVER include page numbers in citations - they are unreliable
+2. Use this format ONLY: [Document Name, Section X] or [Document Name] for general references
+3. Focus on document name and section/division information only
+4. NEVER mention page numbers in your responses
 
 📝 RESPONSE REQUIREMENTS:
 1. You MUST provide complete, detailed answers when relevant content is available
@@ -246,8 +246,7 @@ USER QUESTION: ${question}
 LEGAL RESPONSE FORMAT:
 - Begin with direct answer using exact legal text from highest relevance sources
 - Include complete section content when relevant with proper subsection and paragraph references
-- Use ONLY the page numbers explicitly shown in the "Location: Page X" field above
-- If "Location: Page 0" is shown, omit page numbers from citations
+- NEVER include page numbers in citations
 - Structure with legal hierarchy explicitly stating "subsection (1)", "paragraph (a)", etc.
 - When discussing legal structure, reference the hierarchy levels explicitly using proper legal terminology
 - When explaining what a section "says", describe its structure using terms like "subsection" and "paragraph"
@@ -255,10 +254,11 @@ LEGAL RESPONSE FORMAT:
 - End with summary if complex multi-part answer
 
 CITATION EXAMPLES:
-✅ CORRECT: [C2025C00122, Section 54-1A, Page 30] (only if "Location: Page 30" is shown in context)
-✅ CORRECT: [C2025C00122, Section 54-1A] (when "Location: Page 0" is shown or page number is uncertain)
-❌ INCORRECT: [C2025C00122, Section 54-1A, Page 662] (page numbers above 50 are likely phantom pages)
-❌ INCORRECT: Any page number not explicitly shown in the "Location: Page X" field above
+✅ CORRECT: [C2025C00122, Section 54-1A]
+✅ CORRECT: [C2025C00122, Division 63]
+✅ CORRECT: [Aged Care Act 1997, Section 2-1]
+❌ INCORRECT: [C2025C00122, Section 54-1A, Page 30] (never include page numbers)
+❌ INCORRECT: Any citation that includes page numbers
 
 RESPONSE:`;
 
@@ -281,8 +281,7 @@ RESPONSE:`;
 
       let responseText = result.response.text();
 
-      // Post-process AI response to validate all cited page numbers
-      responseText = this.validateResponseCitations(responseText, citations);
+      // No need to validate page numbers since we don't use them
 
       return responseText;
     } catch (error) {
@@ -353,48 +352,7 @@ RESPONSE:`;
     };
   }
 
-  /**
-   * Post-process AI response to validate all cited page numbers
-   */
-  private validateResponseCitations(response: string, citations: DocumentCitation[]): string {
-    // Create a map of document names to their actual page counts
-    const documentPageCounts: Map<string, number> = new Map();
-    
-    for (const citation of citations) {
-      if (citation.actual_pdf_pages) {
-        documentPageCounts.set(citation.document_name, citation.actual_pdf_pages);
-      }
-    }
 
-    // Regular expression to find page citations in the response
-    const pageRegex = /\[([^\]]+),\s*(?:Section\s+[^,]+,\s*)?Page\s+(\d+)\]/g;
-    let match;
-    const invalidCitations: string[] = [];
-
-    while ((match = pageRegex.exec(response)) !== null) {
-      const documentName = match[1];
-      const pageNumber = parseInt(match[2]);
-      
-      // Check if we have page count info for this document
-      const actualPages = documentPageCounts.get(documentName);
-      
-      if (actualPages && (pageNumber < 1 || pageNumber > actualPages)) {
-        invalidCitations.push(`Page ${pageNumber} in "${documentName}" (max: ${actualPages})`);
-      }
-    }
-
-    // If invalid citations found, add a warning to the response
-    if (invalidCitations.length > 0) {
-      console.warn(`Found ${invalidCitations.length} invalid page citations:`, invalidCitations);
-      
-      // Add a disclaimer to the response
-      const disclaimer = `\n\n⚠️ **Citation Validation Note**: Some page references in this response may be inaccurate. Please verify page numbers against the actual documents.`;
-      
-      return response + disclaimer;
-    }
-
-    return response;
-  }
 
   /**
    * Process a complete chat query with search and response generation

@@ -2,10 +2,11 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, ArrowLeft, History, X, Bookmark, Plus } from 'lucide-react';
+import { BookOpen, ArrowLeft, History, X, Bookmark, Plus, Copy, RotateCcw, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import RegulationHistoryPanel from '@/components/regulation/RegulationHistoryPanel';
+
 import { getCurrentUser } from '@/lib/auth';
 import { renderMarkdown } from '@/lib/markdownRenderer';
 import {
@@ -66,7 +67,7 @@ I can help you find information from:
 • **Fee schedules** and regulatory updates
 
 Ask me anything about aged care regulations, compliance requirements, funding, or program details. I'll provide accurate answers with specific document citations.`,
-      timestamp: new Date(),
+      timestamp: new Date('2024-01-01T00:00:00Z'),
       citations: []
     }
   ]);
@@ -82,6 +83,8 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
   const [bookmarkDescription, setBookmarkDescription] = useState('');
   const [lastSearchTerm, setLastSearchTerm] = useState('');
   const [lastResponse, setLastResponse] = useState<ChatResponse | null>(null);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [retryingMessageId, setRetryingMessageId] = useState<string | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -268,6 +271,26 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
     setBookmarkDescription('');
   };
 
+  const handleBookmarkFromHistory = (search: RegulationSearchHistoryItem) => {
+    if (!currentUser) {
+      alert('User not authenticated');
+      return;
+    }
+    
+    // Set the search term and response from the history item
+    setLastSearchTerm(search.search_term);
+    setLastResponse({
+      message: search.response_preview || '',
+      citations: [],
+      context_used: 0,
+      processing_time: search.processing_time || 0
+    });
+    
+    setShowBookmarkModal(true);
+    setBookmarkName('');
+    setBookmarkDescription('');
+  };
+
   const handleSaveBookmark = async () => {
     if (!currentUser || !lastSearchTerm || !bookmarkName.trim()) {
       return;
@@ -330,6 +353,94 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
     return colorMap[type] || colorMap['other'];
   };
 
+  const handleCopyMessage = async (messageContent: string, messageId: string) => {
+    try {
+      // Remove HTML formatting for clean copy
+      const plainText = messageContent.replace(/<[^>]*>/g, '');
+      await navigator.clipboard.writeText(plainText);
+      setCopiedMessageId(messageId);
+      
+      // Clear the copied indicator after 2 seconds
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (error) {
+      console.error('Failed to copy message:', error);
+      alert('Failed to copy message to clipboard');
+    }
+  };
+
+  const handleRetryResponse = async (originalQuestion: string, messageId: string) => {
+    if (isLoading || retryingMessageId) return;
+    
+    setRetryingMessageId(messageId);
+    
+    // Find the message index and create a new loading message
+    const messageIndex = messages.findIndex(msg => msg.id === messageId);
+    if (messageIndex === -1) return;
+
+    const loadingMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: '🔄 Regenerating response...',
+      timestamp: new Date(),
+      isLoading: true
+    };
+
+    // Replace the current message with loading message
+    const updatedMessages = [...messages];
+    updatedMessages[messageIndex] = loadingMessage;
+    setMessages(updatedMessages);
+
+    try {
+      const response = await fetch('/api/regulation/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: originalQuestion
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const chatResponse: ChatResponse = data.data;
+        setLastResponse(chatResponse);
+        
+        const newAssistantMessage: ChatMessage = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: chatResponse.message,
+          timestamp: new Date(),
+          citations: chatResponse.citations
+        };
+
+        // Replace loading message with new response
+        const finalMessages = [...messages];
+        finalMessages[messageIndex] = newAssistantMessage;
+        setMessages(finalMessages);
+      } else {
+        throw new Error(data.error || 'Failed to regenerate response');
+      }
+    } catch (error) {
+      console.error('Error regenerating response:', error);
+      
+      const errorMessage: ChatMessage = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '❌ Sorry, I encountered an error while regenerating the response. Please try again.',
+        timestamp: new Date()
+      };
+
+      // Replace loading message with error message
+      const finalMessages = [...messages];
+      finalMessages[messageIndex] = errorMessage;
+      setMessages(finalMessages);
+    } finally {
+      setRetryingMessageId(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Fixed History Panel with Hide/Show functionality */}
@@ -364,6 +475,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
               onDeleteSearchItem={handleDeleteSearchItem}
               onDeleteBookmark={handleDeleteBookmark}
               onCreateBookmark={handleCreateBookmark}
+              onBookmarkFromHistory={handleBookmarkFromHistory}
               currentUser={currentUser}
             />
           </div>
@@ -387,8 +499,10 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
       <div className={`min-h-screen transition-all duration-300 ${
         isHistoryPanelVisible ? 'ml-80' : 'ml-12'
       }`}>
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b">
+        {/* Fixed Header */}
+        <div className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b z-20 transition-all duration-300" style={{
+          marginLeft: isHistoryPanelVisible ? '320px' : '48px'
+        }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -408,17 +522,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
                   Main Menu
                 </button>
                 
-                {/* Bookmark Current Search Button */}
-                {lastSearchTerm && currentUser && (
-                  <button
-                    onClick={handleCreateBookmark}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-blue-600 bg-blue-100 hover:bg-blue-200 transition-colors"
-                    title="Bookmark Current Search"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Bookmark
-                  </button>
-                )}
+
               </div>
             </div>
             
@@ -432,7 +536,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
         </div>
 
         {/* Chat Interface */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-32">
           <Card className="shadow-lg border-0">
             <CardHeader className="bg-white border-b border-gray-200">
               <CardTitle className="text-xl font-semibold text-gray-900">
@@ -498,9 +602,6 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
                                         {citation.document_type.replace(/_/g, ' ').toUpperCase()}
                                       </Badge>
                                     </div>
-                                    <div className="text-xs text-gray-500">
-                                      Page {citation.page_number}
-                                    </div>
                                   </div>
                                   
                                   {citation.section_title && (
@@ -525,9 +626,49 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
                         {/* Timestamp */}
                         <div className={`text-xs mt-2 ${
                           message.role === 'user' ? 'text-blue-200' : 'text-gray-500'
-                        }`}>
+                        }`} suppressHydrationWarning>
                           {message.timestamp.toLocaleTimeString()}
                         </div>
+
+                        {/* Action Buttons - Copy, Retry, and Feedback for assistant messages (excluding welcome message) */}
+                        {message.role === 'assistant' && !message.isLoading && message.id !== '1' && (
+                          <div className="flex items-center gap-2 mt-3 pt-2 border-t border-gray-200">
+                            {/* Copy Button */}
+                            <button
+                              onClick={() => handleCopyMessage(message.content, message.id)}
+                              disabled={copiedMessageId === message.id}
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300"
+                              title="Copy response"
+                            >
+                              {copiedMessageId === message.id ? (
+                                <>
+                                  <Check className="w-4 h-4" />
+                                  <span className="hidden sm:inline">Copied!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-4 h-4" />
+                                  <span className="hidden sm:inline">Copy</span>
+                                </>
+                              )}
+                            </button>
+
+                            {/* Retry Button */}
+                            <button
+                              onClick={() => handleRetryResponse(lastSearchTerm, message.id)}
+                              disabled={retryingMessageId === message.id || isLoading}
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Regenerate response"
+                            >
+                              <RotateCcw className={`w-4 h-4 ${retryingMessageId === message.id ? 'animate-spin' : ''}`} />
+                              <span className="hidden sm:inline">
+                                {retryingMessageId === message.id ? 'Retrying...' : 'Retry'}
+                              </span>
+                            </button>
+
+
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
