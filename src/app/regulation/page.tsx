@@ -1,8 +1,26 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { BookOpen, ArrowLeft, History, X, Bookmark, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import RegulationHistoryPanel from '@/components/regulation/RegulationHistoryPanel';
+import { getCurrentUser } from '@/lib/auth';
+import {
+  RegulationSearchHistoryItem,
+  RegulationBookmark,
+  saveRegulationSearchToHistory,
+  getRegulationSearchHistory,
+  getRegulationBookmarks,
+  deleteRegulationSearchHistoryItem,
+  clearRegulationSearchHistory,
+  deleteRegulationBookmark,
+  clearRegulationBookmarks,
+  saveRegulationBookmark,
+  isRegulationBookmarkNameTaken,
+  getRegulationBookmarkCount
+} from '@/lib/regulationHistory';
 
 interface ChatMessage {
   id: string;
@@ -30,6 +48,7 @@ interface ChatResponse {
 }
 
 export default function RegulationPage() {
+  const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -53,6 +72,16 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
   
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
+  const [searchHistory, setSearchHistory] = useState<RegulationSearchHistoryItem[]>([]);
+  const [bookmarks, setBookmarks] = useState<RegulationBookmark[]>([]);
+  const [showBookmarkModal, setShowBookmarkModal] = useState(false);
+  const [bookmarkName, setBookmarkName] = useState('');
+  const [bookmarkDescription, setBookmarkDescription] = useState('');
+  const [lastSearchTerm, setLastSearchTerm] = useState('');
+  const [lastResponse, setLastResponse] = useState<ChatResponse | null>(null);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -64,13 +93,39 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
     scrollToBottom();
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return;
+  // Load user and data on component mount
+  useEffect(() => {
+    const loadUserAndData = async () => {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+        
+        if (user) {
+          // Load search history and bookmarks
+          const [history, userBookmarks] = await Promise.all([
+            getRegulationSearchHistory(user.id),
+            getRegulationBookmarks(user.id)
+          ]);
+          
+          setSearchHistory(history);
+          setBookmarks(userBookmarks);
+        }
+      } catch (error) {
+        console.error('Error loading user and data:', error);
+      }
+    };
+
+    loadUserAndData();
+  }, []);
+
+  const sendMessage = async (messageText?: string) => {
+    const messageToSend = messageText || inputMessage.trim();
+    if (!messageToSend || isLoading) return;
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputMessage.trim(),
+      content: messageToSend,
       timestamp: new Date()
     };
 
@@ -85,6 +140,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
     setMessages(prev => [...prev, userMessage, loadingMessage]);
     setInputMessage('');
     setIsLoading(true);
+    setLastSearchTerm(messageToSend);
 
     try {
       const response = await fetch('/api/regulation/chat', {
@@ -93,7 +149,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          question: inputMessage.trim()
+          question: messageToSend
         }),
       });
 
@@ -101,6 +157,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
 
       if (data.success) {
         const chatResponse: ChatResponse = data.data;
+        setLastResponse(chatResponse);
         
         const assistantMessage: ChatMessage = {
           id: (Date.now() + 2).toString(),
@@ -111,6 +168,25 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
         };
 
         setMessages(prev => prev.slice(0, -1).concat([assistantMessage]));
+
+        // Save to search history if user is logged in
+        if (currentUser) {
+          const responsePreview = chatResponse.message.slice(0, 150);
+          const documentTypes = [...new Set(chatResponse.citations.map(c => c.document_type))];
+          
+          await saveRegulationSearchToHistory(
+            currentUser.id,
+            messageToSend,
+            responsePreview,
+            chatResponse.citations.length,
+            documentTypes,
+            chatResponse.processing_time
+          );
+
+          // Refresh search history
+          const updatedHistory = await getRegulationSearchHistory(currentUser.id);
+          setSearchHistory(updatedHistory);
+        }
       } else {
         throw new Error(data.error || 'Failed to get response');
       }
@@ -137,6 +213,104 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
     }
   };
 
+  const handleSearchSelect = (search: RegulationSearchHistoryItem) => {
+    sendMessage(search.search_term);
+  };
+
+  const handleBookmarkSelect = (bookmark: RegulationBookmark) => {
+    sendMessage(bookmark.search_term);
+  };
+
+  const handleDeleteSearchItem = async (itemId: number) => {
+    if (currentUser) {
+      const success = await deleteRegulationSearchHistoryItem(currentUser.id, itemId);
+      if (success) {
+        setSearchHistory(prev => prev.filter(item => item.id !== itemId));
+      }
+    }
+  };
+
+  const handleClearSearchHistory = async () => {
+    if (currentUser) {
+      const success = await clearRegulationSearchHistory(currentUser.id);
+      if (success) {
+        setSearchHistory([]);
+      }
+    }
+  };
+
+  const handleDeleteBookmark = async (bookmarkId: number) => {
+    if (currentUser) {
+      const success = await deleteRegulationBookmark(currentUser.id, bookmarkId);
+      if (success) {
+        setBookmarks(prev => prev.filter(item => item.id !== bookmarkId));
+      }
+    }
+  };
+
+  const handleClearBookmarks = async () => {
+    if (currentUser) {
+      const success = await clearRegulationBookmarks(currentUser.id);
+      if (success) {
+        setBookmarks([]);
+      }
+    }
+  };
+
+  const handleCreateBookmark = () => {
+    if (!lastSearchTerm) {
+      alert('Please ask a question first to create a bookmark.');
+      return;
+    }
+    setShowBookmarkModal(true);
+    setBookmarkName('');
+    setBookmarkDescription('');
+  };
+
+  const handleSaveBookmark = async () => {
+    if (!currentUser || !lastSearchTerm || !bookmarkName.trim()) {
+      return;
+    }
+
+    // Check if bookmark name is taken
+    const isTaken = await isRegulationBookmarkNameTaken(currentUser.id, bookmarkName.trim());
+    if (isTaken) {
+      alert('A bookmark with this name already exists. Please choose a different name.');
+      return;
+    }
+
+    // Check bookmark limit
+    const bookmarkCount = await getRegulationBookmarkCount(currentUser.id);
+    if (bookmarkCount >= 20) {
+      alert('You have reached the maximum of 20 bookmarks. Please delete some bookmarks first.');
+      return;
+    }
+
+    const responsePreview = lastResponse?.message.slice(0, 150);
+    const documentTypes = lastResponse ? [...new Set(lastResponse.citations.map(c => c.document_type))] : [];
+
+    const success = await saveRegulationBookmark(
+      currentUser.id,
+      bookmarkName.trim(),
+      lastSearchTerm,
+      bookmarkDescription.trim() || undefined,
+      responsePreview,
+      lastResponse?.citations.length,
+      documentTypes
+    );
+
+    if (success) {
+      // Refresh bookmarks
+      const updatedBookmarks = await getRegulationBookmarks(currentUser.id);
+      setBookmarks(updatedBookmarks);
+      setShowBookmarkModal(false);
+      setBookmarkName('');
+      setBookmarkDescription('');
+    } else {
+      alert('Failed to save bookmark. Please try again.');
+    }
+  };
+
   const formatDocumentName = (name: string): string => {
     return name.replace(/_/g, ' ').replace(/-/g, ' ').toUpperCase();
   };
@@ -156,154 +330,308 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50">
+      {/* Fixed History Panel with Hide/Show functionality */}
+      {isHistoryPanelVisible ? (
+        <div className="fixed left-0 top-0 w-80 h-screen bg-white border-r border-gray-200 z-30 transition-all duration-300 flex flex-col">
+          {/* Panel Header */}
+          <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-white">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">History & Bookmarks</h3>
+              <button
+                onClick={() => setIsHistoryPanelVisible(false)}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                title="Hide History Panel"
+              >
+                <X className="w-4 h-4 text-gray-500" />
+              </button>
+            </div>
+          </div>
+          
+          {/* Scrollable Panel Content */}
+          <div className="flex-1 overflow-hidden">
+            <RegulationHistoryPanel
+              searchHistory={searchHistory}
+              bookmarks={bookmarks}
+              isOpen={true}
+              onClose={() => {}}
+              onHide={() => setIsHistoryPanelVisible(false)}
+              onSearchSelect={handleSearchSelect}
+              onBookmarkSelect={handleBookmarkSelect}
+              onClearSearchHistory={handleClearSearchHistory}
+              onClearBookmarks={handleClearBookmarks}
+              onDeleteSearchItem={handleDeleteSearchItem}
+              onDeleteBookmark={handleDeleteBookmark}
+              onCreateBookmark={handleCreateBookmark}
+              currentUser={currentUser}
+            />
+          </div>
+        </div>
+      ) : (
+        /* Fixed History Tab when hidden */
+        <div className="fixed left-0 top-0 w-12 h-screen z-30 transition-all duration-300 bg-white border-r border-gray-200">
+          <div className="h-full flex flex-col items-center justify-start pt-6">
+            <button
+              onClick={() => setIsHistoryPanelVisible(true)}
+              className="group p-2 hover:bg-gray-100 transition-colors duration-200 rounded"
+              title="Show History Panel"
+            >
+              <History className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors duration-200" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content Area with proper left margin */}
+      <div className={`min-h-screen transition-all duration-300 ${
+        isHistoryPanelVisible ? 'ml-80' : 'ml-12'
+      }`}>
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            🏛️ Australian Aged Care Regulation Assistant
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Get instant, accurate answers about aged care regulations with precise document citations
-          </p>
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <BookOpen className="w-8 h-8 text-blue-600" />
+                <h1 className="text-3xl font-bold text-gray-900">Australian Aged Care Regulation Assistant</h1>
+              </div>
+              
+              {/* Back to Main Menu and Actions */}
+              <div className="flex items-center gap-2">
+                {/* Back to Main Menu Button */}
+                <button
+                  onClick={() => router.push('/main')}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+                  title="Back to Main Menu"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Main Menu
+                </button>
+                
+                {/* Bookmark Current Search Button */}
+                {lastSearchTerm && currentUser && (
+                  <button
+                    onClick={handleCreateBookmark}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-blue-600 bg-blue-100 hover:bg-blue-200 transition-colors"
+                    title="Bookmark Current Search"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Bookmark
+                  </button>
+                )}
+              </div>
+            </div>
+            
+            <p className="text-lg text-gray-600">
+              Get instant answers about aged care regulations with document citations
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              ⚠️ <strong>Important:</strong> AI-generated responses may contain errors. Always verify information with official sources and consult legal professionals for compliance advice.
+            </p>
+          </div>
         </div>
 
         {/* Chat Interface */}
-        <Card className="max-w-6xl mx-auto shadow-2xl border-0">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
-            <CardTitle className="text-2xl font-semibold">
-              💬 Regulation Chat
-            </CardTitle>
-            <p className="text-blue-100">
-              Ask questions about aged care acts, CHSP programs, home care packages, and more
-            </p>
-          </CardHeader>
-          
-          <CardContent className="p-0">
-            {/* Messages Container */}
-            <div className="h-[600px] overflow-y-auto bg-white">
-              <div className="p-6 space-y-6">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="shadow-lg border-0">
+            <CardHeader className="bg-white border-b border-gray-200">
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                💬 Regulation Chat
+              </CardTitle>
+              <p className="text-gray-600">
+                Ask questions about aged care acts, CHSP programs, home care packages, and more
+              </p>
+            </CardHeader>
+            
+            <CardContent className="p-0">
+              {/* Messages Container */}
+              <div className="h-[600px] overflow-y-auto bg-white">
+                <div className="p-6 space-y-6">
+                  {messages.map((message) => (
                     <div
-                      className={`max-w-[80%] rounded-lg p-4 ${
-                        message.role === 'user'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-50 text-gray-900 border border-gray-200'
-                      }`}
+                      key={message.id}
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      {/* Message Content */}
-                      <div className="whitespace-pre-wrap break-words">
-                        {message.isLoading ? (
-                          <div className="flex items-center space-x-2">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                            <span>{message.content}</span>
-                          </div>
-                        ) : (
-                          message.content
-                        )}
-                      </div>
-
-                      {/* Citations */}
-                      {message.citations && message.citations.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-gray-200">
-                          <h4 className="text-sm font-semibold text-gray-700 mb-3">
-                            📚 Source Documents:
-                          </h4>
-                          <div className="space-y-3">
-                            {message.citations.map((citation, index) => (
-                              <div
-                                key={index}
-                                className="bg-white border border-gray-200 rounded-lg p-3 text-sm"
-                              >
-                                <div className="flex items-start justify-between gap-3 mb-2">
-                                  <div className="flex-1">
-                                    <div className="font-medium text-gray-900 text-xs mb-1">
-                                      📄 {formatDocumentName(citation.document_name)}
-                                    </div>
-                                    <Badge 
-                                      variant="outline" 
-                                      className={`text-xs ${getDocumentTypeColor(citation.document_type)}`}
-                                    >
-                                      {citation.document_type.replace(/_/g, ' ').toUpperCase()}
-                                    </Badge>
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    Page {citation.page_number}
-                                  </div>
-                                </div>
-                                
-                                {citation.section_title && (
-                                  <div className="text-xs text-gray-600 mb-2 font-medium">
-                                    Section: {citation.section_title}
-                                  </div>
-                                )}
-                                
-                                <div className="text-xs text-gray-600 leading-relaxed">
-                                  {citation.content_snippet}
-                                </div>
-                                
-                                <div className="mt-2 text-xs text-gray-400">
-                                  Relevance: {Math.round(citation.similarity_score * 100)}%
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                      <div
+                        className={`max-w-[80%] rounded-lg p-4 ${
+                          message.role === 'user'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-50 text-gray-900 border border-gray-200'
+                        }`}
+                      >
+                        {/* Message Content */}
+                        <div className="whitespace-pre-wrap break-words">
+                          {message.isLoading ? (
+                            <div className="flex items-center space-x-2">
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                              <span>{message.content}</span>
+                            </div>
+                          ) : (
+                            message.content
+                          )}
                         </div>
-                      )}
 
-                      {/* Timestamp */}
-                      <div className={`text-xs mt-2 ${
-                        message.role === 'user' ? 'text-blue-200' : 'text-gray-500'
-                      }`}>
-                        {message.timestamp.toLocaleTimeString()}
+                        {/* Citations */}
+                        {message.citations && message.citations.length > 0 && (
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                              📚 Source Documents:
+                            </h4>
+                            <div className="space-y-3">
+                              {message.citations.map((citation, index) => (
+                                <div
+                                  key={index}
+                                  className="bg-white border border-gray-200 rounded-lg p-3 text-sm"
+                                >
+                                  <div className="flex items-start justify-between gap-3 mb-2">
+                                    <div className="flex-1">
+                                      <div className="font-medium text-gray-900 text-xs mb-1">
+                                        📄 {formatDocumentName(citation.document_name)}
+                                      </div>
+                                      <Badge 
+                                        variant="outline" 
+                                        className={`text-xs ${getDocumentTypeColor(citation.document_type)}`}
+                                      >
+                                        {citation.document_type.replace(/_/g, ' ').toUpperCase()}
+                                      </Badge>
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                      Page {citation.page_number}
+                                    </div>
+                                  </div>
+                                  
+                                  {citation.section_title && (
+                                    <div className="text-xs text-gray-600 mb-2 font-medium">
+                                      Section: {citation.section_title}
+                                    </div>
+                                  )}
+                                  
+                                  <div className="text-xs text-gray-600 leading-relaxed">
+                                    {citation.content_snippet}
+                                  </div>
+                                  
+                                  <div className="mt-2 text-xs text-gray-400">
+                                    Relevance: {Math.round(citation.similarity_score * 100)}%
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Timestamp */}
+                        <div className={`text-xs mt-2 ${
+                          message.role === 'user' ? 'text-blue-200' : 'text-gray-500'
+                        }`}>
+                          {message.timestamp.toLocaleTimeString()}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
               </div>
-            </div>
 
-            {/* Input Area */}
-            <div className="border-t border-gray-200 bg-gray-50 p-4">
-              <div className="flex space-x-3">
-                <textarea
-                  ref={inputRef}
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Ask about aged care regulations, CHSP requirements, home care packages, fees, or any regulatory question..."
-                  className="flex-1 resize-none border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32"
-                  rows={2}
-                  disabled={isLoading}
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!inputMessage.trim() || isLoading}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium whitespace-nowrap"
-                >
-                  {isLoading ? '⏳' : '📤'} Send
-                </button>
+              {/* Input Area */}
+              <div className="border-t border-gray-200 bg-gray-50 p-4">
+                <div className="flex space-x-3">
+                  <textarea
+                    ref={inputRef}
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Ask about aged care regulations, CHSP requirements, home care packages, fees, or any regulatory question..."
+                    className="flex-1 resize-none border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32"
+                    rows={2}
+                    disabled={isLoading}
+                  />
+                  <button
+                    onClick={() => sendMessage()}
+                    disabled={!inputMessage.trim() || isLoading}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium whitespace-nowrap"
+                  >
+                    {isLoading ? '⏳' : '📤'} Send
+                  </button>
+                </div>
+                
+                <div className="mt-2 text-xs text-gray-500 text-center">
+                  💡 Try asking: "What are the new changes in the Aged Care Act 2024?" or "How do CHSP client contributions work?"
+                </div>
               </div>
-              
-              <div className="mt-2 text-xs text-gray-500 text-center">
-                💡 Try asking: "What are the new changes in the Aged Care Act 2024?" or "How do CHSP client contributions work?"
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Info Footer */}
-        <div className="text-center mt-8 text-sm text-gray-600">
+        <div className="text-center pb-8 text-sm text-gray-600">
           <p>
             🔒 Your questions are processed securely. This assistant uses official Australian aged care regulation documents.
           </p>
+          <p className="mt-2 text-xs text-gray-500">
+            Disclaimer: This AI assistant provides information for reference purposes only. Responses may be incomplete or contain errors. Always verify with official sources and seek professional legal advice for compliance matters.
+          </p>
         </div>
       </div>
+
+      {/* Bookmark Modal */}
+      {showBookmarkModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Save Bookmark</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Bookmark Name *
+                </label>
+                <input
+                  type="text"
+                  value={bookmarkName}
+                  onChange={(e) => setBookmarkName(e.target.value)}
+                  placeholder="Enter a descriptive name..."
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  maxLength={100}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description (optional)
+                </label>
+                <textarea
+                  value={bookmarkDescription}
+                  onChange={(e) => setBookmarkDescription(e.target.value)}
+                  placeholder="Add notes about this search..."
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={3}
+                  maxLength={250}
+                />
+              </div>
+              
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-sm text-gray-600">
+                  <strong>Search:</strong> {lastSearchTerm}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setShowBookmarkModal(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveBookmark}
+                disabled={!bookmarkName.trim()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Save Bookmark
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
