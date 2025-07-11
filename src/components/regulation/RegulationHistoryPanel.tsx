@@ -29,6 +29,7 @@ interface RegulationHistoryPanelProps {
   onDeleteBookmark: (bookmarkId: number) => void | Promise<void>;
   onEditBookmark?: (bookmark: RegulationBookmark) => void;
   onCreateBookmark?: () => void;
+  onBookmarkFromHistory?: (search: RegulationSearchHistoryItem) => void;
   currentUser?: { id: string } | null;
 }
 
@@ -46,6 +47,7 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
   onDeleteBookmark,
   onEditBookmark,
   onCreateBookmark,
+  onBookmarkFromHistory,
   currentUser
 }) => {
   const [activeTab, setActiveTab] = useState<'history' | 'bookmarks'>('history');
@@ -89,6 +91,24 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
     onBookmarkSelect(bookmark);
   };
 
+  const handleBookmarkFromHistory = (e: React.MouseEvent, search: RegulationSearchHistoryItem) => {
+    e.stopPropagation();
+    if (onBookmarkFromHistory) {
+      onBookmarkFromHistory(search);
+    }
+  };
+
+  const handleDeleteFromHistory = (e: React.MouseEvent, searchId: number) => {
+    e.stopPropagation();
+    onDeleteSearchItem(searchId);
+  };
+
+
+
+
+
+
+
   const formatDocumentTypes = (types?: string[]) => {
     if (!types || types.length === 0) return null;
     
@@ -119,6 +139,8 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
     };
     return colorMap[type] || colorMap['other'];
   };
+
+
 
   if (!isOpen) return null;
 
@@ -184,9 +206,13 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
               </div>
             ) : (
               <div className="space-y-3">
-                {searchHistory.map((search, index) => (
+                {searchHistory.map((search, index) => {
+                  // 🔑 1) normalise ID once per render - always a string
+                  const rowKey = (search.id ?? index).toString();
+                  
+                  return (
                   <div
-                    key={search.id || index}
+                    key={rowKey}
                     className="p-3 bg-blue-50 rounded-lg hover:bg-blue-100 cursor-pointer transition-colors border border-blue-200"
                     onClick={() => onSearchSelect(search)}
                   >
@@ -231,18 +257,33 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
                           )}
                         </div>
                       </div>
-                      {search.id && (
-                        <button
-                          onClick={(e) => handleDeleteSearchItem(e, search.id!)}
-                          className="text-gray-400 hover:text-red-600 p-1 rounded-md hover:bg-red-50 transition-colors flex-shrink-0"
-                          title="Delete this search"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      )}
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        {/* Bookmark Icon */}
+                        {onBookmarkFromHistory && (
+                          <button
+                            onClick={(e) => handleBookmarkFromHistory(e, search)}
+                            className="text-gray-400 hover:text-blue-600 p-2 rounded-md hover:bg-blue-50 transition-colors"
+                            title="Bookmark this search"
+                          >
+                            <BookmarkPlus className="w-4 h-4" />
+                          </button>
+                        )}
+                        
+                        {/* Delete Icon */}
+                        {search.id && (
+                          <button
+                            onClick={(e) => handleDeleteFromHistory(e, search.id!)}
+                            className="text-gray-400 hover:text-red-600 p-2 rounded-md hover:bg-red-50 transition-colors"
+                            title="Delete this search"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
