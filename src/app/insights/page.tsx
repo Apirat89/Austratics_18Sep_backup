@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser } from '../../lib/auth';
 import BackToMainButton from '../../components/BackToMainButton';
-import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Globe, Building, Home, ExternalLink } from 'lucide-react';
+import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Globe, Building, Home, ExternalLink, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import SA2BoxPlot from '../../components/sa2/SA2BoxPlot';
@@ -12,6 +12,7 @@ import SA2RadarChart from '../../components/sa2/SA2RadarChart';
 import SA2RankingChart from '../../components/sa2/SA2RankingChart';
 import SA2HeatmapChart from '../../components/sa2/SA2HeatmapChart';
 import InsightsLandingRankings from '../../components/insights/InsightsLandingRankings';
+import InsightsHistoryPanel from '../../components/insights/InsightsHistoryPanel';
 import { searchLocations } from '../../lib/mapSearchService';
 import { 
   saveSA2Search, 
@@ -22,6 +23,13 @@ import {
   clearUserSavedSA2Searches,
   type SavedSA2Search 
 } from '../../lib/savedSA2Searches';
+import {
+  InsightsSearchHistoryItem,
+  saveInsightsSearchToHistory,
+  getInsightsSearchHistory,
+  deleteInsightsSearchHistoryItem,
+  clearInsightsSearchHistory
+} from '../../lib/insightsHistory';
 
 interface UserData {
   email: string;
@@ -115,6 +123,10 @@ export default function SA2AnalyticsPage() {
   const [currentUserLoading, setCurrentUserLoading] = useState(true);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [currentSA2SavedStatus, setCurrentSA2SavedStatus] = useState<boolean>(false);
+  
+  // Insights search history state
+  const [insightsSearchHistory, setInsightsSearchHistory] = useState<InsightsSearchHistoryItem[]>([]);
+  const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(true);
   
   const router = useRouter();
   const dataLoadingRef = useRef(false);
@@ -944,10 +956,13 @@ export default function SA2AnalyticsPage() {
     setSearchQuery(location.name);
     setSearchResults([]);
     
+    let finalSA2Data: SA2Data | undefined = undefined;
+    
     // If it's an SA2 with analytics data, also set the SA2 selection
     if (location.type === 'sa2' && location.analyticsData) {
       console.log('✅ Setting SA2 analytics data for:', location.name);
       setSelectedSA2(location.analyticsData);
+      finalSA2Data = location.analyticsData;
     } else if (location.type === 'sa2' && location.code) {
       // Try to find SA2 data by code if not already attached
       console.log('🔍 Trying to find SA2 data by code:', location.code);
@@ -974,6 +989,7 @@ export default function SA2AnalyticsPage() {
       if (sa2Data) {
         console.log('✅ Found SA2 data with key:', matchedKey, 'for:', location.name);
         setSelectedSA2(sa2Data);
+        finalSA2Data = sa2Data;
       } else {
         console.log('❌ No SA2 data found for any key variation of:', location.code);
         console.log('Available SA2 keys sample:', Object.keys(allSA2Data).slice(0, 10));
@@ -986,6 +1002,7 @@ export default function SA2AnalyticsPage() {
         if (sa2ByName) {
           console.log('✅ Found SA2 data by name match for:', location.name);
           setSelectedSA2(sa2ByName);
+          finalSA2Data = sa2ByName;
         } else {
           console.log('❌ No SA2 data found by name either for:', location.name);
           setSelectedSA2(null);
@@ -996,6 +1013,9 @@ export default function SA2AnalyticsPage() {
       // For non-SA2 or SA2 without analytics data, clear SA2 selection
       setSelectedSA2(null);
     }
+    
+    // Save search to history
+    saveSearchToHistory(searchQuery, location, finalSA2Data, searchResults.length);
   };
 
   // Legacy function for backward compatibility (if needed)
@@ -1004,6 +1024,14 @@ export default function SA2AnalyticsPage() {
     setSearchQuery(sa2.sa2Name);
     setSearchResults([]);
     setSelectedLocation(null);
+    
+    // Save ranking selection to search history
+    saveSearchToHistory(
+      sa2.sa2Name,           // Search term (SA2 name)
+      undefined,             // No location search (ranking click)
+      sa2,                   // SA2 data selected
+      1                      // Results count (1 specific SA2 selected)
+    );
   };
 
   // Load saved SA2 searches for the current user
@@ -1126,6 +1154,110 @@ export default function SA2AnalyticsPage() {
     router.push(`/residential?sa2=${encodeURIComponent(savedSearch.sa2_name)}`);
   };
 
+  // Load insights search history for the current user
+  const loadInsightsSearchHistory = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      const history = await getInsightsSearchHistory(user.id);
+      setInsightsSearchHistory(history);
+    } catch (error) {
+      console.error('Error loading insights search history:', error);
+    }
+  }, [user]);
+
+  // Save search to insights history
+  const saveSearchToHistory = useCallback(async (
+    searchTerm: string,
+    selectedLocation?: SearchResult,
+    sa2Data?: SA2Data,
+    resultsCount?: number
+  ) => {
+    if (!user || !searchTerm.trim()) return;
+
+    try {
+      await saveInsightsSearchToHistory(
+        user.id,
+        searchTerm,
+        selectedLocation?.name,
+        selectedLocation?.type,
+        selectedLocation?.code,
+        sa2Data?.sa2Id,
+        sa2Data?.sa2Name,
+        resultsCount,
+        {
+          selectedLocation: selectedLocation ? {
+            center: selectedLocation.center,
+            population: selectedLocation.population,
+            medianAge: selectedLocation.medianAge,
+            medianIncome: selectedLocation.medianIncome
+          } : undefined
+        }
+      );
+      
+      // Refresh search history
+      await loadInsightsSearchHistory();
+    } catch (error) {
+      console.error('Error saving search to history:', error);
+    }
+  }, [user, loadInsightsSearchHistory]);
+
+  // Handle search history selection
+  const handleSearchHistorySelect = useCallback((historyItem: InsightsSearchHistoryItem) => {
+    // Re-run the search
+    setSearchQuery(historyItem.search_term);
+    performSimpleSearch(historyItem.search_term);
+    
+    // If there was an SA2 selected, try to restore it
+    if (historyItem.sa2_id && allSA2Data[historyItem.sa2_id]) {
+      const sa2Data = allSA2Data[historyItem.sa2_id];
+      setSelectedSA2(sa2Data);
+      
+      // Create a location object for consistency
+      const location: SearchResult = {
+        id: `sa2-${historyItem.sa2_id}`,
+        name: historyItem.sa2_name || sa2Data.sa2Name,
+        area: `${sa2Data.sa2Name} (SA2)`,
+        code: historyItem.sa2_id,
+        type: 'sa2',
+        score: 100,
+        analyticsData: sa2Data,
+        population: sa2Data['Demographics | Estimated resident population (no.)'] || 0,
+        medianAge: sa2Data['Demographics | Median age - persons (years)'] || 0,
+        medianIncome: sa2Data['Economics | Median employee income ($)'] || 0
+      };
+      setSelectedLocation(location);
+    }
+  }, [allSA2Data, performSimpleSearch]);
+
+  // Delete search history item
+  const handleDeleteSearchHistoryItem = useCallback(async (itemId: number) => {
+    if (!user) return;
+    
+    try {
+      const success = await deleteInsightsSearchHistoryItem(user.id, itemId);
+      if (success) {
+        await loadInsightsSearchHistory();
+      }
+    } catch (error) {
+      console.error('Error deleting search history item:', error);
+    }
+  }, [user, loadInsightsSearchHistory]);
+
+  // Clear all search history
+  const handleClearSearchHistory = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      const success = await clearInsightsSearchHistory(user.id);
+      if (success) {
+        await loadInsightsSearchHistory();
+      }
+    } catch (error) {
+      console.error('Error clearing search history:', error);
+    }
+  }, [user, loadInsightsSearchHistory]);
+
   // Check if current SA2 is saved
   const isCurrentSA2Saved = useCallback(async () => {
     if (!user || !selectedSA2) return false;
@@ -1172,6 +1304,13 @@ export default function SA2AnalyticsPage() {
       loadSavedSA2Searches();
     }
   }, [user, currentUserLoading, loadSavedSA2Searches]);
+
+  // Load insights search history when user is available
+  useEffect(() => {
+    if (user && !currentUserLoading) {
+      loadInsightsSearchHistory();
+    }
+  }, [user, currentUserLoading, loadInsightsSearchHistory]);
 
   // Check if current SA2 is saved when SA2 changes
   useEffect(() => {
@@ -1247,798 +1386,863 @@ export default function SA2AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <BarChart3 className="w-8 h-8 text-blue-600" />
-              <h1 className="text-3xl font-bold text-gray-900">SA2 Analytics Platform</h1>
-            </div>
-            
-            {/* Back to Main Menu and Toggle buttons */}
-            <div className="flex items-center gap-2">
-              {/* Back to Main Menu Button */}
+      {/* Fixed History Panel with Hide/Show functionality */}
+      {isHistoryPanelVisible ? (
+        <div className="fixed left-0 top-0 w-80 h-screen bg-white border-r border-gray-200 z-30 transition-all duration-300 flex flex-col">
+          {/* Panel Header */}
+          <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-white">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">Search History</h3>
               <button
-                onClick={() => router.push('/main')}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
-                title="Back to Main Menu"
+                onClick={() => setIsHistoryPanelVisible(false)}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                title="Hide History Panel"
               >
-                <ArrowLeft className="w-4 h-4" />
-                Main Menu
-              </button>
-              
-              {/* Toggle between Search and Saved */}
-              <button
-                onClick={() => {
-                  setShowSavedSearches(false);
-                  // Navigate back to landing page - clear selected SA2 and location
-                  setSelectedSA2(null);
-                  setSelectedLocation(null);
-                  setSearchQuery('');
-                  setSearchResults([]);
-                }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                  !showSavedSearches
-                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                <Search className="w-4 h-4" />
-                Search SA2 Regions
-              </button>
-              <button
-                onClick={() => setShowSavedSearches(true)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                  showSavedSearches
-                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                <History className="w-4 h-4" />
-                Saved Searches ({savedSA2Searches.length})
+                <X className="w-4 h-4 text-gray-500" />
               </button>
             </div>
           </div>
           
-          {!showSavedSearches && (
-            <p className="text-gray-600">
-              Comprehensive analysis of Statistical Area Level 2 regions across Australia
-            </p>
-          )}
-          
-          {showSavedSearches && (
-            <p className="text-sm text-gray-600">
-              {savedSA2Searches.length === 0 
-                ? 'No saved SA2 searches yet. Search and save SA2 regions to view them here.'
-                : `Viewing ${savedSA2Searches.length} saved SA2 searches`
-              }
-            </p>
-          )}
+          {/* Scrollable Panel Content */}
+          <div className="flex-1 overflow-y-auto">
+            <InsightsHistoryPanel
+              searchHistory={insightsSearchHistory}
+              isOpen={true}
+              onClose={() => {}}
+              onHide={() => setIsHistoryPanelVisible(false)}
+              onSearchSelect={handleSearchHistorySelect}
+              onClearSearchHistory={handleClearSearchHistory}
+              onDeleteSearchItem={handleDeleteSearchHistoryItem}
+              currentUser={user}
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        /* Fixed History Tab when hidden */
+        <div className="fixed left-0 top-0 w-12 h-screen z-30 transition-all duration-300 bg-white border-r border-gray-200">
+          <div className="h-full flex flex-col items-center justify-start pt-6">
+            <button
+              onClick={() => setIsHistoryPanelVisible(true)}
+              className="group p-2 hover:bg-gray-100 transition-colors duration-200 rounded"
+              title="Show History Panel"
+            >
+              <History className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors duration-200" />
+            </button>
+          </div>
+        </div>
+      )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Data Loading Status */}
-        {dataLoadingStatus.isLoading && (
-          <Card className="mb-6 border-blue-200 bg-blue-50">
-            <CardContent className="p-4">
-              <div className="flex items-center">
-                <Loader2 className="h-5 w-5 animate-spin mr-3 text-blue-600" />
-                <span className="text-blue-800 font-medium">{dataLoadingStatus.loadingStep}</span>
+      {/* Main Content Area with proper left margin */}
+      <div className={`min-h-screen transition-all duration-300 ${
+        isHistoryPanelVisible ? 'ml-80' : 'ml-12'
+      }`}>
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <BarChart3 className="w-8 h-8 text-blue-600" />
+                <h1 className="text-3xl font-bold text-gray-900">SA2 Analytics Platform</h1>
               </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {dataLoadingStatus.hasError && (
-          <Card className="mb-6 border-red-200 bg-red-50">
-            <CardContent className="p-4">
-              <div className="flex items-center">
-                <AlertTriangle className="h-5 w-5 mr-3 text-red-600" />
-                <span className="text-red-800 font-medium">
-                  Error: {dataLoadingStatus.errorMessage}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {!dataLoadingStatus.isLoading && !dataLoadingStatus.hasError && (
-          <Card className="mb-6 border-green-200 bg-green-50">
-            <CardContent className="p-4">
-              <div className="flex items-center">
-                <CheckCircle className="h-5 w-5 mr-3 text-green-600" />
-                <span className="text-green-800 font-medium">
-                  SA2 Analytics Platform Ready • {Object.keys(allSA2Data).length} regions • {availableMetrics.length} metrics • Enhanced statistics calculated
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Save Message */}
-        {saveMessage && (
-          <Card className={`mb-6 ${saveMessage.type === 'success' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
-            <CardContent className="p-4">
-              <div className="flex items-center">
-                {saveMessage.type === 'success' ? (
-                  <CheckCircle className="h-5 w-5 mr-3 text-green-600" />
-                ) : (
-                  <AlertTriangle className="h-5 w-5 mr-3 text-red-600" />
-                )}
-                <span className={`font-medium ${saveMessage.type === 'success' ? 'text-green-800' : 'text-red-800'}`}>
-                  {saveMessage.text}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {!showSavedSearches && (
-          <>
-            {/* Search Interface */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Search className="h-5 w-5 mr-2" />
+              
+              {/* Back to Main Menu and Toggle buttons */}
+              <div className="flex items-center gap-2">
+                {/* Back to Main Menu Button */}
+                <button
+                  onClick={() => router.push('/main')}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+                  title="Back to Main Menu"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Main Menu
+                </button>
+                
+                {/* Toggle between Search and Saved */}
+                <button
+                  onClick={() => {
+                    setShowSavedSearches(false);
+                    // Navigate back to landing page - clear selected SA2 and location
+                    setSelectedSA2(null);
+                    setSelectedLocation(null);
+                    setSearchQuery('');
+                    setSearchResults([]);
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                    !showSavedSearches
+                      ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <Search className="w-4 h-4" />
                   Search SA2 Regions
-                </CardTitle>
-                <CardDescription>
-                  Search by SA2 name, postcode, or locality. Results prioritized by population size.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Save Current SA2 Button */}
-                  {selectedSA2 && user && (
-                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-md">
-                      <div className="flex items-center">
-                        <MapPin className="h-4 w-4 mr-2 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-900">
-                          Currently viewing: {selectedSA2.sa2Name}
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => toggleSA2SaveHandler(selectedSA2)}
-                        className={`flex items-center px-3 py-1 text-sm rounded-md transition-colors ${
-                          currentSA2SavedStatus
-                            ? 'bg-green-600 text-white hover:bg-green-700'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                        }`}
-                      >
-                        {currentSA2SavedStatus ? (
-                          <>
-                            <BookmarkCheck className="h-4 w-4 mr-1" />
-                            Saved
-                          </>
-                        ) : (
-                          <>
-                            <Bookmark className="h-4 w-4 mr-1" />
-                            Save SA2
-                          </>
-                        )}
-                      </button>
-                    </div>
+                </button>
+                <button
+                  onClick={() => setShowSavedSearches(true)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                    showSavedSearches
+                      ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <History className="w-4 h-4" />
+                  Saved Searches ({savedSA2Searches.length})
+                </button>
+                
+                {/* Search History Panel Toggle */}
+                <button
+                  onClick={() => setIsHistoryPanelVisible(!isHistoryPanelVisible)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                    isHistoryPanelVisible
+                      ? 'bg-green-100 text-green-700 border border-green-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                  title="Toggle Search History Panel"
+                >
+                  <History className="w-4 h-4" />
+                  Recent ({insightsSearchHistory.length})
+                </button>
+              </div>
+            </div>
+            
+            {!showSavedSearches && (
+              <p className="text-gray-600">
+                Comprehensive analysis of Statistical Area Level 2 regions across Australia
+              </p>
+            )}
+            
+            {showSavedSearches && (
+              <p className="text-sm text-gray-600">
+                {savedSA2Searches.length === 0 
+                  ? 'No saved SA2 searches yet. Search and save SA2 regions to view them here.'
+                  : `Viewing ${savedSA2Searches.length} saved SA2 searches`
+                }
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Data Loading Status */}
+          {dataLoadingStatus.isLoading && (
+            <Card className="mb-6 border-blue-200 bg-blue-50">
+              <CardContent className="p-4">
+                <div className="flex items-center">
+                  <Loader2 className="h-5 w-5 animate-spin mr-3 text-blue-600" />
+                  <span className="text-blue-800 font-medium">{dataLoadingStatus.loadingStep}</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {dataLoadingStatus.hasError && (
+            <Card className="mb-6 border-red-200 bg-red-50">
+              <CardContent className="p-4">
+                <div className="flex items-center">
+                  <AlertTriangle className="h-5 w-5 mr-3 text-red-600" />
+                  <span className="text-red-800 font-medium">
+                    Error: {dataLoadingStatus.errorMessage}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {!dataLoadingStatus.isLoading && !dataLoadingStatus.hasError && (
+            <Card className="mb-6 border-green-200 bg-green-50">
+              <CardContent className="p-4">
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 mr-3 text-green-600" />
+                  <span className="text-green-800 font-medium">
+                    SA2 Analytics Platform Ready • {Object.keys(allSA2Data).length} regions • {availableMetrics.length} metrics • Enhanced statistics calculated
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Save Message */}
+          {saveMessage && (
+            <Card className={`mb-6 ${saveMessage.type === 'success' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
+              <CardContent className="p-4">
+                <div className="flex items-center">
+                  {saveMessage.type === 'success' ? (
+                    <CheckCircle className="h-5 w-5 mr-3 text-green-600" />
+                  ) : (
+                    <AlertTriangle className="h-5 w-5 mr-3 text-red-600" />
                   )}
-                  
-                  <div className="relative" ref={searchContainerRef}>
-                    <input
-                      type="text"
-                      placeholder="Search regions (SA2/SA3/SA4/LGA), postcodes, localities, or facilities..."
-                      value={searchQuery}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                      onClick={() => {
-                        // Show existing results when clicking on search bar
-                        if (searchQuery.trim()) {
-                          performSimpleSearch(searchQuery);
-                        }
-                      }}
-                      className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    {isSearching && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  <span className={`font-medium ${saveMessage.type === 'success' ? 'text-green-800' : 'text-red-800'}`}>
+                    {saveMessage.text}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {!showSavedSearches && (
+            <>
+              {/* Search Interface */}
+              <Card className="mb-8">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Search className="h-5 w-5 mr-2" />
+                    Search SA2 Regions
+                  </CardTitle>
+                  <CardDescription>
+                    Search by SA2 name, postcode, or locality. Results prioritized by population size.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Save Current SA2 Button */}
+                    {selectedSA2 && user && (
+                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-md">
+                        <div className="flex items-center">
+                          <MapPin className="h-4 w-4 mr-2 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-900">
+                            Currently viewing: {selectedSA2.sa2Name}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => toggleSA2SaveHandler(selectedSA2)}
+                          className={`flex items-center px-3 py-1 text-sm rounded-md transition-colors ${
+                            currentSA2SavedStatus
+                              ? 'bg-green-600 text-white hover:bg-green-700'
+                              : 'bg-blue-600 text-white hover:bg-blue-700'
+                          }`}
+                        >
+                          {currentSA2SavedStatus ? (
+                            <>
+                              <BookmarkCheck className="h-4 w-4 mr-1" />
+                              Saved
+                            </>
+                          ) : (
+                            <>
+                              <Bookmark className="h-4 w-4 mr-1" />
+                              Save SA2
+                            </>
+                          )}
+                        </button>
                       </div>
                     )}
-                  
-                  {/* Search Results Dropdown */}
-                  {searchResults.length > 0 && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-80 overflow-y-auto">
-                      {searchResults.map((result, index) => {
-                        // Get type-specific icon and info
-                        const getTypeInfo = (type: string) => {
-                          switch (type) {
-                            case 'sa2': return { icon: '📍', label: 'SA2' };
-                            case 'sa3': return { icon: '🗺️', label: 'SA3' };
-                            case 'sa4': return { icon: '🌏', label: 'SA4' };
-                            case 'lga': return { icon: '🏛️', label: 'LGA' };
-                            case 'postcode': return { icon: '📮', label: 'Postcode' };
-                            case 'locality': return { icon: '🏘️', label: 'Locality' };
-                            case 'facility': return { icon: '🏥', label: 'Facility' };
-                            default: return { icon: '📍', label: 'Location' };
+                    
+                    <div className="relative" ref={searchContainerRef}>
+                      <input
+                        type="text"
+                        placeholder="Search regions (SA2/SA3/SA4/LGA), postcodes, localities, or facilities..."
+                        value={searchQuery}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                        onClick={() => {
+                          // Show existing results when clicking on search bar
+                          if (searchQuery.trim()) {
+                            performSimpleSearch(searchQuery);
                           }
-                        };
-                        
-                        const typeInfo = getTypeInfo(result.type);
-                        const isPostcodeMatch = /^\d{4}$/.test(searchQuery.trim()) && result.type === 'postcode';
-                        const isProximitySuggestion = result.isProximitySuggestion;
-                        
-                        return (
-                          <button
-                            key={`${result.id}-${index}`}
-                            onClick={() => handleLocationSelect(result)}
-                            className={`w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 focus:bg-gray-50 focus:outline-none ${
-                              isProximitySuggestion ? 'bg-blue-50 border-l-4 border-l-blue-400' : ''
-                            }`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center">
-                                  <span className="text-lg mr-2">{typeInfo.icon}</span>
-                                  <div>
-                                    <p className="font-medium text-gray-900 truncate">{result.name}</p>
-                                    <div className="flex items-center space-x-3 text-sm text-gray-500">
-                                      <span>{typeInfo.label} {result.code || result.id}</span>
-                                      {result.area && <span>• {result.area}</span>}
-                                      {result.state && <span>• {result.state}</span>}
-                                      {isPostcodeMatch && (
-                                        <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium">
-                                          Postcode Match
-                                        </span>
-                                      )}
-                                      {result.type === 'sa2' && result.analyticsData && (
-                                        <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-medium">
-                                          Analytics Available
-                                        </span>
-                                      )}
-                                      {result.type !== 'sa2' && !isProximitySuggestion && (
-                                        <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-medium">
-                                          No Direct Analytics
-                                        </span>
-                                      )}
-                                      {isProximitySuggestion && (
-                                        <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium">
-                                          Near {result.proximityTo}
-                                        </span>
-                                      )}
+                        }}
+                        className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      {isSearching && (
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                        </div>
+                      )}
+                    
+                    {/* Search Results Dropdown */}
+                    {searchResults.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-80 overflow-y-auto">
+                        {searchResults.map((result, index) => {
+                          // Get type-specific icon and info
+                          const getTypeInfo = (type: string) => {
+                            switch (type) {
+                              case 'sa2': return { icon: '📍', label: 'SA2' };
+                              case 'sa3': return { icon: '🗺️', label: 'SA3' };
+                              case 'sa4': return { icon: '🌏', label: 'SA4' };
+                              case 'lga': return { icon: '🏛️', label: 'LGA' };
+                              case 'postcode': return { icon: '📮', label: 'Postcode' };
+                              case 'locality': return { icon: '🏘️', label: 'Locality' };
+                              case 'facility': return { icon: '🏥', label: 'Facility' };
+                              default: return { icon: '📍', label: 'Location' };
+                            }
+                          };
+                          
+                          const typeInfo = getTypeInfo(result.type);
+                          const isPostcodeMatch = /^\d{4}$/.test(searchQuery.trim()) && result.type === 'postcode';
+                          const isProximitySuggestion = result.isProximitySuggestion;
+                          
+                          return (
+                            <button
+                              key={`${result.id}-${index}`}
+                              onClick={() => handleLocationSelect(result)}
+                              className={`w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 focus:bg-gray-50 focus:outline-none ${
+                                isProximitySuggestion ? 'bg-blue-50 border-l-4 border-l-blue-400' : ''
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center">
+                                    <span className="text-lg mr-2">{typeInfo.icon}</span>
+                                    <div>
+                                      <p className="font-medium text-gray-900 truncate">{result.name}</p>
+                                      <div className="flex items-center space-x-3 text-sm text-gray-500">
+                                        <span>{typeInfo.label} {result.code || result.id}</span>
+                                        {result.area && <span>• {result.area}</span>}
+                                        {result.state && <span>• {result.state}</span>}
+                                        {isPostcodeMatch && (
+                                          <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                                            Postcode Match
+                                          </span>
+                                        )}
+                                        {result.type === 'sa2' && result.analyticsData && (
+                                          <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                                            Analytics Available
+                                          </span>
+                                        )}
+                                        {result.type !== 'sa2' && !isProximitySuggestion && (
+                                          <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                                            No Direct Analytics
+                                          </span>
+                                        )}
+                                        {isProximitySuggestion && (
+                                          <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                                            Near {result.proximityTo}
+                                          </span>
+                                        )}
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div className="text-right flex-shrink-0 ml-4">
-                                {result.population && (
-                                  <p className="text-sm font-medium text-gray-700">
-                                    Pop: {result.population.toLocaleString()}
-                                  </p>
-                                )}
-                                <div className="text-xs text-gray-500 space-y-0.5">
-                                  {result.medianAge && result.medianAge > 0 && <div>Age: {result.medianAge.toFixed(1)}</div>}
-                                  {result.medianIncome && result.medianIncome > 0 && <div>Income: ${(result.medianIncome/1000).toFixed(0)}k</div>}
-                                  {result.address && <div className="truncate max-w-32">{result.address}</div>}
-                                  {isProximitySuggestion && result.proximityDistance && (
-                                    <div className="text-blue-600 font-medium">
-                                      ~{result.proximityDistance.toFixed(1)} km away
-                                    </div>
+                                <div className="text-right flex-shrink-0 ml-4">
+                                  {result.population && (
+                                    <p className="text-sm font-medium text-gray-700">
+                                      Pop: {result.population.toLocaleString()}
+                                    </p>
                                   )}
+                                  <div className="text-xs text-gray-500 space-y-0.5">
+                                    {result.medianAge && result.medianAge > 0 && <div>Age: {result.medianAge.toFixed(1)}</div>}
+                                    {result.medianIncome && result.medianIncome > 0 && <div>Income: ${(result.medianIncome/1000).toFixed(0)}k</div>}
+                                    {result.address && <div className="truncate max-w-32">{result.address}</div>}
+                                    {isProximitySuggestion && result.proximityDistance && (
+                                      <div className="text-blue-600 font-medium">
+                                        ~{result.proximityDistance.toFixed(1)} km away
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </>
-        )}
-
-        {showSavedSearches && (
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <History className="h-4 w-4 mr-2" />
-                  Saved Searches ({savedSA2Searches.length})
-                </div>
-                {savedSA2Searches.length > 0 && (
-                  <button
-                    onClick={handleClearAllSavedSearches}
-                    className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
-                    title="Clear all saved searches"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    Clear All
-                  </button>
-                )}
-              </CardTitle>
-              <CardDescription>
-                Search and save SA2 regions to access them quickly
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {savedSA2Searches.length === 0 ? (
-                <div className="text-center py-12">
-                  <Bookmark className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Saved SA2 Searches</h3>
-                  <p className="text-gray-600 mb-4">
-                    Search for SA2 regions and save them to access quickly later.
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Switch to "Search SA2 Regions" to start exploring regions
-                  </p>
-                </div>
-              ) : (
-                <div className="max-h-80 overflow-y-auto">
-                  {savedSA2Searches.map((savedSearch) => (
-                    <div key={savedSearch.id} className="p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
-                      <div className="flex items-center justify-between">
-                        <button
-                          onClick={() => loadSavedSA2Search(savedSearch)}
-                          className="flex-1 text-left"
-                        >
-                          <p className="font-medium text-gray-900 truncate">{savedSearch.sa2_name}</p>
-                          <p className="text-sm text-gray-500">SA2 {savedSearch.sa2_id}</p>
-                          <p className="text-xs text-gray-400">
-                            Saved {new Date(savedSearch.created_at).toLocaleDateString()}
-                          </p>
-                        </button>
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => navigateToResidentialForSA2(savedSearch)}
-                            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                            title="View residential aged care facilities in this SA2 region"
-                          >
-                            <Building className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => deleteSavedSA2SearchHandler(savedSearch.id)}
-                            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                            title="Delete saved search"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
+                            </button>
+                          );
+                        })}
                       </div>
+                    )}
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Selected Location Information */}
-        {selectedLocation && !selectedSA2 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <MapPin className="h-5 w-5 mr-2 text-blue-600" />
-                {selectedLocation.name}
-              </CardTitle>
-              <CardDescription>
-                {selectedLocation.type.toUpperCase()} {selectedLocation.code || selectedLocation.id} 
-                {selectedLocation.area && ` • ${selectedLocation.area}`}
-                {selectedLocation.state && ` • ${selectedLocation.state}`}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex items-center">
-                  <AlertTriangle className="h-5 w-5 text-yellow-600 mr-2" />
-                  <div>
-                    <p className="text-sm font-medium text-yellow-800">
-                      Analytics Not Available
-                    </p>
-                    <p className="text-sm text-yellow-700 mt-1">
-                      Detailed analytics are only available for SA2 regions. 
-                      {selectedLocation.type !== 'sa2' && ' Try searching for an SA2 region within this area.'}
-                    </p>
                   </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                </CardContent>
+              </Card>
+            </>
+          )}
 
-        {/* Selected SA2 Analysis */}
-        {selectedSA2 && (
-          <div className="space-y-6">
-            {/* SA2 Overview Card */}
-            <Card>
+          {showSavedSearches && (
+            <Card className="mb-8">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <MapPin className="h-5 w-5 mr-2 text-blue-600" />
-                    {selectedSA2.sa2Name}
+                    <History className="h-4 w-4 mr-2" />
+                    Saved Searches ({savedSA2Searches.length})
                   </div>
-                  <div className="flex items-center gap-2">
+                  {savedSA2Searches.length > 0 && (
                     <button
-                      onClick={() => toggleSA2SaveHandler(selectedSA2)}
-                      disabled={!user}
-                      className={`rounded-lg p-1.5 transition-colors ${
-                        currentSA2SavedStatus
-                          ? 'text-green-600 hover:text-green-800 hover:bg-green-50'
-                          : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
-                      } disabled:opacity-50 disabled:cursor-not-allowed`}
-                      title={
-                        !user 
-                          ? 'Sign in to save SA2 regions' 
-                          : currentSA2SavedStatus 
-                            ? 'Remove from saved searches' 
-                            : 'Save this SA2 region to your searches'
-                      }
+                      onClick={handleClearAllSavedSearches}
+                      className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
+                      title="Clear all saved searches"
                     >
-                      {currentSA2SavedStatus ? (
-                        <BookmarkCheck className="h-4 w-4" />
-                      ) : (
-                        <Bookmark className="h-4 w-4" />
-                      )}
+                      <Trash2 className="w-3 h-3" />
+                      Clear All
                     </button>
-                    <button
-                      onClick={() => {
-                        router.push(`/residential?sa2=${encodeURIComponent(selectedSA2.sa2Name)}`);
-                      }}
-                      className="text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg p-1.5 transition-colors"
-                      title="View residential aged care facilities in this SA2 region"
-                    >
-                      <Building className="h-4 w-4" />
-                    </button>
-                  </div>
+                  )}
                 </CardTitle>
                 <CardDescription>
-                  SA2 ID: {selectedSA2.sa2Id} • Comprehensive regional analysis with enhanced statistics
+                  Search and save SA2 regions to access them quickly
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <Users className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-                    <p className="text-2xl font-bold text-blue-800">
-                      {(selectedSA2['Demographics | Persons - 65 years and over (no.)'] || 0).toLocaleString()}
+                {savedSA2Searches.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Bookmark className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Saved SA2 Searches</h3>
+                    <p className="text-gray-600 mb-4">
+                      Search for SA2 regions and save them to access quickly later.
                     </p>
-                    <p className="text-sm text-blue-600">Persons 65+ Years</p>
+                    <p className="text-sm text-gray-500">
+                      Switch to "Search SA2 Regions" to start exploring regions
+                    </p>
                   </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <Heart className="h-8 w-8 mx-auto mb-2 text-green-600" />
-                    <p className="text-2xl font-bold text-green-800">
-                      {(selectedSA2['Number of Participants | Home Care'] || 0).toLocaleString()}
-                    </p>
-                    <p className="text-sm text-green-600">Home Care</p>
+                ) : (
+                  <div className="max-h-80 overflow-y-auto">
+                    {savedSA2Searches.map((savedSearch) => (
+                      <div key={savedSearch.id} className="p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
+                        <div className="flex items-center justify-between">
+                          <button
+                            onClick={() => loadSavedSA2Search(savedSearch)}
+                            className="flex-1 text-left"
+                          >
+                            <p className="font-medium text-gray-900 truncate">{savedSearch.sa2_name}</p>
+                            <p className="text-sm text-gray-500">SA2 {savedSearch.sa2_id}</p>
+                            <p className="text-xs text-gray-400">
+                              Saved {new Date(savedSearch.created_at).toLocaleDateString()}
+                            </p>
+                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => navigateToResidentialForSA2(savedSearch)}
+                              className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                              title="View residential aged care facilities in this SA2 region"
+                            >
+                              <Building className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => deleteSavedSA2SearchHandler(savedSearch.id)}
+                              className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                              title="Delete saved search"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <Heart className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-                    <p className="text-2xl font-bold text-purple-800">
-                      {(selectedSA2['Number of Participants | Residential Care'] || 0).toLocaleString()}
-                    </p>
-                    <p className="text-sm text-purple-600">Residential Care</p>
-                  </div>
-                  <div className="text-center p-4 bg-orange-50 rounded-lg">
-                    <Heart className="h-8 w-8 mx-auto mb-2 text-orange-600" />
-                    <p className="text-2xl font-bold text-orange-800">
-                      {(selectedSA2['Number of Participants | Commonwealth Home Support Program'] || 0).toLocaleString()}
-                    </p>
-                    <p className="text-sm text-orange-600">CHSP Participants</p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Selected Location Information */}
+          {selectedLocation && !selectedSA2 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <MapPin className="h-5 w-5 mr-2 text-blue-600" />
+                  {selectedLocation.name}
+                </CardTitle>
+                <CardDescription>
+                  {selectedLocation.type.toUpperCase()} {selectedLocation.code || selectedLocation.id} 
+                  {selectedLocation.area && ` • ${selectedLocation.area}`}
+                  {selectedLocation.state && ` • ${selectedLocation.state}`}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="flex items-center">
+                    <AlertTriangle className="h-5 w-5 text-yellow-600 mr-2" />
+                    <div>
+                      <p className="text-sm font-medium text-yellow-800">
+                        Analytics Not Available
+                      </p>
+                      <p className="text-sm text-yellow-700 mt-1">
+                        Detailed analytics are only available for SA2 regions. 
+                        {selectedLocation.type !== 'sa2' && ' Try searching for an SA2 region within this area.'}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
+          )}
 
-            {/* Comparison Level Selector */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
-                    Comparison Level
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {[
-                      { key: 'national', label: 'National', icon: Globe, desc: 'vs All Australia' },
-                      { key: 'state', label: 'State', icon: Building, desc: `vs ${selectedSA2.STATE_NAME_2021}` },
-                      { key: 'sa4', label: 'SA4', icon: MapPin, desc: 'Regional Level' },
-                      { key: 'sa3', label: 'SA3', icon: Home, desc: 'Local Level' }
-                    ].map(({ key, label, icon: Icon, desc }) => (
+          {/* Selected SA2 Analysis */}
+          {selectedSA2 && (
+            <div className="space-y-6">
+              {/* SA2 Overview Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <MapPin className="h-5 w-5 mr-2 text-blue-600" />
+                      {selectedSA2.sa2Name}
+                    </div>
+                    <div className="flex items-center gap-2">
                       <button
-                        key={key}
-                        onClick={() => setComparisonLevel(key as any)}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                          comparisonLevel === key
-                            ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
-                        title={desc}
+                        onClick={() => toggleSA2SaveHandler(selectedSA2)}
+                        disabled={!user}
+                        className={`rounded-lg p-1.5 transition-colors ${
+                          currentSA2SavedStatus
+                            ? 'text-green-600 hover:text-green-800 hover:bg-green-50'
+                            : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        title={
+                          !user 
+                            ? 'Sign in to save SA2 regions' 
+                            : currentSA2SavedStatus 
+                              ? 'Remove from saved searches' 
+                              : 'Save this SA2 region to your searches'
+                        }
                       >
-                        <Icon className="w-4 h-4" />
-                        {label}
+                        {currentSA2SavedStatus ? (
+                          <BookmarkCheck className="h-4 w-4" />
+                        ) : (
+                          <Bookmark className="h-4 w-4" />
+                        )}
                       </button>
-                    ))}
+                      <button
+                        onClick={() => {
+                          router.push(`/residential?sa2=${encodeURIComponent(selectedSA2.sa2Name)}`);
+                        }}
+                        className="text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg p-1.5 transition-colors"
+                        title="View residential aged care facilities in this SA2 region"
+                      >
+                        <Building className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </CardTitle>
+                  <CardDescription>
+                    SA2 ID: {selectedSA2.sa2Id} • Comprehensive regional analysis with enhanced statistics
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="text-center p-4 bg-blue-50 rounded-lg">
+                      <Users className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+                      <p className="text-2xl font-bold text-blue-800">
+                        {(selectedSA2['Demographics | Persons - 65 years and over (no.)'] || 0).toLocaleString()}
+                      </p>
+                      <p className="text-sm text-blue-600">Persons 65+ Years</p>
+                    </div>
+                    <div className="text-center p-4 bg-green-50 rounded-lg">
+                      <Heart className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                      <p className="text-2xl font-bold text-green-800">
+                        {(selectedSA2['Number of Participants | Home Care'] || 0).toLocaleString()}
+                      </p>
+                      <p className="text-sm text-green-600">Home Care</p>
+                    </div>
+                    <div className="text-center p-4 bg-purple-50 rounded-lg">
+                      <Heart className="h-8 w-8 mx-auto mb-2 text-purple-600" />
+                      <p className="text-2xl font-bold text-purple-800">
+                        {(selectedSA2['Number of Participants | Residential Care'] || 0).toLocaleString()}
+                      </p>
+                      <p className="text-sm text-purple-600">Residential Care</p>
+                    </div>
+                    <div className="text-center p-4 bg-orange-50 rounded-lg">
+                      <Heart className="h-8 w-8 mx-auto mb-2 text-orange-600" />
+                      <p className="text-2xl font-bold text-orange-800">
+                        {(selectedSA2['Number of Participants | Commonwealth Home Support Program'] || 0).toLocaleString()}
+                      </p>
+                      <p className="text-sm text-orange-600">CHSP Participants</p>
+                    </div>
                   </div>
-                </CardTitle>
-                <CardDescription>
-                  Choose what level to compare this SA2 against in the box plots below
-                </CardDescription>
-              </CardHeader>
-            </Card>
+                </CardContent>
+              </Card>
 
-            {/* Detailed Analysis Tabs */}
+              {/* Comparison Level Selector */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+                      Comparison Level
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {[
+                        { key: 'national', label: 'National', icon: Globe, desc: 'vs All Australia' },
+                        { key: 'state', label: 'State', icon: Building, desc: `vs ${selectedSA2.STATE_NAME_2021}` },
+                        { key: 'sa4', label: 'SA4', icon: MapPin, desc: 'Regional Level' },
+                        { key: 'sa3', label: 'SA3', icon: Home, desc: 'Local Level' }
+                      ].map(({ key, label, icon: Icon, desc }) => (
+                        <button
+                          key={key}
+                          onClick={() => setComparisonLevel(key as any)}
+                          className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                            comparisonLevel === key
+                              ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                          title={desc}
+                        >
+                          <Icon className="w-4 h-4" />
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </CardTitle>
+                  <CardDescription>
+                    Choose what level to compare this SA2 against in the box plots below
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              {/* Detailed Analysis Tabs */}
+              <Card>
+                <CardContent className="p-6">
+                  <Tabs defaultValue="economics" className="w-full">
+                    <TabsList className="grid w-full grid-cols-4">
+                      <TabsTrigger value="economics" className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-green-600" />
+                        <span>Economics</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="demographics" className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span>Demographics</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="health-sector" className="flex items-center gap-2">
+                        <Heart className="h-4 w-4 text-purple-600" />
+                        <span>Health Sector</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="health-stats" className="flex items-center gap-2">
+                        <Cross className="h-4 w-4 text-red-600" />
+                        <span>Health Stats</span>
+                      </TabsTrigger>
+                    </TabsList>
+                    
+
+                    {/* 🟢 Economics Tab */}
+                    <TabsContent value="economics" className="mt-6">
+                      <div className="space-y-6">
+                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+                          <h3 className="text-xl font-bold text-green-800 flex items-center gap-2 mb-2">
+                            <TrendingUp className="h-6 w-6" />
+                            Economics Metrics
+                          </h3>
+                          <p className="text-green-700">Employment rates, income levels, and economic indicators for regional prosperity assessment.</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          {availableMetrics.filter(metric => [
+                            "Labour force status - Census | % of total Census responding population employed",
+                            "Personal income in Australia - year ended 30 June | Median employee income ($)",
+                            "Residential property transfers - year ended 30 June | Median price of attached dwelling transfers ($)",
+                            "Personal income in Australia - year ended 30 June | Median superannuation and annuity income ($)",
+                            "Rent and mortgage payments - Occupied private dwellings - Census | Median weekly household rental payment ($)",
+                            "Tenure type - Occupied private dwellings - Census | Owned outright (%)",
+                            "Tenure type - Occupied private dwellings - Census | Owned outright (no.)",
+                            "Socio-economic indexes for areas (SEIFA) - rank within Australia - Census | SEIFA Index of relative socio-economic advantage and disadvantage (IRSAD) - rank within Australia (decile)",
+                            "Socio-economic indexes for areas (SEIFA) - rank within Australia - Census | SEIFA Index of relative socio-economic disadvantage (IRSD) - rank within Australia (decile)",
+                            "Labour force status - Persons aged 15 years and over - Census | Unemployment rate (%)"
+                          ].includes(metric)).map(metric => {
+                            const currentValue = selectedSA2[metric];
+                            const stats = sa2Statistics[metric];
+                            
+                            if (typeof currentValue !== 'number' || !stats) return null;
+                            
+                            const hierarchicalStats = getHierarchicalStatsForSA2(selectedSA2, metric);
+                            const sa2Info = getSA2Info(selectedSA2);
+                            
+                            return (
+                              <SA2BoxPlot
+                                key={metric}
+                                metricName={getDisplayName(metric)}
+                                currentValue={currentValue}
+                                statistics={stats}
+                                hierarchicalStats={hierarchicalStats}
+                                comparisonLevel={comparisonLevel}
+                                sa2Info={sa2Info}
+                                width={380}
+                                height={140}
+                                showPerformanceIndicator={true}
+                              />
+                            );
+                          }).filter(Boolean)}
+                        </div>
+                      </div>
+                    </TabsContent>
+                    
+                    {/* 🔵 Demographics Tab */}
+                    <TabsContent value="demographics" className="mt-6">
+                      <div className="space-y-6">
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+                          <h3 className="text-xl font-bold text-blue-800 flex items-center gap-2 mb-2">
+                            <Users className="h-6 w-6" />
+                            Demographics Metrics
+                          </h3>
+                          <p className="text-blue-700">Population statistics, age distribution, and demographic characteristics of the region.</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          {availableMetrics.filter(metric => [
+                            "Demographics | Estimated resident population (no.)",
+                            "Demographics | Median age - persons (years)",
+                            "Demographics | Persons - 55-64 years (%)",
+                            "Demographics | Persons - 55-64 years (no.)",
+                            "Demographics | Persons - 65 years and over (%)",
+                            "Demographics | Persons - 65 years and over (no.)",
+                            "Demographics | Population density (persons/km2)",
+                            "Demographics | Working age population (aged 15-64 years) (%)",
+                            "Demographics | Working age population (aged 15-64 years) (no.)"
+                          ].includes(metric)).map(metric => {
+                            const currentValue = selectedSA2[metric];
+                            const stats = sa2Statistics[metric];
+                            
+                            if (typeof currentValue !== 'number' || !stats) return null;
+                            
+                            const hierarchicalStats = getHierarchicalStatsForSA2(selectedSA2, metric);
+                            const sa2Info = getSA2Info(selectedSA2);
+                            
+                            return (
+                              <SA2BoxPlot
+                                key={metric}
+                                metricName={getDisplayName(metric)}
+                                currentValue={currentValue}
+                                statistics={stats}
+                                hierarchicalStats={hierarchicalStats}
+                                comparisonLevel={comparisonLevel}
+                                sa2Info={sa2Info}
+                                width={380}
+                                height={140}
+                                showPerformanceIndicator={true}
+                              />
+                            );
+                          }).filter(Boolean)}
+                        </div>
+                      </div>
+                    </TabsContent>
+                    
+                    {/* 🟣 Health Sector Tab */}
+                    <TabsContent value="health-sector" className="mt-6">
+                      <div className="space-y-6">
+                        <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg p-4 border border-purple-200">
+                          <h3 className="text-xl font-bold text-purple-800 flex items-center gap-2 mb-2">
+                            <Heart className="h-6 w-6" />
+                            Health Sector Metrics
+                          </h3>
+                          <p className="text-purple-700">Healthcare infrastructure, service availability, and support programs in the region.</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          {availableMetrics.filter(metric => [
+                            "Number of Participants | Commonwealth Home Support Program",
+                            "Number of Providers | Commonwealth Home Support Program",
+                            "Participants per provider | Commonwealth Home Support Program",
+                            "Spending | Commonwealth Home Support Program",
+                            "Spending per participant | Commonwealth Home Support Program",
+                            "Spending per provider | Commonwealth Home Support Program",
+                            "Number of Participants | Home Care",
+                            "Number of Providers | Home Care",
+                            "Participants per provider | Home Care",
+                            "Spending | Home Care",
+                            "Spending per participant | Home Care",
+                            "Spending per provider | Home Care",
+                            "Number of Participants | Residential Care",
+                            "Number of Providers | Residential Care",
+                            "Participants per provider | Residential Care",
+                            "Spending | Residential Care",
+                            "Spending per participant | Residential Care",
+                            "Spending per provider | Residential Care"
+                          ].includes(metric)).map(metric => {
+                            const currentValue = selectedSA2[metric];
+                            const stats = sa2Statistics[metric];
+                            
+                            if (typeof currentValue !== 'number' || !stats) return null;
+                            
+                            const hierarchicalStats = getHierarchicalStatsForSA2(selectedSA2, metric);
+                            const sa2Info = getSA2Info(selectedSA2);
+                            
+                            return (
+                              <SA2BoxPlot
+                                key={metric}
+                                metricName={getDisplayName(metric)}
+                                currentValue={currentValue}
+                                statistics={stats}
+                                hierarchicalStats={hierarchicalStats}
+                                comparisonLevel={comparisonLevel}
+                                sa2Info={sa2Info}
+                                width={380}
+                                height={140}
+                                showPerformanceIndicator={true}
+                              />
+                            );
+                          }).filter(Boolean)}
+                        </div>
+                      </div>
+                    </TabsContent>
+                    
+                    {/* 🔴 Health Stats Tab */}
+                    <TabsContent value="health-stats" className="mt-6">
+                      <div className="space-y-6">
+                        <div className="bg-gradient-to-r from-red-50 to-rose-50 rounded-lg p-4 border border-red-200">
+                          <h3 className="text-xl font-bold text-red-800 flex items-center gap-2 mb-2">
+                            <Cross className="h-6 w-6" />
+                            Health Stats Metrics
+                          </h3>
+                          <p className="text-red-700">Health conditions, assistance needs, and wellness indicators for the region.</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          {availableMetrics.filter(metric => [
+                            "Long-term health conditions - Census | Arthritis (%)",
+                            "Long-term health conditions - Census | Asthma (%)",
+                            "Long-term health conditions - Census | Cancer (including remission) (%)",
+                            "Long-term health conditions - Census | Dementia (including Alzheimer's) (%)",
+                            "Long-term health conditions - Census | Diabetes (excluding gestational diabetes) (%)",
+                            "Long-term health conditions - Census | Heart disease (including heart attack or angina) (%)",
+                            "Long-term health conditions - Census | Kidney disease (%)",
+                            "Household composition - Occupied private dwellings - Census | Lone person households (no.)",
+                            "Long-term health conditions - Census | Lung condition (including COPD or emphysema) (%)",
+                            "Long-term health conditions - Census | Mental health condition (including depression or anxiety) (%)",
+                            "Long-term health conditions - Census | No long-term health condition(s) (%)",
+                            "Long-term health conditions - Census | Other long-term health condition(s) (%)",
+                            "Core activity need for assistance - Census | Persons who have need for assistance with core activities (%)",
+                            "Core activity need for assistance - Census | Persons who have need for assistance with core activities (no.)",
+                            "Unpaid assistance to a person with a disability - Census | Provided unpaid assistance (%)",
+                            "Long-term health conditions - Census | Stroke (%)"
+                          ].includes(metric)).map(metric => {
+                            const currentValue = selectedSA2[metric];
+                            const stats = sa2Statistics[metric];
+                            
+                            if (typeof currentValue !== 'number' || !stats) return null;
+                            
+                            const hierarchicalStats = getHierarchicalStatsForSA2(selectedSA2, metric);
+                            const sa2Info = getSA2Info(selectedSA2);
+                            
+                            return (
+                              <SA2BoxPlot
+                                key={metric}
+                                metricName={getDisplayName(metric)}
+                                currentValue={currentValue}
+                                statistics={stats}
+                                hierarchicalStats={hierarchicalStats}
+                                comparisonLevel={comparisonLevel}
+                                sa2Info={sa2Info}
+                                width={380}
+                                height={140}
+                                showPerformanceIndicator={true}
+                              />
+                            );
+                          }).filter(Boolean)}
+                        </div>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Regional Rankings - Landing Page Feature */}
+          {!selectedSA2 && !dataLoadingStatus.isLoading && Object.keys(allSA2Data).length > 0 && (
+            <InsightsLandingRankings
+              allSA2Data={allSA2Data}
+              availableMetrics={availableMetrics}
+              sa2Statistics={sa2Statistics}
+              isLoading={dataLoadingStatus.isLoading}
+              onSelectSA2={handleSelectSA2}
+            />
+          )}
+
+          {/* Empty State */}
+          {!selectedSA2 && !dataLoadingStatus.isLoading && (
             <Card>
-              <CardContent className="p-6">
-                <Tabs defaultValue="economics" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="economics" className="flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-green-600" />
-                      <span>Economics</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="demographics" className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-blue-600" />
-                      <span>Demographics</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="health-sector" className="flex items-center gap-2">
-                      <Heart className="h-4 w-4 text-purple-600" />
-                      <span>Health Sector</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="health-stats" className="flex items-center gap-2">
-                      <Cross className="h-4 w-4 text-red-600" />
-                      <span>Health Stats</span>
-                    </TabsTrigger>
-                  </TabsList>
-                  
-
-                  {/* 🟢 Economics Tab */}
-                  <TabsContent value="economics" className="mt-6">
-                    <div className="space-y-6">
-                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
-                        <h3 className="text-xl font-bold text-green-800 flex items-center gap-2 mb-2">
-                          <TrendingUp className="h-6 w-6" />
-                          Economics Metrics
-                        </h3>
-                        <p className="text-green-700">Employment rates, income levels, and economic indicators for regional prosperity assessment.</p>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        {availableMetrics.filter(metric => [
-                          "Labour force status - Census | % of total Census responding population employed",
-                          "Personal income in Australia - year ended 30 June | Median employee income ($)",
-                          "Residential property transfers - year ended 30 June | Median price of attached dwelling transfers ($)",
-                          "Personal income in Australia - year ended 30 June | Median superannuation and annuity income ($)",
-                          "Rent and mortgage payments - Occupied private dwellings - Census | Median weekly household rental payment ($)",
-                          "Tenure type - Occupied private dwellings - Census | Owned outright (%)",
-                          "Tenure type - Occupied private dwellings - Census | Owned outright (no.)",
-                          "Socio-economic indexes for areas (SEIFA) - rank within Australia - Census | SEIFA Index of relative socio-economic advantage and disadvantage (IRSAD) - rank within Australia (decile)",
-                          "Socio-economic indexes for areas (SEIFA) - rank within Australia - Census | SEIFA Index of relative socio-economic disadvantage (IRSD) - rank within Australia (decile)",
-                          "Labour force status - Persons aged 15 years and over - Census | Unemployment rate (%)"
-                        ].includes(metric)).map(metric => {
-                          const currentValue = selectedSA2[metric];
-                          const stats = sa2Statistics[metric];
-                          
-                          if (typeof currentValue !== 'number' || !stats) return null;
-                          
-                          const hierarchicalStats = getHierarchicalStatsForSA2(selectedSA2, metric);
-                          const sa2Info = getSA2Info(selectedSA2);
-                          
-                          return (
-                            <SA2BoxPlot
-                              key={metric}
-                              metricName={getDisplayName(metric)}
-                              currentValue={currentValue}
-                              statistics={stats}
-                              hierarchicalStats={hierarchicalStats}
-                              comparisonLevel={comparisonLevel}
-                              sa2Info={sa2Info}
-                              width={380}
-                              height={140}
-                              showPerformanceIndicator={true}
-                            />
-                          );
-                        }).filter(Boolean)}
-                      </div>
-                    </div>
-                  </TabsContent>
-                  
-                  {/* 🔵 Demographics Tab */}
-                  <TabsContent value="demographics" className="mt-6">
-                    <div className="space-y-6">
-                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
-                        <h3 className="text-xl font-bold text-blue-800 flex items-center gap-2 mb-2">
-                          <Users className="h-6 w-6" />
-                          Demographics Metrics
-                        </h3>
-                        <p className="text-blue-700">Population statistics, age distribution, and demographic characteristics of the region.</p>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        {availableMetrics.filter(metric => [
-                          "Demographics | Estimated resident population (no.)",
-                          "Demographics | Median age - persons (years)",
-                          "Demographics | Persons - 55-64 years (%)",
-                          "Demographics | Persons - 55-64 years (no.)",
-                          "Demographics | Persons - 65 years and over (%)",
-                          "Demographics | Persons - 65 years and over (no.)",
-                          "Demographics | Population density (persons/km2)",
-                          "Demographics | Working age population (aged 15-64 years) (%)",
-                          "Demographics | Working age population (aged 15-64 years) (no.)"
-                        ].includes(metric)).map(metric => {
-                          const currentValue = selectedSA2[metric];
-                          const stats = sa2Statistics[metric];
-                          
-                          if (typeof currentValue !== 'number' || !stats) return null;
-                          
-                          const hierarchicalStats = getHierarchicalStatsForSA2(selectedSA2, metric);
-                          const sa2Info = getSA2Info(selectedSA2);
-                          
-                          return (
-                            <SA2BoxPlot
-                              key={metric}
-                              metricName={getDisplayName(metric)}
-                              currentValue={currentValue}
-                              statistics={stats}
-                              hierarchicalStats={hierarchicalStats}
-                              comparisonLevel={comparisonLevel}
-                              sa2Info={sa2Info}
-                              width={380}
-                              height={140}
-                              showPerformanceIndicator={true}
-                            />
-                          );
-                        }).filter(Boolean)}
-                      </div>
-                    </div>
-                  </TabsContent>
-                  
-                  {/* 🟣 Health Sector Tab */}
-                  <TabsContent value="health-sector" className="mt-6">
-                    <div className="space-y-6">
-                      <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg p-4 border border-purple-200">
-                        <h3 className="text-xl font-bold text-purple-800 flex items-center gap-2 mb-2">
-                          <Heart className="h-6 w-6" />
-                          Health Sector Metrics
-                        </h3>
-                        <p className="text-purple-700">Healthcare infrastructure, service availability, and support programs in the region.</p>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        {availableMetrics.filter(metric => [
-                          "Number of Participants | Commonwealth Home Support Program",
-                          "Number of Providers | Commonwealth Home Support Program",
-                          "Participants per provider | Commonwealth Home Support Program",
-                          "Spending | Commonwealth Home Support Program",
-                          "Spending per participant | Commonwealth Home Support Program",
-                          "Spending per provider | Commonwealth Home Support Program",
-                          "Number of Participants | Home Care",
-                          "Number of Providers | Home Care",
-                          "Participants per provider | Home Care",
-                          "Spending | Home Care",
-                          "Spending per participant | Home Care",
-                          "Spending per provider | Home Care",
-                          "Number of Participants | Residential Care",
-                          "Number of Providers | Residential Care",
-                          "Participants per provider | Residential Care",
-                          "Spending | Residential Care",
-                          "Spending per participant | Residential Care",
-                          "Spending per provider | Residential Care"
-                        ].includes(metric)).map(metric => {
-                          const currentValue = selectedSA2[metric];
-                          const stats = sa2Statistics[metric];
-                          
-                          if (typeof currentValue !== 'number' || !stats) return null;
-                          
-                          const hierarchicalStats = getHierarchicalStatsForSA2(selectedSA2, metric);
-                          const sa2Info = getSA2Info(selectedSA2);
-                          
-                          return (
-                            <SA2BoxPlot
-                              key={metric}
-                              metricName={getDisplayName(metric)}
-                              currentValue={currentValue}
-                              statistics={stats}
-                              hierarchicalStats={hierarchicalStats}
-                              comparisonLevel={comparisonLevel}
-                              sa2Info={sa2Info}
-                              width={380}
-                              height={140}
-                              showPerformanceIndicator={true}
-                            />
-                          );
-                        }).filter(Boolean)}
-                      </div>
-                    </div>
-                  </TabsContent>
-                  
-                  {/* 🔴 Health Stats Tab */}
-                  <TabsContent value="health-stats" className="mt-6">
-                    <div className="space-y-6">
-                      <div className="bg-gradient-to-r from-red-50 to-rose-50 rounded-lg p-4 border border-red-200">
-                        <h3 className="text-xl font-bold text-red-800 flex items-center gap-2 mb-2">
-                          <Cross className="h-6 w-6" />
-                          Health Stats Metrics
-                        </h3>
-                        <p className="text-red-700">Health conditions, assistance needs, and wellness indicators for the region.</p>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        {availableMetrics.filter(metric => [
-                          "Long-term health conditions - Census | Arthritis (%)",
-                          "Long-term health conditions - Census | Asthma (%)",
-                          "Long-term health conditions - Census | Cancer (including remission) (%)",
-                          "Long-term health conditions - Census | Dementia (including Alzheimer's) (%)",
-                          "Long-term health conditions - Census | Diabetes (excluding gestational diabetes) (%)",
-                          "Long-term health conditions - Census | Heart disease (including heart attack or angina) (%)",
-                          "Long-term health conditions - Census | Kidney disease (%)",
-                          "Household composition - Occupied private dwellings - Census | Lone person households (no.)",
-                          "Long-term health conditions - Census | Lung condition (including COPD or emphysema) (%)",
-                          "Long-term health conditions - Census | Mental health condition (including depression or anxiety) (%)",
-                          "Long-term health conditions - Census | No long-term health condition(s) (%)",
-                          "Long-term health conditions - Census | Other long-term health condition(s) (%)",
-                          "Core activity need for assistance - Census | Persons who have need for assistance with core activities (%)",
-                          "Core activity need for assistance - Census | Persons who have need for assistance with core activities (no.)",
-                          "Unpaid assistance to a person with a disability - Census | Provided unpaid assistance (%)",
-                          "Long-term health conditions - Census | Stroke (%)"
-                        ].includes(metric)).map(metric => {
-                          const currentValue = selectedSA2[metric];
-                          const stats = sa2Statistics[metric];
-                          
-                          if (typeof currentValue !== 'number' || !stats) return null;
-                          
-                          const hierarchicalStats = getHierarchicalStatsForSA2(selectedSA2, metric);
-                          const sa2Info = getSA2Info(selectedSA2);
-                          
-                          return (
-                            <SA2BoxPlot
-                              key={metric}
-                              metricName={getDisplayName(metric)}
-                              currentValue={currentValue}
-                              statistics={stats}
-                              hierarchicalStats={hierarchicalStats}
-                              comparisonLevel={comparisonLevel}
-                              sa2Info={sa2Info}
-                              width={380}
-                              height={140}
-                              showPerformanceIndicator={true}
-                            />
-                          );
-                        }).filter(Boolean)}
-                      </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
+              <CardContent className="py-12">
+                <div className="text-center">
+                  <Search className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                  <h3 className="text-xl font-semibold mb-2">Select an SA2 Region</h3>
+                  <p className="text-gray-600 mb-4">
+                    Use the search bar above to find and analyze any SA2 region across Australia
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {Object.keys(allSA2Data).length} regions available • {availableMetrics.length} metrics • Enhanced statistics ready
+                  </p>
+                </div>
               </CardContent>
             </Card>
-          </div>
-        )}
-
-        {/* Regional Rankings - Landing Page Feature */}
-        {!selectedSA2 && !dataLoadingStatus.isLoading && Object.keys(allSA2Data).length > 0 && (
-          <InsightsLandingRankings
-            allSA2Data={allSA2Data}
-            availableMetrics={availableMetrics}
-            sa2Statistics={sa2Statistics}
-            isLoading={dataLoadingStatus.isLoading}
-            onSelectSA2={handleSelectSA2}
-          />
-        )}
-
-        {/* Empty State */}
-        {!selectedSA2 && !dataLoadingStatus.isLoading && (
-          <Card>
-            <CardContent className="py-12">
-              <div className="text-center">
-                <Search className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-xl font-semibold mb-2">Select an SA2 Region</h3>
-                <p className="text-gray-600 mb-4">
-                  Use the search bar above to find and analyze any SA2 region across Australia
-                </p>
-                <p className="text-sm text-gray-500">
-                  {Object.keys(allSA2Data).length} regions available • {availableMetrics.length} metrics • Enhanced statistics ready
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
