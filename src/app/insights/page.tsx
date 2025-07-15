@@ -1145,6 +1145,14 @@ export default function SA2AnalyticsPage() {
     setSearchResults([]);
     setSelectedLocation(null);
     setShowSavedSearches(false);
+    
+    // Log saved search click to search history
+    saveSearchToHistory(
+      savedSearch.sa2_name,    // Search term
+      undefined,              // No location search
+      savedSearch.sa2_data,   // SA2 data selected
+      1                       // Results count
+    );
   };
 
   // Navigate to residential page with SA2 filter
