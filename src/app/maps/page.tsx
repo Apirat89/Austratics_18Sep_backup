@@ -12,6 +12,7 @@ import ActiveLayers from '../../components/ActiveLayers';
 import SavedSearches, { SavedSearchesRef } from '../../components/SavedSearches';
 import TopBottomPanel from '../../components/TopBottomPanel';
 import FacilityDetailsModal from '../../components/FacilityDetailsModal';
+import FacilityTable from '../../components/FacilityTable';
 import { RankedSA2Data } from '../../components/HeatmapDataService';
 import { getLocationByName } from '../../lib/mapSearchService';
 import { Map, Settings, User, Menu, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
@@ -30,7 +31,7 @@ interface FacilityTypes {
   retirement: boolean;
 }
 
-interface FacilityData {
+export interface FacilityData {
   OBJECTID: number;
   Service_Name: string;
   Physical_Address: string;
@@ -95,6 +96,11 @@ export default function MapsPage() {
   const [preloadProgress, setPreloadProgress] = useState({ current: 0, total: 0 });
   const [stylesPreloaded, setStylesPreloaded] = useState(false);
   const [stylePreloadProgress, setStylePreloadProgress] = useState({ current: 0, total: 5 });
+  
+  // Facility Table state
+  const [tableVisible, setTableVisible] = useState(false);
+  const [selectedFacilities, setSelectedFacilities] = useState<FacilityData[]>([]);
+  const [tableLoading, setTableLoading] = useState(false);
   
   // Heatmap state with default selection (data preloaded but UI starts minimal)
   const [heatmapVisible, setHeatmapVisible] = useState(true); // Default to visible
@@ -380,6 +386,12 @@ export default function MapsPage() {
     const url = new URL(window.location.href);
     url.searchParams.set('facility', facility.OBJECTID.toString());
     window.history.pushState({}, '', url.toString());
+  }, []);
+
+  // Function to handle facility table selection (for demonstration)
+  const handleFacilityTableSelection = useCallback((facilities: FacilityData[]) => {
+    setSelectedFacilities(facilities);
+    setTableVisible(facilities.length > 0);
   }, []);
 
   // Function to close facility details modal
@@ -1160,11 +1172,78 @@ export default function MapsPage() {
             className="absolute top-4 left-4 z-50 w-80"
           />
 
-          {/* Close All Popups Button with Breakdown - Top Right */}
-          {openPopupsCount >= 2 && (
-            <div className="absolute top-4 right-16 z-50 space-y-2">
+          {/* Facility Table Demo Button - Top Right */}
+          <div className="absolute top-4 right-4 z-50">
+            <button
+              onClick={() => {
+                // Demo: Show sample facilities
+                const sampleFacilities: FacilityData[] = [
+                  {
+                    OBJECTID: 1,
+                    Service_Name: "Sample Residential Care",
+                    Physical_Address: "123 Main St",
+                    Physical_Suburb: "Sydney",
+                    Physical_State: "NSW",
+                    Physical_Post_Code: 2000,
+                    Care_Type: "Residential",
+                    Residential_Places: 50,
+                    Home_Care_Places: null,
+                    Home_Care_Max_Places: null,
+                    Restorative_Care_Places: null,
+                    Provider_Name: "Sample Provider",
+                    Organisation_Type: "For Profit",
+                    ABS_Remoteness: "Major Cities",
+                    Phone: "02 9123 4567",
+                    Email: "info@sample.com",
+                    Website: "https://sample.com",
+                    Latitude: -33.8688,
+                    Longitude: 151.2093,
+                    F2019_Aged_Care_Planning_Region: "Sydney",
+                    F2016_SA2_Name: "Sydney - City",
+                    F2016_SA3_Name: "Sydney - City",
+                    F2016_LGA_Name: "Sydney",
+                    facilityType: 'residential' as const
+                  },
+                  {
+                    OBJECTID: 2,
+                    Service_Name: "Sample Home Care Service",
+                    Physical_Address: "456 Oak Ave",
+                    Physical_Suburb: "Melbourne",
+                    Physical_State: "VIC",
+                    Physical_Post_Code: 3000,
+                    Care_Type: "Home Care",
+                    Residential_Places: null,
+                    Home_Care_Places: 25,
+                    Home_Care_Max_Places: 30,
+                    Restorative_Care_Places: null,
+                    Provider_Name: "Home Care Provider",
+                    Organisation_Type: "Not For Profit",
+                    ABS_Remoteness: "Major Cities",
+                    Phone: "03 9876 5432",
+                    Email: "contact@homecare.com",
+                    Website: "https://homecare.com",
+                    Latitude: -37.8136,
+                    Longitude: 144.9631,
+                    F2019_Aged_Care_Planning_Region: "Melbourne",
+                    F2016_SA2_Name: "Melbourne - CBD",
+                    F2016_SA3_Name: "Melbourne - CBD",
+                    F2016_LGA_Name: "Melbourne",
+                    facilityType: 'home' as const
+                  }
+                ];
+                handleFacilityTableSelection(sampleFacilities);
+              }}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              Show Table Demo
+            </button>
+          </div>
+
+          {/* 
+          POPUP_CODE_PRESERVED: Close All Popups Button - Commented out for table-only system
+          {openPopupsCount >= 2 && !tableVisible && (
+            <div className="absolute top-4 right-4 z-50 space-y-2">
               <div className="bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden">
-                {/* Main Close Button */}
                 <button
                   onClick={handleCloseAllPopups}
                   className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900 border-b border-gray-200"
@@ -1187,7 +1266,6 @@ export default function MapsPage() {
                   Close All ({openPopupsCount})
                 </button>
                 
-                {/* Breakdown Panel */}
                 <div className="p-3 bg-gray-50 min-w-[200px]">
                   <div className="text-xs font-medium text-gray-600 mb-2">Open Facility Popups:</div>
                   <div className="space-y-1">
@@ -1204,7 +1282,6 @@ export default function MapsPage() {
                 </div>
               </div>
               
-              {/* Save All / Unsave All Button */}
               {user?.id && (
                 <div className="bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden">
                   <button
@@ -1225,7 +1302,6 @@ export default function MapsPage() {
                     }
                   >
                     {saveAllLoading ? (
-                      // Loading spinner
                       <svg 
                         className="w-4 h-4 animate-spin" 
                         fill="none" 
@@ -1246,7 +1322,6 @@ export default function MapsPage() {
                         />
                       </svg>
                     ) : allFacilitiesSaved ? (
-                      // Unsave/Delete icon
                       <svg 
                         className="w-4 h-4" 
                         fill="currentColor" 
@@ -1262,7 +1337,6 @@ export default function MapsPage() {
                         />
                       </svg>
                     ) : (
-                      // Save/Bookmark icon (filled when saved)
                       <svg 
                         className="w-4 h-4" 
                         fill={allFacilitiesSaved ? "currentColor" : "none"} 
@@ -1278,17 +1352,16 @@ export default function MapsPage() {
                         />
                       </svg>
                     )}
-                    {saveAllLoading 
-                      ? 'Processing...' 
-                      : allFacilitiesSaved 
-                        ? `Unsave All (${openPopupsCount})` 
-                        : `Save All (${openPopupsCount})`
+                    {allFacilitiesSaved 
+                      ? `Unsave All (${openPopupsCount})`
+                      : `Save All (${openPopupsCount})`
                     }
                   </button>
                 </div>
               )}
             </div>
           )}
+          END_POPUP_CODE_PRESERVED */}
 
           {/* Data Layers and Rankings Container - Bottom Left */}
           <div className="absolute bottom-4 left-4 z-40 flex gap-4">
@@ -1316,6 +1389,24 @@ export default function MapsPage() {
               onRegionClick={handleRegionClick}
             />
           </div>
+
+          {/* Facility Table - Modal */}
+          <FacilityTable
+            facilities={selectedFacilities}
+            onFacilityDetails={openFacilityDetails}
+            onSaveFacility={async (facility) => {
+              // TODO: Implement save functionality - for now just log
+              console.log('Save facility:', facility);
+            }}
+            onClose={() => {
+              setTableVisible(false);
+              setSelectedFacilities([]);
+            }}
+            isVisible={tableVisible}
+            userId={user?.id}
+            isLoading={tableLoading}
+            markerGroup={selectedFacilities.length > 1 ? 'marker location' : undefined}
+          />
 
           {/* Map Container - Full screen now */}
           <div className="absolute inset-0">
