@@ -265,47 +265,51 @@ export default function MapLoadingCoordinator({
       hasEverRun.current = true;
       console.log('🎬 MapLoadingCoordinator: Starting fresh loading sequence');
       
-      // Sequential loading simulation - 20 seconds total, no flickering
+      // Sequential loading simulation - 12 seconds total (60% of original 20s), no flickering
       const runLoadingSequence = async () => {
-        console.log('🎬 Starting clean 20-second sequential loading sequence...');
+        console.log('🎬 Starting clean 12-second sequential loading sequence...');
         
         const stages = [
-          { stage: 'map-init' as LoadingStage, message: 'Initializing map...', duration: 1000 },
-          { stage: 'healthcare-data' as LoadingStage, message: 'Loading healthcare data...', duration: 2000 },
-          { stage: 'demographics-data' as LoadingStage, message: 'Loading demographics data...', duration: 2000 },
-          { stage: 'economics-data' as LoadingStage, message: 'Loading economics data...', duration: 2000 },
-          { stage: 'health-stats-data' as LoadingStage, message: 'Loading health statistics data...', duration: 2000 },
-          { stage: 'boundary-data' as LoadingStage, message: 'Loading SA2 boundaries (170MB)...', duration: 6000 },
-          { stage: 'name-mapping' as LoadingStage, message: 'Extracting SA2 name mappings...', duration: 1000 },
-          { stage: 'data-processing' as LoadingStage, message: 'Processing data combinations...', duration: 1000 },
-          { stage: 'heatmap-rendering' as LoadingStage, message: 'Rendering heatmap visualization...', duration: 2000 },
-          { stage: 'map-rendering' as LoadingStage, message: 'Waiting for map to fully render...', duration: 1000 }
+          { stage: 'map-init' as LoadingStage, message: 'Initializing map...', duration: 600 },
+          { stage: 'healthcare-data' as LoadingStage, message: 'Loading healthcare data...', duration: 1200 },
+          { stage: 'demographics-data' as LoadingStage, message: 'Loading demographics data...', duration: 1200 },
+          { stage: 'economics-data' as LoadingStage, message: 'Loading economics data...', duration: 1200 },
+          { stage: 'health-stats-data' as LoadingStage, message: 'Loading health statistics data...', duration: 1200 },
+          { stage: 'boundary-data' as LoadingStage, message: 'Loading SA2 boundaries (170MB)...', duration: 3600 },
+          { stage: 'name-mapping' as LoadingStage, message: 'Extracting SA2 name mappings...', duration: 600 },
+          { stage: 'data-processing' as LoadingStage, message: 'Processing data combinations...', duration: 600 },
+          { stage: 'heatmap-rendering' as LoadingStage, message: 'Rendering heatmap visualization...', duration: 1200 },
+          { stage: 'map-rendering' as LoadingStage, message: 'Waiting for map to fully render...', duration: 600 }
         ];
         
         let currentTime = 0;
         
-        stages.forEach((stageInfo, index) => {
-          // Start each stage
+        stages.forEach((stageConfig, index) => {
           setTimeout(() => {
-            globalLoadingCoordinator.setStageDirectly(stageInfo.stage, 0, stageInfo.message);
+            globalLoadingCoordinator.setStageDirectly(stageConfig.stage, 0, stageConfig.message);
+            
+            // Progress within each stage
+            const stageStartTime = Date.now();
+            const progressInterval = setInterval(() => {
+              const elapsed = Date.now() - stageStartTime;
+              const progress = Math.min(100, Math.round((elapsed / stageConfig.duration) * 100));
+              globalLoadingCoordinator.setStageDirectly(stageConfig.stage, progress, stageConfig.message);
+              
+              if (progress >= 100) {
+                clearInterval(progressInterval);
+              }
+            }, 50);
+            
           }, currentTime);
           
-          // Progress updates within each stage
-          const progressSteps = [25, 50, 75, 100];
-          progressSteps.forEach((progress, progIndex) => {
-            setTimeout(() => {
-              globalLoadingCoordinator.setStageDirectly(stageInfo.stage, progress, stageInfo.message);
-            }, currentTime + (stageInfo.duration / 4) * (progIndex + 1));
-          });
-          
-          currentTime += stageInfo.duration;
+          currentTime += stageConfig.duration;
         });
         
-        // Final completion at exactly 20 seconds
+        // Final completion at exactly 12 seconds
         setTimeout(() => {
-          console.log('🎉 20-second sequence complete - manually triggering completion');
+          console.log('🎉 12-second sequence complete - manually triggering completion');
           globalLoadingCoordinator.triggerCompletion();
-        }, 20000);
+        }, 12000);
       };
       
       runLoadingSequence();
@@ -326,9 +330,7 @@ export default function MapLoadingCoordinator({
 
   // Loading overlay component
   const LoadingOverlay = () => {
-    // Use local completion state instead of global loading state
-    if (isComplete) return null;
-
+    // Define helper function at the top
     const getStageNumber = (stage: LoadingStage): number => {
       const stages: LoadingStage[] = [
         'map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
@@ -338,81 +340,30 @@ export default function MapLoadingCoordinator({
       return stages.indexOf(stage) + 1;
     };
 
-    const totalStages = 10;
+    // Don't show overlay at all if loading is complete
+    if (isComplete) return null;
 
+    // Show corner progress indicator immediately (no full-screen overlay)
     return (
-      <div className="absolute inset-0 bg-white flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-8 max-w-md w-full mx-4">
-          {/* Header */}
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Analytics Platform</h2>
-            <p className="text-sm text-gray-600">Preparing all data layers...</p>
+      <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-xl border border-gray-200 p-4 z-40 max-w-sm">
+        <div className="text-center">
+          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+            <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse" />
           </div>
-
-          {/* Stage Progress */}
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">
-                Stage {getStageNumber(loadingState.stage)} of {totalStages}
-              </span>
-              <span className="text-sm text-gray-500">{loadingState.progress}%</span>
-            </div>
-            
-            {/* Progress Bar */}
-            <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
-              <div 
-                className="bg-blue-600 h-3 rounded-full transition-all duration-300 ease-out"
-                style={{ width: `${loadingState.progress}%` }}
-              />
-            </div>
-            
-            {/* Current Stage Message */}
-            <div className="text-center">
-              <p className="text-sm text-gray-600">{loadingState.message}</p>
-              {loadingState.error && (
-                <p className="text-sm text-red-600 mt-2">Error: {loadingState.error}</p>
-              )}
-            </div>
+          <div className="text-sm font-medium text-gray-700 mb-1">
+            Stage {getStageNumber(loadingState.stage)}/10
           </div>
-
-          {/* Stage Checklist */}
-          <div className="space-y-2 text-xs">
-            {[
-              { stage: 'map-init', label: 'Map initialization' },
-              { stage: 'healthcare-data', label: 'Healthcare data' },
-              { stage: 'demographics-data', label: 'Demographics data' },
-              { stage: 'economics-data', label: 'Economics data' },
-              { stage: 'health-stats-data', label: 'Health statistics data' },
-              { stage: 'boundary-data', label: 'Boundary data (170MB)' },
-              { stage: 'name-mapping', label: 'Name mappings' },
-              { stage: 'data-processing', label: 'Data processing' },
-              { stage: 'heatmap-rendering', label: 'Heatmap rendering' },
-              { stage: 'map-rendering', label: 'Map rendering' }
-            ].map(({ stage, label }) => {
-              const isComplete = loadingState.stage === 'complete' || 
-                               (['map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
-                                 'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
-                                 'heatmap-rendering', 'map-rendering'].indexOf(stage as LoadingStage) < 
-                                ['map-init', 'healthcare-data', 'demographics-data', 'economics-data', 
-                                 'health-stats-data', 'boundary-data', 'name-mapping', 'data-processing', 
-                                 'heatmap-rendering', 'map-rendering'].indexOf(loadingState.stage));
-              const isCurrent = loadingState.stage === stage;
-              
-              return (
-                <div key={stage} className={`flex items-center gap-2 ${isCurrent ? 'text-blue-600 font-medium' : ''}`}>
-                  <div className={`w-2 h-2 rounded-full ${
-                    isComplete ? 'bg-green-500' : 
-                    isCurrent ? 'bg-blue-500 animate-pulse' : 'bg-gray-300'
-                  }`} />
-                  <span className={isComplete ? 'text-green-700' : isCurrent ? 'text-blue-600' : 'text-gray-500'}>
-                    {label}
-                  </span>
-                </div>
-              );
-            })}
+          <div className="text-xs text-gray-500 mb-2">
+            {loadingState.message}
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div 
+              className="bg-blue-500 h-2 rounded-full transition-all duration-200"
+              style={{ width: `${loadingState.progress}%` }}
+            />
+          </div>
+          <div className="text-xs text-gray-400 mt-1">
+            {loadingState.progress}% complete
           </div>
         </div>
       </div>
@@ -422,8 +373,8 @@ export default function MapLoadingCoordinator({
   return (
     <div className="relative w-full h-full">
       <LoadingOverlay />
-      {/* Only render the map after loading is complete - using local completion state */}
-      {isComplete && children}
+      {/* Show map immediately - no waiting for any stage completion */}
+      {children}
     </div>
   );
 } 
