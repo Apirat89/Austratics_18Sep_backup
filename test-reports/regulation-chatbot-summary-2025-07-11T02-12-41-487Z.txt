@@ -1,0 +1,57 @@
+REGULATION CHATBOT TEST REPORT
+=====================================
+
+Test Run: 2025-07-11T02:12:41.486Z
+Total Tests: 7
+Passed: 0
+Failed: 7
+Pass Rate: 0.0%
+Total Time: 3552ms
+
+RESULTS BY CATEGORY:
+--------------------
+Core Legal Content: 0/1 (0.0%)
+Legal Structure: 0/1 (0.0%)
+Specific Legal Queries: 0/1 (0.0%)
+Citation Accuracy: 0/1 (0.0%)
+Complex Legal Questions: 0/1 (0.0%)
+Edge Cases: 0/1 (0.0%)
+Citation Validation: 0/1 (0.0%)
+
+FAILED TESTS:
+-------------
+legal-001: Core Legal Content
+  Question: What are the objects of the Aged Care Act?
+  ❌ Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:
+
+
+legal-002: Legal Structure
+  Question: What does Section 2-1 of the Aged Care Act say?
+  ❌ Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:
+
+
+legal-003: Specific Legal Queries
+  Question: What are the funding requirements for aged care?
+  ❌ Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:
+
+
+legal-004: Citation Accuracy
+  Question: Tell me about Division 2 Objects in the Aged Care Act
+  ❌ Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:
+
+
+legal-005: Complex Legal Questions
+  Question: How does the Aged Care Act ensure quality of care?
+  ❌ Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:
+
+
+edge-001: Edge Cases
+  Question: What is the definition of xyz123 in the Aged Care Act?
+  ❌ Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:
+
+
+cite-001: Citation Validation
+  Question: What are the objects of aged care?
+  ❌ Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:
+
+

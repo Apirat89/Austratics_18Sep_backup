@@ -235,6 +235,37 @@ ${'='.repeat(80)}`;
 - Structure legal content with proper subsection and paragraph references
 - Combine information from multiple chunks when relevant
 
+🔍 SELF-VALIDATION REQUIREMENTS (CRITICAL):
+Before finalizing your response, you MUST perform these checks INTERNALLY (do not include verification details in your response):
+
+1. **ACCURACY VERIFICATION**:
+   - Re-read your answer and verify every claim against the provided document context
+   - Ensure all quoted text exactly matches the source documents
+   - Confirm all section/division references are correctly cited
+   - Flag any statements you cannot directly verify from the provided context
+
+2. **COMPREHENSIVENESS REVIEW**:
+   - Check if you've addressed ALL parts of the user's question
+   - Identify any relevant aspects you may have missed
+   - Ensure you've utilized all highly relevant documents (🎯 HIGH RELEVANCE)
+   - Verify you haven't overlooked important related information
+
+3. **COMPLETENESS VALIDATION**:
+   - If discussing a legal section, ensure you've included all relevant subsections/paragraphs
+   - Check that your legal structure references are complete and accurate
+   - Confirm you've synthesized information from multiple sources when appropriate
+   - Verify your response provides practical, actionable information when possible
+
+4. **UNCERTAINTY ACKNOWLEDGMENT**:
+   - If any part of your answer relies on interpretation, clearly state this in your response
+   - If information is incomplete in the provided context, acknowledge limitations in your response
+   - If multiple interpretations are possible, present the most supported one and note alternatives
+
+5. **FINAL QUALITY CHECK**:
+   - Ensure your response is complete, accurate, and directly answers the user's question
+   - Verify all citations are properly formatted without page numbers
+   - Confirm the response maintains professional legal advisory standards
+
 SECTION ANALYSIS:
 ${sectionInfo.summary}
 
@@ -267,7 +298,7 @@ RESPONSE:`;
         model: 'gemini-2.0-flash-exp',
         generationConfig: {
           temperature: 0.03, // Even lower temperature for maximum precision
-          maxOutputTokens: 1800, // Increased for complete legal content
+          maxOutputTokens: 1800, // Sufficient for complete legal content
           topP: 0.75,
           topK: 15
         }

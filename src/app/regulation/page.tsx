@@ -74,7 +74,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
   
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(false);
+  const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(true);
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
   const [searchHistory, setSearchHistory] = useState<RegulationSearchHistoryItem[]>([]);
   const [bookmarks, setBookmarks] = useState<RegulationBookmark[]>([]);
@@ -461,7 +461,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
           </div>
           
           {/* Scrollable Panel Content */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto">
             <RegulationHistoryPanel
               searchHistory={searchHistory}
               bookmarks={bookmarks}

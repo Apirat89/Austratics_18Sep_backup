@@ -1,0 +1,240 @@
+{
+  "summary": {
+    "total": 7,
+    "passed": 0,
+    "failed": 7,
+    "passRate": "0.0%",
+    "totalTime": "3552ms",
+    "timestamp": "2025-07-11T02:12:41.486Z"
+  },
+  "testResults": [
+    {
+      "id": "legal-001",
+      "category": "Core Legal Content",
+      "question": "What are the objects of the Aged Care Act?",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:37.938Z"
+    },
+    {
+      "id": "legal-002",
+      "category": "Legal Structure",
+      "question": "What does Section 2-1 of the Aged Care Act say?",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:38.465Z"
+    },
+    {
+      "id": "legal-003",
+      "category": "Specific Legal Queries",
+      "question": "What are the funding requirements for aged care?",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:38.968Z"
+    },
+    {
+      "id": "legal-004",
+      "category": "Citation Accuracy",
+      "question": "Tell me about Division 2 Objects in the Aged Care Act",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:39.473Z"
+    },
+    {
+      "id": "legal-005",
+      "category": "Complex Legal Questions",
+      "question": "How does the Aged Care Act ensure quality of care?",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:39.977Z"
+    },
+    {
+      "id": "edge-001",
+      "category": "Edge Cases",
+      "question": "What is the definition of xyz123 in the Aged Care Act?",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:40.480Z"
+    },
+    {
+      "id": "cite-001",
+      "category": "Citation Validation",
+      "question": "What are the objects of aged care?",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:40.983Z"
+    }
+  ],
+  "failedTests": [
+    {
+      "id": "legal-001",
+      "category": "Core Legal Content",
+      "question": "What are the objects of the Aged Care Act?",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:37.938Z"
+    },
+    {
+      "id": "legal-002",
+      "category": "Legal Structure",
+      "question": "What does Section 2-1 of the Aged Care Act say?",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:38.465Z"
+    },
+    {
+      "id": "legal-003",
+      "category": "Specific Legal Queries",
+      "question": "What are the funding requirements for aged care?",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:38.968Z"
+    },
+    {
+      "id": "legal-004",
+      "category": "Citation Accuracy",
+      "question": "Tell me about Division 2 Objects in the Aged Care Act",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:39.473Z"
+    },
+    {
+      "id": "legal-005",
+      "category": "Complex Legal Questions",
+      "question": "How does the Aged Care Act ensure quality of care?",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:39.977Z"
+    },
+    {
+      "id": "edge-001",
+      "category": "Edge Cases",
+      "question": "What is the definition of xyz123 in the Aged Care Act?",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:40.480Z"
+    },
+    {
+      "id": "cite-001",
+      "category": "Citation Validation",
+      "question": "What are the objects of aged care?",
+      "passed": false,
+      "errors": [
+        "Test execution failed: Request failed: write EPROTO 009F1EF801000000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:355:\n"
+      ],
+      "warnings": [],
+      "response": null,
+      "responseTime": 0,
+      "timestamp": "2025-07-11T02:12:40.983Z"
+    }
+  ],
+  "categories": {
+    "Core Legal Content": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "passRate": "0.0%"
+    },
+    "Legal Structure": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "passRate": "0.0%"
+    },
+    "Specific Legal Queries": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "passRate": "0.0%"
+    },
+    "Citation Accuracy": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "passRate": "0.0%"
+    },
+    "Complex Legal Questions": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "passRate": "0.0%"
+    },
+    "Edge Cases": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "passRate": "0.0%"
+    },
+    "Citation Validation": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "passRate": "0.0%"
+    }
+  }
+}

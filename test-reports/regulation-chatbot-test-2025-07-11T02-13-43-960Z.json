@@ -1,0 +1,245 @@
+{
+  "summary": {
+    "total": 7,
+    "passed": 3,
+    "failed": 4,
+    "passRate": "42.9%",
+    "totalTime": "44828ms",
+    "timestamp": "2025-07-11T02:13:43.959Z"
+  },
+  "testResults": [
+    {
+      "id": "legal-001",
+      "category": "Core Legal Content",
+      "question": "What are the objects of the Aged Care Act?",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "response": {
+        "message": "The objects of the Aged Care Act are as follows:\n\nSection 2-1 The objects of this Act [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\n(1) The objects of this Act are as follows: [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\n(a) to provide for funding of *aged care that takes account of: [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(i) the quality of the care; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(ii) the *type of care and level of care provided; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(iii) the need to ensure access to care that is affordable by, and appropriate to the needs of, people who require it; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(iv) appropriate outcomes for recipients of the care; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(v) accountability of the providers of the care for the funding and for the outcomes for recipients; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\n(b) to promote a high quality of care and accommodation for the recipients of *aged care services that meets the needs of individuals; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\n(c) to protect the health and well-being of the recipients of aged care services; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\n(d) to ensure that aged care services are targeted towards the people with the greatest needs for those services; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\n(e) to facilitate access to aged care services by those who need them, regardless of race, culture, language, gender, economic circumstance or geographic location; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\n(f) to provide respite for families, and others, who care for older people; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\n(g) to encourage diverse, flexible and responsive aged care services that: [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(i) are appropriate to meet the needs of the recipients of those services and the carers of those recipients; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(ii) facilitate the independence of, and choice available to, those recipients and carers; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\n(h) to help those recipients to enjoy the same rights as all other people in Australia; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\nThese objects are also listed in the Aged Care (Transitional Provisions) Act 1997 [C2025C00143, Section 2-1, Page 28].\n",
+        "citations": 7,
+        "processing_time": 8892
+      },
+      "responseTime": 9208,
+      "timestamp": "2025-07-11T02:12:59.134Z"
+    },
+    {
+      "id": "legal-002",
+      "category": "Legal Structure",
+      "question": "What does Section 2-1 of the Aged Care Act say?",
+      "passed": false,
+      "errors": [
+        "Missing required content: \"subsection\""
+      ],
+      "warnings": [],
+      "response": {
+        "message": "Section 2-1 of the Aged Care Act 1997 outlines the objects of the Act.\n\nSection 2-1 [C2025C00122, Section 2-1, Page 56]:\n(1) The objects of this Act are as follows:\n(a) to provide for funding of *aged care that takes account of:\n(i) the quality of the care; and\n(ii) the *type of care and level of care provided; and\n(iii) the need to ensure access to care that is affordable by, and appropriate to the needs of, people who require it; and\n(iv) appropriate outcomes for recipients of the care; and\n(v) accountability of the providers of the care for the funding and for the outcomes for recipients;\n(b) to promote a high quality of care and accommodation for the recipients of *aged care services that meets the needs of individuals;\n(c) to protect the health and well-being of the recipients of aged care services;\n(d) to ensure that aged care services are targeted towards the people with the greatest needs for those services;\n(e) to facilitate access to aged care services by those who need them, regardless of race, culture, language, gender, economic circumstance or geographic location;\n(f) to provide respite for families, and others, who care for older people;\n(g) to encourage diverse, flexible and responsive aged care services that:\n(i) are appropriate to meet the needs of the recipients of those services and the carers of those recipients; and\n(ii) facilitate the independence of, and choice available to, those recipients and carers;\n(h) to help those recipients to enjoy the same rights as all other people in Australia.\n",
+        "citations": 7,
+        "processing_time": 3525
+      },
+      "responseTime": 3820,
+      "timestamp": "2025-07-11T02:13:08.844Z"
+    },
+    {
+      "id": "legal-003",
+      "category": "Specific Legal Queries",
+      "question": "What are the funding requirements for aged care?",
+      "passed": false,
+      "errors": [
+        "Missing required content: \"quality of the care\"",
+        "Missing required content: \"accountability\""
+      ],
+      "warnings": [],
+      "response": {
+        "message": "The funding requirements for aged care involve the following:\n\nChapter 4 addresses \"Funding of aged care services\" [C2024A00104REC01, Chapter 4, Page 462]. This is further elaborated in Part 1, which provides an \"Introduction\" [C2024A00104REC01, Part 1, Page 462].\n\nThe \"Funding of aged care services\" is also mentioned in Chapter 4 [C2024A00104REC01, Chapter 4, Page 763] and [C2024A00104REC01, Chapter 4, Page 466].\n\nA \"new approach to funding arrangements is critical to support an aged care system which is sustainable, fair and facilitates greater innovation in the sector\" [final-report-of-the-aged-care-taskforce_0, Page 6].\n",
+        "citations": 7,
+        "processing_time": 2756
+      },
+      "responseTime": 3081,
+      "timestamp": "2025-07-11T02:13:13.165Z"
+    },
+    {
+      "id": "legal-004",
+      "category": "Citation Accuracy",
+      "question": "Tell me about Division 2 Objects in the Aged Care Act",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "response": {
+        "message": "Division 2 of the Aged Care Act pertains to Objects.\n\nSection 2-1 outlines the objects of the Act [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]:\n\nSection 2-1 The objects of this Act\n(1) The objects of this Act are as follows:\n(a) to provide for funding of *aged care that takes account of:\n(i) the quality of the care; and\n(ii) the *type of care and level of care provided; and\n(iii) the need to ensure access to care that is affordable by, and appropriate to the needs of, people who require it; and\n(iv) appropriate outcomes for recipients of the care; and\n(v) accountability of the providers of the care for the funding and for the outcomes for recipients;\n(b) to promote a high quality of care and accommodation for the recipients of *aged care services that meets the needs of individuals;\n(c) to protect the health and well-being of the recipients of aged care services;\n(d) to ensure that aged care services are targeted towards the people with the greatest needs for those services;\n(e) to facilitate access to aged care services by those who need them, regardless of race, culture, language, gender, economic circumstance or geographic location;\n(f) to provide respite for families, and others, who care for older people;\n(g) to encourage diverse, flexible and responsive aged care services that:\n(i) are appropriate to meet the needs of the recipients of those services and the carers of those recipients; and\n(ii) facilitate the independence of, and choice available to, those recipients and carers;\n(h) to help those recipients to enjoy the same rights as all other people in Australia; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\nTo find definitions of asterisked terms, see the Dictionary in Schedule 1 [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56].\n",
+        "citations": 7,
+        "processing_time": 4355
+      },
+      "responseTime": 4663,
+      "timestamp": "2025-07-11T02:13:16.748Z"
+    },
+    {
+      "id": "legal-005",
+      "category": "Complex Legal Questions",
+      "question": "How does the Aged Care Act ensure quality of care?",
+      "passed": false,
+      "errors": [
+        "Response time too slow: 8363ms > 8000ms",
+        "Missing required content: \"recipients\""
+      ],
+      "warnings": [],
+      "response": {
+        "message": "The Aged Care Act ensures quality of care through several mechanisms:\n\n1.  **Aged Care Act 1997**\n    1.  The Act is the main law that covers government-funded aged care, including:\n        1.  eligibility\n        2.  funding\n        3.  regulation\n        4.  approval of providers\n        5.  subsidies and fees\n        6.  standards\n        7.  quality of care\n        8.  rights of people receiving care\n        9.  non-compliance [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n        [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n\n2.  **Quality of Care Principles 2014**\n    1.  There is a suite of principles that sit under the Act providing more detail on these rules, including the Quality of Care Principles 2014 (the Principles). [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n        [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n    2.  The Principles set out the responsibilities of approved providers in providing residential and home care services. [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n        [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n\n3.  **Aged Care Quality Standards**\n    1.  Approved providers are required to provide services to residents in accordance with their obligations under the Aged Care Act 1997 (the Act) and the associated Aged Care Quality Standards ( Quality Standards). [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n        [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n    2.  The rules may prescribe standards relating to the quality of funded aged care services delivered by a registered provider. [C2024A00104REC01, Section 15(1), Page 146]\n        [C2024A00104REC01, Section 15(1), Page 146]\n    3.  The Aged Care Quality Standards define what good care looks like and reflect the quality of care older people should expect. [aged-care-reforms-a-guide-for-providers-and-the-sector, Page 10]\n    4.  The Quality Standards focus on areas like person-centred care, clinical care, diversity, dementia care, food and nutrition, partnership with older people and provider governance, are user friendly and measurable, use simpler language and reduce duplication, and reference the new Statement of Rights. [aged-care-reforms-a-guide-for-providers-and-the-sector, Page 10]\n    5.  Under the strengthened Quality Standards, providers will receive a graded assessment against each standard to encourage excellence in aged care service delivery. [aged-care-reforms-a-guide-for-providers-and-the-sector, Page 10]\n\n4.  **New Aged Care Act (Exposure Draft)**\n    1.  The new Act will specify the rights of older people who are accessing, or seeking to access, funded aged care services (Chapter 1, Part 3, Division 1). [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n        [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n    2.  It also establishes clear standards of care and obligations on registered providers and aged care workers, ensuring that unsafe and poor quality care are never acceptable (Chapter 3). [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n        [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n    3.  Embedding the concept of high quality care in the new Act sends a strong message that we want providers and workers to aim higher and not just comply with minimum requirements. [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n        [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n    4.  We want them to innovate, continuously improve and strive towards delivery of high quality care at all times, with the support of the Aged Care Quality and Safety Commission. [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n        [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n\nIn summary, the Aged Care Act ensures quality of care through a multi-faceted approach encompassing the Act itself, the Quality of Care Principles, the Aged Care Quality Standards, and the forthcoming New Aged Care Act, all working in concert to define, regulate, and promote high-quality care for older Australians.\n",
+        "citations": 7,
+        "processing_time": 8044
+      },
+      "responseTime": 8363,
+      "timestamp": "2025-07-11T02:13:21.911Z"
+    },
+    {
+      "id": "edge-001",
+      "category": "Edge Cases",
+      "question": "What is the definition of xyz123 in the Aged Care Act?",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "Citations found but not properly formatted in response"
+      ],
+      "response": {
+        "message": "NOT IN CORPUS: This information is not available in the provided regulatory documents.\n",
+        "citations": 7,
+        "processing_time": 1648
+      },
+      "responseTime": 1955,
+      "timestamp": "2025-07-11T02:13:30.776Z"
+    },
+    {
+      "id": "cite-001",
+      "category": "Citation Validation",
+      "question": "What are the objects of aged care?",
+      "passed": false,
+      "errors": [
+        "Response time too slow: 10224ms > 8000ms"
+      ],
+      "warnings": [],
+      "response": {
+        "message": "The objects of this Act are as follows:\n\n2-1 The objects of this Act [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(1) The objects of this Act are as follows: [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\n(a) to provide for funding of *aged care that takes account of: [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(i) the quality of the care; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(ii) the *type of care and level of care provided; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(iii) the need to ensure access to care that is affordable by, and appropriate to the needs of, people who require it; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(iv) appropriate outcomes for recipients of the care; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(v) accountability of the providers of the care for the funding and for the outcomes for recipients; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(b) to promote a high quality of care and accommodation for the recipients of *aged care services that meets the needs of individuals; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(c) to protect the health and well-being of the recipients of aged care services; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(d) to ensure that aged care services are targeted towards the people with the greatest needs for those services; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(e) to facilitate access to aged care services by those who need them, regardless of race, culture, language, gender, economic circumstance or geographic location; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(f) to provide respite for families, and others, who care for older people; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(g) to encourage diverse, flexible and responsive aged care services that: [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(i) are appropriate to meet the needs of the recipients of those services and the carers of those recipients; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(ii) facilitate the independence of, and choice available to, those recipients and carers; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(h) to help those recipients to enjoy the same rights as all other people in Australia; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(i) to plan effectively for the delivery of aged care services that: [C2025C00122, Section 2-1, Page 59]\n(i) promote the targeting of services to areas of the greatest need and people with the greatest need; and [C2025C00122, Section 2-1, Page 59]\n(ii) avoid duplication of those services; and [C2025C00122, Section 2-1, Page 59]\n(iii) improve the integration of the planning and delivery of aged care services with the planning and delivery of related health and community services; [C2025C00122, Section 2-1, Page 59]\n(j) to promote ageing in place through the linking of care and support services to the places where older people prefer to live. [C2025C00122, Section 2-1, Page 59]\n\n(2) In construing the objects, due regard must be had to: [C2025C00122, Section 2-1, Page 59]\n(a) the limited resources available to support services and programs under this Act; and [C2025C00122, Section 2-1, Page 59]\n(b) the need to consider equity and merit in accessing those resources. [C2025C00122, Section 2-1, Page 59]\n\nThe objects of this Act, in conjunction with the Aged Care Act 1997, are as follows: [C2025C00143, Section 2-1, Page 28] [C2025C00143, Section 2-1, Page 28]\n(a) to provide for funding of *aged care that takes account of: [C2025C00143, Section 2-1, Page 28] [C2025C00143, Section 2-1, Page 28]\n(i) the quality of the care; and [C2025C00143, Section 2-1, Page 28] [C2025C00143, Section 2-1, Page 28]\n(ii) the *type of care and level of care provided; and [C2025C00143, Section 2-1, Page 28] [C2025C00143, Section 2-1, Page 28]\n(iii) the need to ensure access to care that is affordable by, and appropriate to the needs of, people who require it; and [C2025C",
+        "citations": 7,
+        "processing_time": 9900
+      },
+      "responseTime": 10224,
+      "timestamp": "2025-07-11T02:13:33.233Z"
+    }
+  ],
+  "failedTests": [
+    {
+      "id": "legal-002",
+      "category": "Legal Structure",
+      "question": "What does Section 2-1 of the Aged Care Act say?",
+      "passed": false,
+      "errors": [
+        "Missing required content: \"subsection\""
+      ],
+      "warnings": [],
+      "response": {
+        "message": "Section 2-1 of the Aged Care Act 1997 outlines the objects of the Act.\n\nSection 2-1 [C2025C00122, Section 2-1, Page 56]:\n(1) The objects of this Act are as follows:\n(a) to provide for funding of *aged care that takes account of:\n(i) the quality of the care; and\n(ii) the *type of care and level of care provided; and\n(iii) the need to ensure access to care that is affordable by, and appropriate to the needs of, people who require it; and\n(iv) appropriate outcomes for recipients of the care; and\n(v) accountability of the providers of the care for the funding and for the outcomes for recipients;\n(b) to promote a high quality of care and accommodation for the recipients of *aged care services that meets the needs of individuals;\n(c) to protect the health and well-being of the recipients of aged care services;\n(d) to ensure that aged care services are targeted towards the people with the greatest needs for those services;\n(e) to facilitate access to aged care services by those who need them, regardless of race, culture, language, gender, economic circumstance or geographic location;\n(f) to provide respite for families, and others, who care for older people;\n(g) to encourage diverse, flexible and responsive aged care services that:\n(i) are appropriate to meet the needs of the recipients of those services and the carers of those recipients; and\n(ii) facilitate the independence of, and choice available to, those recipients and carers;\n(h) to help those recipients to enjoy the same rights as all other people in Australia.\n",
+        "citations": 7,
+        "processing_time": 3525
+      },
+      "responseTime": 3820,
+      "timestamp": "2025-07-11T02:13:08.844Z"
+    },
+    {
+      "id": "legal-003",
+      "category": "Specific Legal Queries",
+      "question": "What are the funding requirements for aged care?",
+      "passed": false,
+      "errors": [
+        "Missing required content: \"quality of the care\"",
+        "Missing required content: \"accountability\""
+      ],
+      "warnings": [],
+      "response": {
+        "message": "The funding requirements for aged care involve the following:\n\nChapter 4 addresses \"Funding of aged care services\" [C2024A00104REC01, Chapter 4, Page 462]. This is further elaborated in Part 1, which provides an \"Introduction\" [C2024A00104REC01, Part 1, Page 462].\n\nThe \"Funding of aged care services\" is also mentioned in Chapter 4 [C2024A00104REC01, Chapter 4, Page 763] and [C2024A00104REC01, Chapter 4, Page 466].\n\nA \"new approach to funding arrangements is critical to support an aged care system which is sustainable, fair and facilitates greater innovation in the sector\" [final-report-of-the-aged-care-taskforce_0, Page 6].\n",
+        "citations": 7,
+        "processing_time": 2756
+      },
+      "responseTime": 3081,
+      "timestamp": "2025-07-11T02:13:13.165Z"
+    },
+    {
+      "id": "legal-005",
+      "category": "Complex Legal Questions",
+      "question": "How does the Aged Care Act ensure quality of care?",
+      "passed": false,
+      "errors": [
+        "Response time too slow: 8363ms > 8000ms",
+        "Missing required content: \"recipients\""
+      ],
+      "warnings": [],
+      "response": {
+        "message": "The Aged Care Act ensures quality of care through several mechanisms:\n\n1.  **Aged Care Act 1997**\n    1.  The Act is the main law that covers government-funded aged care, including:\n        1.  eligibility\n        2.  funding\n        3.  regulation\n        4.  approval of providers\n        5.  subsidies and fees\n        6.  standards\n        7.  quality of care\n        8.  rights of people receiving care\n        9.  non-compliance [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n        [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n\n2.  **Quality of Care Principles 2014**\n    1.  There is a suite of principles that sit under the Act providing more detail on these rules, including the Quality of Care Principles 2014 (the Principles). [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n        [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n    2.  The Principles set out the responsibilities of approved providers in providing residential and home care services. [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n        [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n\n3.  **Aged Care Quality Standards**\n    1.  Approved providers are required to provide services to residents in accordance with their obligations under the Aged Care Act 1997 (the Act) and the associated Aged Care Quality Standards ( Quality Standards). [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n        [the-australian-national-aged-care-classification-an-acc-funding-guide_0, Section 11.1, Page 51]\n    2.  The rules may prescribe standards relating to the quality of funded aged care services delivered by a registered provider. [C2024A00104REC01, Section 15(1), Page 146]\n        [C2024A00104REC01, Section 15(1), Page 146]\n    3.  The Aged Care Quality Standards define what good care looks like and reflect the quality of care older people should expect. [aged-care-reforms-a-guide-for-providers-and-the-sector, Page 10]\n    4.  The Quality Standards focus on areas like person-centred care, clinical care, diversity, dementia care, food and nutrition, partnership with older people and provider governance, are user friendly and measurable, use simpler language and reduce duplication, and reference the new Statement of Rights. [aged-care-reforms-a-guide-for-providers-and-the-sector, Page 10]\n    5.  Under the strengthened Quality Standards, providers will receive a graded assessment against each standard to encourage excellence in aged care service delivery. [aged-care-reforms-a-guide-for-providers-and-the-sector, Page 10]\n\n4.  **New Aged Care Act (Exposure Draft)**\n    1.  The new Act will specify the rights of older people who are accessing, or seeking to access, funded aged care services (Chapter 1, Part 3, Division 1). [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n        [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n    2.  It also establishes clear standards of care and obligations on registered providers and aged care workers, ensuring that unsafe and poor quality care are never acceptable (Chapter 3). [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n        [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n    3.  Embedding the concept of high quality care in the new Act sends a strong message that we want providers and workers to aim higher and not just comply with minimum requirements. [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n        [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n    4.  We want them to innovate, continuously improve and strive towards delivery of high quality care at all times, with the support of the Aged Care Quality and Safety Commission. [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n        [a-new-aged-care-act-exposure-draft-consultation-paper-no-2, Page 21]\n\nIn summary, the Aged Care Act ensures quality of care through a multi-faceted approach encompassing the Act itself, the Quality of Care Principles, the Aged Care Quality Standards, and the forthcoming New Aged Care Act, all working in concert to define, regulate, and promote high-quality care for older Australians.\n",
+        "citations": 7,
+        "processing_time": 8044
+      },
+      "responseTime": 8363,
+      "timestamp": "2025-07-11T02:13:21.911Z"
+    },
+    {
+      "id": "cite-001",
+      "category": "Citation Validation",
+      "question": "What are the objects of aged care?",
+      "passed": false,
+      "errors": [
+        "Response time too slow: 10224ms > 8000ms"
+      ],
+      "warnings": [],
+      "response": {
+        "message": "The objects of this Act are as follows:\n\n2-1 The objects of this Act [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(1) The objects of this Act are as follows: [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n\n(a) to provide for funding of *aged care that takes account of: [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(i) the quality of the care; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(ii) the *type of care and level of care provided; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(iii) the need to ensure access to care that is affordable by, and appropriate to the needs of, people who require it; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(iv) appropriate outcomes for recipients of the care; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(v) accountability of the providers of the care for the funding and for the outcomes for recipients; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(b) to promote a high quality of care and accommodation for the recipients of *aged care services that meets the needs of individuals; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(c) to protect the health and well-being of the recipients of aged care services; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(d) to ensure that aged care services are targeted towards the people with the greatest needs for those services; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(e) to facilitate access to aged care services by those who need them, regardless of race, culture, language, gender, economic circumstance or geographic location; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(f) to provide respite for families, and others, who care for older people; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(g) to encourage diverse, flexible and responsive aged care services that: [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(i) are appropriate to meet the needs of the recipients of those services and the carers of those recipients; and [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(ii) facilitate the independence of, and choice available to, those recipients and carers; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(h) to help those recipients to enjoy the same rights as all other people in Australia; [C2025C00122, Section 2-1, Page 56] [C2025C00122, Section 2-1, Page 56]\n(i) to plan effectively for the delivery of aged care services that: [C2025C00122, Section 2-1, Page 59]\n(i) promote the targeting of services to areas of the greatest need and people with the greatest need; and [C2025C00122, Section 2-1, Page 59]\n(ii) avoid duplication of those services; and [C2025C00122, Section 2-1, Page 59]\n(iii) improve the integration of the planning and delivery of aged care services with the planning and delivery of related health and community services; [C2025C00122, Section 2-1, Page 59]\n(j) to promote ageing in place through the linking of care and support services to the places where older people prefer to live. [C2025C00122, Section 2-1, Page 59]\n\n(2) In construing the objects, due regard must be had to: [C2025C00122, Section 2-1, Page 59]\n(a) the limited resources available to support services and programs under this Act; and [C2025C00122, Section 2-1, Page 59]\n(b) the need to consider equity and merit in accessing those resources. [C2025C00122, Section 2-1, Page 59]\n\nThe objects of this Act, in conjunction with the Aged Care Act 1997, are as follows: [C2025C00143, Section 2-1, Page 28] [C2025C00143, Section 2-1, Page 28]\n(a) to provide for funding of *aged care that takes account of: [C2025C00143, Section 2-1, Page 28] [C2025C00143, Section 2-1, Page 28]\n(i) the quality of the care; and [C2025C00143, Section 2-1, Page 28] [C2025C00143, Section 2-1, Page 28]\n(ii) the *type of care and level of care provided; and [C2025C00143, Section 2-1, Page 28] [C2025C00143, Section 2-1, Page 28]\n(iii) the need to ensure access to care that is affordable by, and appropriate to the needs of, people who require it; and [C2025C",
+        "citations": 7,
+        "processing_time": 9900
+      },
+      "responseTime": 10224,
+      "timestamp": "2025-07-11T02:13:33.233Z"
+    }
+  ],
+  "categories": {
+    "Core Legal Content": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "passRate": "100.0%"
+    },
+    "Legal Structure": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "passRate": "0.0%"
+    },
+    "Specific Legal Queries": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "passRate": "0.0%"
+    },
+    "Citation Accuracy": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "passRate": "100.0%"
+    },
+    "Complex Legal Questions": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "passRate": "0.0%"
+    },
+    "Edge Cases": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "passRate": "100.0%"
+    },
+    "Citation Validation": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "passRate": "0.0%"
+    }
+  }
+}

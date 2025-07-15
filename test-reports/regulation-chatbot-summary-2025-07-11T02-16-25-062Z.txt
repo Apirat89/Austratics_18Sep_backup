@@ -1,0 +1,35 @@
+REGULATION CHATBOT TEST REPORT
+=====================================
+
+Test Run: 2025-07-11T02:16:25.062Z
+Total Tests: 7
+Passed: 4
+Failed: 3
+Pass Rate: 57.1%
+Total Time: 38228ms
+
+RESULTS BY CATEGORY:
+--------------------
+Core Legal Content: 1/1 (100.0%)
+Legal Structure: 1/1 (100.0%)
+Specific Legal Queries: 0/1 (0.0%)
+Citation Accuracy: 1/1 (100.0%)
+Complex Legal Questions: 0/1 (0.0%)
+Edge Cases: 1/1 (100.0%)
+Citation Validation: 0/1 (0.0%)
+
+FAILED TESTS:
+-------------
+legal-003: Specific Legal Queries
+  Question: What are the funding requirements for aged care?
+  ❌ Missing required content: "quality of the care"
+  ❌ Missing required content: "accountability"
+
+legal-005: Complex Legal Questions
+  Question: How does the Aged Care Act ensure quality of care?
+  ❌ Missing required content: "recipients"
+
+cite-001: Citation Validation
+  Question: What are the objects of aged care?
+  ❌ Response time too slow: 8735ms > 8000ms
+

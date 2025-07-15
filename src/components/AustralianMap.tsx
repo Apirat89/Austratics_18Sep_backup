@@ -95,6 +95,8 @@ interface AustralianMapProps {
   loadingComplete?: boolean;
   // ✅ NEW: Heatmap completion callback for real-time loading indicator
   onHeatmapRenderComplete?: () => void;
+  // ✅ NEW: Facility table selection callback to replace popup system
+  onFacilityTableSelection?: (facilities: FacilityData[]) => void;
 }
 
 // Expose methods to parent component
@@ -248,7 +250,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   onRankedDataCalculated,
   onFacilityDetailsClick,
   loadingComplete = false,
-  onHeatmapRenderComplete
+  onHeatmapRenderComplete,
+  onFacilityTableSelection
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
@@ -1957,151 +1960,103 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
 
           // ✅ NEW: Enhanced click behavior for cluster vs single markers
           if (isClusterMarker) {
-            // For cluster markers, add custom click handler with toggle behavior (Task 3.4)
+            // For cluster markers, use table selection with all facilities instead of multiple popups
             markerElement.addEventListener('click', (e) => {
               e.stopPropagation(); // Prevent map click
               
-              // Create unique ID for this cluster marker
-              const markerId = `cluster-${lng.toFixed(6)}-${lat.toFixed(6)}`;
-              const currentState = clusterPopupStatesRef.current.get(markerId);
+              console.log(`🎯 Cluster marker clicked: ${allClusterFacilities.length} facilities`);
               
-              if (currentState?.isOpen) {
-                // ✅ CLOSE: Remove all cluster popups (toggle off - like single marker second click)
-                console.log(`🚪 Cluster marker toggle OFF: Closing ${currentState.popups.length} popups`);
+              if (onFacilityTableSelection) {
+                // Use table selection callback with all cluster facilities
+                const clusterFacilityData = allClusterFacilities.map(facility => ({
+                  OBJECTID: facility.OBJECTID || 0,
+                  Service_Name: facility.Service_Name || 'Unknown Service',
+                  Physical_Address: facility.Physical_Address || 'Address not available',
+                  Physical_Suburb: facility.Physical_Suburb || '',
+                  Physical_State: facility.Physical_State || '',
+                  Physical_Post_Code: facility.Physical_Post_Code || 0,
+                  Care_Type: facility.Care_Type || 'Unknown',
+                  Residential_Places: facility.Residential_Places || null,
+                  Home_Care_Places: facility.Home_Care_Places || null,
+                  Home_Care_Max_Places: facility.Home_Care_Max_Places || null,
+                  Restorative_Care_Places: facility.Restorative_Care_Places || null,
+                  Provider_Name: facility.Provider_Name || '',
+                  Organisation_Type: facility.Organisation_Type || '',
+                  ABS_Remoteness: facility.ABS_Remoteness || '',
+                  Phone: facility.Phone || undefined,
+                  Email: facility.Email || undefined,
+                  Website: facility.Website || undefined,
+                  Latitude: facility.Latitude,
+                  Longitude: facility.Longitude,
+                  F2019_Aged_Care_Planning_Region: facility.F2019_Aged_Care_Planning_Region || '',
+                  F2016_SA2_Name: facility.F2016_SA2_Name || '',
+                  F2016_SA3_Name: facility.F2016_SA3_Name || '',
+                  F2016_LGA_Name: facility.F2016_LGA_Name || '',
+                  facilityType: typeKey as 'residential' | 'mps' | 'home' | 'retirement'
+                }));
                 
-                currentState.popups.forEach((popup) => {
-                  popup.remove();
-                  // Remove from tracking
-                  openPopupsRef.current.delete(popup);
-                  openPopupFacilityTypesRef.current.delete(popup);
-                  openPopupFacilitiesRef.current.delete(popup);
-                });
-                
-                // Update state to closed
-                clusterPopupStatesRef.current.set(markerId, { isOpen: false, popups: [] });
-                console.log(`✅ Cluster toggle OFF complete: ${currentState.popups.length} popups closed`);
-                
+                onFacilityTableSelection(clusterFacilityData);
               } else {
-                // ✅ OPEN: Create and show cluster popups (toggle on - like single marker first click)
-                console.log(`🎯 Cluster marker toggle ON: Creating ${allClusterFacilities.length} popups`);
+                // Fallback to popup system if no table callback provided
+                // Create unique ID for this cluster marker
+                const markerId = `cluster-${lng.toFixed(6)}-${lat.toFixed(6)}`;
+                const currentState = clusterPopupStatesRef.current.get(markerId);
                 
-                // Create multiple popups positioned around the marker
-                const clusterPopups = createClusterPopups(allClusterFacilities, [lng, lat], typeKey, typeColors);
-                const createdPopups: maptilersdk.Popup[] = [];
-                
-                // Add all popups to the map
-                clusterPopups.forEach((popupData, index) => {
-                  console.log(`🎯 Adding cluster popup ${index + 1}/${clusterPopups.length}: ${popupData.serviceName}`);
-                  popupData.popup.addTo(map.current);
-                  createdPopups.push(popupData.popup);
+                if (currentState?.isOpen) {
+                  // ✅ CLOSE: Remove all cluster popups (toggle off - like single marker second click)
+                  console.log(`🚪 Cluster marker toggle OFF: Closing ${currentState.popups.length} popups`);
                   
-                  // Track all cluster popups as open
-                  openPopupsRef.current.add(popupData.popup);
-                  openPopupFacilityTypesRef.current.set(popupData.popup, popupData.typeKey);
-                  openPopupFacilitiesRef.current.set(popupData.popup, popupData.facility);
-                  
-                  // ✅ Add drag functionality to cluster popups (Task 3.2)
-                  setTimeout(() => {
-                    const popupElement = document.getElementById(popupData.popupId);
-                    if (popupElement) {
-                      let isDragging = false;
-                      let initialPopupCoords: any = null;
-                      let initialMouseX = 0, initialMouseY = 0;
-
-                      // Set cursor style for entire popup
-                      popupElement.style.cursor = 'move';
-
-                      const handleMouseDown = (e: MouseEvent) => {
-                        // Prevent dragging if user clicks on buttons or interactive elements
-                        const target = e.target as HTMLElement;
-                        if (target.tagName === 'BUTTON' || target.closest('button') || target.tagName === 'A' || target.closest('a')) {
-                          return;
-                        }
-
-                        isDragging = true;
-                        // Store popup's starting position and mouse starting position
-                        initialPopupCoords = popupData.popup.getLngLat();
-                        initialMouseX = e.clientX;
-                        initialMouseY = e.clientY;
-                        popupElement.style.cursor = 'grabbing';
-                        e.preventDefault();
-                        console.log(`🎯 Cluster popup drag started: ${popupData.serviceName}`, initialPopupCoords);
-                      };
-
-                      const handleMouseMove = (e: MouseEvent) => {
-                        if (!isDragging || !initialPopupCoords) return;
-                        
-                        // Calculate movement delta from initial click position
-                        const deltaX = e.clientX - initialMouseX;
-                        const deltaY = e.clientY - initialMouseY;
-                        
-                        // Apply delta to initial popup position
-                        if (map.current) {
-                          const initialScreenCoords = map.current.project(initialPopupCoords);
-                          const newScreenCoords: [number, number] = [
-                            initialScreenCoords.x + deltaX,
-                            initialScreenCoords.y + deltaY
-                          ];
-                          const newMapCoords = map.current.unproject(newScreenCoords);
-                          popupData.popup.setLngLat(newMapCoords);
-                        }
-                      };
-
-                      const handleMouseUp = () => {
-                        if (isDragging) {
-                          isDragging = false;
-                          popupElement.style.cursor = 'move';
-                          console.log(`🎯 Cluster popup drag completed: ${popupData.serviceName}`, popupData.popup.getLngLat());
-                        }
-                      };
-
-                      popupElement.addEventListener('mousedown', handleMouseDown);
-                      document.addEventListener('mousemove', handleMouseMove);
-                      document.addEventListener('mouseup', handleMouseUp);
-                      
-                      // Store cleanup function for later removal
-                      (popupElement as any).dragCleanup = () => {
-                        popupElement.removeEventListener('mousedown', handleMouseDown);
-                        document.removeEventListener('mousemove', handleMouseMove);
-                        document.removeEventListener('mouseup', handleMouseUp);
-                      };
-                      
-                      console.log(`✅ Drag functionality added to cluster popup: ${popupData.serviceName}`);
-                    }
-                  }, 100); // Small delay to ensure DOM is ready
-                  
-                  // ✅ Add close event handler for cluster popups (individual close cleanup)
-                  popupData.popup.on('close', () => {
-                    // Remove this cluster popup from open tracking
-                    openPopupsRef.current.delete(popupData.popup);
-                    openPopupFacilityTypesRef.current.delete(popupData.popup);
-                    openPopupFacilitiesRef.current.delete(popupData.popup);
-                    
-                    // Clean up drag listeners
-                    const popupElement = document.getElementById(popupData.popupId);
-                    if (popupElement && (popupElement as any).dragCleanup) {
-                      (popupElement as any).dragCleanup();
-                    }
-                    
-                    // Update cluster state if all popups are closed manually
-                    const remainingPopups = createdPopups.filter(p => openPopupsRef.current.has(p));
-                    if (remainingPopups.length === 0) {
-                      clusterPopupStatesRef.current.set(markerId, { isOpen: false, popups: [] });
-                      console.log(`🚪 All cluster popups manually closed: ${popupData.serviceName} cluster`);
-                    }
-                    
-                    console.log(`🚪 Individual cluster popup closed: ${popupData.serviceName}`);
+                  currentState.popups.forEach((popup) => {
+                    popup.remove();
+                    // Remove from tracking
+                    openPopupsRef.current.delete(popup);
+                    openPopupFacilityTypesRef.current.delete(popup);
+                    openPopupFacilitiesRef.current.delete(popup);
                   });
-                });
-                
-                // Update state to open with all created popups
-                clusterPopupStatesRef.current.set(markerId, { isOpen: true, popups: createdPopups });
-                console.log(`✅ Cluster toggle ON complete: ${clusterPopups.length} popups opened`);
+                  
+                  // Update state to closed
+                  clusterPopupStatesRef.current.set(markerId, { isOpen: false, popups: [] });
+                  console.log(`✅ Cluster toggle OFF complete: ${currentState.popups.length} popups closed`);
+                  
+                } else {
+                  // ✅ OPEN: Create and show cluster popups (toggle on - like single marker first click)
+                  console.log(`🎯 Cluster marker toggle ON: Creating ${allClusterFacilities.length} popups`);
+                  
+                  // Create multiple popups positioned around the marker
+                  const clusterPopups = createClusterPopups(allClusterFacilities, [lng, lat], typeKey, typeColors);
+                  const createdPopups: maptilersdk.Popup[] = [];
+                  
+                  // Add all popups to the map
+                  clusterPopups.forEach((popupData, index) => {
+                    console.log(`🎯 Adding cluster popup ${index + 1}/${clusterPopups.length}: ${popupData.serviceName}`);
+                    popupData.popup.addTo(map.current);
+                    createdPopups.push(popupData.popup);
+                    
+                    // Track all cluster popups as open
+                    openPopupsRef.current.add(popupData.popup);
+                    openPopupFacilityTypesRef.current.set(popupData.popup, popupData.typeKey);
+                    openPopupFacilitiesRef.current.set(popupData.popup, popupData.facility);
+                  });
+                  
+                  // Update state to open with all created popups
+                  clusterPopupStatesRef.current.set(markerId, { isOpen: true, popups: createdPopups });
+                  console.log(`✅ Cluster toggle ON complete: ${clusterPopups.length} popups opened`);
+                }
               }
             });
           } else {
-            // For single markers, use standard popup behavior (existing functionality)
-            marker.setPopup(popup);
+            // For single markers, use table selection instead of popup (existing functionality replaced)
+            if (onFacilityTableSelection) {
+              // Use table selection callback with single facility
+              markerElement.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent map click
+                console.log(`🎯 Single marker clicked: ${serviceName}`);
+                onFacilityTableSelection([facilityData]);
+              });
+            } else {
+              // Fallback to popup if no table callback provided
+              marker.setPopup(popup);
+            }
           }
 
           marker.addTo(map.current);

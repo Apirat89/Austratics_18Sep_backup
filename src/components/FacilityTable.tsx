@@ -3,16 +3,17 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLongPress } from 'react-use';
 import { FacilityData } from '../app/maps/page';
+import { FacilityTableActions } from './FacilityTableActions';
 
 interface FacilityTableProps {
   facilities: FacilityData[];
   onFacilityDetails: (facility: FacilityData) => void;
-  onSaveFacility: (facility: FacilityData) => void;
+  onSaveFacility: (facility: FacilityData) => Promise<{ success: boolean; error?: string; isSaved?: boolean }>;
   onClose: () => void;
   isVisible: boolean;
-  markerGroup?: string;
   userId?: string;
   isLoading?: boolean;
+  markerGroup?: string;
 }
 
 // ⚡ ENHANCED: Improved types with readonly constraints
@@ -459,53 +460,6 @@ const FacilityTable: React.FC<FacilityTableProps> = ({
   // 🛡️ SAFETY: Defensive visibility check
   if (!isVisible) return null;
 
-  // Action button component
-  const FacilityTableActions: React.FC<{ facility: FacilityData; isLoading?: boolean }> = ({ facility, isLoading }) => {
-    const [isSaving, setIsSaving] = useState(false);
-
-    const handleSave = async () => {
-      setIsSaving(true);
-      try {
-        await onSaveFacility(facility);
-      } catch (error) {
-        console.error('Error saving facility:', error);
-      } finally {
-        setIsSaving(false);
-      }
-    };
-
-    return (
-      <div className="flex gap-1 sm:gap-2">
-        <button
-          onClick={() => onFacilityDetails(facility)}
-          disabled={isLoading}
-          className="bg-blue-600 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          Details
-        </button>
-        {userId && (
-          <button
-            onClick={handleSave}
-            disabled={isSaving || isLoading}
-            className="bg-green-600 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
-          >
-            {isSaving ? (
-              <>
-                <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                <span className="hidden sm:inline">Saving...</span>
-              </>
-            ) : (
-              'Save'
-            )}
-          </button>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div 
       className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-2 sm:p-4"
@@ -633,7 +587,13 @@ const FacilityTable: React.FC<FacilityTableProps> = ({
                         <div className="text-xs sm:text-sm text-gray-900">{facility.F2016_SA2_Name}</div>
                       </td>
                       <td className="p-2 sm:p-3 border-b">
-                        <FacilityTableActions facility={facility} isLoading={isLoading} />
+                        <FacilityTableActions 
+                          facility={facility} 
+                          userId={userId}
+                          isLoading={isLoading}
+                          onSaveFacility={onSaveFacility}
+                          onFacilityDetails={onFacilityDetails}
+                        />
                       </td>
                     </tr>
                   ))}

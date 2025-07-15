@@ -185,7 +185,7 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-medium text-gray-900 flex items-center gap-2">
                 <Search className="w-4 h-4 text-blue-600" />
-                Recent Searches (2 weeks)
+                Recent Searches
               </h3>
               {searchHistory.length > 0 && (
                 <button
@@ -213,13 +213,13 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
                   return (
                   <div
                     key={rowKey}
-                    className="p-3 bg-blue-50 rounded-lg hover:bg-blue-100 cursor-pointer transition-colors border border-blue-200"
+                    className="w-full p-3 bg-blue-50 rounded-lg hover:bg-blue-100 cursor-pointer transition-colors border border-blue-200"
                     onClick={() => onSearchSelect(search)}
                   >
-                    <div className="flex items-start gap-2">
+                    <div className="grid grid-cols-[auto_1fr_auto] items-start gap-3">
                       <Search className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-700 leading-relaxed break-words font-medium">
+                      <div className="min-w-0">
+                        <p className="text-sm text-gray-700 leading-relaxed font-medium truncate">
                           {search.search_term}
                         </p>
                         
@@ -230,7 +230,7 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
                           />
                         )}
                         
-                        <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center gap-2 mt-2 flex-wrap">
                           <Clock className="w-3 h-3 text-gray-400" />
                           <span className="text-xs text-gray-500">
                             {search.updated_at ? new Date(search.updated_at).toLocaleDateString() : 'Recently searched'}
@@ -243,7 +243,7 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
                           )}
                           
                           {search.document_types && search.document_types.length > 0 && (
-                            <div className="flex gap-1">
+                            <div className="flex gap-1 flex-wrap">
                               {formatDocumentTypes(search.document_types)?.map((type, i) => (
                                 <Badge 
                                   key={i} 
@@ -339,30 +339,30 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
                 {bookmarks.map((bookmark, index) => (
                   <div
                     key={bookmark.id || index}
-                    className="p-3 bg-orange-50 rounded-lg hover:bg-orange-100 cursor-pointer transition-colors border border-orange-200"
+                    className="w-full p-3 bg-orange-50 rounded-lg hover:bg-orange-100 cursor-pointer transition-colors border border-orange-200"
                     onClick={() => handleBookmarkClick(bookmark)}
                   >
-                    <div className="flex items-start gap-2">
+                    <div className="grid grid-cols-[auto_1fr_auto] items-start gap-3">
                       <Bookmark className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
+                      <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="text-sm text-gray-900 font-semibold">
+                          <p className="text-sm text-gray-900 font-semibold truncate">
                             {bookmark.bookmark_name}
                           </p>
                           {bookmark.usage_count !== undefined && bookmark.usage_count > 0 && (
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1 flex-shrink-0">
                               <Star className="w-3 h-3 text-yellow-500" />
                               <span className="text-xs text-gray-500">{bookmark.usage_count}</span>
                             </div>
                           )}
                         </div>
                         
-                        <p className="text-xs text-gray-600 leading-relaxed break-words">
+                        <p className="text-xs text-gray-600 leading-relaxed truncate">
                           {bookmark.search_term}
                         </p>
                         
                         {bookmark.description && (
-                          <p className="text-xs text-gray-500 mt-1 italic">
+                          <p className="text-xs text-gray-500 mt-1 italic truncate">
                             {bookmark.description}
                           </p>
                         )}
@@ -374,7 +374,7 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
                           />
                         )}
                         
-                        <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center gap-2 mt-2 flex-wrap">
                           <Clock className="w-3 h-3 text-gray-400" />
                           <span className="text-xs text-gray-500">
                             {bookmark.created_at ? new Date(bookmark.created_at).toLocaleDateString() : 'Recently saved'}
@@ -387,7 +387,7 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
                           )}
                           
                           {bookmark.document_types && bookmark.document_types.length > 0 && (
-                            <div className="flex gap-1">
+                            <div className="flex gap-1 flex-wrap">
                               {formatDocumentTypes(bookmark.document_types)?.map((type, i) => (
                                 <Badge 
                                   key={i} 

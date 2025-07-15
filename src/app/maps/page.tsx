@@ -1172,72 +1172,12 @@ export default function MapsPage() {
             className="absolute top-4 left-4 z-50 w-80"
           />
 
-          {/* Facility Table Demo Button - Top Right */}
-          <div className="absolute top-4 right-4 z-50">
-            <button
-              onClick={() => {
-                // Demo: Show sample facilities
-                const sampleFacilities: FacilityData[] = [
-                  {
-                    OBJECTID: 1,
-                    Service_Name: "Sample Residential Care",
-                    Physical_Address: "123 Main St",
-                    Physical_Suburb: "Sydney",
-                    Physical_State: "NSW",
-                    Physical_Post_Code: 2000,
-                    Care_Type: "Residential",
-                    Residential_Places: 50,
-                    Home_Care_Places: null,
-                    Home_Care_Max_Places: null,
-                    Restorative_Care_Places: null,
-                    Provider_Name: "Sample Provider",
-                    Organisation_Type: "For Profit",
-                    ABS_Remoteness: "Major Cities",
-                    Phone: "02 9123 4567",
-                    Email: "info@sample.com",
-                    Website: "https://sample.com",
-                    Latitude: -33.8688,
-                    Longitude: 151.2093,
-                    F2019_Aged_Care_Planning_Region: "Sydney",
-                    F2016_SA2_Name: "Sydney - City",
-                    F2016_SA3_Name: "Sydney - City",
-                    F2016_LGA_Name: "Sydney",
-                    facilityType: 'residential' as const
-                  },
-                  {
-                    OBJECTID: 2,
-                    Service_Name: "Sample Home Care Service",
-                    Physical_Address: "456 Oak Ave",
-                    Physical_Suburb: "Melbourne",
-                    Physical_State: "VIC",
-                    Physical_Post_Code: 3000,
-                    Care_Type: "Home Care",
-                    Residential_Places: null,
-                    Home_Care_Places: 25,
-                    Home_Care_Max_Places: 30,
-                    Restorative_Care_Places: null,
-                    Provider_Name: "Home Care Provider",
-                    Organisation_Type: "Not For Profit",
-                    ABS_Remoteness: "Major Cities",
-                    Phone: "03 9876 5432",
-                    Email: "contact@homecare.com",
-                    Website: "https://homecare.com",
-                    Latitude: -37.8136,
-                    Longitude: 144.9631,
-                    F2019_Aged_Care_Planning_Region: "Melbourne",
-                    F2016_SA2_Name: "Melbourne - CBD",
-                    F2016_SA3_Name: "Melbourne - CBD",
-                    F2016_LGA_Name: "Melbourne",
-                    facilityType: 'home' as const
-                  }
-                ];
-                handleFacilityTableSelection(sampleFacilities);
-              }}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-            >
-              Show Table Demo
-            </button>
-          </div>
+          {/* 
+          DEMO_CODE_REMOVED: Facility Table Demo Button - Removed since table now connects to real marker clicks
+          The table will display automatically when users click on facility markers:
+          - Single marker click → single row in table
+          - Numbered marker (cluster) click → multiple rows in table
+          */}
 
           {/* 
           POPUP_CODE_PRESERVED: Close All Popups Button - Commented out for table-only system
@@ -1395,8 +1335,108 @@ export default function MapsPage() {
             facilities={selectedFacilities}
             onFacilityDetails={openFacilityDetails}
             onSaveFacility={async (facility) => {
-              // TODO: Implement save functionality - for now just log
-              console.log('Save facility:', facility);
+              if (!user?.id) {
+                alert('Please sign in to save facilities');
+                return { success: false, error: 'User not signed in' };
+              }
+
+              try {
+                // Import the required functions
+                const { isSearchSaved, saveSearchToSavedSearches, deleteSavedSearch } = await import('../../lib/savedSearches');
+                const { createBrowserSupabaseClient } = await import('../../lib/supabase');
+                
+                // Check if facility is already saved
+                const isAlreadySaved = await isSearchSaved(user.id, facility.Service_Name);
+                
+                if (isAlreadySaved) {
+                  // Unsave operation
+                  try {
+                    // Find the saved search ID by searching for it
+                    const supabase = createBrowserSupabaseClient();
+                    const { data: savedSearch, error: findError } = await supabase
+                      .from('saved_searches')
+                      .select('id')
+                      .eq('user_id', user.id)
+                      .or(`search_term.eq.${facility.Service_Name},search_display_name.eq.${facility.Service_Name}`)
+                      .limit(1)
+                      .single();
+
+                    if (findError || !savedSearch) {
+                      throw new Error('Could not find saved facility to remove');
+                    }
+
+                    // Delete the saved search
+                    const result = await deleteSavedSearch(user.id, savedSearch.id);
+                    
+                    if (result.success) {
+                      // Refresh saved searches
+                      handleSavedSearchAdded();
+                      
+                      console.log(`✅ Removed from saved: ${facility.Service_Name}`);
+                      return { success: true, isSaved: false };
+                    } else {
+                      throw new Error(result.error || 'Failed to remove facility');
+                    }
+                  } catch (error) {
+                    console.error('Error removing facility:', error);
+                    alert('An error occurred while removing the facility');
+                    return { success: false, error: 'Failed to remove facility' };
+                  }
+                } else {
+                  // Save operation
+                  try {
+                    // Create location data for the facility
+                    const facilityLocationData = {
+                      id: `facility-${facility.Service_Name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${facility.Longitude}-${facility.Latitude}`,
+                      name: facility.Service_Name,
+                      area: `${facility.Physical_State}${facility.Physical_Post_Code ? ' ' + facility.Physical_Post_Code : ''}`,
+                      type: 'facility' as const,
+                      state: facility.Physical_State,
+                      center: [facility.Longitude, facility.Latitude] as [number, number],
+                      bounds: undefined, // Facilities don't have bounds
+                      address: facility.Physical_Address,
+                      careType: facility.Care_Type,
+                      facilityType: facility.facilityType
+                    };
+
+                    // Save the facility
+                    const result = await saveSearchToSavedSearches(
+                      user.id,
+                      facility.Service_Name,
+                      facilityLocationData,
+                      'facility'
+                    );
+
+                    if (result.success) {
+                      // Refresh saved searches
+                      handleSavedSearchAdded();
+                      
+                      console.log(`✅ Saved: ${facility.Service_Name}`);
+                      return { success: true, isSaved: true };
+                    } else {
+                      // Handle different error types
+                      if (result.atLimit) {
+                        alert('You have reached the maximum of 100 saved locations. Please delete some locations first.');
+                        return { success: false, error: 'Save limit reached' };
+                      } else if (result.error?.includes('already saved')) {
+                        alert('This facility is already saved to your locations.');
+                        return { success: false, error: 'Already saved' };
+                      } else {
+                        alert(result.error || 'Failed to save facility');
+                        return { success: false, error: result.error || 'Failed to save facility' };
+                      }
+                    }
+                  } catch (error) {
+                    console.error('Error saving facility:', error);
+                    alert('An error occurred while saving the facility');
+                    return { success: false, error: 'Failed to save facility' };
+                  }
+                }
+              } catch (error) {
+                console.error('Error with save operation:', error);
+                alert('An error occurred while processing the save operation');
+                return { success: false, error: 'Save operation failed' };
+              }
             }}
             onClose={() => {
               setTableVisible(false);
@@ -1433,6 +1473,7 @@ export default function MapsPage() {
                 onRankedDataCalculated={handleRankedDataCalculated}
                 onFacilityDetailsClick={openFacilityDetails}
                 loadingComplete={loadingComplete}
+                onFacilityTableSelection={handleFacilityTableSelection}
                 onHeatmapRenderComplete={() => {
                   console.log('🎉 Maps Page: Heatmap render complete, calling DataLayers callback');
                   // ✅ FIXED: Add safety check and async execution to prevent setState during render
