@@ -158,6 +158,15 @@ export default function MapsPage() {
   // Facility Count collapsible state
   const [facilityCountExpanded, setFacilityCountExpanded] = useState(true);
   
+  // Bulk Selection state
+  const [bulkSelectionEnabled, setBulkSelectionEnabled] = useState(false);
+  const [bulkSelectionTypes, setBulkSelectionTypes] = useState<FacilityTypes>({
+    residential: true,
+    mps: true,
+    home: true,
+    retirement: true
+  });
+  
   // Map reference for calling map methods
   const mapRef = useRef<AustralianMapRef>(null);
   const savedSearchesRef = useRef<SavedSearchesRef>(null);
@@ -222,6 +231,16 @@ export default function MapsPage() {
       setAllFacilitiesSaved(false);
     }
   }, [openPopupsCount]);
+
+  // Function to calculate selected facility count based on checked types
+  const calculateSelectedFacilityCount = useCallback((counts: { residential: number; mps: number; home: number; retirement: number }, types: FacilityTypes) => {
+    let selectedCount = 0;
+    if (types.residential) selectedCount += counts.residential;
+    if (types.mps) selectedCount += counts.mps;
+    if (types.home) selectedCount += counts.home;
+    if (types.retirement) selectedCount += counts.retirement;
+    return selectedCount;
+  }, []);
 
   // Add facility counting functionality
   const updateFacilityCounts = useCallback(() => {
@@ -288,6 +307,13 @@ export default function MapsPage() {
         total: total,
         loading: false
       });
+      
+      // Update bulk selection enabled state based on selected facility limit (not total)
+      const selectedCount = calculateSelectedFacilityCount(
+        { residential: counts.residential || 0, mps: counts.mps || 0, home: counts.home || 0, retirement: counts.retirement || 0 },
+        bulkSelectionTypes
+      );
+      setBulkSelectionEnabled(selectedCount <= 100 && selectedCount > 0);
 
       console.log('🔢 Facility counts updated:', {
         residential: counts.residential || 0,
@@ -318,6 +344,17 @@ export default function MapsPage() {
       }, 1000);
     }
   }, [loadingComplete, updateFacilityCounts]);
+
+  // Update bulk selection enabled state when selection types change
+  useEffect(() => {
+    if (!facilityCountsInViewport.loading) {
+      const selectedCount = calculateSelectedFacilityCount(
+        { residential: facilityCountsInViewport.residential, mps: facilityCountsInViewport.mps, home: facilityCountsInViewport.home, retirement: facilityCountsInViewport.retirement },
+        bulkSelectionTypes
+      );
+      setBulkSelectionEnabled(selectedCount <= 100 && selectedCount > 0);
+    }
+  }, [bulkSelectionTypes, facilityCountsInViewport, calculateSelectedFacilityCount]);
 
   // Function to load facility by ID and open modal
   const loadFacilityById = async (facilityId: string) => {
@@ -393,6 +430,40 @@ export default function MapsPage() {
     setSelectedFacilities(facilities);
     setTableVisible(facilities.length > 0);
   }, []);
+
+  // Function to handle bulk facility selection
+  const handleBulkSelection = useCallback(() => {
+    if (!mapRef.current || !bulkSelectionEnabled) return;
+    
+    console.log('🔄 Bulk Selection: Starting bulk facility selection...');
+    
+    // Get all facilities from the map
+    const allFacilities = mapRef.current.getAllFacilities();
+    
+    // Filter facilities by viewport (same logic as facility count)
+    const facilitiesInViewport = allFacilities.filter(facility => {
+      if (!facility.Latitude || !facility.Longitude) return false;
+      
+      const bounds = mapRef.current?.getBounds();
+      if (!bounds) return false;
+      
+      const lat = facility.Latitude;
+      const lng = facility.Longitude;
+      
+      return lat >= bounds.south && lat <= bounds.north &&
+             lng >= bounds.west && lng <= bounds.east;
+    });
+    
+    // Filter by selected facility types
+    const selectedFacilities = facilitiesInViewport.filter(facility => {
+      return bulkSelectionTypes[facility.facilityType];
+    });
+    
+    console.log('🎯 Bulk Selection: Selected', selectedFacilities.length, 'facilities');
+    
+    // Use existing table selection handler
+    handleFacilityTableSelection(selectedFacilities);
+  }, [bulkSelectionEnabled, bulkSelectionTypes, handleFacilityTableSelection]);
 
   // Function to close facility details modal
   const closeFacilityModal = useCallback(() => {
@@ -1018,7 +1089,7 @@ export default function MapsPage() {
               {/* Empty row between Map Settings and Select All Facilities */}
               <div className="py-4 border-b border-gray-100"></div>
 
-              {/* Facility Count */}
+              {/* Facility Selection */}
               <div className="border-b border-gray-200">
                 {/* Header */}
                 <button
@@ -1026,7 +1097,7 @@ export default function MapsPage() {
                   className="flex items-center gap-3 p-4 w-full hover:bg-gray-50 transition-colors text-left"
                 >
                   <BarChart3 className="h-5 w-5 text-gray-600" />
-                  <span className="text-sm font-medium text-gray-900">Facility Count</span>
+                  <span className="text-sm font-medium text-gray-900">Facility Selection</span>
                   {facilityCountExpanded ? (
                     <ChevronUp className="h-4 w-4 text-gray-400 ml-auto" />
                   ) : (
@@ -1038,11 +1109,18 @@ export default function MapsPage() {
                 {facilityCountExpanded && (
                   <div className="px-4 pb-4">
                     <div className="space-y-3">
-                      {/* Facility Type Counts */}
+                      {/* Facility Type Selection */}
                       <div className="space-y-2">
                         {/* Residential Care */}
                         <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
                           <div className="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              id="select-residential"
+                              checked={bulkSelectionTypes.residential}
+                              onChange={(e) => setBulkSelectionTypes(prev => ({ ...prev, residential: e.target.checked }))}
+                              className="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
+                            />
                             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                             <span className="text-sm text-gray-700">Residential Care</span>
                           </div>
@@ -1054,6 +1132,13 @@ export default function MapsPage() {
                         {/* Multi-Purpose Service */}
                         <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
                           <div className="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              id="select-mps"
+                              checked={bulkSelectionTypes.mps}
+                              onChange={(e) => setBulkSelectionTypes(prev => ({ ...prev, mps: e.target.checked }))}
+                              className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                            />
                             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                             <span className="text-sm text-gray-700">Multi-Purpose Service</span>
                           </div>
@@ -1065,6 +1150,13 @@ export default function MapsPage() {
                         {/* Home Care */}
                         <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
                           <div className="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              id="select-home"
+                              checked={bulkSelectionTypes.home}
+                              onChange={(e) => setBulkSelectionTypes(prev => ({ ...prev, home: e.target.checked }))}
+                              className="w-4 h-4 text-green-600 rounded border-gray-300 focus:ring-green-500"
+                            />
                             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                             <span className="text-sm text-gray-700">Home Care</span>
                           </div>
@@ -1076,6 +1168,13 @@ export default function MapsPage() {
                         {/* Retirement Living */}
                         <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
                           <div className="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              id="select-retirement"
+                              checked={bulkSelectionTypes.retirement}
+                              onChange={(e) => setBulkSelectionTypes(prev => ({ ...prev, retirement: e.target.checked }))}
+                              className="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                            />
                             <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
                             <span className="text-sm text-gray-700">Retirement Living</span>
                           </div>
@@ -1085,8 +1184,8 @@ export default function MapsPage() {
                         </div>
                       </div>
 
-                      {/* Total Count */}
-                      <div className="border-t border-gray-200 pt-3">
+                      {/* Total Count and Selected Count */}
+                      <div className="border-t border-gray-200 pt-3 space-y-2">
                         <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 border border-blue-200">
                           <div className="flex items-center gap-3">
                             <BarChart3 className="w-4 h-4 text-blue-600" />
@@ -1096,6 +1195,15 @@ export default function MapsPage() {
                             {facilityCountsInViewport.loading ? '...' : facilityCountsInViewport.total.toLocaleString()}
                           </span>
                         </div>
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 border border-green-200">
+                          <div className="flex items-center gap-3">
+                            <span className="text-green-600">🎯</span>
+                            <span className="text-sm font-medium text-green-800">Selected for Bulk</span>
+                          </div>
+                          <span className="text-lg font-bold text-green-900">
+                            {facilityCountsInViewport.loading ? '...' : calculateSelectedFacilityCount(facilityCountsInViewport, bulkSelectionTypes).toLocaleString()}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
@@ -1103,7 +1211,35 @@ export default function MapsPage() {
                     <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
                       <div className="text-sm text-green-800">
                         🔄 Counts update automatically as you zoom and pan the map.
+                        <br />
+                        ✅ Check facility types above to select for bulk operations.
                       </div>
+                    </div>
+
+                    {/* Select All Button */}
+                    <div className="mt-4">
+                      <button
+                        onClick={handleBulkSelection}
+                        disabled={!bulkSelectionEnabled || facilityCountsInViewport.loading}
+                        className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
+                          bulkSelectionEnabled && !facilityCountsInViewport.loading
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                        title={
+                          !bulkSelectionEnabled 
+                            ? `Too many selected (${calculateSelectedFacilityCount(facilityCountsInViewport, bulkSelectionTypes)}). Limit: 100.`
+                            : 'Select all visible facilities based on checked types'
+                        }
+                      >
+                        {facilityCountsInViewport.loading ? (
+                          'Loading...'
+                        ) : bulkSelectionEnabled ? (
+                          `Select All (${calculateSelectedFacilityCount(facilityCountsInViewport, bulkSelectionTypes)})`
+                        ) : (
+                          `Too Many (${calculateSelectedFacilityCount(facilityCountsInViewport, bulkSelectionTypes)}/100)`
+                        )}
+                      </button>
                     </div>
                   </div>
                 )}

@@ -12,6 +12,8 @@ import LayerManager from './LayerManager';
 import HeatmapDataService, { SA2HeatmapData, RankedSA2Data } from './HeatmapDataService';
 import { globalLoadingCoordinator } from './MapLoadingCoordinator';
 
+// Removed magic wand imports - replaced with bulk selection system
+
 // MapTiler API key - you'll need to add this to your environment variables
 const MAPTILER_API_KEY = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || 'YOUR_MAPTILER_API_KEY';
 
@@ -335,6 +337,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   const [facilityError, setFacilityError] = useState<string | null>(null);
   const facilityRetryCountRef = useRef<number>(0);
   
+  // Removed magic wand state - replaced with bulk selection system
+  
   // ✅ PHASE 7: Add style change notification for heatmap
   // Style change notification system removed - LayerManager handles this directly
 
@@ -359,6 +363,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       console.log('❌ AustralianMap: No heatmap data available');
     }
   }, [isLoaded]);
+
+  // Removed magic wand event handlers - replaced with bulk selection system
 
   // Stabilize facilityTypes to prevent unnecessary re-renders
   const stableFacilityTypes = useMemo(() => facilityTypes, [
@@ -428,6 +434,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           if (viewportChangeCallbackRef.current) {
             viewportChangeCallbackRef.current();
           }
+          
+          // Removed magic wand zoom level detection - replaced with bulk selection system
         });
       }
       
@@ -3071,6 +3079,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         className="w-full h-full min-h-[400px] rounded-lg"
         style={{ minHeight: '500px' }}
       />
+      
+      {/* Removed magic wand UI components - replaced with bulk selection system */}
       
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
