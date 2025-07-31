@@ -51,17 +51,37 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
   currentUser
 }) => {
   const [activeTab, setActiveTab] = useState<'history' | 'bookmarks'>('history');
+  const [isClearingHistory, setIsClearingHistory] = useState(false);
+  const [isClearingBookmarks, setIsClearingBookmarks] = useState(false);
 
-  // Handle clear all with confirmation
-  const handleClearSearchHistory = () => {
+  // Handle clear all with confirmation and loading state
+  const handleClearSearchHistory = async () => {
+    if (isClearingHistory) return; // Prevent multiple clicks
+    
     if (confirm('Are you sure you want to clear all search history? This action cannot be undone.')) {
-      onClearSearchHistory();
+      setIsClearingHistory(true);
+      try {
+        await onClearSearchHistory();
+      } catch (error) {
+        console.error('❌ Clear history failed:', error);
+      } finally {
+        setIsClearingHistory(false);
+      }
     }
   };
 
-  const handleClearBookmarks = () => {
+  const handleClearBookmarks = async () => {
+    if (isClearingBookmarks) return; // Prevent multiple clicks
+    
     if (confirm('Are you sure you want to clear all bookmarks? This action cannot be undone.')) {
-      onClearBookmarks();
+      setIsClearingBookmarks(true);
+      try {
+        await onClearBookmarks();
+      } catch (error) {
+        console.error('❌ Clear bookmarks failed:', error);
+      } finally {
+        setIsClearingBookmarks(false);
+      }
     }
   };
 
@@ -190,10 +210,15 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
               {searchHistory.length > 0 && (
                 <button
                   onClick={handleClearSearchHistory}
-                  className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
+                  disabled={isClearingHistory}
+                  className={`text-xs flex items-center gap-1 ${
+                    isClearingHistory 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-red-600 hover:text-red-800'
+                  }`}
                 >
                   <Trash2 className="w-3 h-3" />
-                  Clear
+                  {isClearingHistory ? 'Clearing...' : 'Clear'}
                 </button>
               )}
             </div>
@@ -310,10 +335,15 @@ const RegulationHistoryPanel: React.FC<RegulationHistoryPanelProps> = ({
                 {bookmarks.length > 0 && (
                   <button
                     onClick={handleClearBookmarks}
-                    className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
+                    disabled={isClearingBookmarks}
+                    className={`text-xs flex items-center gap-1 ${
+                      isClearingBookmarks 
+                        ? 'text-gray-400 cursor-not-allowed' 
+                        : 'text-red-600 hover:text-red-800'
+                    }`}
                   >
                     <Trash2 className="w-3 h-3" />
-                    Clear
+                    {isClearingBookmarks ? 'Clearing...' : 'Clear'}
                   </button>
                 )}
               </div>

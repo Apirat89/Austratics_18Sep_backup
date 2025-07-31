@@ -12,16 +12,26 @@ import { renderMarkdown } from '@/lib/markdownRenderer';
 import {
   RegulationSearchHistoryItem,
   RegulationBookmark,
+  UnifiedHistoryItem,
+  UnifiedBookmark,
   saveRegulationSearchToHistory,
   getRegulationSearchHistory,
   getRegulationBookmarks,
+  getUnifiedSearchHistory,
+  getUnifiedBookmarks,
   deleteRegulationSearchHistoryItem,
+  deleteUnifiedHistoryItem,
+  deleteUnifiedBookmark,
   clearRegulationSearchHistory,
+  clearUnifiedSearchHistory,
+  clearUnifiedBookmarks,
   deleteRegulationBookmark,
   clearRegulationBookmarks,
   saveRegulationBookmark,
   isRegulationBookmarkNameTaken,
-  getRegulationBookmarkCount
+  getRegulationBookmarkCount,
+  adaptUnifiedHistoryToOld,
+  adaptUnifiedBookmarksToOld
 } from '@/lib/regulationHistory';
 
 interface ChatMessage {
@@ -47,10 +57,25 @@ interface ChatResponse {
   citations: DocumentCitation[];
   context_used: number;
   processing_time: number;
+  conversation_id?: number;
+  message_id?: number;
+}
+
+interface Conversation {
+  id: number;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  message_count: number;
+  status: 'active' | 'archived';
 }
 
 export default function RegulationPage() {
   const router = useRouter();
+  
+  // Conversation state
+  const [currentConversationId, setCurrentConversationId] = useState<number | null>(null);
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -78,6 +103,8 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
   const [searchHistory, setSearchHistory] = useState<RegulationSearchHistoryItem[]>([]);
   const [bookmarks, setBookmarks] = useState<RegulationBookmark[]>([]);
+  const [unifiedHistory, setUnifiedHistory] = useState<UnifiedHistoryItem[]>([]);
+  const [unifiedBookmarks, setUnifiedBookmarks] = useState<UnifiedBookmark[]>([]);
   const [showBookmarkModal, setShowBookmarkModal] = useState(false);
   const [bookmarkName, setBookmarkName] = useState('');
   const [bookmarkDescription, setBookmarkDescription] = useState('');
@@ -85,6 +112,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
   const [lastResponse, setLastResponse] = useState<ChatResponse | null>(null);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const [retryingMessageId, setRetryingMessageId] = useState<string | null>(null);
+
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -105,14 +133,19 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
         setCurrentUser(user);
         
         if (user) {
-          // Load search history and bookmarks
-          const [history, userBookmarks] = await Promise.all([
-            getRegulationSearchHistory(user.id),
-            getRegulationBookmarks(user.id)
-          ]);
-          
-          setSearchHistory(history);
-          setBookmarks(userBookmarks);
+                  // Load unified search history and bookmarks
+        const [unifiedHistoryData, unifiedBookmarksData] = await Promise.all([
+          getUnifiedSearchHistory(user.id),
+          getUnifiedBookmarks(user.id)
+        ]);
+        
+        // Set unified data
+        setUnifiedHistory(unifiedHistoryData);
+        setUnifiedBookmarks(unifiedBookmarksData);
+        
+        // Convert to old format for backward compatibility with existing UI
+        setSearchHistory(adaptUnifiedHistoryToOld(unifiedHistoryData));
+        setBookmarks(adaptUnifiedBookmarksToOld(unifiedBookmarksData));
         }
       } catch (error) {
         console.error('Error loading user and data:', error);
@@ -121,6 +154,161 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
 
     loadUserAndData();
   }, []);
+
+  // Load conversations from API
+  const loadConversations = async (): Promise<Conversation[]> => {
+    try {
+      const response = await fetch('/api/regulation/chat?action=conversations&limit=20');
+      const data = await response.json();
+      
+      if (data.success) {
+        return data.data;
+      } else {
+        console.error('Failed to load conversations:', data.error);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error loading conversations:', error);
+      return [];
+    }
+  };
+
+  // Helper function to refresh unified data
+  const refreshUnifiedData = async () => {
+    if (currentUser) {
+      const [updatedUnifiedHistory, updatedUnifiedBookmarks] = await Promise.all([
+        getUnifiedSearchHistory(currentUser.id),
+        getUnifiedBookmarks(currentUser.id)
+      ]);
+      
+      setUnifiedHistory(updatedUnifiedHistory);
+      setUnifiedBookmarks(updatedUnifiedBookmarks);
+      
+      // Update adapted data for backward compatibility
+      setSearchHistory(adaptUnifiedHistoryToOld(updatedUnifiedHistory));
+      setBookmarks(adaptUnifiedBookmarksToOld(updatedUnifiedBookmarks));
+    }
+  };
+
+  // Load conversation history
+  const loadConversationHistory = async (conversationId: number): Promise<ChatMessage[]> => {
+    try {
+      const response = await fetch(`/api/regulation/chat?action=conversation-history&conversation_id=${conversationId}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        return data.data.map((msg: any) => ({
+          id: msg.id.toString(),
+          role: msg.role,
+          content: msg.content,
+          timestamp: new Date(msg.timestamp),
+          citations: msg.citations || []
+        }));
+      } else {
+        console.error('Failed to load conversation history:', data.error);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error loading conversation history:', error);
+      return [];
+    }
+  };
+
+  // Create new conversation
+  const createNewConversation = async () => {
+    if (!currentUser) return;
+
+    try {
+      const response = await fetch('/api/regulation/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'create-conversation',
+          title: 'New Chat',
+          first_message: 'Hello'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const newConversationId = data.data.conversation_id;
+        setCurrentConversationId(newConversationId);
+        
+        // Reset to welcome message
+        setMessages([
+          {
+            id: '1',
+            role: 'assistant',
+            content: `👋 Welcome to the Australian Aged Care Regulation Assistant!
+
+I can help you find information from:
+• **Aged Care Act 2024** (Current & November 2025 versions)
+• **Commonwealth Home Support Programme (CHSP)** manuals
+• **Home Care Package** operational guides  
+• **Residential Aged Care** funding documents
+• **Retirement Village Acts** (all Australian states)
+• **Support at Home** program handbooks
+• **Fee schedules** and regulatory updates
+
+Ask me anything about aged care regulations, compliance requirements, funding, or program details. I'll provide accurate answers with specific document citations.`,
+            timestamp: new Date(),
+            citations: []
+          }
+        ]);
+        
+
+        
+        // Focus on input
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 100);
+      } else {
+        console.error('Failed to create conversation:', data.error);
+      }
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+    }
+  };
+
+  // Switch to existing conversation
+  const switchToConversation = async (conversationId: number) => {
+    try {
+      const history = await loadConversationHistory(conversationId);
+      
+      if (history.length > 0) {
+        setMessages(history);
+      } else {
+        // If no history, show welcome message
+        setMessages([
+          {
+            id: '1',
+            role: 'assistant',
+            content: `👋 Welcome to the Australian Aged Care Regulation Assistant!
+
+I can help you find information from:
+• **Aged Care Act 2024** (Current & November 2025 versions)
+• **Commonwealth Home Support Programme (CHSP)** manuals
+• **Home Care Package** operational guides  
+• **Residential Aged Care** funding documents
+• **Retirement Village Acts** (all Australian states)
+• **Support at Home** program handbooks
+• **Fee schedules** and regulatory updates
+
+Ask me anything about aged care regulations, compliance requirements, funding, or program details. I'll provide accurate answers with specific document citations.`,
+            timestamp: new Date(),
+            citations: []
+          }
+        ]);
+      }
+      
+          setCurrentConversationId(conversationId);
+    } catch (error) {
+      console.error('Error switching to conversation:', error);
+    }
+  };
 
   const sendMessage = async (messageText?: string) => {
     const messageToSend = messageText || inputMessage.trim();
@@ -147,13 +335,38 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
     setLastSearchTerm(messageToSend);
 
     try {
+      // If no conversation exists, create one
+      let conversationId = currentConversationId;
+      if (!conversationId && currentUser) {
+        const createResponse = await fetch('/api/regulation/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'create-conversation',
+            title: messageToSend.slice(0, 50),
+            first_message: messageToSend
+          }),
+        });
+
+        const createData = await createResponse.json();
+        if (createData.success) {
+          conversationId = createData.data.conversation_id;
+          setCurrentConversationId(conversationId);
+        }
+      }
+
+      // Send message with conversation context
       const response = await fetch('/api/regulation/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          question: messageToSend
+          question: messageToSend,
+          conversation_id: conversationId,
+          conversation_history: messages.filter(m => !m.isLoading).slice(-5) // Last 5 messages for context
         }),
       });
 
@@ -187,9 +400,11 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
             chatResponse.processing_time
           );
 
-          // Refresh search history
-          const updatedHistory = await getRegulationSearchHistory(currentUser.id);
-          setSearchHistory(updatedHistory);
+          // Refresh unified search history
+          const updatedUnifiedHistory = await getUnifiedSearchHistory(currentUser.id);
+          
+          setUnifiedHistory(updatedUnifiedHistory);
+          setSearchHistory(adaptUnifiedHistoryToOld(updatedUnifiedHistory));
         }
       } else {
         throw new Error(data.error || 'Failed to get response');
@@ -227,36 +442,75 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
 
   const handleDeleteSearchItem = async (itemId: number) => {
     if (currentUser) {
-      const success = await deleteRegulationSearchHistoryItem(currentUser.id, itemId);
-      if (success) {
-        setSearchHistory(prev => prev.filter(item => item.id !== itemId));
+      // Find the unified history item to determine its source type
+      const unifiedItem = unifiedHistory.find(item => item.id === itemId);
+      
+      if (unifiedItem) {
+        const success = await deleteUnifiedHistoryItem(currentUser.id, unifiedItem);
+        if (success) {
+          // Update unified history state
+          const updatedUnifiedHistory = unifiedHistory.filter(item => item.id !== itemId);
+          setUnifiedHistory(updatedUnifiedHistory);
+          
+          // Update adapted history state for backward compatibility
+          setSearchHistory(adaptUnifiedHistoryToOld(updatedUnifiedHistory));
+        }
+      } else {
+        // Fallback to old method if not found in unified history
+        const success = await deleteRegulationSearchHistoryItem(currentUser.id, itemId);
+        if (success) {
+          setSearchHistory(prev => prev.filter(item => item.id !== itemId));
+        }
       }
     }
   };
 
   const handleClearSearchHistory = async () => {
     if (currentUser) {
-      const success = await clearRegulationSearchHistory(currentUser.id);
+      const success = await clearUnifiedSearchHistory(currentUser.id);
+      
       if (success) {
-        setSearchHistory([]);
+        // Reload unified history to get accurate state after clearing
+        const updatedUnifiedHistory = await getUnifiedSearchHistory(currentUser.id);
+        setUnifiedHistory(updatedUnifiedHistory);
+        setSearchHistory(adaptUnifiedHistoryToOld(updatedUnifiedHistory));
       }
     }
   };
 
   const handleDeleteBookmark = async (bookmarkId: number) => {
     if (currentUser) {
-      const success = await deleteRegulationBookmark(currentUser.id, bookmarkId);
-      if (success) {
-        setBookmarks(prev => prev.filter(item => item.id !== bookmarkId));
+      // Find the unified bookmark item to determine its source type
+      const unifiedBookmark = unifiedBookmarks.find(item => item.id === bookmarkId);
+      
+      if (unifiedBookmark) {
+        const success = await deleteUnifiedBookmark(currentUser.id, unifiedBookmark);
+        if (success) {
+          // Update unified bookmarks state
+          const updatedUnifiedBookmarks = unifiedBookmarks.filter(item => item.id !== bookmarkId);
+          setUnifiedBookmarks(updatedUnifiedBookmarks);
+          
+          // Update adapted bookmarks state for backward compatibility
+          setBookmarks(adaptUnifiedBookmarksToOld(updatedUnifiedBookmarks));
+        }
+      } else {
+        // Fallback to old method if not found in unified bookmarks
+        const success = await deleteRegulationBookmark(currentUser.id, bookmarkId);
+        if (success) {
+          setBookmarks(prev => prev.filter(item => item.id !== bookmarkId));
+        }
       }
     }
   };
 
   const handleClearBookmarks = async () => {
     if (currentUser) {
-      const success = await clearRegulationBookmarks(currentUser.id);
+      const success = await clearUnifiedBookmarks(currentUser.id);
       if (success) {
-        setBookmarks([]);
+        // Reload unified bookmarks to get accurate state after clearing
+        const updatedUnifiedBookmarks = await getUnifiedBookmarks(currentUser.id);
+        setUnifiedBookmarks(updatedUnifiedBookmarks);
+        setBookmarks(adaptUnifiedBookmarksToOld(updatedUnifiedBookmarks));
       }
     }
   };
@@ -324,9 +578,8 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
     );
 
     if (success) {
-      // Refresh bookmarks
-      const updatedBookmarks = await getRegulationBookmarks(currentUser.id);
-      setBookmarks(updatedBookmarks);
+      // Refresh unified data to include new bookmark
+      await refreshUnifiedData();
       setShowBookmarkModal(false);
       setBookmarkName('');
       setBookmarkDescription('');
@@ -397,7 +650,9 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          question: originalQuestion
+          question: originalQuestion,
+          conversation_id: currentConversationId,
+          conversation_history: messages.filter(m => !m.isLoading && m.id !== messageId).slice(-5)
         }),
       });
 
@@ -443,25 +698,37 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Fixed History Panel with Hide/Show functionality */}
+      {/* Fixed History & Bookmarks Panel - Always Visible */}
       {isHistoryPanelVisible ? (
-        <div className="fixed left-0 top-0 w-80 h-screen bg-white border-r border-gray-200 z-30 transition-all duration-300 flex flex-col">
+        <div className="fixed left-0 top-0 w-80 h-screen bg-white border-r border-gray-200 z-30 flex flex-col">
           {/* Panel Header */}
           <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-white">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">History & Bookmarks</h3>
-              <button
-                onClick={() => setIsHistoryPanelVisible(false)}
-                className="p-1 hover:bg-gray-100 rounded transition-colors"
-                title="Hide History Panel"
-              >
-                <X className="w-4 h-4 text-gray-500" />
-              </button>
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <History className="w-5 h-5 text-blue-600" />
+                History & Bookmarks
+              </h3>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={createNewConversation}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="New Chat"
+                >
+                  <Plus className="w-4 h-4 text-gray-600" />
+                </button>
+                <button
+                  onClick={() => setIsHistoryPanelVisible(false)}
+                  className="p-1 hover:bg-gray-100 rounded transition-colors"
+                  title="Hide History Panel"
+                >
+                  <X className="w-4 h-4 text-gray-500" />
+                </button>
+              </div>
             </div>
           </div>
           
-          {/* Scrollable Panel Content */}
-          <div className="flex-1 overflow-y-auto">
+          {/* Full History & Bookmarks Content */}
+          <div className="flex-1 overflow-hidden">
             <RegulationHistoryPanel
               searchHistory={searchHistory}
               bookmarks={bookmarks}
@@ -487,7 +754,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
             <button
               onClick={() => setIsHistoryPanelVisible(true)}
               className="group p-2 hover:bg-gray-100 transition-colors duration-200 rounded"
-              title="Show History Panel"
+              title="Show History & Bookmarks"
             >
               <History className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors duration-200" />
             </button>
@@ -512,6 +779,16 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
               
               {/* Back to Main Menu and Actions */}
               <div className="flex items-center gap-2">
+                {/* New Chat Button */}
+                <button
+                  onClick={createNewConversation}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                  title="Start New Chat"
+                >
+                  <Plus className="w-4 h-4" />
+                  New Chat
+                </button>
+
                 {/* Back to Main Menu Button */}
                 <button
                   onClick={() => router.push('/main')}
@@ -521,8 +798,6 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
                   <ArrowLeft className="w-4 h-4" />
                   Main Menu
                 </button>
-                
-
               </div>
             </div>
             
@@ -665,8 +940,6 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
                                 {retryingMessageId === message.id ? 'Retrying...' : 'Retry'}
                               </span>
                             </button>
-
-
                           </div>
                         )}
                       </div>
