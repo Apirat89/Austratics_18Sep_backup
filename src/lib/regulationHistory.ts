@@ -492,25 +492,17 @@ export async function saveRegulationSearchToHistory(
     const supabase = createBrowserSupabaseClient();
     
     // Check if this search already exists for this user (to avoid duplicates)
+    // Using .maybeSingle() to avoid 406 errors when no match found
     const { data: existing, error: selectError } = await supabase
       .from('regulation_search_history')
       .select('id, updated_at')
       .eq('user_id', userId)
       .eq('search_term', searchTerm)
-      .single();
+      .maybeSingle();
 
-    if (selectError && selectError.code !== 'PGRST116') {
-      // Handle case where table doesn't exist yet
-      if (selectError.message?.includes('relation "public.regulation_search_history" does not exist') || 
-          selectError.message?.includes('does not exist')) {
-        console.warn('Regulation search history table not found. Search not saved. Please run the database setup script.');
-        return false;
-      }
-      // Ignore "No rows found" error (PGRST116) as it's expected when no existing record
-      if (selectError.code !== 'PGRST116') {
-        console.error('Error checking existing regulation search:', selectError.message || selectError);
-        return false;
-      }
+    if (selectError) {
+      console.error('Error checking existing regulation search:', selectError.message || selectError);
+      // Continue with insert anyway to avoid blocking new entries
     }
 
     if (existing) {
@@ -533,6 +525,20 @@ export async function saveRegulationSearchToHistory(
       }
     } else {
       // Create new record
+      // If conversation_id provided, verify it exists first
+      if (conversationId) {
+        const { data: convCheck, error: convError } = await supabase
+          .from('regulation_conversations')
+          .select('id')
+          .eq('id', conversationId)
+          .maybeSingle();
+          
+        if (convError || !convCheck) {
+          console.warn('Conversation not found, saving history without conversation_id:', conversationId);
+          conversationId = undefined;
+        }
+      }
+      
       const { error: insertError } = await supabase
         .from('regulation_search_history')
         .insert({

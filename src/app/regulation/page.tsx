@@ -192,24 +192,34 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
 
   // Load conversation history
   const loadConversationHistory = async (conversationId: number): Promise<ChatMessage[]> => {
+    console.log('📖 LOAD DEBUG: loadConversationHistory called for conversation:', conversationId);
     try {
-      const response = await fetch(`/api/regulation/chat?action=conversation-history&conversation_id=${conversationId}`);
+      const url = `/api/regulation/chat?action=conversation-history&conversation_id=${conversationId}`;
+      console.log('📖 LOAD DEBUG: fetching URL:', url);
+      
+      const response = await fetch(url);
       const data = await response.json();
       
+      console.log('📖 LOAD DEBUG: API response status:', response.status);
+      console.log('📖 LOAD DEBUG: API response data:', data);
+      
       if (data.success) {
-        return data.data.map((msg: any) => ({
+        const messages = data.data.map((msg: any) => ({
           id: msg.id.toString(),
           role: msg.role,
           content: msg.content,
           timestamp: new Date(msg.created_at),
           citations: msg.citations || []
         }));
+        
+        console.log('✅ LOAD DEBUG: Successfully mapped', messages.length, 'messages');
+        return messages;
       } else {
-        console.error('Failed to load conversation history:', data.error);
+        console.error('❌ LOAD DEBUG: Failed to load conversation history:', data.error);
         return [];
       }
     } catch (error) {
-      console.error('Error loading conversation history:', error);
+      console.error('❌ LOAD DEBUG: Error loading conversation history:', error);
       return [];
     }
   };
@@ -275,12 +285,17 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
 
   // Switch to existing conversation
   const switchToConversation = async (conversationId: number) => {
+    console.log('🔄 SWITCH DEBUG: switchToConversation called with ID:', conversationId);
     try {
       const history = await loadConversationHistory(conversationId);
+      console.log('📚 SWITCH DEBUG: loaded history length:', history.length);
+      console.log('📚 SWITCH DEBUG: history preview:', history.map(m => ({ role: m.role, preview: m.content.substring(0, 50) + '...' })));
       
       if (history.length > 0) {
         setMessages(history);
+        console.log('✅ SWITCH DEBUG: Messages set from history');
       } else {
+        console.log('⚠️ SWITCH DEBUG: No history found, showing welcome message');
         // If no history, show welcome message
         setMessages([
           {
@@ -304,20 +319,16 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
         ]);
       }
       
-          setCurrentConversationId(conversationId);
+      setCurrentConversationId(conversationId);
+      console.log('🔄 SWITCH DEBUG: currentConversationId set to:', conversationId);
     } catch (error) {
-      console.error('Error switching to conversation:', error);
+      console.error('❌ SWITCH DEBUG: Error switching to conversation:', error);
     }
   };
 
   const sendMessage = async (messageText?: string) => {
     const messageToSend = messageText || inputMessage.trim();
     if (!messageToSend || isLoading) return;
-
-    console.log('🔍 DEBUGGING: sendMessage started');
-    console.log('🔍 messageToSend:', messageToSend);
-    console.log('🔍 currentConversationId before:', currentConversationId);
-    console.log('🔍 currentUser:', currentUser?.id);
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -342,10 +353,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
     try {
       // If no conversation exists, create one
       let conversationId = currentConversationId;
-      console.log('🔍 DEBUGGING: conversation check - conversationId:', conversationId);
-      
       if (!conversationId && currentUser) {
-        console.log('🔍 DEBUGGING: Creating new conversation...');
         const createResponse = await fetch('/api/regulation/chat', {
           method: 'POST',
           headers: {
@@ -359,20 +367,13 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
         });
 
         const createData = await createResponse.json();
-        console.log('🔍 DEBUGGING: Create conversation response:', createData);
-        
         if (createData.success) {
           conversationId = createData.data.conversation_id;
           setCurrentConversationId(conversationId);
-          console.log('🔍 DEBUGGING: New conversation created with ID:', conversationId);
-        } else {
-          console.error('🔍 DEBUGGING: Failed to create conversation:', createData.error);
         }
       }
 
       // Send message with conversation context
-      console.log('🔍 DEBUGGING: Sending message with conversation_id:', conversationId);
-      
       const response = await fetch('/api/regulation/chat', {
         method: 'POST',
         headers: {
@@ -386,7 +387,6 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
       });
 
       const data = await response.json();
-      console.log('🔍 DEBUGGING: API response:', data);
 
       if (data.success) {
         const chatResponse: ChatResponse = data.data;
@@ -404,16 +404,11 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
 
         // Save to search history if user is logged in
         if (currentUser) {
-          console.log('🔍 DEBUGGING: Saving to history...');
-          console.log('🔍 conversationId to save:', conversationId);
-          console.log('🔍 chatResponse.conversation_id:', chatResponse.conversation_id);
-          
           const responsePreview = chatResponse.message.slice(0, 150);
           const documentTypes = [...new Set(chatResponse.citations.map(c => c.document_type))];
           
-          // FIXED: conversation_id now being saved to history!
+          // Save with conversation_id for ChatGPT-like instant loading
           const finalConversationId = chatResponse.conversation_id || conversationId;
-          console.log('🔍 DEBUGGING: finalConversationId that should be saved:', finalConversationId);
           
           await saveRegulationSearchToHistory(
             currentUser.id,
@@ -424,19 +419,17 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
             chatResponse.processing_time,
             finalConversationId || undefined
           );
-          
-          console.log('🔍 FIXED: conversation_id now passed to history:', finalConversationId);
 
-          console.log('🔍 DEBUGGING: History saved, refreshing unified history...');
-          
           // Refresh unified search history
           const updatedUnifiedHistory = await getUnifiedSearchHistory(currentUser.id);
-          console.log('🔍 DEBUGGING: Updated unified history length:', updatedUnifiedHistory.length);
+          console.log('📚 HISTORY DEBUG: Updated unified history:', updatedUnifiedHistory.map(h => ({ 
+            search_term: h.search_term, 
+            conversation_id: (h as any).conversation_id,
+            source_type: h.source_type 
+          })));
           
           setUnifiedHistory(updatedUnifiedHistory);
           setSearchHistory(adaptUnifiedHistoryToOld(updatedUnifiedHistory));
-          
-          console.log('🔍 DEBUGGING: History refresh complete');
         }
       } else {
         throw new Error(data.error || 'Failed to get response');
@@ -465,12 +458,16 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
   };
 
   const handleSearchSelect = (search: RegulationSearchHistoryItem) => {
+    console.log('🔍 CLICK DEBUG: handleSearchSelect called with:', search);
+    console.log('🔍 CLICK DEBUG: search object keys:', Object.keys(search));
+    console.log('🔍 CLICK DEBUG: conversation_id value:', (search as any)?.conversation_id);
+    
     const cid = (search as any)?.conversation_id;
     if (cid) {
-      // Load saved conversation – NO regeneration
+      console.log('✅ LOADING SAVED CONVERSATION:', cid);
       switchToConversation(Number(cid));
     } else {
-      // Fallback to legacy behavior: re-run the query
+      console.log('❌ NO CONVERSATION_ID - REGENERATING:', search.search_term);
       sendMessage(search.search_term);
     }
   };
