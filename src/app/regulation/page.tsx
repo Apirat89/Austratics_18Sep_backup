@@ -201,7 +201,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
           id: msg.id.toString(),
           role: msg.role,
           content: msg.content,
-          timestamp: new Date(msg.timestamp),
+          timestamp: new Date(msg.created_at),
           citations: msg.citations || []
         }));
       } else {
@@ -433,11 +433,25 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
   };
 
   const handleSearchSelect = (search: RegulationSearchHistoryItem) => {
-    sendMessage(search.search_term);
+    const cid = (search as any)?.conversation_id;
+    if (cid) {
+      // Load saved conversation – NO regeneration
+      switchToConversation(Number(cid));
+    } else {
+      // Fallback to legacy behavior: re-run the query
+      sendMessage(search.search_term);
+    }
   };
 
   const handleBookmarkSelect = (bookmark: RegulationBookmark) => {
-    sendMessage(bookmark.search_term);
+    const cid = (bookmark as any)?.conversation_id;
+    if (cid) {
+      // Load saved conversation – NO regeneration  
+      switchToConversation(Number(cid));
+    } else {
+      // Fallback to legacy behavior: re-run the query
+      sendMessage(bookmark.search_term);
+    }
   };
 
   const handleDeleteSearchItem = async (itemId: number) => {
