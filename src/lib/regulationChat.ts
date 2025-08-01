@@ -25,6 +25,29 @@ export interface ChatResponse {
   citations: DocumentCitation[];
   context_used: number;
   processing_time: number;
+  conversation_id?: number;
+  message_id?: number;
+}
+
+// New interfaces for conversation support
+export interface ConversationContext {
+  conversation_id?: number;
+  user_id: string;
+  conversation_history?: ChatMessage[];
+  max_context_messages?: number;
+}
+
+export interface CreateConversationRequest {
+  user_id: string;
+  title?: string;
+  first_message: string;
+}
+
+export interface AddMessageRequest {
+  conversation_id: number;
+  user_id: string;
+  user_message: string;
+  conversation_history?: ChatMessage[];
 }
 
 export class RegulationChatService {
@@ -47,6 +70,504 @@ export class RegulationChatService {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
   }
+
+  // =============================================================================
+  // CONVERSATION MANAGEMENT METHODS
+  // =============================================================================
+
+  /**
+   * Create a new conversation
+   */
+  async createConversation(request: CreateConversationRequest): Promise<number> {
+    try {
+      const { user_id, title, first_message } = request;
+
+      // Insert new conversation
+      const { data, error } = await this.supabase
+        .from('regulation_conversations')
+        .insert({
+          user_id,
+          title: title || this.generateConversationTitle(first_message),
+          status: 'active'
+        })
+        .select('id')
+        .single();
+
+      if (error) {
+        throw new Error(`Failed to create conversation: ${error.message}`);
+      }
+
+      return data.id;
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get conversation history
+   */
+  async getConversationHistory(conversationId: number, userId: string): Promise<ChatMessage[]> {
+    try {
+      const { data, error } = await this.supabase
+        .rpc('get_conversation_messages', { 
+          conversation_id_param: conversationId,
+          user_id_param: userId
+        });
+
+      if (error) {
+        throw new Error(`Failed to get conversation history: ${error.message}`);
+      }
+
+      return (data || []).map((msg: any) => ({
+        id: msg.id.toString(),
+        role: msg.role,
+        content: msg.content,
+        timestamp: new Date(msg.created_at),
+        citations: msg.citations || []
+      }));
+    } catch (error) {
+      console.error('Error getting conversation history:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Add message to conversation
+   */
+  async addMessageToConversation(
+    conversationId: number,
+    role: 'user' | 'assistant',
+    content: string,
+    citations?: DocumentCitation[],
+    processingTime?: number
+  ): Promise<number> {
+    try {
+      console.log(`🔧 DEBUGGING: Calling add_message_to_conversation RPC with:`, {
+        conversationId,
+        role,
+        contentLength: content.length,
+        citationsCount: citations?.length || 0,
+        processingTime
+      });
+      
+      const { data: messageId, error } = await this.supabase
+        .rpc('add_message_to_conversation', {
+          conversation_id_param: conversationId,
+          role_param: role,
+          content_param: content,
+          citations_param: citations || null,
+          processing_time_param: processingTime || null,
+          search_intent_param: role === 'user' ? 'question' : null
+        });
+
+      if (error) {
+        console.error(`❌ RPC ERROR: add_message_to_conversation failed:`, error);
+        throw error;
+      }
+      
+      console.log(`🎉 RPC SUCCESS: add_message_to_conversation returned ID: ${messageId}`);
+      return messageId;
+    } catch (error) {
+      console.error('❌ Error adding message to conversation:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get user's recent conversations
+   */
+  async getUserConversations(userId: string, limit: number = 20): Promise<any[]> {
+    try {
+      const { data, error } = await this.supabase
+        .rpc('get_user_recent_conversations', {
+          user_id_param: userId,
+          limit_param: limit
+        });
+
+      if (error) {
+        throw new Error(`Failed to get user conversations: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error getting user conversations:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Generate conversation title from first message
+   */
+  private generateConversationTitle(firstMessage: string): string {
+    if (!firstMessage || firstMessage.length === 0) {
+      return 'New Conversation';
+    }
+    
+    // Clean up the message and truncate
+    const cleaned = firstMessage
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    return cleaned.length > 50 ? cleaned.substring(0, 50) + '...' : cleaned;
+  }
+
+  // =============================================================================
+  // ENHANCED QUERY PROCESSING WITH CONVERSATION CONTEXT
+  // =============================================================================
+
+  /**
+   * Process a complete chat query with conversation context
+   */
+  async processConversationalQuery(
+    question: string, 
+    context: ConversationContext = {} as ConversationContext
+  ): Promise<ChatResponse> {
+    const startTime = Date.now();
+    const { conversation_id, user_id, conversation_history = [], max_context_messages = 5 } = context;
+    
+    // Define actualConversationId at the top level for proper scoping
+    let actualConversationId = conversation_id;
+
+    try {
+      console.log(`🔍 Processing conversational query: "${question}"`);
+      console.log(`📚 Context: ${conversation_history.length} messages, conversation_id: ${conversation_id}`);
+
+      // Step 1: Create conversation if this is the first message
+      if (!actualConversationId && user_id) {
+        actualConversationId = await this.createConversation({
+          user_id,
+          first_message: question
+        });
+        console.log(`✨ Created new conversation: ${actualConversationId}`);
+      }
+
+      // Step 2: Add user message to conversation
+      let userMessageId: number | undefined;
+      if (actualConversationId) {
+        try {
+          console.log(`🔧 DEBUGGING: About to save user message to conversation ${actualConversationId}`);
+          console.log(`🔧 DEBUGGING: User message content: "${question}"`);
+          
+          userMessageId = await this.addMessageToConversation(
+            actualConversationId,
+            'user',
+            question
+          );
+          
+          console.log(`🎉 SUCCESS: Added user message with ID: ${userMessageId}`);
+        } catch (error) {
+          console.error(`❌ ERROR: Failed to save user message:`, error);
+          console.error(`❌ ERROR DETAILS:`, {
+            conversationId: actualConversationId,
+            question,
+            error: error instanceof Error ? error.message : String(error)
+          });
+          // Continue execution even if saving fails
+        }
+      }
+
+      // Step 3: Search for relevant documents
+      const citations = await this.searchRelevantDocuments(question, 7);
+      console.log(`📄 Found ${citations.length} relevant document sections`);
+
+      if (citations.length === 0) {
+        const response: ChatResponse = {
+          message: "I couldn't find any relevant information in the regulation documents to answer your question. Please try rephrasing your question or asking about specific aspects of aged care regulations, home care packages, CHSP programs, or retirement village acts.",
+          citations: [],
+          context_used: 0,
+          processing_time: Date.now() - startTime,
+          conversation_id: actualConversationId,
+          message_id: userMessageId
+        };
+
+        // Add assistant message to conversation
+        if (actualConversationId) {
+          await this.addMessageToConversation(
+            actualConversationId,
+            'assistant',
+            response.message,
+            [],
+            response.processing_time
+          );
+        }
+
+        return response;
+      }
+
+      // Step 4: Generate context-aware answer
+      const answer = await this.generateContextualAnswer(question, citations, conversation_history, max_context_messages);
+      console.log(`🤖 Generated contextual response using conversation history`);
+
+      const processingTime = Date.now() - startTime;
+      console.log(`⚡ Query processed in ${processingTime}ms`);
+
+      // Step 5: Add assistant message to conversation
+      let assistantMessageId: number | undefined;
+      if (actualConversationId) {
+        try {
+          console.log(`🔧 DEBUGGING: About to save assistant message to conversation ${actualConversationId}`);
+          console.log(`🔧 DEBUGGING: Assistant message content: "${answer.substring(0, 100)}..."`);
+          console.log(`🔧 DEBUGGING: Citations count: ${citations.length}`);
+          
+          assistantMessageId = await this.addMessageToConversation(
+            actualConversationId,
+            'assistant',
+            answer,
+            citations,
+            processingTime
+          );
+          
+          console.log(`🎉 SUCCESS: Added assistant message with ID: ${assistantMessageId}`);
+          
+          // Verify the message was actually saved
+          const { data: savedMessage, error: verifyError } = await this.supabase
+            .from('regulation_messages')
+            .select('*')
+            .eq('id', assistantMessageId)
+            .single();
+          
+          if (verifyError) {
+            console.error(`❌ VERIFICATION FAILED: Could not verify assistant message was saved:`, verifyError);
+          } else {
+            console.log(`✅ VERIFICATION SUCCESS: Assistant message saved successfully:`, {
+              id: savedMessage.id,
+              role: savedMessage.role,
+              content: savedMessage.content.substring(0, 100) + '...',
+              conversation_id: savedMessage.conversation_id
+            });
+          }
+        } catch (error) {
+          console.error(`❌ ERROR: Failed to save assistant message:`, error);
+          console.error(`❌ ERROR DETAILS:`, {
+            conversationId: actualConversationId,
+            answerLength: answer.length,
+            citationsCount: citations.length,
+            processingTime,
+            error: error instanceof Error ? error.message : String(error)
+          });
+          // Continue execution even if saving fails
+        }
+      } else {
+        console.warn(`⚠️  WARNING: No conversation ID available to save assistant message`);
+      }
+
+      const response: ChatResponse = {
+        message: answer,
+        citations,
+        context_used: citations.length,
+        processing_time: processingTime,
+        conversation_id: actualConversationId,
+        message_id: assistantMessageId
+      };
+
+      return response;
+
+    } catch (error) {
+      console.error('Error processing conversational query:', error);
+      
+      const response: ChatResponse = {
+        message: "I apologize, but I encountered an error while processing your question. Please try again or rephrase your question.",
+        citations: [],
+        context_used: 0,
+        processing_time: Date.now() - startTime,
+        conversation_id: actualConversationId
+      };
+
+      // Add error message to conversation if we have a conversation ID
+      if (actualConversationId) {
+        await this.addMessageToConversation(
+          actualConversationId,
+          'assistant',
+          response.message,
+          [],
+          response.processing_time
+        );
+      }
+
+      return response;
+    }
+  }
+
+  /**
+   * Generate context-aware answer using conversation history
+   */
+  async generateContextualAnswer(
+    question: string,
+    citations: DocumentCitation[],
+    conversationHistory: ChatMessage[],
+    maxContextMessages: number = 5
+  ): Promise<string> {
+    try {
+      // Sort citations by relevance score (highest first)
+      const sortedCitations = [...citations].sort((a, b) => b.similarity_score - a.similarity_score);
+
+      // Enhanced section analysis
+      const sectionInfo = this.extractSectionInformation(sortedCitations);
+
+      // Prepare conversation context
+      const recentHistory = conversationHistory.slice(-maxContextMessages);
+      const conversationContext = recentHistory.length > 0 ? 
+        recentHistory.map(msg => `${msg.role.toUpperCase()}: ${msg.content}`).join('\n') : 
+        'No previous conversation context.';
+
+      // Prepare prioritized context with better formatting
+      const contextChunks = sortedCitations.map((citation, index) => {
+        const relevanceIndicator = citation.similarity_score > 0.8 ? "🎯 HIGH RELEVANCE" : 
+                                   citation.similarity_score > 0.6 ? "📋 MEDIUM RELEVANCE" : 
+                                   "📄 LOWER RELEVANCE";
+        
+        return `[DOCUMENT ${index + 1}] ${relevanceIndicator}
+Document: "${citation.document_name}"${citation.section_title ? `
+Section: ${citation.section_title}` : ''}
+Similarity: ${(citation.similarity_score * 100).toFixed(1)}%
+
+CONTENT:
+${citation.content_snippet}
+
+${'='.repeat(80)}`;
+      });
+
+      const context = contextChunks.join('\n\n');
+
+      // Enhanced legal-specific prompt with conversation awareness
+      const prompt = `You are a specialized Australian aged care regulation legal advisor engaged in a conversation with a user. You must provide complete, accurate answers based on the provided regulatory documents while maintaining conversation context.
+
+🎯 PRIMARY GOAL: Provide comprehensive, helpful answers using the regulatory content available while considering the conversation history.
+
+💬 CONVERSATION CONTEXT:
+${conversationContext}
+
+📋 CITATION REQUIREMENTS:
+1. NEVER include page numbers in citations - they are unreliable
+2. Use this format ONLY: [Document Name, Section X] or [Document Name] for general references
+3. Focus on document name and section/division information only
+4. NEVER mention page numbers in your responses
+
+📝 CONVERSATION-AWARE RESPONSE REQUIREMENTS:
+1. You MUST consider the conversation history when answering
+2. If this is a follow-up question, reference previous parts of the conversation appropriately
+3. If the user is asking for clarification, provide more detailed explanations
+4. If the user is asking a new question, treat it as a fresh inquiry but maintain conversational tone
+5. You MUST provide complete, detailed answers when relevant content is available
+6. You MUST quote exact legal text from the documents
+7. You MUST use proper legal terminology: "Section", "subsection", "paragraph", "Division", "Chapter"
+8. You MUST structure responses with proper legal hierarchy
+9. You MUST synthesize information from multiple relevant chunks
+10. You MUST prioritize higher relevance documents (marked with 🎯 HIGH RELEVANCE)
+11. ONLY use "NOT IN CORPUS" if the content is genuinely not relevant to the question
+
+🔍 CONTEXTUAL ANALYSIS:
+- Analyze if this question builds on previous questions in the conversation
+- Determine if the user is asking for clarification, elaboration, or new information
+- Adjust your response style accordingly (more detailed for follow-ups, comprehensive for new topics)
+
+🔍 SELF-VALIDATION REQUIREMENTS (CRITICAL):
+Before finalizing your response, you MUST perform these checks INTERNALLY (do not include verification details in your response):
+
+1. **CONVERSATION CONTINUITY**: 
+   - Ensure your response flows naturally from the conversation context
+   - If referencing previous discussion, do so clearly and accurately
+   - Maintain consistent terminology and explanations throughout the conversation
+
+2. **ACCURACY VERIFICATION**:
+   - Re-read your answer and verify every claim against the provided document context
+   - Ensure all quoted text exactly matches the source documents
+   - Confirm all section/division references are correctly cited
+   - Flag any statements you cannot directly verify from the provided context
+
+3. **COMPREHENSIVENESS REVIEW**:
+   - Check if you've addressed ALL parts of the user's question
+   - Identify any relevant aspects you may have missed
+   - Ensure you've utilized all highly relevant documents (🎯 HIGH RELEVANCE)
+   - Verify you haven't overlooked important related information
+
+4. **COMPLETENESS VALIDATION**:
+   - If discussing a legal section, ensure you've included all relevant subsections/paragraphs
+   - Check that your legal structure references are complete and accurate
+   - Confirm you've synthesized information from multiple sources when appropriate
+   - Verify your response provides practical, actionable information when possible
+
+5. **UNCERTAINTY ACKNOWLEDGMENT**:
+   - If any part of your answer relies on interpretation, clearly state this in your response
+   - If information is incomplete in the provided context, acknowledge limitations in your response
+   - If multiple interpretations are possible, present the most supported one and note alternatives
+
+6. **FINAL QUALITY CHECK**:
+   - Ensure your response is complete, accurate, and directly answers the user's question
+   - Verify all citations are properly formatted without page numbers
+   - Confirm the response maintains professional legal advisory standards
+   - Check that the response maintains conversational flow from previous messages
+
+SECTION ANALYSIS:
+${sectionInfo.summary}
+
+REGULATORY DOCUMENT CONTEXT:
+${context}
+
+CURRENT USER QUESTION: ${question}
+
+CONVERSATIONAL LEGAL RESPONSE:
+- If this is a follow-up question, acknowledge the previous context appropriately
+- Begin with direct answer using exact legal text from highest relevance sources
+- Include complete section content when relevant with proper subsection and paragraph references
+- NEVER include page numbers in citations
+- Structure with legal hierarchy explicitly stating "subsection (1)", "paragraph (a)", etc.
+- When discussing legal structure, reference the hierarchy levels explicitly using proper legal terminology
+- When explaining what a section "says", describe its structure using terms like "subsection" and "paragraph"
+- If multiple sources confirm the same information, mention this for authority
+- Maintain conversational tone while preserving legal accuracy
+- End with summary if complex multi-part answer or natural conversation closing
+
+CITATION EXAMPLES:
+✅ CORRECT: [C2025C00122, Section 54-1A]
+✅ CORRECT: [C2025C00122, Division 63]
+✅ CORRECT: [Aged Care Act 1997, Section 2-1]
+❌ INCORRECT: [C2025C00122, Section 54-1A, Page 30] (never include page numbers)
+❌ INCORRECT: Any citation that includes page numbers
+
+RESPONSE:`;
+
+      // Use Gemini 2.0 Flash with optimized parameters for conversation
+      const model = this.genAI.getGenerativeModel({ 
+        model: 'gemini-2.0-flash-exp',
+        generationConfig: {
+          temperature: 0.05, // Slightly higher for more natural conversation
+          maxOutputTokens: 2000, // Increased for conversational responses
+          topP: 0.8,
+          topK: 20
+        }
+      });
+
+      const result = await model.generateContent(prompt);
+      
+      if (!result.response || !result.response.text()) {
+        throw new Error('No response generated from Gemini');
+      }
+
+      let responseText = result.response.text();
+      return responseText;
+    } catch (error) {
+      console.error('Error generating contextual answer:', error);
+      throw new Error(`Failed to generate contextual answer: ${error}`);
+    }
+  }
+
+  // =============================================================================
+  // BACKWARD COMPATIBILITY - Keep existing processQuery method
+  // =============================================================================
+
+  /**
+   * Process a complete chat query with search and response generation (legacy method)
+   */
+  async processQuery(question: string): Promise<ChatResponse> {
+    // Call the new conversational method without context for backward compatibility
+    return await this.processConversationalQuery(question, {} as ConversationContext);
+  }
+
+  // =============================================================================
+  // EXISTING METHODS (unchanged)
+  // =============================================================================
 
   private getPdfProcessor(): PDFProcessor {
     if (!this.pdfProcessor) {
@@ -383,69 +904,6 @@ RESPONSE:`;
     };
   }
 
-
-
-  /**
-   * Process a complete chat query with search and response generation
-   */
-  async processQuery(question: string): Promise<ChatResponse> {
-    const startTime = Date.now();
-
-    try {
-      console.log(`🔍 Processing regulation query: "${question}"`);
-
-      // Check cache first
-      const cachedResponse = this.getFromCache(question);
-      if (cachedResponse) {
-        console.log(`⚡ Returning cached response for "${question}"`);
-        return cachedResponse;
-      }
-
-      // Step 1: Search for relevant documents
-      const citations = await this.searchRelevantDocuments(question, 7);
-      console.log(`📄 Found ${citations.length} relevant document sections`);
-
-      if (citations.length === 0) {
-        const response: ChatResponse = {
-          message: "I couldn't find any relevant information in the regulation documents to answer your question. Please try rephrasing your question or asking about specific aspects of aged care regulations, home care packages, CHSP programs, or retirement village acts.",
-          citations: [],
-          context_used: 0,
-          processing_time: Date.now() - startTime
-        };
-        this.addToCache(question, response);
-        return response;
-      }
-
-      // Step 2: Generate comprehensive answer using enhanced context
-      const answer = await this.generateAnswer(question, citations);
-      console.log(`🤖 Generated response using Gemini 2.0 Flash with enhanced context processing`);
-
-      const processingTime = Date.now() - startTime;
-      console.log(`⚡ Query processed in ${processingTime}ms`);
-
-      const response: ChatResponse = {
-        message: answer,
-        citations,
-        context_used: citations.length,
-        processing_time: processingTime
-      };
-      this.addToCache(question, response);
-      return response;
-
-    } catch (error) {
-      console.error('Error processing query:', error);
-      
-      const response: ChatResponse = {
-        message: "I apologize, but I encountered an error while processing your question. Please try again or rephrase your question.",
-        citations: [],
-        context_used: 0,
-        processing_time: Date.now() - startTime
-      };
-      this.addToCache(question, response);
-      return response;
-    }
-  }
-
   /**
    * Get available document types for filtering
    */
@@ -634,6 +1092,229 @@ RESPONSE:`;
 
     console.log(`📋 Citation validation: ${citations.length} → ${validatedCitations.length} citations (${citations.length - validatedCitations.length} phantom pages rejected)`);
     return validatedCitations;
+  }
+
+  // Individual message management methods
+  async deleteMessage(messageId: number, userId: string): Promise<boolean> {
+    try {
+      // First verify the message belongs to the user
+      const { data: message, error: fetchError } = await this.supabase
+        .from('regulation_messages')
+        .select('id, conversation_id, role, message_index')
+        .eq('id', messageId)
+        .single();
+
+      if (fetchError || !message) {
+        console.error('Message not found:', fetchError);
+        return false;
+      }
+
+      // Check if user owns the conversation
+      const { data: conversation, error: convError } = await this.supabase
+        .from('regulation_conversations')
+        .select('id, user_id')
+        .eq('id', message.conversation_id)
+        .eq('user_id', userId)
+        .single();
+
+      if (convError || !conversation) {
+        console.error('Conversation not found or user not authorized:', convError);
+        return false;
+      }
+
+      // Delete the message
+      const { error: deleteError } = await this.supabase
+        .from('regulation_messages')
+        .delete()
+        .eq('id', messageId);
+
+      if (deleteError) {
+        console.error('Error deleting message:', deleteError);
+        return false;
+      }
+
+      // Update conversation message count
+      await this.supabase
+        .rpc('update_conversation_message_count', {
+          conversation_id_param: message.conversation_id
+        });
+
+      console.log(`Message ${messageId} deleted successfully`);
+      return true;
+    } catch (error) {
+      console.error('Error in deleteMessage:', error);
+      return false;
+    }
+  }
+
+  async bookmarkMessage(messageId: number, userId: string, bookmarked: boolean): Promise<boolean> {
+    try {
+      // First verify the message belongs to the user
+      const { data: message, error: fetchError } = await this.supabase
+        .from('regulation_messages')
+        .select('id, conversation_id')
+        .eq('id', messageId)
+        .single();
+
+      if (fetchError || !message) {
+        console.error('Message not found:', fetchError);
+        return false;
+      }
+
+      // Check if user owns the conversation
+      const { data: conversation, error: convError } = await this.supabase
+        .from('regulation_conversations')
+        .select('id, user_id')
+        .eq('id', message.conversation_id)
+        .eq('user_id', userId)
+        .single();
+
+      if (convError || !conversation) {
+        console.error('Conversation not found or user not authorized:', convError);
+        return false;
+      }
+
+      // Add bookmark flag to message (we'll need to add this column to the table)
+      const { error: updateError } = await this.supabase
+        .from('regulation_messages')
+        .update({ 
+          is_bookmarked: bookmarked,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', messageId);
+
+      if (updateError) {
+        console.error('Error bookmarking message:', updateError);
+        return false;
+      }
+
+      console.log(`Message ${messageId} bookmark ${bookmarked ? 'added' : 'removed'} successfully`);
+      return true;
+    } catch (error) {
+      console.error('Error in bookmarkMessage:', error);
+      return false;
+    }
+  }
+
+  async bookmarkConversation(conversationId: number, userId: string, bookmarked: boolean): Promise<boolean> {
+    try {
+      // Update conversation bookmark flag
+      const { error: updateError } = await this.supabase
+        .from('regulation_conversations')
+        .update({ 
+          is_bookmarked: bookmarked,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', conversationId)
+        .eq('user_id', userId);
+
+      if (updateError) {
+        console.error('Error bookmarking conversation:', updateError);
+        return false;
+      }
+
+      console.log(`Conversation ${conversationId} bookmark ${bookmarked ? 'added' : 'removed'} successfully`);
+      return true;
+    } catch (error) {
+      console.error('Error in bookmarkConversation:', error);
+      return false;
+    }
+  }
+
+  async deleteConversation(conversationId: number, userId: string): Promise<boolean> {
+    try {
+      // First verify the conversation belongs to the user
+      const { data: conversation, error: fetchError } = await this.supabase
+        .from('regulation_conversations')
+        .select('id, user_id')
+        .eq('id', conversationId)
+        .eq('user_id', userId)
+        .single();
+
+      if (fetchError || !conversation) {
+        console.error('Conversation not found or user not authorized:', fetchError);
+        return false;
+      }
+
+      // Delete the conversation (messages will be deleted automatically due to CASCADE)
+      const { error: deleteError } = await this.supabase
+        .from('regulation_conversations')
+        .delete()
+        .eq('id', conversationId)
+        .eq('user_id', userId);
+
+      if (deleteError) {
+        console.error('Error deleting conversation:', deleteError);
+        return false;
+      }
+
+      console.log(`Conversation ${conversationId} deleted successfully`);
+      return true;
+    } catch (error) {
+      console.error('Error in deleteConversation:', error);
+      return false;
+    }
+  }
+
+  // Unified bookmarks methods
+  async getUnifiedBookmarks(userId: string, limit: number = 20): Promise<any[]> {
+    try {
+      const { data, error } = await this.supabase
+        .rpc('get_unified_bookmarks', {
+          user_id_param: userId,
+          limit_param: limit
+        });
+
+      if (error) {
+        console.error('Error fetching unified bookmarks:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getUnifiedBookmarks:', error);
+      return [];
+    }
+  }
+
+  async getBookmarkedMessages(userId: string, limit: number = 20): Promise<any[]> {
+    try {
+      const { data, error } = await this.supabase
+        .rpc('get_user_bookmarked_messages', {
+          user_id_param: userId,
+          limit_param: limit
+        });
+
+      if (error) {
+        console.error('Error fetching bookmarked messages:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getBookmarkedMessages:', error);
+      return [];
+    }
+  }
+
+  async getBookmarkedConversations(userId: string, limit: number = 20): Promise<any[]> {
+    try {
+      const { data, error } = await this.supabase
+        .rpc('get_user_bookmarked_conversations', {
+          user_id_param: userId,
+          limit_param: limit
+        });
+
+      if (error) {
+        console.error('Error fetching bookmarked conversations:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getBookmarkedConversations:', error);
+      return [];
+    }
   }
 }
 
