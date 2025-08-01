@@ -485,7 +485,8 @@ export async function saveRegulationSearchToHistory(
   responsePreview?: string,
   citationsCount?: number,
   documentTypes?: string[],
-  processingTime?: number
+  processingTime?: number,
+  conversationId?: number
 ): Promise<boolean> {
   try {
     const supabase = createBrowserSupabaseClient();
@@ -521,7 +522,8 @@ export async function saveRegulationSearchToHistory(
           response_preview: responsePreview,
           citations_count: citationsCount,
           document_types: documentTypes,
-          processing_time: processingTime
+          processing_time: processingTime,
+          conversation_id: conversationId
         })
         .eq('id', existing.id);
 
@@ -540,6 +542,7 @@ export async function saveRegulationSearchToHistory(
           citations_count: citationsCount,
           document_types: documentTypes,
           processing_time: processingTime,
+          conversation_id: conversationId,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         });

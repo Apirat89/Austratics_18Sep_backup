@@ -314,6 +314,11 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
     const messageToSend = messageText || inputMessage.trim();
     if (!messageToSend || isLoading) return;
 
+    console.log('🔍 DEBUGGING: sendMessage started');
+    console.log('🔍 messageToSend:', messageToSend);
+    console.log('🔍 currentConversationId before:', currentConversationId);
+    console.log('🔍 currentUser:', currentUser?.id);
+
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -337,7 +342,10 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
     try {
       // If no conversation exists, create one
       let conversationId = currentConversationId;
+      console.log('🔍 DEBUGGING: conversation check - conversationId:', conversationId);
+      
       if (!conversationId && currentUser) {
+        console.log('🔍 DEBUGGING: Creating new conversation...');
         const createResponse = await fetch('/api/regulation/chat', {
           method: 'POST',
           headers: {
@@ -351,13 +359,20 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
         });
 
         const createData = await createResponse.json();
+        console.log('🔍 DEBUGGING: Create conversation response:', createData);
+        
         if (createData.success) {
           conversationId = createData.data.conversation_id;
           setCurrentConversationId(conversationId);
+          console.log('🔍 DEBUGGING: New conversation created with ID:', conversationId);
+        } else {
+          console.error('🔍 DEBUGGING: Failed to create conversation:', createData.error);
         }
       }
 
       // Send message with conversation context
+      console.log('🔍 DEBUGGING: Sending message with conversation_id:', conversationId);
+      
       const response = await fetch('/api/regulation/chat', {
         method: 'POST',
         headers: {
@@ -371,6 +386,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
       });
 
       const data = await response.json();
+      console.log('🔍 DEBUGGING: API response:', data);
 
       if (data.success) {
         const chatResponse: ChatResponse = data.data;
@@ -388,8 +404,16 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
 
         // Save to search history if user is logged in
         if (currentUser) {
+          console.log('🔍 DEBUGGING: Saving to history...');
+          console.log('🔍 conversationId to save:', conversationId);
+          console.log('🔍 chatResponse.conversation_id:', chatResponse.conversation_id);
+          
           const responsePreview = chatResponse.message.slice(0, 150);
           const documentTypes = [...new Set(chatResponse.citations.map(c => c.document_type))];
+          
+          // FIXED: conversation_id now being saved to history!
+          const finalConversationId = chatResponse.conversation_id || conversationId;
+          console.log('🔍 DEBUGGING: finalConversationId that should be saved:', finalConversationId);
           
           await saveRegulationSearchToHistory(
             currentUser.id,
@@ -397,14 +421,22 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
             responsePreview,
             chatResponse.citations.length,
             documentTypes,
-            chatResponse.processing_time
+            chatResponse.processing_time,
+            finalConversationId || undefined
           );
+          
+          console.log('🔍 FIXED: conversation_id now passed to history:', finalConversationId);
 
+          console.log('🔍 DEBUGGING: History saved, refreshing unified history...');
+          
           // Refresh unified search history
           const updatedUnifiedHistory = await getUnifiedSearchHistory(currentUser.id);
+          console.log('🔍 DEBUGGING: Updated unified history length:', updatedUnifiedHistory.length);
           
           setUnifiedHistory(updatedUnifiedHistory);
           setSearchHistory(adaptUnifiedHistoryToOld(updatedUnifiedHistory));
+          
+          console.log('🔍 DEBUGGING: History refresh complete');
         }
       } else {
         throw new Error(data.error || 'Failed to get response');

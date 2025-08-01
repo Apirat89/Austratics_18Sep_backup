@@ -1,0 +1,47 @@
+## Background and Motivation
+
+The user has identified a critical issue with the conversational regulation chat system: **only user queries are being saved to the database, but AI assistant responses are not being saved**. This breaks the conversation history functionality and prevents users from seeing complete conversation threads.
+
+## Key Challenges and Analysis
+
+### 🔍 **Root Cause Analysis Complete**
+
+**Issue**: Assistant responses are not being saved to the conversation history database.
+
+**Testing Results**:
+- ✅ **Database Function Works**: `add_message_to_conversation` can successfully save assistant messages
+- ✅ **User Messages Saved**: User queries are being saved correctly
+- ❌ **Assistant Messages Missing**: AI responses are not being saved during actual chat flow
+
+**Code Analysis**:
+- The `processConversationalQuery` method in `RegulationChatService` SHOULD save assistant responses (lines 275-283)
+- The flow is: User message → AI processing → Assistant response → Save assistant message
+- But assistant messages are not appearing in the database
+
+### 🎯 **Potential Root Causes**
+
+1. **Error in Assistant Message Saving**: The `addMessageToConversation` call for assistant messages might be failing silently
+2. **Flow Bypass**: The conversation might be using the old single-query endpoint instead of the new conversational endpoint
+3. **Transaction Issue**: The assistant message save might be rolling back due to an error
+4. **Authentication Issue**: The assistant message save might be failing due to RLS policies
+
+## High-level Task Breakdown
+
+### **Phase 1: Diagnostic Investigation** 
+- **Task 1.1**: Add comprehensive logging to track assistant message saving flow
+- **Task 1.2**: Check if API is using conversational vs single-query endpoints
+- **Task 1.3**: Verify the frontend is calling the correct conversation endpoints
+
+### **Phase 2: Fix Implementation**
+- **Task 2.1**: Fix any errors in the assistant message saving logic
+- **Task 2.2**: Ensure frontend uses conversational endpoints consistently
+- **Task 2.3**: Add error handling for failed assistant message saves
+
+### **Phase 3: Testing & Verification**
+- **Task 3.1**: Test complete conversation flow with both user and assistant messages
+- **Task 3.2**: Verify conversation history displays both user and assistant messages
+- **Task 3.3**: Test edge cases (errors, long messages, etc.)
+
+## Next Steps
+
+The investigation should start with **Task 1.1** to add comprehensive logging and identify exactly where the assistant message saving is failing in the actual chat flow. 
