@@ -208,7 +208,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
           id: msg.id.toString(),
           role: msg.role,
           content: msg.content,
-          timestamp: new Date(msg.created_at),
+          timestamp: msg.created_at ? new Date(msg.created_at) : new Date(),
           citations: msg.citations || []
         }));
         
@@ -945,7 +945,9 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
                         <div className={`text-xs mt-2 ${
                           message.role === 'user' ? 'text-blue-200' : 'text-gray-500'
                         }`} suppressHydrationWarning>
-                          {message.timestamp.toLocaleTimeString()}
+                          {message.timestamp && !isNaN(message.timestamp.getTime()) 
+                            ? message.timestamp.toLocaleTimeString() 
+                            : 'Just now'}
                         </div>
 
                         {/* Action Buttons - Copy, Retry, and Feedback for assistant messages (excluding welcome message) */}

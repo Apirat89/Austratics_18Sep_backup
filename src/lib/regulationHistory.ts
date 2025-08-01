@@ -156,14 +156,48 @@ export async function getUnifiedSearchHistory(
       }
     }
 
+    // Deduplicate based on conversation_id (prefer search_history over conversation_message)
+    const deduplicatedItems: UnifiedHistoryItem[] = [];
+    const seenConversationIds = new Set<number>();
+    const itemsWithoutConversation: UnifiedHistoryItem[] = [];
+
+    // First pass: collect items with conversation_id, preferring search_history
+    for (const item of unifiedItems) {
+      if (item.conversation_id) {
+        if (!seenConversationIds.has(item.conversation_id)) {
+          seenConversationIds.add(item.conversation_id);
+          // Prefer search_history source over conversation_message
+          if (item.source_type === 'search_history') {
+            deduplicatedItems.push(item);
+          } else {
+            // Check if we already have a search_history for this conversation
+            const existingIndex = deduplicatedItems.findIndex(
+              existing => existing.conversation_id === item.conversation_id && existing.source_type === 'search_history'
+            );
+            if (existingIndex === -1) {
+              deduplicatedItems.push(item);
+            }
+          }
+        }
+      } else {
+        // Items without conversation_id (legacy items)
+        itemsWithoutConversation.push(item);
+      }
+    }
+
+    // Add items without conversation_id
+    deduplicatedItems.push(...itemsWithoutConversation);
+
     // Sort by created_at descending and limit
-    unifiedItems.sort((a, b) => {
+    deduplicatedItems.sort((a, b) => {
       const aTime = new Date(a.created_at || 0).getTime();
       const bTime = new Date(b.created_at || 0).getTime();
       return bTime - aTime;
     });
 
-    return unifiedItems.slice(0, limit);
+    console.log(`🔧 DEDUPLICATION: ${unifiedItems.length} → ${deduplicatedItems.length} items (removed ${unifiedItems.length - deduplicatedItems.length} duplicates)`);
+
+    return deduplicatedItems.slice(0, limit);
   } catch (error) {
     console.error('Error fetching unified search history:', error);
     return [];
@@ -492,22 +526,17 @@ export async function saveRegulationSearchToHistory(
   try {
     const supabase = createBrowserSupabaseClient();
     
-    // Enhanced duplicate prevention with time-based deduplication
-    // Check for exact same search within the last 5 minutes to prevent rapid duplicates
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    
-    console.log('🔍 DUPLICATE CHECK: Searching for recent duplicates...');
+    // Simple duplicate prevention - check for exact same search term for this user
+    console.log('🔍 DUPLICATE CHECK: Searching for existing record...');
     console.log(`   userId: ${userId}`);
     console.log(`   searchTerm: "${searchTerm}"`);
-    console.log(`   since: ${fiveMinutesAgo}`);
     
     const { data: existing, error: selectError } = await supabase
       .from('regulation_search_history')
       .select('id, updated_at, created_at')
       .eq('user_id', userId)
       .eq('search_term', searchTerm)
-      .gte('created_at', fiveMinutesAgo)  // Only check recent records (5 minutes)
-      .order('created_at', { ascending: false })
+      .order('updated_at', { ascending: false })  // Get most recent if multiple exist
       .maybeSingle();
 
     if (selectError) {
