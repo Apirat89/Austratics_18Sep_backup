@@ -430,7 +430,8 @@ export function adaptUnifiedHistoryToOld(items: UnifiedHistoryItem[]): Regulatio
     document_types: item.document_types,
     processing_time: item.processing_time,
     created_at: item.created_at,
-    updated_at: item.updated_at
+    updated_at: item.updated_at,
+    conversation_id: (item as any).conversation_id  // ✅ ADDED: Include conversation_id for ChatGPT-like loading
   }));
 }
 
@@ -491,21 +492,39 @@ export async function saveRegulationSearchToHistory(
   try {
     const supabase = createBrowserSupabaseClient();
     
-    // Check if this search already exists for this user (to avoid duplicates)
-    // Using .maybeSingle() to avoid 406 errors when no match found
+    // Enhanced duplicate prevention with time-based deduplication
+    // Check for exact same search within the last 5 minutes to prevent rapid duplicates
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    
+    console.log('🔍 DUPLICATE CHECK: Searching for recent duplicates...');
+    console.log(`   userId: ${userId}`);
+    console.log(`   searchTerm: "${searchTerm}"`);
+    console.log(`   since: ${fiveMinutesAgo}`);
+    
     const { data: existing, error: selectError } = await supabase
       .from('regulation_search_history')
-      .select('id, updated_at')
+      .select('id, updated_at, created_at')
       .eq('user_id', userId)
       .eq('search_term', searchTerm)
+      .gte('created_at', fiveMinutesAgo)  // Only check recent records (5 minutes)
+      .order('created_at', { ascending: false })
       .maybeSingle();
 
     if (selectError) {
-      console.error('Error checking existing regulation search:', selectError.message || selectError);
+      console.error('❌ DUPLICATE CHECK: Error checking existing regulation search:', selectError.message || selectError);
       // Continue with insert anyway to avoid blocking new entries
+    } else {
+      console.log('✅ DUPLICATE CHECK: Query successful');
+      if (existing) {
+        console.log(`🔍 DUPLICATE CHECK: Found existing record ID ${existing.id} from ${existing.created_at}`);
+      } else {
+        console.log('🔍 DUPLICATE CHECK: No recent duplicates found, proceeding with insert');
+      }
     }
 
     if (existing) {
+      console.log(`🔄 DUPLICATE PREVENTION: Updating existing record ID ${existing.id} instead of creating duplicate`);
+      
       // Update existing record with new metadata
       const { error: updateError } = await supabase
         .from('regulation_search_history')
@@ -520,9 +539,12 @@ export async function saveRegulationSearchToHistory(
         .eq('id', existing.id);
 
       if (updateError) {
-        console.error('Error updating regulation search history:', updateError.message || updateError);
+        console.error('❌ Error updating regulation search history:', updateError.message || updateError);
         return false;
       }
+      
+      console.log('✅ DUPLICATE PREVENTION: Successfully updated existing record instead of creating duplicate');
+      return true;  // Early return - no need to continue to insert logic
     } else {
       // Create new record
       // If conversation_id provided, verify it exists first

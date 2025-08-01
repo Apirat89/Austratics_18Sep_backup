@@ -8319,3 +8319,102 @@ node scripts/test-conversation-loading.js
 
 **✅ FRONTEND CONVERSATION LOADING IS NOW FIXED**
 **Backend was already 100% working - this was purely a frontend loading issue**
+
+---
+
+## 🚨 **CRITICAL ISSUE ANALYSIS: Duplicate History & Missing Conversation Persistence**
+
+**USER REPORT**: 
+1. "when i make one search, 2 recent search are added per photo, when it should only be 1"
+2. "the conversation is still not saved just the user queries, and the system rruns the chat bot reply in new way again based on the saved user queries"
+
+**PLANNER MODE ACTIVE** 🧠
+
+### **🔍 DETAILED CRITICAL ANALYSIS**
+
+After implementing comprehensive fixes, both critical issues persist. Console logs reveal the exact failure points:
+
+### **🚨 CRITICAL ISSUE 1: Duplicate History Entries**
+
+**Evidence from Console Logs:**
+```javascript
+regulationHistory.ts:565 Regulation search saved to history: What are the rights of older people receiving aged care services?
+page.tsx:425 📚 HISTORY DEBUG: Updated unified history: (2) [{…}, {…}]
+// ... user clicks history item ...
+regulationHistory.ts:565 Regulation search saved to history: What are the rights of older people receiving aged care services?
+page.tsx:425 📚 HISTORY DEBUG: Updated unified history: (3) [{…}, {…}, {…}]
+```
+
+**ROOT CAUSE**: `saveRegulationSearchToHistory` called **TWICE** for single search:
+1. **First Call**: Original user search → saves to history (entry #1)
+2. **Second Call**: User clicks history → triggers `sendMessage()` → saves AGAIN (entry #2)
+
+**Why Duplicate Prevention Fails**: Our `.maybeSingle()` fix works, but duplicate check fails to find existing records due to:
+- Time window mismatches
+- Exact string matching failures
+- Database transaction timing issues
+
+### **🚨 CRITICAL ISSUE 2: Missing conversation_id in History Records**
+
+**Evidence from Console Logs:**
+```javascript
+🔍 CLICK DEBUG: search object keys: (9) ['id', 'user_id', 'search_term', 'response_preview', 'citations_count', 'document_types', 'processing_time', 'created_at', 'updated_at']
+🔍 CLICK DEBUG: conversation_id value: undefined
+❌ NO CONVERSATION_ID - REGENERATING: What are the rights of older people receiving aged care services?
+```
+
+**ROOT CAUSE**: `conversation_id` field **completely missing** from history records.
+
+**Critical Discovery**: Search object has 9 fields, but `conversation_id` is **NOT among them**.
+
+**Why This Happens:**
+1. **Missing SELECT**: `getUnifiedSearchHistory()` doesn't select `conversation_id` column
+2. **Not Being Saved**: `conversation_id` never saved to `regulation_search_history` table
+
+**Backend vs Frontend Disconnect:**
+- ✅ **Backend Perfect**: Conversations created (ID: 27), messages saved (64, 65)
+- ❌ **Frontend Broken**: History records lack `conversation_id`, can't load saved conversations
+
+### **🔍 STEP-BY-STEP FAILURE ANALYSIS**
+
+**Duplicate History Flow:**
+1. User types question → `sendMessage()` → First history save (Entry #1)
+2. User clicks history → `handleSearchSelect()` → No `conversation_id` found
+3. Falls back to `sendMessage()` → Second history save (Entry #2, duplicate check fails)
+4. **Result**: 2 entries instead of 1
+
+**Missing Conversation Flow:**
+1. Conversation created (ID: 27) → Backend working perfectly
+2. History saved WITHOUT `conversation_id` → Missing database link
+3. User clicks history → `conversation_id: undefined`
+4. Frontend regenerates instead of loading → No conversation persistence
+
+### **🚨 CRITICAL FIXES NEEDED IMMEDIATELY**
+
+#### **Priority 1: Add conversation_id to SELECT Query**
+- **Impact**: TOTAL FAILURE of conversation persistence
+- **Fix**: Add `conversation_id` to SELECT in `getUnifiedSearchHistory()`
+- **Time**: 5 minutes
+- **Status**: **URGENT - BLOCKING ALL CONVERSATION FEATURES**
+
+#### **Priority 2: Fix Duplicate Prevention Logic**
+- **Impact**: Creates 2+ entries per search
+- **Fix**: Enhance duplicate detection in `saveRegulationSearchToHistory()`
+- **Time**: 15 minutes
+- **Status**: **URGENT - USER EXPERIENCE DEGRADATION**
+
+#### **Priority 3: Ensure conversation_id Saving**
+- **Impact**: History records lack conversation links
+- **Fix**: Update `saveRegulationSearchToHistory()` to save `conversation_id`
+- **Time**: 10 minutes
+- **Status**: **URGENT - CORE FUNCTIONALITY BROKEN**
+
+### **🎯 ROOT CAUSE SUMMARY**
+
+Both issues are **frontend-side problems** - backend working perfectly:
+
+1. **Duplicate History**: Duplicate check works but doesn't find matches → treats every search as new
+2. **No Conversation Persistence**: `getUnifiedSearchHistory()` doesn't SELECT conversation_id → frontend gets undefined
+
+**Confidence Level**: **95%** - Console logs provide definitive evidence
+**Next Action**: Immediate fixes in Priority 1 → 2 → 3 order
