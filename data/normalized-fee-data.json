@@ -1,0 +1,1458 @@
+{
+  "metadata": {
+    "extractedAt": "2025-08-20T11:25:15.550Z",
+    "schemaVersion": "1.0.0",
+    "totalDocuments": 15,
+    "dateRange": {
+      "earliest": "2021-12-31",
+      "latest": "2025-06-30"
+    }
+  },
+  "feeSchedules": [
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care_01 Jan 2022.pdf",
+      "effectiveDate": "2021-12-31",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 9.88,
+              "formatted": "$9.88",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 10.44,
+              "formatted": "$10.44",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 10.74,
+              "formatted": "$10.74",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 11.02,
+              "formatted": "$11.02",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 28,
+            "formatted": "$28.00",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "coupleIllnessSeparated": {
+            "amount": 27952.6,
+            "formatted": "$27,952.60",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 42083.6,
+            "formatted": "$42,083.60",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 59.49,
+            "formatted": "$59.49",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care_20 March 2022.pdf",
+      "effectiveDate": "2022-03-19",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 10.08,
+              "formatted": "$10.08",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 10.66,
+              "formatted": "$10.66",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 10.97,
+              "formatted": "$10.97",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 11.26,
+              "formatted": "$11.26",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 29,
+            "formatted": "$29.00",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "coupleIllnessSeparated": {
+            "amount": 28454.4,
+            "formatted": "$28,454.40",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 42868.8,
+            "formatted": "$42,868.80",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 60.74,
+            "formatted": "$60.74",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care 1 July 2022.pdf",
+      "effectiveDate": "2022-06-30",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 10.08,
+              "formatted": "$10.08",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 10.66,
+              "formatted": "$10.66",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 10.97,
+              "formatted": "$10.97",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 11.26,
+              "formatted": "$11.26",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 54.69,
+            "formatted": "$54.69",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 29234.4,
+            "formatted": "$29,234.40",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 28662.4,
+            "formatted": "$28,662.40",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 43076.8,
+            "formatted": "$43,076.80",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 60.74,
+            "formatted": "$60.74",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care 20 Sep 2022.pdf",
+      "effectiveDate": "2022-09-19",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 10.49,
+              "formatted": "$10.49",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 11.09,
+              "formatted": "$11.09",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 11.4,
+              "formatted": "$11.40",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 11.71,
+              "formatted": "$11.71",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 56.87,
+            "formatted": "$56.87",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 30204.2,
+            "formatted": "$30,204.20",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 29632.2,
+            "formatted": "$29,632.20",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 44605.6,
+            "formatted": "$44,605.60",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 63.14,
+            "formatted": "$63.14",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care_01 Jan 2023.pdf",
+      "effectiveDate": "2022-12-31",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 10.49,
+              "formatted": "$10.49",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 11.09,
+              "formatted": "$11.09",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 11.4,
+              "formatted": "$11.40",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 11.71,
+              "formatted": "$11.71",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 56.87,
+            "formatted": "$56.87",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 30204.2,
+            "formatted": "$30,204.20",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 29632.2,
+            "formatted": "$29,632.20",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 44605.6,
+            "formatted": "$44,605.60",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 63.14,
+            "formatted": "$63.14",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care_20 March 2023.pdf",
+      "effectiveDate": "2023-03-19",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 10.88,
+              "formatted": "$10.88",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 11.5,
+              "formatted": "$11.50",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 11.83,
+              "formatted": "$11.83",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 12.14,
+              "formatted": "$12.14",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 58.98,
+            "formatted": "$58.98",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 31140.2,
+            "formatted": "$31,140.20",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 30568.2,
+            "formatted": "$30,568.20",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 46072,
+            "formatted": "$46,072.00",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 65.49,
+            "formatted": "$65.49",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care 1 July 2023.pdf",
+      "effectiveDate": "2023-06-30",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 10.88,
+              "formatted": "$10.88",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 11.5,
+              "formatted": "$11.50",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 11.83,
+              "formatted": "$11.83",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 12.14,
+              "formatted": "$12.14",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 58.98,
+            "formatted": "$58.98",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 31504.2,
+            "formatted": "$31,504.20",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 30880.2,
+            "formatted": "$30,880.20",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 46384,
+            "formatted": "$46,384.00",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 65.49,
+            "formatted": "$65.49",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care 20 Sep 2023.pdf",
+      "effectiveDate": "2023-09-19",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 11.22,
+              "formatted": "$11.22",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 11.87,
+              "formatted": "$11.87",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 12.2,
+              "formatted": "$12.20",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 12.53,
+              "formatted": "$12.53",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 60.86,
+            "formatted": "$60.86",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 32331,
+            "formatted": "$32,331.00",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 31707,
+            "formatted": "$31,707.00",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 47668.4,
+            "formatted": "$47,668.40",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 66.94,
+            "formatted": "$66.94",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care_01 Jan 2024.pdf",
+      "effectiveDate": "2023-12-31",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 11.22,
+              "formatted": "$11.22",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 11.87,
+              "formatted": "$11.87",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 12.2,
+              "formatted": "$12.20",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 12.53,
+              "formatted": "$12.53",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 60.86,
+            "formatted": "$60.86",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 32331,
+            "formatted": "$32,331.00",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 31707,
+            "formatted": "$31,707.00",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 47668.4,
+            "formatted": "$47,668.40",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 66.94,
+            "formatted": "$66.94",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care_20 March 2024.pdf",
+      "effectiveDate": "2024-03-19",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 11.43,
+              "formatted": "$11.43",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 12.08,
+              "formatted": "$12.08",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 12.42,
+              "formatted": "$12.42",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 12.75,
+              "formatted": "$12.75",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 61.96,
+            "formatted": "$61.96",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 32819.8,
+            "formatted": "$32,819.80",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 32195.8,
+            "formatted": "$32,195.80",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 48432.8,
+            "formatted": "$48,432.80",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 68.14,
+            "formatted": "$68.14",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care 1 July 2024.pdf",
+      "effectiveDate": "2024-06-30",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 11.43,
+              "formatted": "$11.43",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 12.08,
+              "formatted": "$12.08",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 12.42,
+              "formatted": "$12.42",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 12.75,
+              "formatted": "$12.75",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 61.96,
+            "formatted": "$61.96",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 33027.8,
+            "formatted": "$33,027.80",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 32351.8,
+            "formatted": "$32,351.80",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 48588.8,
+            "formatted": "$48,588.80",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 68.14,
+            "formatted": "$68.14",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care 20 Sep 2024.pdf",
+      "effectiveDate": "2024-09-19",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 11.72,
+              "formatted": "$11.72",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 12.4,
+              "formatted": "$12.40",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 12.75,
+              "formatted": "$12.75",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 13.08,
+              "formatted": "$13.08",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 63.57,
+            "formatted": "$63.57",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 33735,
+            "formatted": "$33,735.00",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 33059,
+            "formatted": "$33,059.00",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 49691.2,
+            "formatted": "$49,691.20",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 69.49,
+            "formatted": "$69.49",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care_01 Jan 2025.pdf",
+      "effectiveDate": "2024-12-31",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 11.72,
+              "formatted": "$11.72",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 12.4,
+              "formatted": "$12.40",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 12.75,
+              "formatted": "$12.75",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 13.08,
+              "formatted": "$13.08",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 63.57,
+            "formatted": "$63.57",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 33735,
+            "formatted": "$33,735.00",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 33059,
+            "formatted": "$33,059.00",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 49691.2,
+            "formatted": "$49,691.20",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 69.49,
+            "formatted": "$69.49",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care_20 March 2025.pdf",
+      "effectiveDate": "2025-03-19",
+      "isCurrent": false,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 11.77,
+              "formatted": "$11.77",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 12.45,
+              "formatted": "$12.45",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 12.8,
+              "formatted": "$12.80",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 13.14,
+              "formatted": "$13.14",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 63.82,
+            "formatted": "$63.82",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 33849.4,
+            "formatted": "$33,849.40",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 33173.4,
+            "formatted": "$33,173.40",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 49873.2,
+            "formatted": "$49,873.20",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 69.79,
+            "formatted": "$69.79",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    },
+    {
+      "documentName": "schedule-of-fees-and-charges-for-residential-and-home-care 1 July 2025.pdf",
+      "effectiveDate": "2025-06-30",
+      "isCurrent": true,
+      "feeCategories": {
+        "basicDailyFees": {
+          "homeCare": {
+            "level1": {
+              "amount": 11.77,
+              "formatted": "$11.77",
+              "currency": "AUD"
+            },
+            "level2": {
+              "amount": 12.45,
+              "formatted": "$12.45",
+              "currency": "AUD"
+            },
+            "level3": {
+              "amount": 12.8,
+              "formatted": "$12.80",
+              "currency": "AUD"
+            },
+            "level4": {
+              "amount": 13.14,
+              "formatted": "$13.14",
+              "currency": "AUD"
+            }
+          },
+          "residentialCare": {
+            "amount": 63.82,
+            "formatted": "$63.82",
+            "currency": "AUD"
+          }
+        },
+        "incomeFreeAreas": {
+          "singlePerson": {
+            "amount": 34005.4,
+            "formatted": "$34,005.40",
+            "currency": "AUD"
+          },
+          "coupleIllnessSeparated": {
+            "amount": 33277.4,
+            "formatted": "$33,277.40",
+            "currency": "AUD"
+          },
+          "coupleLivingTogether": {
+            "amount": 49977.2,
+            "formatted": "$49,977.20",
+            "currency": "AUD"
+          }
+        },
+        "accommodationSupplements": {
+          "maximum": {
+            "amount": 69.79,
+            "formatted": "$69.79",
+            "currency": "AUD",
+            "period": "per day"
+          }
+        }
+      },
+      "sourceReferences": {
+        "pageNumber": null,
+        "sectionTitle": null,
+        "extractionConfidence": 0.95
+      }
+    }
+  ],
+  "queryMappings": {
+    "homeCareLevel1": [
+      "home care level 1 fee",
+      "level 1 home care package",
+      "basic daily fee home care level 1",
+      "home care package 1 cost",
+      "level 1 home care daily fee",
+      "what is the official basic daily fee rate of Home care - level 1",
+      "home care level 1 basic daily fee",
+      "level 1 package fee",
+      "home care package level 1"
+    ],
+    "homeCareLevel2": [
+      "home care level 2 fee",
+      "level 2 home care package",
+      "home care package 2 cost",
+      "level 2 package fee",
+      "home care package level 2"
+    ],
+    "homeCareLevel3": [
+      "home care level 3 fee",
+      "level 3 home care package",
+      "home care package 3 cost",
+      "level 3 package fee",
+      "home care package level 3"
+    ],
+    "homeCareLevel4": [
+      "home care level 4 fee",
+      "level 4 home care package",
+      "home care package 4 cost",
+      "level 4 package fee",
+      "home care package level 4"
+    ],
+    "residentialCare": [
+      "residential care basic daily fee",
+      "residential care fee",
+      "basic daily fee residential",
+      "residential care daily fee",
+      "residential basic daily fee"
+    ],
+    "allHomeCare": [
+      "home care fees",
+      "home care package fees",
+      "home care level fees",
+      "what are the home care level fees"
+    ]
+  },
+  "normalizedLookups": {
+    "currentFees": {
+      "home_care_level_1": {
+        "amount": 11.77,
+        "formatted": "$11.77",
+        "currency": "AUD"
+      },
+      "home_care_level_2": {
+        "amount": 12.45,
+        "formatted": "$12.45",
+        "currency": "AUD"
+      },
+      "home_care_level_3": {
+        "amount": 12.8,
+        "formatted": "$12.80",
+        "currency": "AUD"
+      },
+      "home_care_level_4": {
+        "amount": 13.14,
+        "formatted": "$13.14",
+        "currency": "AUD"
+      },
+      "residential_care": {
+        "amount": 63.82,
+        "formatted": "$63.82",
+        "currency": "AUD"
+      },
+      "effective_date": "2025-06-30"
+    },
+    "historicalFees": {},
+    "feeEvolution": {
+      "homeCareLevel1": [
+        {
+          "date": "2021-12-31",
+          "amount": 9.88,
+          "formatted": "$9.88"
+        },
+        {
+          "date": "2022-03-19",
+          "amount": 10.08,
+          "formatted": "$10.08"
+        },
+        {
+          "date": "2022-06-30",
+          "amount": 10.08,
+          "formatted": "$10.08"
+        },
+        {
+          "date": "2022-09-19",
+          "amount": 10.49,
+          "formatted": "$10.49"
+        },
+        {
+          "date": "2022-12-31",
+          "amount": 10.49,
+          "formatted": "$10.49"
+        },
+        {
+          "date": "2023-03-19",
+          "amount": 10.88,
+          "formatted": "$10.88"
+        },
+        {
+          "date": "2023-06-30",
+          "amount": 10.88,
+          "formatted": "$10.88"
+        },
+        {
+          "date": "2023-09-19",
+          "amount": 11.22,
+          "formatted": "$11.22"
+        },
+        {
+          "date": "2023-12-31",
+          "amount": 11.22,
+          "formatted": "$11.22"
+        },
+        {
+          "date": "2024-03-19",
+          "amount": 11.43,
+          "formatted": "$11.43"
+        },
+        {
+          "date": "2024-06-30",
+          "amount": 11.43,
+          "formatted": "$11.43"
+        },
+        {
+          "date": "2024-09-19",
+          "amount": 11.72,
+          "formatted": "$11.72"
+        },
+        {
+          "date": "2024-12-31",
+          "amount": 11.72,
+          "formatted": "$11.72"
+        },
+        {
+          "date": "2025-03-19",
+          "amount": 11.77,
+          "formatted": "$11.77"
+        },
+        {
+          "date": "2025-06-30",
+          "amount": 11.77,
+          "formatted": "$11.77"
+        }
+      ],
+      "homeCareLevel2": [
+        {
+          "date": "2021-12-31",
+          "amount": 10.44,
+          "formatted": "$10.44"
+        },
+        {
+          "date": "2022-03-19",
+          "amount": 10.66,
+          "formatted": "$10.66"
+        },
+        {
+          "date": "2022-06-30",
+          "amount": 10.66,
+          "formatted": "$10.66"
+        },
+        {
+          "date": "2022-09-19",
+          "amount": 11.09,
+          "formatted": "$11.09"
+        },
+        {
+          "date": "2022-12-31",
+          "amount": 11.09,
+          "formatted": "$11.09"
+        },
+        {
+          "date": "2023-03-19",
+          "amount": 11.5,
+          "formatted": "$11.50"
+        },
+        {
+          "date": "2023-06-30",
+          "amount": 11.5,
+          "formatted": "$11.50"
+        },
+        {
+          "date": "2023-09-19",
+          "amount": 11.87,
+          "formatted": "$11.87"
+        },
+        {
+          "date": "2023-12-31",
+          "amount": 11.87,
+          "formatted": "$11.87"
+        },
+        {
+          "date": "2024-03-19",
+          "amount": 12.08,
+          "formatted": "$12.08"
+        },
+        {
+          "date": "2024-06-30",
+          "amount": 12.08,
+          "formatted": "$12.08"
+        },
+        {
+          "date": "2024-09-19",
+          "amount": 12.4,
+          "formatted": "$12.40"
+        },
+        {
+          "date": "2024-12-31",
+          "amount": 12.4,
+          "formatted": "$12.40"
+        },
+        {
+          "date": "2025-03-19",
+          "amount": 12.45,
+          "formatted": "$12.45"
+        },
+        {
+          "date": "2025-06-30",
+          "amount": 12.45,
+          "formatted": "$12.45"
+        }
+      ],
+      "homeCareLevel3": [
+        {
+          "date": "2021-12-31",
+          "amount": 10.74,
+          "formatted": "$10.74"
+        },
+        {
+          "date": "2022-03-19",
+          "amount": 10.97,
+          "formatted": "$10.97"
+        },
+        {
+          "date": "2022-06-30",
+          "amount": 10.97,
+          "formatted": "$10.97"
+        },
+        {
+          "date": "2022-09-19",
+          "amount": 11.4,
+          "formatted": "$11.40"
+        },
+        {
+          "date": "2022-12-31",
+          "amount": 11.4,
+          "formatted": "$11.40"
+        },
+        {
+          "date": "2023-03-19",
+          "amount": 11.83,
+          "formatted": "$11.83"
+        },
+        {
+          "date": "2023-06-30",
+          "amount": 11.83,
+          "formatted": "$11.83"
+        },
+        {
+          "date": "2023-09-19",
+          "amount": 12.2,
+          "formatted": "$12.20"
+        },
+        {
+          "date": "2023-12-31",
+          "amount": 12.2,
+          "formatted": "$12.20"
+        },
+        {
+          "date": "2024-03-19",
+          "amount": 12.42,
+          "formatted": "$12.42"
+        },
+        {
+          "date": "2024-06-30",
+          "amount": 12.42,
+          "formatted": "$12.42"
+        },
+        {
+          "date": "2024-09-19",
+          "amount": 12.75,
+          "formatted": "$12.75"
+        },
+        {
+          "date": "2024-12-31",
+          "amount": 12.75,
+          "formatted": "$12.75"
+        },
+        {
+          "date": "2025-03-19",
+          "amount": 12.8,
+          "formatted": "$12.80"
+        },
+        {
+          "date": "2025-06-30",
+          "amount": 12.8,
+          "formatted": "$12.80"
+        }
+      ],
+      "homeCareLevel4": [
+        {
+          "date": "2021-12-31",
+          "amount": 11.02,
+          "formatted": "$11.02"
+        },
+        {
+          "date": "2022-03-19",
+          "amount": 11.26,
+          "formatted": "$11.26"
+        },
+        {
+          "date": "2022-06-30",
+          "amount": 11.26,
+          "formatted": "$11.26"
+        },
+        {
+          "date": "2022-09-19",
+          "amount": 11.71,
+          "formatted": "$11.71"
+        },
+        {
+          "date": "2022-12-31",
+          "amount": 11.71,
+          "formatted": "$11.71"
+        },
+        {
+          "date": "2023-03-19",
+          "amount": 12.14,
+          "formatted": "$12.14"
+        },
+        {
+          "date": "2023-06-30",
+          "amount": 12.14,
+          "formatted": "$12.14"
+        },
+        {
+          "date": "2023-09-19",
+          "amount": 12.53,
+          "formatted": "$12.53"
+        },
+        {
+          "date": "2023-12-31",
+          "amount": 12.53,
+          "formatted": "$12.53"
+        },
+        {
+          "date": "2024-03-19",
+          "amount": 12.75,
+          "formatted": "$12.75"
+        },
+        {
+          "date": "2024-06-30",
+          "amount": 12.75,
+          "formatted": "$12.75"
+        },
+        {
+          "date": "2024-09-19",
+          "amount": 13.08,
+          "formatted": "$13.08"
+        },
+        {
+          "date": "2024-12-31",
+          "amount": 13.08,
+          "formatted": "$13.08"
+        },
+        {
+          "date": "2025-03-19",
+          "amount": 13.14,
+          "formatted": "$13.14"
+        },
+        {
+          "date": "2025-06-30",
+          "amount": 13.14,
+          "formatted": "$13.14"
+        }
+      ],
+      "residentialCare": [
+        {
+          "date": "2021-12-31",
+          "amount": 28,
+          "formatted": "$28.00"
+        },
+        {
+          "date": "2022-03-19",
+          "amount": 29,
+          "formatted": "$29.00"
+        },
+        {
+          "date": "2022-06-30",
+          "amount": 54.69,
+          "formatted": "$54.69"
+        },
+        {
+          "date": "2022-09-19",
+          "amount": 56.87,
+          "formatted": "$56.87"
+        },
+        {
+          "date": "2022-12-31",
+          "amount": 56.87,
+          "formatted": "$56.87"
+        },
+        {
+          "date": "2023-03-19",
+          "amount": 58.98,
+          "formatted": "$58.98"
+        },
+        {
+          "date": "2023-06-30",
+          "amount": 58.98,
+          "formatted": "$58.98"
+        },
+        {
+          "date": "2023-09-19",
+          "amount": 60.86,
+          "formatted": "$60.86"
+        },
+        {
+          "date": "2023-12-31",
+          "amount": 60.86,
+          "formatted": "$60.86"
+        },
+        {
+          "date": "2024-03-19",
+          "amount": 61.96,
+          "formatted": "$61.96"
+        },
+        {
+          "date": "2024-06-30",
+          "amount": 61.96,
+          "formatted": "$61.96"
+        },
+        {
+          "date": "2024-09-19",
+          "amount": 63.57,
+          "formatted": "$63.57"
+        },
+        {
+          "date": "2024-12-31",
+          "amount": 63.57,
+          "formatted": "$63.57"
+        },
+        {
+          "date": "2025-03-19",
+          "amount": 63.82,
+          "formatted": "$63.82"
+        },
+        {
+          "date": "2025-06-30",
+          "amount": 63.82,
+          "formatted": "$63.82"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "timestamp": "2025-08-20T02:16:45.126Z",
+  "databaseFiles": {
+    "total": 0,
+    "list": []
+  },
+  "jsonMappings": {
+    "total": 43,
+    "list": [
+      "2012-38 ACT.PDF",
+      "2016.50.auth SA.pdf",
+      "24-7-registered-nurse-responsibility-policy-guidelines-for-mps-sites-participating-in-trial-arrangements_0.pdf",
+      "C2024A00104REC01.pdf",
+      "C2024C00505.pdf",
+      "C2025C00122.pdf",
+      "C2025C00143.pdf",
+      "Repr029 201120 NT.pdf",
+      "Retirement Villages Amendment Act 2024 - WA.pdf",
+      "a-new-aged-care-act-exposure-draft-consultation-paper-no-2.pdf",
+      "a-new-aged-care-act-for-the-rights-of-older-people_0.pdf",
+      "about-the-aged-care-act-2024-plain-language-fact-sheet.pdf",
+      "act-1999-071 - QLD.pdf",
+      "act-1999-081 NSW.pdf",
+      "act-VIC.pdf",
+      "aged-care-data-and-digital-strategy-2024-2029_0_0.pdf",
+      "aged-care-reforms-a-guide-for-providers-and-the-sector.pdf",
+      "appendix_a_-_chsp_context_and_history_final.pdf",
+      "appendix_b_wellness_and_reablement_dec24_updates.pdf",
+      "appendix_c_-_chsp_provider_supports_resources_and_information_final.pdf",
+      "appendix_d_-_chsp_client_and_carer_supports_resources_and_information_final.pdf",
+      "appendix_e_chsp_police_certificate_guidelines_final_0.pdf",
+      "appendix_f_-_guide_to_the_national_chsp_client_contribution_framework_final.pdf",
+      "appendix_g_-_chsp_national_unit_price_ranges_and_client_contributions_final.pdf",
+      "appendix_h_-_chsp_compliance_framework_final.pdf",
+      "appendix_i_-_chsp_service_catalogue.pdf",
+      "commonwealth-home-support-programme-chsp-manual.pdf",
+      "final-report-of-the-aged-care-taskforce_0.pdf",
+      "home-care-packages-program-operational-manual-a-guide-for-home-care-providers.pdf",
+      "how-is-cognition-assessed-for-residential-aged-care-funding_0.pdf",
+      "new-aged-care-act-rules-consultation-release-3-provider-obligations_0.pdf",
+      "quality-assurance-of-residential-aged-care-funding-assessments.pdf",
+      "questions-and-answers-from-the-mandatory-care-minutes-webinar-5-september-2023_1.pdf",
+      "residential-aged-care-financial-reporting-and-care-minutes-funding-update-questions-and-answers.pdf",
+      "residential-aged-care-funding-assessment-pathways-fact-sheet.pdf",
+      "residential-aged-care-funding-assessments-dashboard.pdf",
+      "residential-aged-care-funding-reform-update-questions-and-answers.pdf",
+      "residential-aged-care-provider-process-map.pdf",
+      "short-term-restorative-care-programme-manual.pdf",
+      "support-at-home-program-handbook.pdf",
+      "the-australian-national-aged-care-classification-an-acc-funding-guide_0.pdf",
+      "the-new-aged-care-act-culturally-safe-care-for-older-aboriginal-torres-strait-islander-people-fact-sheet.pdf",
+      "the-new-aged-care-act-puts-older-people-at-the-centre-of-aged-care.pdf"
+    ]
+  },
+  "analysis": {
+    "exactMatches": [],
+    "missingMappings": [],
+    "extensionMismatches": [],
+    "caseMismatches": [],
+    "otherMismatches": []
+  },
+  "userExampleAnalysis": [
+    {
+      "fileName": "commonwealth-home-support-programme-chsp-manual",
+      "databaseMatch": null,
+      "hasMapping": false
+    },
+    {
+      "fileName": "short-term-restorative-care-programme-manual",
+      "databaseMatch": null,
+      "hasMapping": false
+    },
+    {
+      "fileName": "C2024C00505",
+      "databaseMatch": null,
+      "hasMapping": false
+    }
+  ]
+}

@@ -50,6 +50,7 @@ interface DocumentCitation {
   page_number: number;
   content_snippet: string;
   similarity_score: number;
+  display_title?: string; // Professional document title for display
 }
 
 interface ChatResponse {
@@ -911,7 +912,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
                                   <div className="flex items-start justify-between gap-3 mb-2">
                                     <div className="flex-1">
                                       <div className="font-medium text-gray-900 text-xs mb-1">
-                                        📄 {formatDocumentName(citation.document_name)}
+                                        📄 {citation.display_title || formatDocumentName(citation.document_name)}
                                       </div>
                                       <Badge 
                                         variant="outline" 

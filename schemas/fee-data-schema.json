@@ -1,0 +1,274 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Aged Care Fee Schedule Data Schema",
+  "description": "Structured schema for Australian aged care fee schedules to enable precise numerical lookups",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "extractedAt": { "type": "string", "format": "date-time" },
+        "schemaVersion": { "type": "string", "default": "1.0.0" },
+        "totalDocuments": { "type": "integer" },
+        "dateRange": {
+          "type": "object",
+          "properties": {
+            "earliest": { "type": "string", "format": "date" },
+            "latest": { "type": "string", "format": "date" }
+          }
+        }
+      },
+      "required": ["extractedAt", "schemaVersion"]
+    },
+    "feeSchedules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "documentName": { 
+            "type": "string",
+            "description": "Original PDF filename for traceability"
+          },
+          "effectiveDate": { 
+            "type": "string", 
+            "format": "date",
+            "description": "Date when these fees become effective"
+          },
+          "endDate": { 
+            "type": "string", 
+            "format": "date",
+            "description": "Date when these fees expire (optional)"
+          },
+          "isCurrent": {
+            "type": "boolean",
+            "description": "Whether this is the currently active fee schedule"
+          },
+          "feeCategories": {
+            "type": "object",
+            "properties": {
+              "basicDailyFees": {
+                "type": "object",
+                "properties": {
+                  "homeCare": {
+                    "type": "object",
+                    "properties": {
+                      "level1": {
+                        "type": "object",
+                        "properties": {
+                          "amount": { "type": "number", "description": "Fee amount in AUD" },
+                          "formatted": { "type": "string", "description": "Human-readable format like '$11.72'" },
+                          "currency": { "type": "string", "default": "AUD" }
+                        },
+                        "required": ["amount", "formatted"]
+                      },
+                      "level2": {
+                        "type": "object",
+                        "properties": {
+                          "amount": { "type": "number" },
+                          "formatted": { "type": "string" },
+                          "currency": { "type": "string", "default": "AUD" }
+                        },
+                        "required": ["amount", "formatted"]
+                      },
+                      "level3": {
+                        "type": "object",
+                        "properties": {
+                          "amount": { "type": "number" },
+                          "formatted": { "type": "string" },
+                          "currency": { "type": "string", "default": "AUD" }
+                        },
+                        "required": ["amount", "formatted"]
+                      },
+                      "level4": {
+                        "type": "object",
+                        "properties": {
+                          "amount": { "type": "number" },
+                          "formatted": { "type": "string" },
+                          "currency": { "type": "string", "default": "AUD" }
+                        },
+                        "required": ["amount", "formatted"]
+                      }
+                    },
+                    "required": ["level1", "level2", "level3", "level4"]
+                  },
+                  "residentialCare": {
+                    "type": "object",
+                    "properties": {
+                      "amount": { "type": "number" },
+                      "formatted": { "type": "string" },
+                      "currency": { "type": "string", "default": "AUD" }
+                    },
+                    "required": ["amount", "formatted"]
+                  }
+                },
+                "required": ["homeCare", "residentialCare"]
+              },
+              "accommodationSupplements": {
+                "type": "object",
+                "properties": {
+                  "maximum": {
+                    "type": "object",
+                    "properties": {
+                      "amount": { "type": "number" },
+                      "formatted": { "type": "string" },
+                      "currency": { "type": "string", "default": "AUD" },
+                      "period": { "type": "string", "default": "per day" }
+                    },
+                    "required": ["amount", "formatted"]
+                  }
+                }
+              },
+              "incomeFreeAreas": {
+                "type": "object",
+                "properties": {
+                  "singlePerson": {
+                    "type": "object",
+                    "properties": {
+                      "amount": { "type": "number" },
+                      "formatted": { "type": "string" },
+                      "currency": { "type": "string", "default": "AUD" }
+                    },
+                    "required": ["amount", "formatted"]
+                  },
+                  "coupleIllnessSeparated": {
+                    "type": "object",
+                    "properties": {
+                      "amount": { "type": "number" },
+                      "formatted": { "type": "string" },
+                      "currency": { "type": "string", "default": "AUD" }
+                    },
+                    "required": ["amount", "formatted"]
+                  },
+                  "coupleLivingTogether": {
+                    "type": "object",
+                    "properties": {
+                      "amount": { "type": "number" },
+                      "formatted": { "type": "string" },
+                      "currency": { "type": "string", "default": "AUD" }
+                    },
+                    "required": ["amount", "formatted"]
+                  }
+                },
+                "required": ["singlePerson", "coupleIllnessSeparated", "coupleLivingTogether"]
+              },
+              "incomeThresholds": {
+                "type": "object",
+                "properties": {
+                  "singlePerson": {
+                    "type": "object",
+                    "properties": {
+                      "amount": { "type": "number" },
+                      "formatted": { "type": "string" },
+                      "currency": { "type": "string", "default": "AUD" }
+                    },
+                    "required": ["amount", "formatted"]
+                  },
+                  "coupleIllnessSeparated": {
+                    "type": "object",
+                    "properties": {
+                      "amount": { "type": "number" },
+                      "formatted": { "type": "string" },
+                      "currency": { "type": "string", "default": "AUD" }
+                    },
+                    "required": ["amount", "formatted"]
+                  },
+                  "coupleLivingTogether": {
+                    "type": "object",
+                    "properties": {
+                      "amount": { "type": "number" },
+                      "formatted": { "type": "string" },
+                      "currency": { "type": "string", "default": "AUD" }
+                    },
+                    "required": ["amount", "formatted"]
+                  }
+                },
+                "required": ["singlePerson", "coupleIllnessSeparated", "coupleLivingTogether"]
+              },
+              "transitionCare": {
+                "type": "object",
+                "properties": {
+                  "homeOrCommunity": {
+                    "type": "object",
+                    "properties": {
+                      "amount": { "type": "number" },
+                      "formatted": { "type": "string" },
+                      "currency": { "type": "string", "default": "AUD" }
+                    },
+                    "required": ["amount", "formatted"]
+                  },
+                  "residentialSetting": {
+                    "type": "object",
+                    "properties": {
+                      "amount": { "type": "number" },
+                      "formatted": { "type": "string" },
+                      "currency": { "type": "string", "default": "AUD" }
+                    },
+                    "required": ["amount", "formatted"]
+                  }
+                }
+              }
+            },
+            "required": ["basicDailyFees"]
+          },
+          "sourceReferences": {
+            "type": "object",
+            "properties": {
+              "documentChunkId": { "type": "string", "description": "Reference to original document chunk" },
+              "pageNumber": { "type": "integer" },
+              "sectionTitle": { "type": "string" },
+              "extractionConfidence": { 
+                "type": "number", 
+                "minimum": 0, 
+                "maximum": 1,
+                "description": "Confidence score for extracted data accuracy"
+              }
+            }
+          }
+        },
+        "required": ["documentName", "effectiveDate", "feeCategories"]
+      }
+    },
+    "queryMappings": {
+      "type": "object",
+      "description": "Common query patterns mapped to schema paths for fast lookup",
+      "properties": {
+        "homeCareLevel1": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "home care level 1 fee",
+            "level 1 home care package",
+            "basic daily fee home care level 1",
+            "home care package 1 cost",
+            "level 1 home care daily fee"
+          ]
+        },
+        "homeCareLevel2": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "home care level 2 fee",
+            "level 2 home care package",
+            "home care package 2 cost"
+          ]
+        },
+        "residentialCare": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "residential care basic daily fee",
+            "residential care fee",
+            "basic daily fee residential"
+          ]
+        }
+      }
+    }
+  },
+  "required": ["metadata", "feeSchedules"]
+} 

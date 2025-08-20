@@ -1,0 +1,80 @@
+{
+  "timestamp": "2025-08-20T02:17:41.655Z",
+  "supabaseConnection": {
+    "url": "Connected",
+    "authenticated": true
+  },
+  "tableResults": {
+    "document_chunks": {
+      "exists": true,
+      "rowCount": 0,
+      "sampleData": [],
+      "columns": []
+    },
+    "documents": {
+      "exists": true,
+      "rowCount": null,
+      "sampleData": [],
+      "columns": []
+    },
+    "chunks": {
+      "exists": true,
+      "rowCount": null,
+      "sampleData": [],
+      "columns": []
+    },
+    "embeddings": {
+      "exists": true,
+      "rowCount": null,
+      "sampleData": [],
+      "columns": []
+    },
+    "regulation_chunks": {
+      "exists": true,
+      "rowCount": null,
+      "sampleData": [],
+      "columns": []
+    },
+    "pdf_chunks": {
+      "exists": true,
+      "rowCount": null,
+      "sampleData": [],
+      "columns": []
+    },
+    "document_embeddings": {
+      "exists": true,
+      "rowCount": null,
+      "sampleData": [],
+      "columns": []
+    },
+    "regulation_documents": {
+      "exists": true,
+      "rowCount": null,
+      "sampleData": [],
+      "columns": []
+    },
+    "regulation_search_history": {
+      "exists": true,
+      "rowCount": 0,
+      "sampleData": [],
+      "columns": []
+    },
+    "regulation_messages": {
+      "exists": true,
+      "rowCount": 0,
+      "sampleData": [],
+      "columns": []
+    },
+    "regulation_conversations": {
+      "exists": true,
+      "rowCount": 0,
+      "sampleData": [],
+      "columns": []
+    }
+  },
+  "documentRelatedTables": [],
+  "recommendations": [
+    "No document data found - check if documents need to be processed/imported",
+    "document_chunks table is empty - may need to run document processing pipeline"
+  ]
+}

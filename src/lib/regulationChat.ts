@@ -1,6 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createClient } from '@supabase/supabase-js';
 import { PDFProcessor, DocumentChunk } from './pdfProcessor';
+import { documentTitleService, DocumentTitleService } from './documentTitleService';
+import OpenAI from 'openai';
+import { feeSearchService } from './feeSearchService';
+import { feeQueryParser } from './feeQueryParser';
+import { feeResponseGenerator } from './feeResponseGenerator';
 
 export interface ChatMessage {
   id: string;
@@ -18,6 +23,7 @@ export interface DocumentCitation {
   content_snippet: string;
   similarity_score: number;
   actual_pdf_pages?: number; // For citation validation
+  display_title?: string; // Professional document title for display
 }
 
 export interface ChatResponse {
@@ -595,7 +601,7 @@ RESPONSE:`;
         throw new Error(`Search error: ${error.message}`);
       }
 
-      // Transform results into citation format with FULL content
+      // Transform results into citation format with FULL content and enhanced titles
       const citations: DocumentCitation[] = (data || []).map((chunk: any) => ({
         document_name: chunk.document_name,
         document_type: chunk.document_type,
@@ -603,7 +609,8 @@ RESPONSE:`;
         page_number: chunk.page_number,
         content_snippet: chunk.content,
         similarity_score: chunk.similarity,
-        actual_pdf_pages: chunk.actual_pdf_pages
+        actual_pdf_pages: chunk.actual_pdf_pages,
+        display_title: documentTitleService.getDocumentTitle(chunk.document_name)
       }));
 
       // Validate citations to prevent phantom page numbers
@@ -718,7 +725,7 @@ RESPONSE:`;
                                    "📄 LOWER RELEVANCE";
         
         return `[DOCUMENT ${index + 1}] ${relevanceIndicator}
-Document: "${citation.document_name}"${citation.section_title ? `
+Document: "${citation.display_title || citation.document_name}"${citation.section_title ? `
 Section: ${citation.section_title}` : ''}
 Similarity: ${(citation.similarity_score * 100).toFixed(1)}%
 
@@ -737,9 +744,10 @@ ${'='.repeat(80)}`;
 
 📋 CITATION REQUIREMENTS:
 1. NEVER include page numbers in citations - they are unreliable
-2. Use this format ONLY: [Document Name, Section X] or [Document Name] for general references
-3. Focus on document name and section/division information only
+2. Use this format ONLY: [Document Title, Section X] or [Document Title] for general references
+3. Focus on proper document titles and section/division information only
 4. NEVER mention page numbers in your responses
+5. Use the professional document titles provided in the context, not file names
 
 📝 RESPONSE REQUIREMENTS:
 1. You MUST provide complete, detailed answers when relevant content is available
