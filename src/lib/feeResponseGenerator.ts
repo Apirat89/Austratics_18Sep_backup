@@ -13,14 +13,11 @@ interface FeeResponseContext {
   additionalContext?: string;
 }
 
+import { DocumentCitation } from './regulationChat';
+
 interface FormattedFeeResponse {
   answer: string;
-  citations: Array<{
-    document_name: string;
-    display_title: string;
-    page_number?: number;
-    section_title?: string;
-  }>;
+  citations: DocumentCitation[];
   metadata: {
     responseType: 'fee_lookup' | 'general';
     confidence: number;

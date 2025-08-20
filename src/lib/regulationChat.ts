@@ -273,7 +273,60 @@ export class RegulationChatService {
         }
       }
 
-      // Step 3: Search for relevant documents
+      // Step 3: Check if this is a fee query for structured search
+      console.log(`🔍 Checking if query is fee-related: "${question}"`);
+      
+      // Initialize fee search service if not already done
+      await feeSearchService.initialize();
+      
+      if (feeSearchService.isFeeQuery(question)) {
+        console.log(`💰 Fee query detected - using structured search`);
+        
+        const feeResult = await feeSearchService.searchFees(question);
+        
+        if (feeResult.success) {
+          console.log(`✅ Fee search successful - returning structured answer`);
+          
+          // Generate professional response with proper citation
+          const feeResponse = feeResponseGenerator.generateFeeResponse({
+            query: question,
+            answer: feeResult.answer,
+            confidence: feeResult.confidence,
+            source: feeResult.source
+          });
+          
+          const processingTime = Date.now() - startTime;
+          console.log(`⚡ Fee query processed in ${processingTime}ms (structured)`);
+
+          const response: ChatResponse = {
+            message: feeResponse.answer,
+            citations: feeResponse.citations,
+            context_used: 1,
+            processing_time: processingTime,
+            conversation_id: actualConversationId,
+            message_id: userMessageId
+          };
+
+          // Add assistant message to conversation
+          if (actualConversationId) {
+            await this.addMessageToConversation(
+              actualConversationId,
+              'assistant',
+              response.message,
+              response.citations,
+              response.processing_time
+            );
+          }
+
+          return response;
+        } else {
+          console.log(`⚠️ Fee search failed - falling back to vector search`);
+        }
+      } else {
+        console.log(`📄 Not a fee query - using vector search`);
+      }
+
+      // Step 4: Search for relevant documents (fallback to vector search)
       const citations = await this.searchRelevantDocuments(question, 7);
       console.log(`📄 Found ${citations.length} relevant document sections`);
 
@@ -301,14 +354,14 @@ export class RegulationChatService {
         return response;
       }
 
-      // Step 4: Generate context-aware answer
+      // Step 5: Generate context-aware answer
       const answer = await this.generateContextualAnswer(question, citations, conversation_history, max_context_messages);
       console.log(`🤖 Generated contextual response using conversation history`);
 
       const processingTime = Date.now() - startTime;
       console.log(`⚡ Query processed in ${processingTime}ms`);
 
-      // Step 5: Add assistant message to conversation
+      // Step 6: Add assistant message to conversation
       let assistantMessageId: number | undefined;
       if (actualConversationId) {
         try {
