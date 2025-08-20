@@ -81,7 +81,7 @@ export default function RegulationPage() {
     {
       id: '1',
       role: 'assistant',
-      content: `👋 Welcome to the Australian Aged Care Regulation Assistant!
+      content: `👋 Welcome to the Australian Aged Care Regulation Assistant (BETA)!
 
 I can help you find information from:
 • **Aged Care Act 2024** (Current & November 2025 versions)
@@ -818,7 +818,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <BookOpen className="w-8 h-8 text-blue-600" />
-                <h1 className="text-3xl font-bold text-gray-900">Australian Aged Care Regulation Assistant</h1>
+                <h1 className="text-3xl font-bold text-gray-900">Australian Aged Care Regulation Assistant <span className="text-2xl text-blue-600 font-medium">(BETA)</span></h1>
               </div>
               
               {/* Back to Main Menu and Actions */}
@@ -1032,6 +1032,9 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
           </p>
           <p className="mt-2 text-xs text-gray-500">
             Disclaimer: This AI assistant provides information for reference purposes only. Responses may be incomplete or contain errors. Always verify with official sources and seek professional legal advice for compliance matters.
+          </p>
+          <p className="mt-1 text-xs text-orange-600 font-medium">
+            ⚠️ BETA Version: This system is currently in beta testing. Please exercise caution and cross-reference all information with official regulatory sources before making decisions.
           </p>
         </div>
       </div>

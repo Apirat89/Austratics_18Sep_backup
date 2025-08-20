@@ -75,7 +75,7 @@ export default function MainPage() {
       route: "/maps"
     },
     {
-      title: "Regulation", 
+      title: "Regulation (BETA)", 
       icon: BookOpen,
       route: "/regulation"
     },
