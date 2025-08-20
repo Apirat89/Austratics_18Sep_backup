@@ -52,9 +52,9 @@ export async function GET(request: NextRequest) {
         const total = filteredData.length;
         const paginatedData = filteredData.slice(offset, offset + limit);
         
-        // Get unique sources from filtered data
+        // Get unique sources from original unfiltered data (not filtered data)
         const uniqueSources = Array.from(
-          new Map(filteredData.map(item => [item.source.id, item.source])).values()
+          new Map(cachedData.items.map(item => [item.source.id, item.source])).values()
         );
         
         // Return instantly without expensive cache stats lookup
@@ -143,9 +143,9 @@ export async function GET(request: NextRequest) {
     const total = filteredData.length;
     const paginatedData = filteredData.slice(offset, offset + limit);
     
-    // Get unique sources from filtered data
+    // Get unique sources from original unfiltered data (not filtered data)
     const uniqueSources = Array.from(
-      new Map(filteredData.map(item => [item.source.id, item.source])).values()
+      new Map(newsData.map(item => [item.source.id, item.source])).values()
     );
     
     // Get cache stats for metadata
