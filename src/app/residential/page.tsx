@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Scale, CheckSquare, Square, Eye, X, Filter, ExternalLink } from 'lucide-react';
+import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Scale, CheckSquare, Square, Eye, X, Filter, ExternalLink, Save } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InlineBoxPlot from '@/components/residential/InlineBoxPlot';
@@ -1496,7 +1496,7 @@ export default function ResidentialPage() {
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  <History className="w-4 h-4" />
+                  <Save className="w-4 h-4" />
                   Saved ({savedFacilities.length})
                 </button>
                 
@@ -1808,11 +1808,9 @@ export default function ResidentialPage() {
                             }`}
                             title="Select for comparison"
                           >
-                            {isFacilitySelected(facility) ? (
-                              <CheckSquare className="w-5 h-5" />
-                            ) : (
-                              <Square className="w-5 h-5" />
-                            )}
+                            <Scale className={`w-5 h-5 ${
+                              isFacilitySelected(facility) ? 'text-white' : 'text-gray-400'
+                            }`} />
                           </button>
                           {isFacilitySelected(facility) && (
                             <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-600 rounded-full flex items-center justify-center">
@@ -1882,11 +1880,9 @@ export default function ResidentialPage() {
                                 }`}
                                 title={isFacilitySaved(facility) ? 'Remove from saved' : 'Save facility'}
                               >
-                                {isFacilitySaved(facility) ? (
-                                  <BookmarkCheck className="w-4 h-4" />
-                                ) : (
-                                  <Bookmark className="w-4 h-4" />
-                                )}
+                                <Save className={`w-4 h-4 ${
+                                  isFacilitySaved(facility) ? 'text-green-700' : 'text-gray-600'
+                                }`} />
                               </button>
                             </div>
                           </div>
