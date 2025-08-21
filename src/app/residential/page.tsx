@@ -39,6 +39,13 @@ import {
   getUserSavedSA2Searches,
   type SavedSA2Search
 } from '../../lib/savedSA2Searches';
+import { getLocationByName } from '../../lib/mapSearchService';
+import { 
+  filterFacilitiesByRadius, 
+  sortFacilitiesByDistance, 
+  addDistanceToFacilities,
+  calculateDistance 
+} from '../../lib/spatialUtils';
 
 interface ResidentialFacility {
   // Enhanced Provider Information
@@ -349,6 +356,14 @@ export default function ResidentialPage() {
   const [selectedSA2Filter, setSelectedSA2Filter] = useState<SavedSA2Search | null>(null);
   const [sa2LoadingError, setSA2LoadingError] = useState<string | null>(null);
 
+  // NEW: Text-first search with location enhancement state
+  const [searchCoordinates, setSearchCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+  const [isLocationSearchActive, setIsLocationSearchActive] = useState(false); // True when location enhancement is active
+  const [locationSearchLoading, setLocationSearchLoading] = useState(false);
+  const [searchRadius, setSearchRadius] = useState(0.18); // Default 0.18 degrees ≈ 20km
+  const [locationSearchContext, setLocationSearchContext] = useState<string>('');
+  const [isTextEnhanced, setIsTextEnhanced] = useState(false); // True when text search is enhanced with location radius
+
   // Load current user, saved facilities, and history from Supabase on component mount
   useEffect(() => {
     const loadUserAndData = async () => {
@@ -476,6 +491,103 @@ export default function ResidentialPage() {
     }
   }, [searchParams, savedSA2Regions.length, selectedSA2Filter]); // Use .length for stable dependency
 
+  // TEXT-FIRST search resolution effect - prioritizes text search with location enhancement
+  useEffect(() => {
+    const performTextFirstSearch = async (term: string) => {
+      if (!term.trim()) {
+        setSearchCoordinates(null);
+        setIsLocationSearchActive(false);
+        setLocationSearchContext('');
+        setIsTextEnhanced(false);
+        return;
+      }
+
+      setLocationSearchLoading(true);
+      
+      try {
+        console.log('🔍 TEXT-FIRST: Starting text search for:', term);
+        
+        // PRIMARY: Always perform text search first
+        const textResults = facilities.filter(facility =>
+          facility["Service Name"]?.toLowerCase().includes(term.toLowerCase()) ||
+          facility.formatted_address?.toLowerCase().includes(term.toLowerCase()) ||
+          facility.address_locality?.toLowerCase().includes(term.toLowerCase()) ||
+          facility.provider_name?.toLowerCase().includes(term.toLowerCase()) ||
+          facility.address_postcode?.includes(term)
+        );
+        
+        console.log(`🔍 TEXT-FIRST: Found ${textResults.length} text matches`);
+        
+        if (textResults.length > 0) {
+          // Use coordinates from first text result for location enhancement
+          const firstResult = textResults[0];
+          console.log('🧪 TEXT-FIRST: First text result details:', {
+            serviceName: firstResult["Service Name"],
+            postcode: firstResult.address_postcode,
+            locality: firstResult.address_locality,
+            latitude: firstResult.latitude,
+            longitude: firstResult.longitude,
+            hasCoordinates: !!(firstResult.latitude && firstResult.longitude)
+          });
+          
+          if (firstResult.latitude && firstResult.longitude) {
+            console.log('📍 ✅ TEXT-ENHANCED: Using coordinates from first text result for radius enhancement');
+            setSearchCoordinates({ 
+              lat: firstResult.latitude, 
+              lng: firstResult.longitude 
+            });
+            setIsLocationSearchActive(true);
+            setIsTextEnhanced(true); // This is now text-enhanced search
+            setLocationSearchContext(`Found ${textResults.length} matches for "${term}", showing facilities within ~20km of search area`);
+          } else {
+            console.log('⚠️ TEXT-FIRST: First result missing coordinates, no location enhancement available');
+            setSearchCoordinates(null);
+            setIsLocationSearchActive(false);
+            setIsTextEnhanced(false);
+            setLocationSearchContext('');
+          }
+        } else {
+          console.log('🔍 TEXT-FIRST: No text matches found, falling back to location resolution...');
+          
+          // FALLBACK: Only use getLocationByName when text search yields no results
+          const locationResult = await getLocationByName(term);
+          
+          if (locationResult && locationResult.center) {
+            console.log('🗺️ FALLBACK: Location resolved:', locationResult);
+            setSearchCoordinates({ 
+              lat: locationResult.center[1], 
+              lng: locationResult.center[0] 
+            });
+            setIsLocationSearchActive(true);
+            setIsTextEnhanced(false); // Pure location search, not text-enhanced
+            setLocationSearchContext(`Showing facilities within ~20km of ${locationResult.name}`);
+          } else {
+            console.log('❌ FALLBACK: No location found either');
+            setSearchCoordinates(null);
+            setIsLocationSearchActive(false);
+            setIsTextEnhanced(false);
+            setLocationSearchContext('');
+          }
+        }
+      } catch (error) {
+        console.error('❌ Search resolution error:', error);
+        setSearchCoordinates(null);
+        setIsLocationSearchActive(false);
+        setIsTextEnhanced(false);
+        setLocationSearchContext('');
+      } finally {
+        setLocationSearchLoading(false);
+      }
+    };
+
+    // Debounce search resolution to avoid excessive operations
+    const timeoutId = setTimeout(() => {
+      performTextFirstSearch(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, searchRadius, facilities]);
+
   useEffect(() => {
     // SA2-based filtering function
     const filterBySA2 = (facilities: ResidentialFacility[], sa2Region: SavedSA2Search) => {
@@ -493,6 +605,16 @@ export default function ResidentialPage() {
       });
     };
 
+    // Location-based filtering function
+    const filterByLocation = (facilities: ResidentialFacility[], coordinates: { lat: number; lng: number }) => {
+      console.log(`🗺️ Filtering ${facilities.length} facilities by location:`, coordinates);
+      const radiusResults = filterFacilitiesByRadius(facilities, coordinates.lat, coordinates.lng, searchRadius);
+      const sortedResults = sortFacilitiesByDistance(radiusResults, coordinates.lat, coordinates.lng);
+      const resultsWithDistance = addDistanceToFacilities(sortedResults, coordinates.lat, coordinates.lng);
+      console.log(`📍 Found ${resultsWithDistance.length} facilities within ~20km of coordinates [${coordinates.lat.toFixed(4)}, ${coordinates.lng.toFixed(4)}]`);
+      return resultsWithDistance;
+    };
+
     // Search term filtering function
     const filterBySearchTerm = (facilities: ResidentialFacility[], term: string) => {
       return facilities.filter(facility =>
@@ -503,6 +625,43 @@ export default function ResidentialPage() {
       );
     };
 
+        // Text-first hybrid search function - prioritizes text matches with location enhancement
+    const hybridSearch = (facilities: ResidentialFacility[], term: string, coordinates: { lat: number; lng: number } | null) => {
+      let textResults: ResidentialFacility[] = [];
+      let locationEnhancedResults: ResidentialFacility[] = [];
+
+      // PRIMARY: Always perform text search first
+      if (term.trim() !== '') {
+        textResults = filterBySearchTerm(facilities, term);
+        console.log(`🔍 TEXT-FIRST: Text search for "${term}" found ${textResults.length} results`);
+      }
+
+      // ENHANCEMENT: Get location-based results if coordinates are available (from text results or fallback)
+      if (coordinates) {
+        const searchType = isTextEnhanced ? 'TEXT-ENHANCED' : 'LOCATION-FALLBACK';
+        console.log(`🗺️ ${searchType}: Using coordinates for radius enhancement:`, coordinates);
+        locationEnhancedResults = filterByLocation(facilities, coordinates);
+        console.log(`📍 ${searchType}: Found ${locationEnhancedResults.length} facilities within radius`);
+      }
+
+      // Combine results, prioritizing TEXT MATCHES first, then adding unique location-enhanced results
+      const combinedResults = [...textResults]; // Start with text matches (highest priority)
+      const existingIds = new Set(textResults.map(f => f["Service Name"]));
+
+      // Add location-enhanced results that aren't already in text results
+      for (const locationResult of locationEnhancedResults) {
+        if (!existingIds.has(locationResult["Service Name"])) {
+          combinedResults.push(locationResult);
+        }
+      }
+
+      const uniqueLocationResults = locationEnhancedResults.filter(l => !existingIds.has(l["Service Name"])).length;
+      console.log(`🔍 FINAL RESULTS: ${textResults.length} text matches + ${uniqueLocationResults} unique location-enhanced = ${combinedResults.length} total`);
+      console.log(`📊 Result composition: ${textResults.length} direct matches, ${uniqueLocationResults} nearby facilities`);
+      
+      return combinedResults;
+    };
+
     let filtered = facilities;
 
     // Apply SA2 filter first if selected
@@ -510,9 +669,9 @@ export default function ResidentialPage() {
       filtered = filterBySA2(filtered, selectedSA2Filter);
     }
 
-    // Then apply search term filter if provided
+    // Apply hybrid search (location + text) if search term is provided
     if (searchTerm.trim() !== '') {
-      filtered = filterBySearchTerm(filtered, searchTerm);
+      filtered = hybridSearch(filtered, searchTerm, searchCoordinates);
     }
 
     // Only show results if there's a search term or SA2 filter applied
@@ -521,7 +680,7 @@ export default function ResidentialPage() {
     } else {
       setFilteredFacilities(filtered);
     }
-  }, [searchTerm, facilities, selectedSA2Filter]);
+  }, [searchTerm, facilities, selectedSA2Filter, searchCoordinates, searchRadius, isTextEnhanced]);
 
   // Toggle save facility function (save/unsave) - now using Supabase with search history
   const toggleSaveFacility = async (facility: ResidentialFacility) => {
@@ -673,8 +832,13 @@ export default function ResidentialPage() {
 
   const addToSearchHistory = async (term: string) => {
     if (term.trim() && currentUser) {
-      // Save to Supabase
-      const saved = await saveResidentialSearchToHistory(currentUser.id, term.trim());
+      // Enhanced search term with location context for history
+      const enhancedTerm = isLocationSearchActive && locationSearchContext 
+        ? `${term} (${locationSearchContext})`
+        : term.trim();
+      
+      // Save to Supabase with enhanced context
+      const saved = await saveResidentialSearchToHistory(currentUser.id, enhancedTerm);
       if (saved) {
         // Reload search history from Supabase
         const updatedSearches = await getResidentialSearchHistory(currentUser.id, 10);
@@ -1464,7 +1628,7 @@ export default function ResidentialPage() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search by facility name, address, locality, or provider..."
+                    placeholder="Search by location (e.g., Sydney CBD) or facility name, address, provider..."
                     value={searchTerm}
                     onChange={(e) => handleSearchChange(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -1557,6 +1721,22 @@ export default function ResidentialPage() {
                     </button>
                   </div>
                 )}
+                {/* Location search loading indicator */}
+                {locationSearchLoading && searchTerm.trim() !== '' && (
+                  <div className="flex items-center gap-2 mb-2 text-blue-600">
+                    <div className="w-4 h-4 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                    <span className="text-sm">Resolving location...</span>
+                  </div>
+                )}
+
+                {/* Location search context */}
+                {isLocationSearchActive && locationSearchContext && (
+                  <div className="flex items-center gap-2 mb-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                    <MapPin className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm text-blue-700">{locationSearchContext}</span>
+                  </div>
+                )}
+
                 <p>
                   {searchTerm.trim() === '' && !selectedSA2Filter
                     ? `Search through ${facilities.length} residential facilities using the search bar or SA2 region filter above`
@@ -1564,6 +1744,8 @@ export default function ResidentialPage() {
                     ? `Showing ${filteredFacilities.length} facilities in ${selectedSA2Filter.sa2_name} region`
                     : selectedSA2Filter && searchTerm.trim() !== ''
                     ? `Showing ${filteredFacilities.length} facilities matching "${searchTerm}" in ${selectedSA2Filter.sa2_name} region`
+                    : isLocationSearchActive && searchCoordinates
+                    ? `Found ${filteredFacilities.length} facilities (${filteredFacilities.filter(f => (f as any).distance !== undefined).length} within radius + ${filteredFacilities.filter(f => (f as any).distance === undefined).length} text matches)`
                     : `Showing ${filteredFacilities.length} of ${facilities.length} facilities matching "${searchTerm}"`
                   }
                 </p>
@@ -1649,6 +1831,15 @@ export default function ResidentialPage() {
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <MapPin className="w-4 h-4" />
                               {facility.formatted_address}
+                            </div>
+                          )}
+
+                          {/* Distance badge for location-based search results */}
+                          {isLocationSearchActive && (facility as any).distanceFormatted && (
+                            <div className="flex items-center gap-1 text-xs">
+                              <div className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                                📍 {(facility as any).distanceFormatted} away
+                              </div>
                             </div>
                           )}
                         </CardHeader>

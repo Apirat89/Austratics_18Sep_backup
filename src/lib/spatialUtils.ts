@@ -146,4 +146,112 @@ export function filterFacilitiesByPolygon<T extends { Latitude: number; Longitud
   return facilities.filter(facility => 
     isFacilityInGeoPolygon(facility, geoPolygon)
   );
+}
+
+/**
+ * Calculate the distance between two geographic points using the Haversine formula
+ * @param lat1 - Latitude of first point
+ * @param lng1 - Longitude of first point
+ * @param lat2 - Latitude of second point
+ * @param lng2 - Longitude of second point
+ * @returns Distance in kilometers
+ */
+export function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371; // Earth's radius in kilometers
+  
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  
+  return R * c; // Distance in kilometers
+}
+
+/**
+ * Filter facilities within a radius of a center point
+ * @param facilities - Array of facilities with latitude and longitude
+ * @param centerLat - Center latitude
+ * @param centerLng - Center longitude
+ * @param radiusDegrees - Radius in degrees (0.18 degrees ≈ 20km)
+ * @returns Array of facilities within the radius
+ */
+export function filterFacilitiesByRadius<T extends { latitude?: number; longitude?: number }>(
+  facilities: T[],
+  centerLat: number,
+  centerLng: number,
+  radiusDegrees: number = 0.18
+): T[] {
+  return facilities.filter(facility => {
+    if (!facility.latitude || !facility.longitude) return false;
+    
+    const latDiff = Math.abs(facility.latitude - centerLat);
+    const lngDiff = Math.abs(facility.longitude - centerLng);
+    
+    // Quick bounding box check for performance
+    if (latDiff > radiusDegrees || lngDiff > radiusDegrees) return false;
+    
+    // More precise distance calculation for edge cases
+    const distance = calculateDistance(centerLat, centerLng, facility.latitude, facility.longitude);
+    const radiusKm = radiusDegrees * 111; // Rough conversion: 0.18 degrees ≈ 20km
+    
+    return distance <= radiusKm;
+  });
+}
+
+/**
+ * Sort facilities by distance from a center point
+ * @param facilities - Array of facilities with latitude and longitude
+ * @param centerLat - Center latitude
+ * @param centerLng - Center longitude
+ * @returns Array of facilities sorted by distance (closest first)
+ */
+export function sortFacilitiesByDistance<T extends { latitude?: number; longitude?: number }>(
+  facilities: T[],
+  centerLat: number,
+  centerLng: number
+): T[] {
+  return facilities.sort((a, b) => {
+    if (!a.latitude || !a.longitude) return 1;
+    if (!b.latitude || !b.longitude) return -1;
+    
+    const distanceA = calculateDistance(centerLat, centerLng, a.latitude, a.longitude);
+    const distanceB = calculateDistance(centerLat, centerLng, b.latitude, b.longitude);
+    
+    return distanceA - distanceB;
+  });
+}
+
+/**
+ * Add distance information to facilities based on center point
+ * @param facilities - Array of facilities with latitude and longitude
+ * @param centerLat - Center latitude
+ * @param centerLng - Center longitude
+ * @returns Array of facilities with distance information added
+ */
+export function addDistanceToFacilities<T extends { latitude?: number; longitude?: number }>(
+  facilities: T[],
+  centerLat: number,
+  centerLng: number
+): (T & { distance?: number; distanceFormatted?: string })[] {
+  return facilities.map(facility => {
+    if (!facility.latitude || !facility.longitude) {
+      return facility as T & { distance?: number; distanceFormatted?: string };
+    }
+    
+    const distance = calculateDistance(centerLat, centerLng, facility.latitude, facility.longitude);
+    const distanceFormatted = distance < 1 
+      ? `${Math.round(distance * 1000)}m`
+      : `${distance.toFixed(1)}km`;
+    
+    return {
+      ...facility,
+      distance,
+      distanceFormatted
+    };
+  });
 } 
