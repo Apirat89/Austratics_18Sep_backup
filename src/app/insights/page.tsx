@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser } from '../../lib/auth';
 import BackToMainButton from '../../components/BackToMainButton';
-import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Globe, Building, Home, ExternalLink, X } from 'lucide-react';
+import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Save, Trash2, History, ArrowLeft, Globe, Building, Home, ExternalLink, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import SA2BoxPlot from '../../components/sa2/SA2BoxPlot';
@@ -1492,23 +1492,10 @@ export default function SA2AnalyticsPage() {
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  <History className="w-4 h-4" />
+                  <Save className="w-4 h-4" />
                   Saved Searches ({savedSA2Searches.length})
                 </button>
-                
-                {/* Search History Panel Toggle */}
-                <button
-                  onClick={() => setIsHistoryPanelVisible(!isHistoryPanelVisible)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                    isHistoryPanelVisible
-                      ? 'bg-green-100 text-green-700 border border-green-200'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                  title="Toggle Search History Panel"
-                >
-                  <History className="w-4 h-4" />
-                  Recent ({insightsSearchHistory.length})
-                </button>
+
               </div>
             </div>
             
@@ -1614,21 +1601,15 @@ export default function SA2AnalyticsPage() {
                           onClick={() => toggleSA2SaveHandler(selectedSA2)}
                           className={`flex items-center px-3 py-1 text-sm rounded-md transition-colors ${
                             currentSA2SavedStatus
-                              ? 'bg-green-600 text-white hover:bg-green-700'
-                              : 'bg-blue-600 text-white hover:bg-blue-700'
+                              ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                           }`}
+                          title={currentSA2SavedStatus ? 'Remove from saved' : 'Save SA2'}
                         >
-                          {currentSA2SavedStatus ? (
-                            <>
-                              <BookmarkCheck className="h-4 w-4 mr-1" />
-                              Saved
-                            </>
-                          ) : (
-                            <>
-                              <Bookmark className="h-4 w-4 mr-1" />
-                              Save SA2
-                            </>
-                          )}
+                          <Save className={`h-4 w-4 mr-1 ${
+                            currentSA2SavedStatus ? 'text-green-700' : 'text-gray-600'
+                          }`} />
+                          {currentSA2SavedStatus ? 'Saved' : 'Save SA2'}
                         </button>
                       </div>
                     )}
@@ -1753,7 +1734,7 @@ export default function SA2AnalyticsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <History className="h-4 w-4 mr-2" />
+                    <Save className="h-4 w-4 mr-2" />
                     Saved Searches ({savedSA2Searches.length})
                   </div>
                   {savedSA2Searches.length > 0 && (
@@ -1774,7 +1755,7 @@ export default function SA2AnalyticsPage() {
               <CardContent>
                 {savedSA2Searches.length === 0 ? (
                   <div className="text-center py-12">
-                    <Bookmark className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <Save className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">No Saved SA2 Searches</h3>
                     <p className="text-gray-600 mb-4">
                       Search for SA2 regions and save them to access quickly later.
@@ -1873,8 +1854,8 @@ export default function SA2AnalyticsPage() {
                         disabled={!user}
                         className={`rounded-lg p-1.5 transition-colors ${
                           currentSA2SavedStatus
-                            ? 'text-green-600 hover:text-green-800 hover:bg-green-50'
-                            : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+                            ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                         title={
                           !user 
@@ -1884,11 +1865,9 @@ export default function SA2AnalyticsPage() {
                               : 'Save this SA2 region to your searches'
                         }
                       >
-                        {currentSA2SavedStatus ? (
-                          <BookmarkCheck className="h-4 w-4" />
-                        ) : (
-                          <Bookmark className="h-4 w-4" />
-                        )}
+                        <Save className={`h-4 w-4 ${
+                          currentSA2SavedStatus ? 'text-green-700' : 'text-gray-600'
+                        }`} />
                       </button>
                       <button
                         onClick={() => {
