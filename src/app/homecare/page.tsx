@@ -157,22 +157,15 @@ export default function HomecarePage() {
 
     const loadStatistics = async () => {
       try {
-        console.log('🔄 Loading homecare statistics...');
         const response = await fetch('/Maps_ABS_CSV/homecare_statistics_analysis.json');
         if (!response.ok) {
           throw new Error(`Failed to load statistics: ${response.status}`);
         }
         const data = await response.json();
         setStatisticsData(data);
-        console.log('✅ Loaded homecare statistics data:', {
-          totalProviders: data.metadata?.totalProviders,
-          numericFields: data.metadata?.numericFields,
-          hasNationwide: !!data.nationwide,
-          nationwideFieldCount: Object.keys(data.nationwide?.fields || {}).length,
-          sampleField: Object.keys(data.nationwide?.fields || {})[0]
-        });
+        console.log('Loaded homecare statistics data');
       } catch (error) {
-        console.error('❌ Error loading homecare statistics:', error);
+        console.error('Error loading homecare statistics:', error);
       } finally {
         setStatsLoading(false);
       }
@@ -634,40 +627,20 @@ export default function HomecarePage() {
 
   // Helper function to get statistics for current scope - NEW
   const getStatisticsForScope = () => {
-    if (!statisticsData) {
-      console.log('⚠️ No statisticsData available');
-      return null;
-    }
-    
-    let result = null;
-    const targetValue = selectedProvider?.provider_info?.address?.state;
+    if (!statisticsData) return null;
     
     switch (selectedScope) {
       case 'nationwide':
-        result = statisticsData.nationwide;
-        break;
+        return statisticsData.nationwide;
       case 'state':
-        result = statisticsData.byState?.find((s: any) => s.groupName === selectedProvider?.provider_info?.address?.state);
-        console.log(`🏛️ Looking for state stats: "${selectedProvider?.provider_info?.address?.state}", found: ${!!result}`);
-        break;
+        return statisticsData.byState?.find((s: any) => s.groupName === selectedProvider?.provider_info?.address?.state);
       case 'locality':
-        result = statisticsData.byLocality?.find((l: any) => l.groupName === selectedProvider?.provider_info?.address?.locality);
-        console.log(`🏘️ Looking for locality stats: "${selectedProvider?.provider_info?.address?.locality}", found: ${!!result}`);
-        break;
+        return statisticsData.byLocality?.find((l: any) => l.groupName === selectedProvider?.provider_info?.address?.locality);
       case 'service_region':
-        result = statisticsData.byServiceRegion?.find((r: any) => r.groupName === selectedProvider?.cost_info?.service_region);
-        console.log(`🗺️ Looking for service region stats: "${selectedProvider?.cost_info?.service_region}", found: ${!!result}`);
-        break;
+        return statisticsData.byServiceRegion?.find((r: any) => r.groupName === selectedProvider?.cost_info?.service_region);
       default:
-        result = statisticsData.nationwide;
+        return statisticsData.nationwide;
     }
-    
-    console.log(`📊 Statistics for scope "${selectedScope}":`, {
-      hasResult: !!result,
-      fieldCount: result?.fields ? Object.keys(result.fields).length : 0
-    });
-    
-    return result;
   };
 
   // Helper function to render fields with optional box plots - NEW
@@ -678,22 +651,6 @@ export default function HomecarePage() {
     const isNumeric = typeof value === 'number';
     const scopeStats = getStatisticsForScope();
     const fieldStats = fieldName && scopeStats ? scopeStats.fields?.[fieldName] : null;
-    
-    // Debugging box plot conditions
-    if (fieldName && isNumeric) {
-      console.log(`🔍 Box Plot Debug for ${fieldName}:`, {
-        label,
-        value,
-        isNumeric,
-        showBoxPlots,
-        statsLoading,
-        hasStatisticsData: !!statisticsData,
-        hasScopeStats: !!scopeStats,
-        hasFieldStats: !!fieldStats,
-        selectedScope,
-        scopeStatsKeys: scopeStats ? Object.keys(scopeStats.fields || {}).slice(0, 5) : 'none'
-      });
-    }
     
     return (
       <div className="mb-3">
