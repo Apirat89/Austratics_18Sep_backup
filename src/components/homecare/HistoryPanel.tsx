@@ -1,7 +1,6 @@
 import React from 'react';
-import { Clock, Trash2, Search, Scale, X, History } from 'lucide-react';
+import { Clock, Search, Scale, X, History } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { 
   HomecareSearchHistoryItem, 
   HomecareComparisonHistoryItem 
@@ -89,54 +88,57 @@ export default function HomecareHistoryPanel({
           ) : (
             <div className="space-y-2">
               {searchHistory.map((item) => (
-                <Card key={item.id} className="cursor-pointer hover:bg-gray-50 transition-colors">
-                  <CardContent className="p-3">
-                    <div className="flex items-start justify-between">
-                      <div 
-                        className="flex-1 cursor-pointer"
-                        onClick={() => onSearchHistoryClick(item)}
-                      >
-                        <div className="text-sm font-medium text-gray-900 mb-1">
-                          {item.search_term}
-                        </div>
-                        <div className="text-xs text-gray-500 flex items-center gap-2">
-                          <Clock className="w-3 h-3" />
+                <div
+                  key={item.id}
+                  className="p-3 bg-green-50 rounded-lg hover:bg-green-100 cursor-pointer transition-colors border border-green-200"
+                  onClick={() => onSearchHistoryClick(item)}
+                >
+                  <div className="flex items-start gap-2">
+                    <Search className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-700 leading-relaxed break-words">
+                        {item.search_term}
+                      </p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Clock className="w-3 h-3 text-gray-400" />
+                        <span className="text-xs text-gray-500">
                           {new Date(item.searched_at).toLocaleDateString()}
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1">
-                          {item.results_count} results
-                        </div>
-                        
-                        {/* Applied Filters */}
-                        {item.filters_applied && (
-                          <div className="mt-2 flex flex-wrap gap-1">
-                            {item.filters_applied.package_levels?.map((level) => (
-                              <Badge key={level} variant="secondary" className="text-xs">
-                                Level {level}
-                              </Badge>
-                            ))}
-                            {item.filters_applied.organization_types?.map((type) => (
-                              <Badge key={type} variant="secondary" className="text-xs">
-                                {type}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-600 mt-1">
+                        {item.results_count} results
                       </div>
                       
+                      {/* Applied Filters */}
+                      {item.filters_applied && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {item.filters_applied.package_levels?.map((level) => (
+                            <Badge key={level} variant="secondary" className="text-xs">
+                              Level {level}
+                            </Badge>
+                          ))}
+                          {item.filters_applied.organization_types?.map((type) => (
+                            <Badge key={type} variant="secondary" className="text-xs">
+                              {type}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {item.id && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onDeleteSearchHistory(item.id);
                         }}
-                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                        title="Delete search"
+                        className="text-gray-400 hover:text-red-600 p-1 rounded-md hover:bg-red-50 transition-colors flex-shrink-0"
+                        title="Delete this search"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <X className="w-3 h-3" />
                       </button>
-                    </div>
-                  </CardContent>
-                </Card>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           )}
@@ -164,43 +166,46 @@ export default function HomecareHistoryPanel({
           ) : (
             <div className="space-y-2">
               {comparisonHistory.map((item) => (
-                <Card key={item.id} className="cursor-pointer hover:bg-gray-50 transition-colors">
-                  <CardContent className="p-3">
-                    <div className="flex items-start justify-between">
-                      <div 
-                        className="flex-1 cursor-pointer"
-                        onClick={() => onComparisonHistoryClick(item)}
-                      >
-                        <div className="text-sm font-medium text-gray-900 mb-1">
-                          {item.comparison_name}
-                        </div>
-                        <div className="text-xs text-gray-500 flex items-center gap-2 mb-1">
-                          <Clock className="w-3 h-3" />
+                <div
+                  key={item.id}
+                  className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors border border-gray-200"
+                  onClick={() => onComparisonHistoryClick(item)}
+                >
+                  <div className="flex items-start gap-2">
+                    <Scale className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-700 leading-relaxed break-words">
+                        {item.comparison_name}
+                      </p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Clock className="w-3 h-3 text-gray-400" />
+                        <span className="text-xs text-gray-500">
                           {new Date(item.compared_at).toLocaleDateString()}
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          {item.provider_names.length} providers compared
-                        </div>
-                        {item.comparison_notes && (
-                          <div className="text-xs text-gray-600 mt-1 italic">
-                            "{item.comparison_notes.substring(0, 50)}{item.comparison_notes.length > 50 ? '...' : ''}"
-                          </div>
-                        )}
+                        </span>
                       </div>
-                      
+                      <div className="text-xs text-gray-600 mt-1">
+                        {item.provider_names.length} providers compared
+                      </div>
+                      {item.comparison_notes && (
+                        <div className="text-xs text-gray-600 mt-1 italic">
+                          "{item.comparison_notes.substring(0, 50)}{item.comparison_notes.length > 50 ? '...' : ''}"
+                        </div>
+                      )}
+                    </div>
+                    {item.id && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onDeleteComparisonHistory(item.id);
                         }}
-                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                        title="Delete comparison"
+                        className="text-gray-400 hover:text-red-600 p-1 rounded-md hover:bg-red-50 transition-colors flex-shrink-0"
+                        title="Delete this comparison"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <X className="w-3 h-3" />
                       </button>
-                    </div>
-                  </CardContent>
-                </Card>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           )}

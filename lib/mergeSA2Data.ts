@@ -56,7 +56,7 @@ interface RawDemographicsRow {
   'SA2 Name': string;
   'Description': string;
   'Amount': string | number;
-  [key: string]: any;
+  [key: string]: string | number;
 }
 
 interface RawEconHealthRow {
@@ -65,7 +65,7 @@ interface RawEconHealthRow {
   'Parent Description': string;
   'Description': string;
   'Amount': string | number;
-  [key: string]: any;
+  [key: string]: string | number;
 }
 
 interface RawDSSRow {
@@ -74,7 +74,7 @@ interface RawDSSRow {
   'Category': string;
   'Type': string;
   'Amount': string | number;
-  [key: string]: any;
+  [key: string]: string | number;
 }
 
 // Module-level cache for memoization
@@ -104,8 +104,7 @@ interface MergedSA2File {
     totalMetrics: number;
     medians: { [key: string]: number };
     generatedAt: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: any;
+    [key: string]: string | number | { [key: string]: number };
   };
 }
 
@@ -200,8 +199,14 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
   try {
     // Load the single merged file
     const filePath = path.join(process.cwd(), 'data', 'sa2', 'merged_sa2_data_with_postcodes.json');
+    console.log('📁 Reading file from:', filePath);
+    
     const fileContent = await fs.readFile(filePath, 'utf-8');
+    console.log('📄 File read successfully, size:', (fileContent.length / 1024 / 1024).toFixed(2), 'MB');
+    
+    console.log('🔍 Parsing JSON...');
     const mergedFile: MergedSA2File = JSON.parse(fileContent);
+    console.log('✅ JSON parsed successfully');
     
     console.log(`📊 Processing merged data: ${mergedFile.metadata.totalRegions} regions, ${mergedFile.metadata.totalMetrics} metrics`);
     

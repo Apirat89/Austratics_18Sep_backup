@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, Home, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Scale, CheckSquare, Square, Eye, X, Filter, ExternalLink, Save, Building2, Building } from 'lucide-react';
+import { Search, Home, Phone, Globe, MapPin, DollarSign, FileText, Activity, Heart, Award, BarChart3, BookmarkCheck, Trash2, ArrowLeft, Scale, X, Save, Building2, Building } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import HomecareInlineBoxPlot from '@/components/homecare/HomecareInlineBoxPlot';
@@ -127,6 +127,38 @@ export default function HomecarePage() {
 
     loadUser();
   }, []);
+
+  // DEBUG: Monitor selectedForComparison state changes
+  useEffect(() => {
+    console.log('🔍 COMPARISON STATE CHANGE DETECTED');
+    console.log('📊 selectedForComparison length:', selectedForComparison.length);
+    console.log('📝 Selected providers:', selectedForComparison.map(p => 
+      `${p.provider_info.provider_name} (ID: ${p.provider_id})`
+    ));
+    console.log('🔢 Provider IDs:', selectedForComparison.map(p => p.provider_id));
+  }, [selectedForComparison]);
+
+  // Restore comparison selections from persistent state when providers are loaded
+  useEffect(() => {
+    const restoreComparisonSelections = async () => {
+      if (providers.length > 0 && persistentSelections.length > 0 && currentUser) {
+        console.log('🔄 PERSISTENCE: Restoring comparison selections...');
+        console.log('📋 Persistent selections to restore:', persistentSelections.length);
+        
+        // Find providers that match persistent selections
+        const restoredProviders = providers.filter(provider => 
+          persistentSelections.some(selection => selection.provider_id === provider.provider_id)
+        );
+        
+        console.log('✅ PERSISTENCE: Found', restoredProviders.length, 'providers to restore');
+        console.log('📝 PERSISTENCE: Restored providers:', restoredProviders.map(p => p.provider_info.provider_name));
+        
+        setSelectedForComparison(restoredProviders);
+      }
+    };
+
+    restoreComparisonSelections();
+  }, [providers, persistentSelections, currentUser]);
 
   // Load homecare providers - CLIENT-SIDE like residential
   useEffect(() => {
@@ -296,23 +328,30 @@ export default function HomecarePage() {
              setLocationSearchContext('');
            }
          } else {
-           console.log('🔍 TEXT-FIRST: No text matches found, falling back to location resolution...');
-           
-           // FALLBACK: Only use getLocationByName when text search yields no results
-           const locationResult = await getLocationByName(term);
-           
-           if (locationResult && locationResult.center) {
-             console.log('🗺️ FALLBACK: Location resolved:', locationResult);
-             setSearchCoordinates({ 
-               lat: locationResult.center[1], 
-               lng: locationResult.center[0] 
-             });
-             setIsLocationSearchActive(true);
-             setIsTextEnhanced(false); // Pure location search, not text-enhanced
-             setLocationSearchContext(`Showing providers within ~20km of ${locationResult.name}`);
-           } else {
-             console.log('❌ FALLBACK: No location found either');
-             setSearchCoordinates(null);
+                     console.log('🔍 TEXT-FIRST: No text matches found, falling back to location resolution...');
+          
+          // FALLBACK: Only use getLocationByName when text search yields no results
+          try {
+            const locationResult = await getLocationByName(term);
+            
+            if (locationResult && locationResult.center) {
+              console.log('🗺️ FALLBACK: Location resolved:', locationResult);
+              setSearchCoordinates({ 
+                lat: locationResult.center[1], 
+                lng: locationResult.center[0] 
+              });
+              setIsLocationSearchActive(true);
+              setIsTextEnhanced(false); // Pure location search, not text-enhanced
+              setLocationSearchContext(`Showing providers within ~20km of ${locationResult.name}`);
+            } else {
+              console.log('❌ FALLBACK: No location found either');
+              setSearchCoordinates(null);
+              setIsLocationSearchActive(false);
+              setLocationSearchContext('');
+            }
+          } catch (locationError) {
+            console.warn('Location search unavailable:', locationError);
+            setSearchCoordinates(null);
              setIsLocationSearchActive(false);
              setIsTextEnhanced(false);
              setLocationSearchContext('');
@@ -634,14 +673,65 @@ export default function HomecarePage() {
     setSelectedProvider(providerData);
   };
 
-  // Comparison functionality
-  const toggleProviderSelection = (provider: HomecareProvider) => {
+  // Comparison functionality with 5-provider limit and persistence
+  const toggleProviderSelection = async (provider: HomecareProvider) => {
+    console.log('🔄 COMPARISON DEBUG: toggleProviderSelection called');
+    console.log('📋 Provider being toggled:', provider.provider_info.provider_name, 'ID:', provider.provider_id);
+    
     setSelectedForComparison(prev => {
+      console.log('📊 Current selection state before toggle:', prev.length, 'providers');
+      console.log('📝 Current providers:', prev.map(p => p.provider_info.provider_name));
+      
       const isSelected = prev.some(p => p.provider_id === provider.provider_id);
+      console.log('🔍 Provider already selected?', isSelected);
+      
       if (isSelected) {
-        return prev.filter(p => p.provider_id !== provider.provider_id);
+        // Remove from persistent storage if user is logged in
+        if (currentUser) {
+          removeHomecareComparisonSelection(currentUser.id, provider.provider_id)
+            .then(() => {
+              console.log('💾 PERSISTENCE: Removed from database');
+              // Update persistent selections state
+              setPersistentSelections(prev => 
+                prev.filter(selection => selection.provider_id !== provider.provider_id)
+              );
+            })
+            .catch(error => console.error('❌ PERSISTENCE ERROR (remove):', error));
+        }
+        
+        const newState = prev.filter(p => p.provider_id !== provider.provider_id);
+        console.log('❌ REMOVING provider. New count:', newState.length);
+        console.log('📝 Remaining providers:', newState.map(p => p.provider_info.provider_name));
+        return newState;
       } else {
-        return [...prev, provider];
+        // Add 5-provider limit like residential page
+        if (prev.length < 5) {
+          // Save to persistent storage if user is logged in
+          if (currentUser) {
+            addHomecareComparisonSelection(
+              currentUser.id,
+              provider.provider_id,
+              provider.provider_info.provider_name,
+              provider.provider_info.service_area || '',
+              provider.provider_info.organization_type || ''
+            )
+              .then((newSelection) => {
+                console.log('💾 PERSISTENCE: Saved to database');
+                // Update persistent selections state
+                setPersistentSelections(prev => [...prev, newSelection]);
+              })
+              .catch(error => console.error('❌ PERSISTENCE ERROR (add):', error));
+          }
+          
+          const newState = [...prev, provider];
+          console.log('✅ ADDING provider. New count:', newState.length);
+          console.log('📝 All providers:', newState.map(p => p.provider_info.provider_name));
+          return newState;
+        } else {
+          console.log('🚫 LIMIT REACHED: Cannot add more than 5 providers');
+          alert('Maximum 5 providers can be selected for comparison');
+          return prev;
+        }
       }
     });
   };
@@ -650,12 +740,80 @@ export default function HomecarePage() {
     return selectedForComparison.some(p => p.provider_id === provider.provider_id);
   };
 
-  const handleClearComparisonSelections = () => {
+  const handleClearComparisonSelections = async () => {
+    console.log('🗑️ PERSISTENCE: Clearing all comparison selections');
+    
+    // Clear persistent storage if user is logged in
+    if (currentUser) {
+      try {
+        await clearHomecareComparisonSelections(currentUser.id);
+        console.log('💾 PERSISTENCE: Cleared database selections');
+        
+        // Reload persistent selections from database
+        const updatedSelections = await getHomecareComparisonSelections(currentUser.id);
+        setPersistentSelections(updatedSelections);
+      } catch (error) {
+        console.error('❌ PERSISTENCE ERROR (clear):', error);
+      }
+    }
+    
     setSelectedForComparison([]);
   };
 
-  const startComparison = () => {
-    router.push('/homecare/compare');
+  const startComparison = async () => {
+    console.log('🚀 COMPARISON DEBUG: startComparison called');
+    console.log('📊 Current selectedForComparison length:', selectedForComparison.length);
+    console.log('📝 Selected providers:', selectedForComparison.map(p => p.provider_info.provider_name));
+    console.log('👤 Current user:', currentUser ? 'Logged in' : 'Anonymous');
+    
+    if (selectedForComparison.length >= 2) {
+      console.log('✅ COMPARISON CONDITION MET: >= 2 providers selected');
+      
+      const comparisonName = selectedForComparison.map(p => p.provider_info.provider_name).join(" vs ");
+      const providerNames = selectedForComparison.map(p => p.provider_info.provider_name);
+      const providerIds = selectedForComparison.map(p => p.provider_id);
+      
+      console.log('📋 Comparison name:', comparisonName);
+      console.log('📝 Provider names for URL:', providerNames);
+      console.log('🆔 Provider IDs:', providerIds);
+      
+      // Save to history only if user is logged in
+      if (currentUser) {
+        console.log('💾 SAVING TO DATABASE: User is logged in');
+        try {
+          const saved = await saveHomecareComparisonToHistory(currentUser.id, comparisonName, providerIds, providerNames);
+          console.log('✅ Database save result:', saved ? 'SUCCESS' : 'FAILED');
+          if (saved) {
+            // Reload comparison history from Supabase
+            const updatedComparisons = await getHomecareComparisonHistory(currentUser.id);
+            setRecentComparisons(updatedComparisons);
+            console.log('🔄 Updated comparison history loaded');
+          }
+        } catch (dbError) {
+          console.error('❌ DATABASE ERROR:', dbError);
+        }
+      } else {
+        console.log('⚠️ SKIPPING DATABASE: User not logged in');
+      }
+      
+      // Navigate to dedicated comparison page with provider names as URL parameters
+      const encodedProviderNames = providerNames.join(',');
+      const comparisonURL = `/homecare/compare?providers=${encodeURIComponent(encodedProviderNames)}`;
+      console.log('🧭 NAVIGATION: Attempting to navigate to:', comparisonURL);
+      
+      try {
+        router.push(comparisonURL);
+        console.log('✅ NAVIGATION: router.push() called successfully');
+        
+        // Don't clear selections immediately - let user return and maintain state
+        // Only clear when they explicitly clear or start a new search
+        console.log('🔄 PERSISTENCE: Keeping selections for potential return navigation');
+      } catch (navError) {
+        console.error('❌ NAVIGATION ERROR:', navError);
+      }
+    } else {
+      console.log('❌ COMPARISON CONDITION NOT MET: Only', selectedForComparison.length, 'provider(s) selected (need >= 2)');
+    }
   };
 
   // Helper function to get statistics for current scope - NEW
@@ -842,7 +1000,7 @@ export default function HomecarePage() {
                   }`}
                 >
                   <Scale className="w-4 h-4" />
-                  Compare ({selectedForComparison.length})
+                  Compare ({selectedForComparison.length}/5 selected)
                 </button>
                 
                 {/* Selected Providers Dropdown */}
@@ -869,7 +1027,7 @@ export default function HomecarePage() {
                             <p className="text-xs text-gray-500">{provider.provider_info.address.locality}, {provider.provider_info.address.state}</p>
                           </div>
                           <button
-                            onClick={() => toggleProviderSelection(provider)}
+                            onClick={async () => await toggleProviderSelection(provider)}
                             className="text-red-600 hover:text-red-700 p-1"
                             title="Remove from comparison"
                           >
@@ -883,6 +1041,8 @@ export default function HomecarePage() {
                       <div className="p-3 border-t border-gray-200">
                         <button
                           onClick={() => {
+                            console.log('🖱️ COMPARISON DEBUG: View Comparison button clicked!');
+                            console.log('📊 Current state when button clicked:', selectedForComparison.length, 'providers selected');
                             setShowSelectedList(false);
                             startComparison();
                           }}
@@ -968,9 +1128,9 @@ export default function HomecarePage() {
                         {/* Always-visible Comparison Selection - Scale Icon like residential */}
                         <div className="absolute top-2 right-2 z-10">
                           <button
-                            onClick={(e) => {
+                            onClick={async (e) => {
                               e.stopPropagation();
-                              toggleProviderSelection(provider);
+                              await toggleProviderSelection(provider);
                             }}
                             className={`w-8 h-8 rounded-lg flex items-center justify-center border-2 transition-colors ${
                               isProviderSelected(provider)
@@ -1491,7 +1651,7 @@ export default function HomecarePage() {
                                              <dl className="space-y-2">
                          {renderField("Compliance Status", selectedProvider.provider_info.compliance_status)}
                          {renderField("Provider Summary", selectedProvider.provider_info.summary)}
-                         {renderField("Data Sources", selectedProvider.data_sources?.join(', '))}
+                         {/* Removed Data Sources display per user request - hiding provider_info, cost_info, compliance_info, finance_info */}
                        </dl>
                     </CardContent>
                   </Card>

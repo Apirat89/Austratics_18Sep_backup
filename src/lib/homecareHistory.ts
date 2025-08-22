@@ -180,12 +180,15 @@ export async function addHomecareComparisonSelection(
 
   const { data, error } = await supabase
     .from('homecare_comparison_selections')
-    .insert({
+    .upsert({
       user_id: userId,
       provider_id: providerId,
       provider_name: providerName,
       service_area: serviceArea,
       organization_type: organizationType
+    }, {
+      onConflict: 'user_id,provider_id',
+      ignoreDuplicates: false
     })
     .select()
     .single();
@@ -256,6 +259,8 @@ export async function clearHomecareComparisonSelections(userId: string): Promise
 
   return 0;
 }
+
+
 
 export async function isHomecareProviderSelected(userId: string, providerId: string): Promise<boolean> {
   const supabase = createBrowserSupabaseClient();

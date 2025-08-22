@@ -71,10 +71,20 @@ export async function GET(request: NextRequest) {
     }
 
     // Return all merged data (default)
+    console.log('🚀 Loading merged SA2 data...');
     const mergedData = await getMergedSA2Data();
+    console.log('✅ Merged data loaded successfully');
+    
     const regionCount = Object.keys(mergedData).length;
+    console.log('📊 Region count:', regionCount);
+    
+    console.log('📈 Getting metrics...');
     const metricCount = await listAllMetrics().then(metrics => metrics.length);
+    console.log('📈 Metric count:', metricCount);
+    
+    console.log('📊 Getting medians...');
     const medians = await getMetricMedians();
+    console.log('✅ All data processing complete');
 
     return NextResponse.json({
       success: true,
@@ -96,10 +106,20 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ SA2 API error:', error);
+    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    
+    // Check if this is a specific type of error
+    if (error instanceof Error) {
+      console.error('❌ Error type:', error.constructor.name);
+      console.error('❌ Error message:', error.message);
+    }
+    
     return NextResponse.json(
       { 
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
+        type: error instanceof Error ? error.constructor.name : 'Unknown',
+        timestamp: new Date().toISOString()
       },
       { status: 500 }
     );

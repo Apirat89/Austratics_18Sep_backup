@@ -811,17 +811,18 @@ export default function ResidentialPage() {
   };
 
   const startComparison = async () => {
-    if (selectedForComparison.length >= 2 && currentUser) {
-      // Add comparison to recent comparisons when "View Comparison" is pressed
+    if (selectedForComparison.length >= 2) {
       const comparisonName = selectedForComparison.map(f => f["Service Name"]).join(" vs ");
       const facilityNames = selectedForComparison.map(f => f["Service Name"]);
       
-      // Save to Supabase
-      const saved = await saveResidentialComparisonToHistory(currentUser.id, comparisonName, facilityNames);
-      if (saved) {
-        // Reload comparison history from Supabase
-        const updatedComparisons = await getResidentialComparisonHistory(currentUser.id, 10);
-        setRecentComparisons(updatedComparisons);
+      // Save to history only if user is logged in
+      if (currentUser) {
+        const saved = await saveResidentialComparisonToHistory(currentUser.id, comparisonName, facilityNames);
+        if (saved) {
+          // Reload comparison history from Supabase
+          const updatedComparisons = await getResidentialComparisonHistory(currentUser.id, 10);
+          setRecentComparisons(updatedComparisons);
+        }
       }
       
       // Navigate to dedicated comparison page with facility names as URL parameters

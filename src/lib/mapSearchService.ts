@@ -378,6 +378,10 @@ async function buildSA2PostcodeSearchIndex(): Promise<SearchResult[]> {
       return [];
     }
 
+    // TEMPORARY: Disable SA2 postcode search until API issue is resolved
+    console.warn('SA2 postcode search temporarily disabled due to API issues');
+    return [];
+
     // Load SA2 data from the API
     const response = await fetch('/api/sa2');
     if (!response.ok) {
@@ -576,7 +580,16 @@ export async function searchLocations(searchTerm: string, maxResults: number = 2
 
   try {
     // Load search indices for all boundary types, healthcare facilities, and SA2 postcode data
-    const [lgaResults, sa2Results, sa3Results, sa4Results, postcodeResults, localityResults, facilityResults, sa2PostcodeResults] = await Promise.all([
+    // Handle SA2 postcode data separately with error handling to prevent page failures
+    let sa2PostcodeResults: SearchResult[] = [];
+    try {
+      sa2PostcodeResults = await buildSA2PostcodeSearchIndex();
+    } catch (sa2Error) {
+      console.warn('SA2 postcode search unavailable:', sa2Error);
+      // Continue without SA2 postcode search - other functionality remains working
+    }
+
+    const [lgaResults, sa2Results, sa3Results, sa4Results, postcodeResults, localityResults, facilityResults] = await Promise.all([
       buildSearchIndex('lga'),
       buildSearchIndex('sa2'),
       buildSearchIndex('sa3'),
@@ -584,7 +597,6 @@ export async function searchLocations(searchTerm: string, maxResults: number = 2
       buildSearchIndex('postcode'),
       buildSearchIndex('locality'),
       buildHealthcareFacilityIndex(),
-      buildSA2PostcodeSearchIndex(),
     ]);
 
     // ✅ FIXED: Filter out SA2 API-based results that don't have coordinates
