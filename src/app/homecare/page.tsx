@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, Home, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Scale, CheckSquare, Square, Eye, X, Filter, ExternalLink, Save, Building2 } from 'lucide-react';
+import { Search, Home, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Scale, CheckSquare, Square, Eye, X, Filter, ExternalLink, Save, Building2, Building } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import HomecareInlineBoxPlot from '@/components/homecare/HomecareInlineBoxPlot';
 
 import { getCurrentUser } from '../../lib/auth';
 import { 
@@ -78,6 +80,12 @@ export default function HomecarePage() {
   // Filtering state
   const [filters, setFilters] = useState<HomecareFilters>({});
 
+  // Statistical data for inline box plots - NEW
+  const [statisticsData, setStatisticsData] = useState<any>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [selectedScope, setSelectedScope] = useState<'nationwide' | 'state' | 'locality' | 'service_region'>('nationwide');
+  const [showBoxPlots, setShowBoxPlots] = useState(true);
+
   // Spatial search state - like residential
   const [searchCoordinates, setSearchCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [isLocationSearchActive, setIsLocationSearchActive] = useState(false);
@@ -147,7 +155,31 @@ export default function HomecarePage() {
       }
     };
 
+    const loadStatistics = async () => {
+      try {
+        console.log('🔄 Loading homecare statistics...');
+        const response = await fetch('/Maps_ABS_CSV/homecare_statistics_analysis.json');
+        if (!response.ok) {
+          throw new Error(`Failed to load statistics: ${response.status}`);
+        }
+        const data = await response.json();
+        setStatisticsData(data);
+        console.log('✅ Loaded homecare statistics data:', {
+          totalProviders: data.metadata?.totalProviders,
+          numericFields: data.metadata?.numericFields,
+          hasNationwide: !!data.nationwide,
+          nationwideFieldCount: Object.keys(data.nationwide?.fields || {}).length,
+          sampleField: Object.keys(data.nationwide?.fields || {})[0]
+        });
+      } catch (error) {
+        console.error('❌ Error loading homecare statistics:', error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
     loadProviders();
+    loadStatistics();
   }, []); // Only load once, not dependent on search or filters
 
   // SEARCH HELPER FUNCTIONS - defined outside useEffect for reusability
@@ -598,6 +630,95 @@ export default function HomecarePage() {
 
   const startComparison = () => {
     router.push('/homecare/compare');
+  };
+
+  // Helper function to get statistics for current scope - NEW
+  const getStatisticsForScope = () => {
+    if (!statisticsData) {
+      console.log('⚠️ No statisticsData available');
+      return null;
+    }
+    
+    let result = null;
+    const targetValue = selectedProvider?.provider_info?.address?.state;
+    
+    switch (selectedScope) {
+      case 'nationwide':
+        result = statisticsData.nationwide;
+        break;
+      case 'state':
+        result = statisticsData.byState?.find((s: any) => s.groupName === selectedProvider?.provider_info?.address?.state);
+        console.log(`🏛️ Looking for state stats: "${selectedProvider?.provider_info?.address?.state}", found: ${!!result}`);
+        break;
+      case 'locality':
+        result = statisticsData.byLocality?.find((l: any) => l.groupName === selectedProvider?.provider_info?.address?.locality);
+        console.log(`🏘️ Looking for locality stats: "${selectedProvider?.provider_info?.address?.locality}", found: ${!!result}`);
+        break;
+      case 'service_region':
+        result = statisticsData.byServiceRegion?.find((r: any) => r.groupName === selectedProvider?.cost_info?.service_region);
+        console.log(`🗺️ Looking for service region stats: "${selectedProvider?.cost_info?.service_region}", found: ${!!result}`);
+        break;
+      default:
+        result = statisticsData.nationwide;
+    }
+    
+    console.log(`📊 Statistics for scope "${selectedScope}":`, {
+      hasResult: !!result,
+      fieldCount: result?.fields ? Object.keys(result.fields).length : 0
+    });
+    
+    return result;
+  };
+
+  // Helper function to render fields with optional box plots - NEW
+  const renderField = (label: string, value: any, fieldName?: string) => {
+    if (value === null || value === undefined || value === '') return null;
+    
+    // Check if this is a numeric field that can have inline statistics
+    const isNumeric = typeof value === 'number';
+    const scopeStats = getStatisticsForScope();
+    const fieldStats = fieldName && scopeStats ? scopeStats.fields?.[fieldName] : null;
+    
+    // Debugging box plot conditions
+    if (fieldName && isNumeric) {
+      console.log(`🔍 Box Plot Debug for ${fieldName}:`, {
+        label,
+        value,
+        isNumeric,
+        showBoxPlots,
+        statsLoading,
+        hasStatisticsData: !!statisticsData,
+        hasScopeStats: !!scopeStats,
+        hasFieldStats: !!fieldStats,
+        selectedScope,
+        scopeStatsKeys: scopeStats ? Object.keys(scopeStats.fields || {}).slice(0, 5) : 'none'
+      });
+    }
+    
+    return (
+      <div className="mb-3">
+        <dt className="text-sm font-medium text-gray-500">{label}</dt>
+        <dd className="text-gray-900 flex items-center">
+          {typeof value === 'number' && fieldName?.includes('cost') ? formatCurrency(value) : value}
+          {showBoxPlots && isNumeric && fieldName && !statsLoading && fieldStats && (
+            <HomecareInlineBoxPlot
+              fieldName={fieldName}
+              currentValue={value}
+              statistics={fieldStats}
+              scope={selectedScope}
+            />
+          )}
+        </dd>
+      </div>
+    );
+  };
+
+  // Helper function to format currency - NEW
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-AU', {
+      style: 'currency',
+      currency: 'AUD',
+    }).format(amount);
   };
 
   return (
@@ -1055,37 +1176,401 @@ export default function HomecarePage() {
           </div>
         ) : (
           /* Provider Details View */
-          <div>
+          <div className="max-w-6xl mx-auto">
             <button
               onClick={() => setSelectedProvider(null)}
-              className="mb-4 flex items-center gap-2 text-blue-600 hover:text-blue-800"
+              className="mb-6 text-blue-600 hover:text-blue-800 font-medium"
             >
-              <ArrowLeft className="w-4 h-4" />
-              Back to results
+              ← Back to providers list
             </button>
             
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">{selectedProvider.provider_info.provider_name}</CardTitle>
-                <div className="flex items-center space-x-4 text-sm text-gray-600">
-                  <div className="flex items-center space-x-1">
-                    <MapPin className="w-4 h-4" />
-                    <span>{selectedProvider.provider_info.service_area}</span>
+            <div className="bg-white rounded-lg shadow-lg">
+              {/* Header */}
+              <div className="p-6 border-b space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h1 className="text-2xl font-bold text-gray-900">
+                      {selectedProvider.provider_info.provider_name}
+                    </h1>
+                    <div className="flex items-center gap-2 text-gray-600 mt-2">
+                      <MapPin className="w-4 h-4" />
+                      {selectedProvider.provider_info.address.street}, {selectedProvider.provider_info.address.locality}, {selectedProvider.provider_info.address.state} {selectedProvider.provider_info.address.postcode}
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <Building2 className="w-4 h-4" />
-                    <span>{selectedProvider.provider_info.organization_type}</span>
-                  </div>
+                  
+                  {/* Save Button */}
+                  <button
+                    onClick={() => handleToggleSave(selectedProvider)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                      selectedProvider.isSaved
+                        ? 'bg-green-100 text-green-700 hover:bg-green-200 border border-green-200'
+                        : 'bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-200'
+                    }`}
+                    title={selectedProvider.isSaved ? 'Remove from saved' : 'Save this provider'}
+                  >
+                    <Save className="w-4 h-4" />
+                    {selectedProvider.isSaved ? 'Unsave' : 'Save Provider'}
+                  </button>
                 </div>
-              </CardHeader>
-              
-              <CardContent>
-                {/* Detailed provider information would go here */}
-                <p className="text-gray-600">
-                  Detailed provider information will be displayed here.
-                </p>
-              </CardContent>
-            </Card>
+                
+                {/* Controls Row */}
+                <div className="flex items-center justify-between pt-2">
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm font-medium text-gray-700">Statistical Comparison:</span>
+                    <div className="flex items-center gap-2">
+                      {[
+                        { key: 'nationwide', label: 'Nationwide', icon: Globe },
+                        { key: 'state', label: 'State', icon: Building },
+                        { key: 'locality', label: 'Locality', icon: Home },
+                        { key: 'service_region', label: 'Region', icon: MapPin }
+                      ].map(({ key, label, icon: Icon }) => (
+                        <button
+                          key={key}
+                          onClick={() => setSelectedScope(key as any)}
+                          className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                            selectedScope === key
+                              ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Box Plot Toggle */}
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showBoxPlots}
+                      onChange={(e) => setShowBoxPlots(e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Show Box Plots</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Tabs */}
+              <Tabs defaultValue="main" className="p-6">
+                <TabsList className="grid grid-cols-6 gap-2 mb-6">
+                  <TabsTrigger value="main">Main</TabsTrigger>
+                  <TabsTrigger value="costs">Package Costs</TabsTrigger>
+                  <TabsTrigger value="services">Services</TabsTrigger>
+                  <TabsTrigger value="compliance">Compliance</TabsTrigger>
+                  <TabsTrigger value="coverage">Coverage</TabsTrigger>
+                  <TabsTrigger value="finance">Finance</TabsTrigger>
+                </TabsList>
+
+                {/* Tab 1: Main */}
+                <TabsContent value="main">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Building className="w-5 h-5" />
+                          Provider Information
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <dl className="space-y-2">
+                          {renderField("Provider Name", selectedProvider.provider_info.provider_name)}
+                          {renderField("Service Area", selectedProvider.provider_info.service_area)}
+                          {renderField("Organization Type", selectedProvider.provider_info.organization_type)}
+                          {renderField("Compliance Status", selectedProvider.provider_info.compliance_status)}
+                          {renderField("Last Updated", selectedProvider.provider_info.last_updated)}
+                        </dl>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Phone className="w-5 h-5" />
+                          Contact Information
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <dl className="space-y-2">
+                          {selectedProvider.provider_info.contact.phone && (
+                            <div className="mb-3">
+                              <dt className="text-sm font-medium text-gray-500">Phone</dt>
+                              <dd>
+                                <a href={`tel:${selectedProvider.provider_info.contact.phone}`} 
+                                   className="text-blue-600 hover:text-blue-800">
+                                  {selectedProvider.provider_info.contact.phone}
+                                </a>
+                              </dd>
+                            </div>
+                          )}
+                          {selectedProvider.provider_info.contact.email && (
+                            <div className="mb-3">
+                              <dt className="text-sm font-medium text-gray-500">Email</dt>
+                              <dd>
+                                <a href={`mailto:${selectedProvider.provider_info.contact.email}`} 
+                                   className="text-blue-600 hover:text-blue-800">
+                                  {selectedProvider.provider_info.contact.email}
+                                </a>
+                              </dd>
+                            </div>
+                          )}
+                          {renderField("Address", `${selectedProvider.provider_info.address.street}, ${selectedProvider.provider_info.address.locality}, ${selectedProvider.provider_info.address.state} ${selectedProvider.provider_info.address.postcode}`)}
+                        </dl>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Heart className="w-5 h-5" />
+                          Package Coverage
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <p className="text-sm font-medium text-gray-500 mb-2">Available Package Levels</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {[1, 2, 3, 4].map(level => (
+                              <div key={level} className={`p-2 rounded-lg border text-center ${
+                                selectedProvider.provider_info.home_care_packages[`level_${level}` as keyof typeof selectedProvider.provider_info.home_care_packages]
+                                  ? 'bg-green-50 border-green-200 text-green-700'
+                                  : 'bg-gray-50 border-gray-200 text-gray-500'
+                              }`}>
+                                <span className="text-sm font-medium">Level {level}</span>
+                                <div className="text-xs">
+                                  {selectedProvider.provider_info.home_care_packages[`level_${level}` as keyof typeof selectedProvider.provider_info.home_care_packages] ? 'Available' : 'Not Available'}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Activity className="w-5 h-5" />
+                          Services Offered
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {selectedProvider.provider_info.services_offered && selectedProvider.provider_info.services_offered.length > 0 && (
+                          <div className="mb-4">
+                            <p className="text-sm font-medium text-gray-500 mb-2">Services</p>
+                            <div className="flex flex-wrap gap-2">
+                              {selectedProvider.provider_info.services_offered.map((service, index) => (
+                                <span key={index} className="inline-flex items-center rounded-full border border-gray-300 bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-900">{service}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedProvider.provider_info.specialized_care && selectedProvider.provider_info.specialized_care.length > 0 && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-500 mb-2">Specialized Care</p>
+                            <div className="space-y-1">
+                              {selectedProvider.provider_info.specialized_care.map((care, index) => (
+                                <p key={index} className="text-sm text-gray-600">• {care}</p>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                {/* Tab 2: Package Costs */}
+                <TabsContent value="costs">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <DollarSign className="w-5 h-5" />
+                          Care Management Costs
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <dl className="space-y-2">
+                          {renderField("Level 1 (Fortnightly)", selectedProvider.cost_info?.management_costs?.care_management?.level_1_fortnightly, "management_costs_care_management_level_1_fortnightly")}
+                          {renderField("Level 2 (Fortnightly)", selectedProvider.cost_info?.management_costs?.care_management?.level_2_fortnightly, "management_costs_care_management_level_2_fortnightly")}
+                          {renderField("Level 3 (Fortnightly)", selectedProvider.cost_info?.management_costs?.care_management?.level_3_fortnightly, "management_costs_care_management_level_3_fortnightly")}
+                          {renderField("Level 4 (Fortnightly)", selectedProvider.cost_info?.management_costs?.care_management?.level_4_fortnightly, "management_costs_care_management_level_4_fortnightly")}
+                        </dl>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <BarChart3 className="w-5 h-5" />
+                          Package Management Costs
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <dl className="space-y-2">
+                          {renderField("Level 1 (Fortnightly)", selectedProvider.cost_info?.management_costs?.package_management?.level_1_fortnightly, "management_costs_package_management_level_1_fortnightly")}
+                          {renderField("Level 2 (Fortnightly)", selectedProvider.cost_info?.management_costs?.package_management?.level_2_fortnightly, "management_costs_package_management_level_2_fortnightly")}
+                          {renderField("Level 3 (Fortnightly)", selectedProvider.cost_info?.management_costs?.package_management?.level_3_fortnightly, "management_costs_package_management_level_3_fortnightly")}
+                          {renderField("Level 4 (Fortnightly)", selectedProvider.cost_info?.management_costs?.package_management?.level_4_fortnightly, "management_costs_package_management_level_4_fortnightly")}
+                        </dl>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Award className="w-5 h-5" />
+                          Package Budgets
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                                                 <dl className="space-y-2">
+                           {renderField("Level 1 Package (Fortnightly)", selectedProvider.cost_info?.package_budget?.hcp_level_1_fortnightly, "package_budget_hcp_level_1_fortnightly")}
+                           {renderField("Charges Basic Daily Fee", selectedProvider.cost_info?.package_budget?.charges_basic_daily_fee ? "Yes" : "No")}
+                         </dl>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                {/* Tab 3: Services */}
+                <TabsContent value="services">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Activity className="w-5 h-5" />
+                          Services Offered
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {selectedProvider.provider_info.services_offered && selectedProvider.provider_info.services_offered.length > 0 ? (
+                          <div className="space-y-2">
+                            {selectedProvider.provider_info.services_offered.map((service, index) => (
+                              <div key={index} className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <span className="text-sm text-gray-700">{service}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 text-sm">No services information available</p>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Heart className="w-5 h-5" />
+                          Specialized Care
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {selectedProvider.provider_info.specialized_care && selectedProvider.provider_info.specialized_care.length > 0 ? (
+                          <div className="space-y-2">
+                            {selectedProvider.provider_info.specialized_care.map((care, index) => (
+                              <div key={index} className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                <span className="text-sm text-gray-700">{care}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 text-sm">No specialized care information available</p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                {/* Tab 4: Compliance */}
+                <TabsContent value="compliance">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <FileText className="w-5 h-5" />
+                        Compliance & Regulatory Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                                             <dl className="space-y-2">
+                         {renderField("Compliance Status", selectedProvider.provider_info.compliance_status)}
+                         {renderField("Provider Summary", selectedProvider.provider_info.summary)}
+                         {renderField("Data Sources", selectedProvider.data_sources?.join(', '))}
+                       </dl>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                {/* Tab 5: Coverage */}
+                <TabsContent value="coverage">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <MapPin className="w-5 h-5" />
+                        Service Coverage
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <dl className="space-y-2">
+                        {renderField("Service Region", selectedProvider.cost_info?.service_region)}
+                        {renderField("Service Area", selectedProvider.provider_info.service_area)}
+                        {renderField("Primary Address", `${selectedProvider.provider_info.address.street}, ${selectedProvider.provider_info.address.locality}, ${selectedProvider.provider_info.address.state} ${selectedProvider.provider_info.address.postcode}`)}
+                        {selectedProvider.provider_info.coordinates && (
+                          <div className="mb-3">
+                            <dt className="text-sm font-medium text-gray-500">Coordinates</dt>
+                            <dd className="text-gray-900">
+                              {selectedProvider.provider_info.coordinates.latitude?.toFixed(6)}, {selectedProvider.provider_info.coordinates.longitude?.toFixed(6)}
+                            </dd>
+                          </div>
+                        )}
+                      </dl>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                {/* Tab 6: Finance */}
+                <TabsContent value="finance">
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <DollarSign className="w-5 h-5" />
+                          Complete Cost Breakdown
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <h4 className="font-semibold mb-3">Care Management Costs</h4>
+                            <dl className="space-y-2">
+                              {renderField("Level 1", selectedProvider.cost_info?.management_costs?.care_management?.level_1_fortnightly, "management_costs_care_management_level_1_fortnightly")}
+                              {renderField("Level 2", selectedProvider.cost_info?.management_costs?.care_management?.level_2_fortnightly, "management_costs_care_management_level_2_fortnightly")}
+                              {renderField("Level 3", selectedProvider.cost_info?.management_costs?.care_management?.level_3_fortnightly, "management_costs_care_management_level_3_fortnightly")}
+                              {renderField("Level 4", selectedProvider.cost_info?.management_costs?.care_management?.level_4_fortnightly, "management_costs_care_management_level_4_fortnightly")}
+                            </dl>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold mb-3">Package Management Costs</h4>
+                            <dl className="space-y-2">
+                              {renderField("Level 1", selectedProvider.cost_info?.management_costs?.package_management?.level_1_fortnightly, "management_costs_package_management_level_1_fortnightly")}
+                              {renderField("Level 2", selectedProvider.cost_info?.management_costs?.package_management?.level_2_fortnightly, "management_costs_package_management_level_2_fortnightly")}
+                              {renderField("Level 3", selectedProvider.cost_info?.management_costs?.package_management?.level_3_fortnightly, "management_costs_package_management_level_3_fortnightly")}
+                              {renderField("Level 4", selectedProvider.cost_info?.management_costs?.package_management?.level_4_fortnightly, "management_costs_package_management_level_4_fortnightly")}
+                            </dl>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
           </div>
         )}
       </div>
