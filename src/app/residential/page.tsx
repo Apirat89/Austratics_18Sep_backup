@@ -873,7 +873,37 @@ export default function ResidentialPage() {
 
   // Handle clicking on a recent search to populate search field
   const handleSearchSelect = (search: ResidentialSearchHistoryItem) => {
-    setSearchTerm(search.search_term);
+    console.log('🔄 RESTORING: Recent search clicked:', search.search_term);
+    
+    // Parse enhanced search term to extract original search term and detect location context
+    const searchTermToRestore = search.search_term;
+    
+    // Check if this is an enhanced location-based search (contains location context in parentheses)
+    const locationContextMatch = searchTermToRestore.match(/^(.+?)\s*\((.+)\)$/);
+    
+    if (locationContextMatch) {
+      // This was a location-based search - extract original term
+      const originalTerm = locationContextMatch[1].trim();
+      const savedContext = locationContextMatch[2];
+      
+      console.log('🗺️ RESTORING: Location-based search detected');
+      console.log('📍 RESTORING: Original term:', originalTerm);
+      console.log('📍 RESTORING: Saved context:', savedContext);
+      
+      // Set the clean search term (this will trigger location resolution via useEffect)
+      setSearchTerm(originalTerm);
+      
+      // The location resolution useEffect will handle:
+      // - Setting searchCoordinates
+      // - Setting isLocationSearchActive
+      // - Setting locationSearchContext
+      // - Setting isTextEnhanced
+      // - Filtering and displaying results
+    } else {
+      // This is a simple text search - restore as normal
+      console.log('📝 RESTORING: Text-only search');
+      setSearchTerm(searchTermToRestore);
+    }
   };
 
   // Clear all saved facilities

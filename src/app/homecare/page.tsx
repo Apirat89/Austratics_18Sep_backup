@@ -501,7 +501,39 @@ export default function HomecarePage() {
 
   // History panel handlers
   const handleSearchHistoryClick = (item: HomecareSearchHistoryItem) => {
-    setSearchTerm(item.search_term);
+    console.log('🔄 RESTORING: Recent homecare search clicked:', item.search_term);
+    
+    // Parse enhanced search term to extract original search term and detect location context
+    const searchTermToRestore = item.search_term;
+    
+    // Check if this is an enhanced location-based search (contains location context in parentheses)
+    const locationContextMatch = searchTermToRestore.match(/^(.+?)\s*\((.+)\)$/);
+    
+    if (locationContextMatch) {
+      // This was a location-based search - extract original term
+      const originalTerm = locationContextMatch[1].trim();
+      const savedContext = locationContextMatch[2];
+      
+      console.log('🗺️ RESTORING: Location-based search detected');
+      console.log('📍 RESTORING: Original term:', originalTerm);
+      console.log('📍 RESTORING: Saved context:', savedContext);
+      
+      // Set the clean search term (this will trigger location resolution via useEffect)
+      setSearchTerm(originalTerm);
+      
+      // The location resolution useEffect will handle:
+      // - Setting searchCoordinates
+      // - Setting isLocationSearchActive
+      // - Setting locationSearchContext
+      // - Setting isTextEnhanced
+      // - Filtering and displaying results
+    } else {
+      // This is a simple text search - restore as normal
+      console.log('📝 RESTORING: Text-only search');
+      setSearchTerm(searchTermToRestore);
+    }
+    
+    // Restore filters if they were applied
     if (item.filters_applied) {
       // Convert the stored filter format to our current filter format
       const convertedFilters: HomecareFilters = {
@@ -511,6 +543,7 @@ export default function HomecarePage() {
         costRange: item.filters_applied.cost_range
       };
       setFilters(convertedFilters);
+      console.log('🎛️ RESTORING: Filters applied:', convertedFilters);
     }
   };
 

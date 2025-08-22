@@ -367,7 +367,7 @@ Home care - level 4 package $13.08
 Residential care $63.57
 ```
 
-**Current Problem:** Vector similarity search may not effectively match user queries like "Home care level 1 fee" to the specific "$11.72" value because:
+**Current Problem:** Vector similarity search may not effectively match user queries like "level 1 home care fee" to the specific "$11.72" value because:
 1. **Semantic Distance**: Numbers and specific rates have low semantic similarity to natural language queries
 2. **Context Separation**: Fee values may be separated from their descriptive context during chunking
 3. **Precision Requirements**: Users need exact values, not approximate or contextual information
@@ -1640,7 +1640,7 @@ Navigate to: `http://localhost:3000/homecare`
 **USER REQUEST:** Fee schedule documents in `/data/Regulation Docs/Fee and Subsidies Aged Care/` contain structured numerical data that doesn't work properly with vector embeddings. Users asking specific fee questions like "what is the official basic daily fee rate of Home care - level 1?" should get "$11.72" but the current RAG system isn't retrieving this structured data effectively.
 
 **📊 PROBLEM ANALYSIS:**
-- ✅ **Current System**: Vector embeddings work well for narrative text and general content
+- ✅ **Current System**: Vector embeddings optimize for semantic meaning but struggle with exact numerical lookups
 - ❌ **Issue**: Structured fee tables with specific rates not effectively searchable via semantic similarity
 - ❌ **Example Failure**: User asks "Home care level 1 fee" → System may not find "$11.72" from fee schedule tables
 - ✅ **Target Data**: Fee schedules contain critical rate information in tabular format
@@ -1664,7 +1664,7 @@ Home care - level 4 package $13.08
 Residential care $63.57
 ```
 
-**Current Problem:** Vector similarity search may not effectively match user queries like "Home care level 1 fee" to the specific "$11.72" value because:
+**Current Problem:** Vector similarity search may not effectively match user queries like "level 1 home care fee" to the specific "$11.72" value because:
 1. **Semantic Distance**: Numbers and specific rates have low semantic similarity to natural language queries
 2. **Context Separation**: Fee values may be separated from their descriptive context during chunking
 3. **Precision Requirements**: Users need exact values, not approximate or contextual information
@@ -5235,9 +5235,7 @@ interface FacilityData {
 - **Consistent Styling**: Matches existing design system and color schemes
 - **Professional Polish**: Loading states, hover effects, and smooth transitions
 
-### 📝 **Next Steps for Production**
-
-**Immediate (Optional)**:
+**Next Steps for Production**:
 1. **Real Marker Integration**: Connect table to actual marker click events
 2. **Save Functionality**: Implement full save/unsave feature integration
 3. **Performance Optimization**: Add virtualization for large facility lists
@@ -5269,7 +5267,7 @@ interface FacilityData {
 The current implementation has a dual-system approach with feature flags between popup and table modes. The user wants to simplify this to:
 - **Table-First Experience**: Make the table the primary interaction method
 - **Centered Modal-Style**: Move from bottom-right positioned panel to center-screen modal
-- **Draggable Functionality**: Allow users to move the table around the screen
+- **Draggable Functionality**: Allow users to move around the table
 - **Self-Contained Controls**: Add close button directly to the table
 - **Simplified Interface**: Remove external toggle buttons
 
@@ -5379,7 +5377,7 @@ The current implementation has a dual-system approach with feature flags between
 - **Table Container**: `z-51` (above backdrop)
 
 **State Management:**
-```typescript
+```
 // New state variables to add:
 const [tableVisible, setTableVisible] = useState(false);
 const [tablePosition, setTablePosition] = useState({ x: 0, y: 0 });
@@ -6081,7 +6079,7 @@ The FacilityTable drag system now provides a **professional, responsive, and acc
 - **Dual Loading States**: Full-screen overlay only during map-init, corner indicator for data loading
 
 **Implementation Strategy**:
-```typescript
+```
 // Before: Map blocked until full completion
 {isComplete && children}
 
@@ -6182,7 +6180,7 @@ The map now renders **immediately** after basic initialization while all data la
 3. **Optimized Stage Durations**: All durations scaled to 60% of original
 
 **Stage Duration Optimization**:
-```typescript
+```
 // Before (20 seconds total):
 { stage: 'map-init', duration: 1000 },                    // 1s
 { stage: 'healthcare-data', duration: 2000 },             // 2s
@@ -6366,7 +6364,7 @@ The map rendering optimization project is now **live on both GitHub branches** a
 - ✅ **Responsive Design**: Different text for desktop/mobile (icons only on mobile)
 
 **Implementation Logic**:
-```typescript
+```
 // Save operation
 markerElement.addEventListener('click', (e) => {
   e.stopPropagation();
@@ -7180,11 +7178,7 @@ The user wants to replace the complex magic wand polygon drawing system with a s
 - **Task 3.3**: Add real-time selected count display - **COMPLETED** ✅
 - **Task 3.4**: Update button enable/disable logic - **COMPLETED** ✅
 
-#### **Phase 4: Implementation & Testing** - **COMPLETED** ✅
-- **Task 4.1**: Implement combined UI components - **COMPLETED** ✅
-- **Task 4.2**: Test selection logic with various combinations - **COMPLETED** ✅
-- **Task 4.3**: Verify mobile responsiveness - **COMPLETED** ✅
-- **Task 4.4**: User acceptance testing - **READY FOR USER TESTING** 🚀
+#### **Phase 4: Implementation & Testing** - **READY FOR USER TESTING** 🚀
 
 ## Background and Motivation
 
@@ -8505,7 +8499,7 @@ interface FacilityData {
 The current implementation has a dual-system approach with feature flags between popup and table modes. The user wants to simplify this to:
 - **Table-First Experience**: Make the table the primary interaction method
 - **Centered Modal-Style**: Move from bottom-right positioned panel to center-screen modal
-- **Draggable Functionality**: Allow users to move the table around the screen
+- **Draggable Functionality**: Allow users to move the table around
 - **Self-Contained Controls**: Add close button directly to the table
 - **Simplified Interface**: Remove external toggle buttons
 
@@ -11773,10 +11767,10 @@ This will create a more intuitive user experience where users immediately unders
 - **Consistent Pattern**: Same icon, different colors for active/inactive states
 
 ### **🎨 FINAL ICON MAPPING**
-- **✅ Save (Saved)**: `Save` (floppy disk) - Green when saved, gray when not saved
-- **✅ Comparison (Selected)**: `Scale` - Orange when selected, gray when not selected
-- **✅ Top Menu Save**: `Save` (floppy disk) - Blue theme
-- **✅ Top Menu Compare**: `Scale` - Orange theme (already correct)
+- **✅ Save (Saved)**: `Save` icon in gray (`text-gray-600`)
+- **✅ Comparison (Selected)**: `Scale` icon in white (`text-white`) with orange background
+- **✅ Top Menu Save**: `Save` icon in blue theme (matches current styling)
+- **✅ Top Menu Compare**: `Scale` icon in orange theme (already correct)
 
 ### **⚡ IMPLEMENTATION ESTIMATE**: ~30 minutes
 - Icon replacements: 10 minutes
@@ -12285,3 +12279,130 @@ The homecare page now provides a professional, comprehensive facility detail exp
 **Next Steps**: The core homecare detail view implementation is complete. Ready for user feedback, additional feature requests, or refinement of existing functionality.
 
 **Implementation Time**: ~8 hours total for comprehensive detail view system with statistical analysis integration.
+
+---
+
+## 🚨 **HOMECARE PAGE RECENT SEARCH ISSUE ANALYSIS**
+
+**PLANNER MODE ACTIVE** 📋
+
+### Background and Motivation
+
+After successfully fixing the residential page recent search functionality, investigating the homecare page reveals it has **IDENTICAL ISSUE**. The homecare page implements location-based search but the recent search handler fails to restore location state variables.
+
+**CONFIRMED: HOMECARE HAS IDENTICAL ISSUE** ⚠️
+
+### Key Challenges and Analysis
+
+#### **🔍 ANALYSIS FINDINGS:**
+
+**✅ HOMECARE LOCATION-BASED SEARCH CONFIRMED:**
+- Lines 89-95: Has identical spatial search state variables (`searchCoordinates`, `isLocationSearchActive`, `isTextEnhanced`, `locationSearchContext`, `searchRadius`)
+- Lines 255-341: Has `performTextFirstSearch` function with location resolution logic
+- Lines 424-450: Has `addToSearchHistory` with enhanced term creation using location context
+
+**❌ BROKEN RECENT SEARCH HANDLER:**
+- Lines 503-515: `handleSearchHistoryClick` only sets `searchTerm` and optional `filters`
+- **MISSING**: No restoration of location state variables needed for location-based searches
+- **RESULT**: Location-based searches saved as enhanced terms fail to restore properly
+
+**📊 ENHANCED SEARCH TERM EXAMPLES:**
+- Saved: `"Sydney CBD (Found 45 matches, showing providers within ~20km of search area)"`
+- Current handler: Sets entire enhanced string as search term → location resolution fails
+- **NEEDED**: Parse enhanced term → extract original → trigger location resolution
+
+**🔄 IDENTICAL PATTERN TO RESIDENTIAL:**
+- Same spatial search architecture
+- Same enhanced search term saving logic  
+- Same broken recent search restoration
+- **SOLUTION**: Apply exact same parsing fix as residential
+
+**🎯 ENHANCED DATA STRUCTURE BONUS:**
+- Homecare `HomecareSearchHistoryItem` has richer data: `location_searched`, `radius_km`, `filters_applied`, `results_count`
+- **OPPORTUNITY**: Could implement more sophisticated restoration using stored location/radius data
+- **APPROACH**: Start with simple parsing fix (like residential), consider enhanced restoration later
+
+### High-level Task Breakdown
+
+#### **Phase 1: Quick Fix Implementation** 
+- **Task 1.1**: Enhance `handleSearchHistoryClick` Function - **IN PROGRESS** 🔄
+  - Parse enhanced search terms to detect location context
+  - Extract original search term from enhanced format  
+  - Set clean search term to trigger existing location resolution
+  - Add comprehensive debug logging for troubleshooting
+  - Maintain backward compatibility for text-only searches
+
+#### **Phase 2: Testing & Validation**
+- **Task 2.1**: Test Location-based Search Restoration - **PENDING**
+  - Verify enhanced search terms are parsed correctly
+  - Confirm location state variables are restored
+  - Test search results display correctly in main area
+  - Validate old text-only searches still work
+
+#### **Phase 3: Implementation Consistency Check**
+- **Task 3.1**: Cross-page Implementation Audit - **PENDING**
+  - Ensure homecare and residential fixes are consistent
+  - Verify both pages handle enhanced search terms identically
+  - Document the pattern for future search implementations
+
+**EXECUTOR MODE ACTIVE** 🛠️
+
+## Project Status Board
+
+#### **Phase 1: Quick Fix Implementation** 
+- **Task 1.1**: Enhance `handleSearchHistoryClick` Function - **COMPLETED** ✅
+
+#### **Phase 2: Testing & Validation**
+- **Task 2.1**: Test Location-based Search Restoration - **PENDING**
+
+#### **Phase 3: Implementation Consistency Check**
+- **Task 3.1**: Cross-page Implementation Audit - **PENDING**
+
+## Executor's Feedback or Assistance Requests
+
+**🎉 TASK 1.1 COMPLETED: Enhanced Homecare Search Selection Handler**
+
+**✅ QUICK FIX IMPLEMENTED:**
+
+**Solution Applied**: Enhanced `handleSearchHistoryClick` function in `src/app/homecare/page.tsx` (lines 503-541)
+
+**Key Improvements**:
+1. **Smart Search Term Parsing**: Uses identical regex as residential to detect location-based searches with format `"SearchTerm (LocationContext)"`
+2. **Original Term Extraction**: Extracts clean search term from enhanced saved searches  
+3. **Location Resolution Triggering**: Sets clean term to trigger existing location resolution logic
+4. **Filter Restoration**: Preserves existing filter restoration functionality
+5. **Debug Logging**: Added comprehensive logging for troubleshooting
+6. **Backward Compatibility**: Text-only searches work exactly as before
+
+**How It Works**:
+- **Location-based searches**: `"Sydney CBD (Found 45 matches, showing providers within ~20km of search area)"` → extracts `"Sydney CBD"` → triggers location resolution
+- **Text-only searches**: `"nursing"` → uses as-is → works normally  
+- **Existing useEffect**: Handles location resolution and state setting automatically
+- **Filter Integration**: Restores applied filters alongside search term
+
+**Expected Result**: 
+- ✅ Clicking recent location-based searches now triggers proper location resolution
+- ✅ Search coordinates, context, and radius filtering are restored
+- ✅ Applied filters are restored correctly
+- ✅ Old text searches continue to work normally
+- ✅ Users get back their expected location-based search results
+
+**🔧 IMPLEMENTATION DETAILS:**
+
+```typescript
+// Enhanced function detects and parses location-based searches (identical to residential)
+const locationContextMatch = searchTermToRestore.match(/^(.+?)\s*\((.+)\)$/);
+
+if (locationContextMatch) {
+  // Extract original term and trigger location resolution
+  const originalTerm = locationContextMatch[1].trim();
+  setSearchTerm(originalTerm); // Triggers existing location resolution logic
+} else {
+  // Simple text search - use as-is
+  setSearchTerm(searchTermToRestore);
+}
+
+// Plus: Filter restoration preserved from original implementation
+```
+
+**Status**: ✅ **Ready for testing** - Quick fix implemented and should resolve the homecare recent search issue
