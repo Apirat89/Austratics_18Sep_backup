@@ -343,6 +343,60 @@
         "max": 19546126,
         "mean": 1745294.05,
         "count": 2094
+      },
+      "finance_info_financials_staff_pay_rates_registered_nurse_hourly_rate": {
+        "min": 0,
+        "q1": 0,
+        "median": 48.76,
+        "q3": 52.67,
+        "max": 120,
+        "mean": 38.16456532538509,
+        "count": 2013
+      },
+      "finance_info_financials_staff_pay_rates_registered_nurse_sector_average": {
+        "min": 46,
+        "q1": 46,
+        "median": 46,
+        "q3": 46,
+        "max": 46,
+        "mean": 46,
+        "count": 2013
+      },
+      "finance_info_financials_staff_pay_rates_enrolled_nurse_hourly_rate": {
+        "min": 0,
+        "q1": 0,
+        "median": 0,
+        "q3": 38,
+        "max": 82,
+        "mean": 16.732811723795272,
+        "count": 2013
+      },
+      "finance_info_financials_staff_pay_rates_enrolled_nurse_sector_average": {
+        "min": 0,
+        "q1": 0,
+        "median": 0,
+        "q3": 0,
+        "max": 0,
+        "mean": 0,
+        "count": 2012
+      },
+      "finance_info_financials_staff_pay_rates_home_care_worker_hourly_rate": {
+        "min": 0,
+        "q1": 31.93,
+        "median": 33,
+        "q3": 36.25,
+        "max": 65,
+        "mean": 33.390173869846016,
+        "count": 2013
+      },
+      "finance_info_financials_staff_pay_rates_home_care_worker_sector_average": {
+        "min": 33,
+        "q1": 33,
+        "median": 33,
+        "q3": 33,
+        "max": 33,
+        "mean": 33,
+        "count": 2013
       }
     }
   },

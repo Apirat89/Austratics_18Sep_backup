@@ -898,11 +898,22 @@ export default function HomecarePage() {
       }
     }
 
-          return (
-        <div className="mb-3">
-          <dt className="text-sm font-medium text-gray-500">{label}</dt>
-          <dd className="text-gray-900 flex items-center">
-            {typeof value === 'number' && fieldName && /(cost|finance|income|expenditure|rate|hourly|surplus|deficit)/.test(fieldName) ? formatCurrency(value) : value}
+    // Handle object values that can't be rendered directly by React
+    const renderValue = () => {
+      if (typeof value === 'object' && value !== null) {
+        return JSON.stringify(value);
+      }
+      if (typeof value === 'number' && fieldName && /(cost|finance|income|expenditure|rate|hourly|surplus|deficit)/.test(fieldName)) {
+        return formatCurrency(value);
+      }
+      return value;
+    };
+
+    return (
+      <div className="mb-3">
+        <dt className="text-sm font-medium text-gray-500">{label}</dt>
+        <dd className="text-gray-900 flex items-center">
+          {renderValue()}
           {showBoxPlots && isNumeric && fieldName && !statsLoading && fieldStats && (
             <HomecareInlineBoxPlot
               fieldName={fieldName}
@@ -1893,24 +1904,24 @@ export default function HomecarePage() {
                           <div>
                             <h4 className="font-semibold mb-3 text-blue-900">Registered Nurse</h4>
                             <dl className="space-y-2">
-                              {renderField("Hourly Rate", selectedProvider.finance_info?.financials?.staff_pay_rates?.registered_nurse?.hourly_rate)}
-                              {renderField("Sector Average", selectedProvider.finance_info?.financials?.staff_pay_rates?.registered_nurse?.sector_average)}
+                              {renderField("Hourly Rate", selectedProvider.finance_info?.financials?.staff_pay_rates?.registered_nurse?.hourly_rate, "finance_info_financials_staff_pay_rates_registered_nurse_hourly_rate")}
+                              {renderField("Sector Average", selectedProvider.finance_info?.financials?.staff_pay_rates?.registered_nurse?.sector_average, "finance_info_financials_staff_pay_rates_registered_nurse_sector_average")}
                             </dl>
                           </div>
                           
                           <div>
                             <h4 className="font-semibold mb-3 text-green-900">Enrolled Nurse</h4>
                             <dl className="space-y-2">
-                              {renderField("Hourly Rate", selectedProvider.finance_info?.financials?.staff_pay_rates?.enrolled_nurse?.hourly_rate)}
-                              {renderField("Sector Average", selectedProvider.finance_info?.financials?.staff_pay_rates?.enrolled_nurse?.sector_average)}
+                              {renderField("Hourly Rate", selectedProvider.finance_info?.financials?.staff_pay_rates?.enrolled_nurse?.hourly_rate, "finance_info_financials_staff_pay_rates_enrolled_nurse_hourly_rate")}
+                              {renderField("Sector Average", selectedProvider.finance_info?.financials?.staff_pay_rates?.enrolled_nurse?.sector_average, "finance_info_financials_staff_pay_rates_enrolled_nurse_sector_average")}
                             </dl>
                           </div>
                           
                           <div>
                             <h4 className="font-semibold mb-3 text-purple-900">Home Care Worker</h4>
                             <dl className="space-y-2">
-                              {renderField("Hourly Rate", selectedProvider.finance_info?.financials?.staff_pay_rates?.home_care_worker?.hourly_rate)}
-                              {renderField("Sector Average", selectedProvider.finance_info?.financials?.staff_pay_rates?.home_care_worker?.sector_average)}
+                              {renderField("Hourly Rate", selectedProvider.finance_info?.financials?.staff_pay_rates?.home_care_worker?.hourly_rate, "finance_info_financials_staff_pay_rates_home_care_worker_hourly_rate")}
+                              {renderField("Sector Average", selectedProvider.finance_info?.financials?.staff_pay_rates?.home_care_worker?.sector_average, "finance_info_financials_staff_pay_rates_home_care_worker_sector_average")}
                             </dl>
                           </div>
                         </div>
