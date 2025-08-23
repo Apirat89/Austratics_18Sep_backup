@@ -13,7 +13,7 @@ import { NewsCacheService } from '@/lib/news-cache';
  * - GET /api/news/refresh - Get cache status information
  */
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: Request) {
   try {
     console.log('🔄 News cache refresh requested');
     
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: Request) {
   try {
     console.log('🔄 Background news refresh started...');
     const startTime = Date.now();

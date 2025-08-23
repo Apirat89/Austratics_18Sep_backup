@@ -81,11 +81,6 @@ const _calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numb
 
 // ... existing code ...
 
-interface _HomecareAPIResponse {
-  data: HomecareProvider[];
-  success: boolean;
-}
-
 export default function HomecarePage() {
   const router = useRouter();
   const _searchParams = useSearchParams();
@@ -123,6 +118,7 @@ export default function HomecarePage() {
   const [statsLoading, setStatsLoading] = useState(true);
   const [selectedScope, setSelectedScope] = useState<'nationwide' | 'state' | 'locality' | 'service_region'>('nationwide');
   const [showBoxPlots, setShowBoxPlots] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   // Spatial search state - like residential
   const [searchCoordinates, setSearchCoordinates] = useState<{ lat: number; lng: number } | null>(null);
@@ -166,6 +162,18 @@ export default function HomecarePage() {
     loadUser();
   }, []);
 
+  // Ensure client-side hydration
+  useEffect(() => {
+    console.log('🚀 MOUNTED: Client-side hydration complete');
+    setMounted(true);
+    
+    // Test if we can modify DOM on client side
+    if (typeof window !== 'undefined') {
+      console.log('🌐 WINDOW: Available on client side');
+      document.title = 'Homecare - Client side active';
+    }
+  }, []);
+
   // DEBUG: Monitor selectedForComparison state changes
   useEffect(() => {
     console.log('🔍 COMPARISON STATE CHANGE DETECTED');
@@ -202,26 +210,36 @@ export default function HomecarePage() {
   useEffect(() => {
     const loadProviders = async () => {
       try {
+        console.log('🔄 Starting to load homecare providers...');
         setLoading(true);
         
         // Load full dataset directly like residential
         const response = await fetch('/Maps_ABS_CSV/merged_homecare_providers.json');
+        console.log('📡 Fetch response status:', response.status, response.ok);
+        
         if (!response.ok) {
           throw new Error(`Failed to load homecare data: ${response.status}`);
         }
         
         const data = await response.json();
+        console.log('📊 Raw data loaded, length:', data.length);
+        console.log('📋 First provider sample:', data[0]?.provider_info?.provider_name);
+        
         setProviders(data);
         setFilteredProviders([]); // Start with empty list like residential
         
-        console.log(`Loaded ${data.length} homecare providers`);
+        console.log(`✅ SUCCESS: Loaded ${data.length} homecare providers into state`);
+        
+        // Add debug indicator
+        document.title = `Homecare - ${data.length} providers loaded`;
         
       } catch (error) {
-        console.error('Error loading homecare providers:', error);
+        console.error('❌ ERROR loading homecare providers:', error);
         setProviders([]);
         setFilteredProviders([]);
       } finally {
         setLoading(false);
+        console.log('🏁 Provider loading completed');
       }
     };
 
@@ -245,7 +263,7 @@ export default function HomecarePage() {
 
     loadProviders();
     loadStatistics();
-  }, []); // Only load once, not dependent on search or filters
+  }, []); // Run once on mount
 
   // SEARCH HELPER FUNCTIONS - defined outside useEffect for reusability
   const filterBySearchTerm = (providers: HomecareProvider[], term: string) => {
@@ -874,35 +892,20 @@ export default function HomecarePage() {
     }
   };
 
-  // Helper function to render fields with optional box plots - UPDATED
+  // Helper function to render fields with optional box plots - NEW
   const renderField = (label: string, value: any, fieldName?: string) => {
     if (value === null || value === undefined || value === '') return null;
-
+    
     // Check if this is a numeric field that can have inline statistics
     const isNumeric = typeof value === 'number';
     const scopeStats = getStatisticsForScope();
+    const fieldStats = fieldName && scopeStats ? scopeStats.fields?.[fieldName] : null;
     
-    // Support both formats: { fields: { "<key>": {...} } } OR { "<key>": {...} }
-    const fieldStats = fieldName && scopeStats ? 
-      ((scopeStats as any).fields ?? scopeStats)?.[fieldName] : null;
-
-    // Debug logging (temporary)
-    if (showBoxPlots && fieldName && !statsLoading) {
-      if (!isNumeric) {
-        console.debug(`[boxplot] Non-numeric value for ${fieldName}:`, value);
-      } else if (!fieldStats) {
-        const availableKeys = Object.keys(((scopeStats as any)?.fields ?? scopeStats) ?? {});
-        console.debug(`[boxplot] No stats for ${fieldName} in scope ${selectedScope}. Available keys sample:`, availableKeys.slice(0, 10));
-      } else {
-        console.debug(`[boxplot] ✅ Found stats for ${fieldName}:`, fieldStats);
-      }
-    }
-
-          return (
-        <div className="mb-3">
-          <dt className="text-sm font-medium text-gray-500">{label}</dt>
-          <dd className="text-gray-900 flex items-center">
-            {typeof value === 'number' && fieldName && /(cost|finance|income|expenditure|rate|hourly|surplus|deficit)/.test(fieldName) ? formatCurrency(value) : value}
+    return (
+      <div className="mb-3">
+        <dt className="text-sm font-medium text-gray-500">{label}</dt>
+        <dd className="text-gray-900 flex items-center">
+          {typeof value === 'number' && fieldName?.includes('cost') ? formatCurrency(value) : value}
           {showBoxPlots && isNumeric && fieldName && !statsLoading && fieldStats && (
             <HomecareInlineBoxPlot
               fieldName={fieldName}
@@ -1702,7 +1705,7 @@ export default function HomecarePage() {
                           <h4 className="font-semibold mb-3 text-orange-900">Travel Costs</h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <dl className="space-y-2">
-                              {renderField("Per KM Rate", selectedProvider.cost_info?.travel_costs?.per_km_rate, "travel_costs_per_km_rate")}
+                              {renderField("Per KM Rate", selectedProvider.cost_info?.travel_costs?.per_km_rate, "cost_info.travel_costs.per_km_rate")}
                               {renderField("Special Conditions", selectedProvider.cost_info?.travel_costs?.special_conditions)}
                             </dl>
                           </div>
@@ -1839,11 +1842,30 @@ export default function HomecarePage() {
                       </CardHeader>
                       <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          <dl className="space-y-2">
-                            {renderField("Financial Year", selectedProvider.finance_info?.financial_year)}
-                            {renderField("Provider ABN", selectedProvider.finance_info?.provider_abn)}
-                            {renderField("Ownership Details", selectedProvider.finance_info?.ownership_details)}
-                          </dl>
+                          <div>
+                            <h4 className="font-semibold mb-3 text-red-900">Total Expenditure</h4>
+                            <dl className="space-y-2">
+                              {renderField("Total Expenditure", selectedProvider.finance_info?.financials?.expenditure?.total, "finance_info_financials_expenditure_total")}
+                              {renderField("Case Management", selectedProvider.finance_info?.financials?.expenditure?.case_management?.value, "finance_info_financials_expenditure_case_management_value")}
+                            </dl>
+                          </div>
+                          
+                          <div>
+                            <h4 className="font-semibold mb-3 text-orange-900">Care Expenses</h4>
+                            <dl className="space-y-2">
+                              {renderField("Total Care Expenses", selectedProvider.finance_info?.financials?.expenditure?.care_expenses?.total?.value, "finance_info_financials_expenditure_care_expenses_total_value")}
+                              {renderField("Employee/Agency Costs", selectedProvider.finance_info?.financials?.expenditure?.care_expenses?.breakdown?.employee_agency_costs?.value, "finance_info_financials_expenditure_care_expenses_breakdown_employee_agency_costs_value")}
+                              {renderField("Subcontracted Costs", selectedProvider.finance_info?.financials?.expenditure?.care_expenses?.breakdown?.subcontracted_costs?.value, "finance_info_financials_expenditure_care_expenses_breakdown_subcontracted_costs_value")}
+                            </dl>
+                          </div>
+                          
+                          <div>
+                            <h4 className="font-semibold mb-3 text-blue-900">Income & Budget</h4>
+                            <dl className="space-y-2">
+                              {renderField("Total Income", selectedProvider.finance_info?.financials?.income?.total, "finance_info_financials_income_total")}
+                              {renderField("Budget Surplus/Deficit", selectedProvider.finance_info?.financials?.budget_surplus_deficit?.value, "finance_info_financials_budget_surplus_deficit_value")}
+                            </dl>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -1893,24 +1915,24 @@ export default function HomecarePage() {
                           <div>
                             <h4 className="font-semibold mb-3 text-blue-900">Registered Nurse</h4>
                             <dl className="space-y-2">
-                              {renderField("Hourly Rate", selectedProvider.finance_info?.financials?.staff_pay_rates?.registered_nurse?.hourly_rate)}
-                              {renderField("Sector Average", selectedProvider.finance_info?.financials?.staff_pay_rates?.registered_nurse?.sector_average)}
+                              {renderField("Hourly Rate", selectedProvider.finance_info?.financials?.staff_pay_rates?.registered_nurse?.hourly_rate, "finance_info.financials.staff_pay_rates.registered_nurse.hourly_rate")}
+                              {renderField("Sector Average", selectedProvider.finance_info?.financials?.staff_pay_rates?.registered_nurse?.sector_average, "finance_info.financials.staff_pay_rates.registered_nurse.sector_average")}
                             </dl>
                           </div>
                           
                           <div>
                             <h4 className="font-semibold mb-3 text-green-900">Enrolled Nurse</h4>
                             <dl className="space-y-2">
-                              {renderField("Hourly Rate", selectedProvider.finance_info?.financials?.staff_pay_rates?.enrolled_nurse?.hourly_rate)}
-                              {renderField("Sector Average", selectedProvider.finance_info?.financials?.staff_pay_rates?.enrolled_nurse?.sector_average)}
+                              {renderField("Hourly Rate", selectedProvider.finance_info?.financials?.staff_pay_rates?.enrolled_nurse?.hourly_rate, "finance_info.financials.staff_pay_rates.enrolled_nurse.hourly_rate")}
+                              {renderField("Sector Average", selectedProvider.finance_info?.financials?.staff_pay_rates?.enrolled_nurse?.sector_average, "finance_info.financials.staff_pay_rates.enrolled_nurse.sector_average")}
                             </dl>
                           </div>
                           
                           <div>
                             <h4 className="font-semibold mb-3 text-purple-900">Home Care Worker</h4>
                             <dl className="space-y-2">
-                              {renderField("Hourly Rate", selectedProvider.finance_info?.financials?.staff_pay_rates?.home_care_worker?.hourly_rate)}
-                              {renderField("Sector Average", selectedProvider.finance_info?.financials?.staff_pay_rates?.home_care_worker?.sector_average)}
+                              {renderField("Hourly Rate", selectedProvider.finance_info?.financials?.staff_pay_rates?.home_care_worker?.hourly_rate, "finance_info.financials.staff_pay_rates.home_care_worker.hourly_rate")}
+                              {renderField("Sector Average", selectedProvider.finance_info?.financials?.staff_pay_rates?.home_care_worker?.sector_average, "finance_info.financials.staff_pay_rates.home_care_worker.sector_average")}
                             </dl>
                           </div>
                         </div>

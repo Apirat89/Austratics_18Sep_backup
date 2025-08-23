@@ -10,8 +10,8 @@ import {
   getUserFeedbackSummary
 } from '@/lib/regulationFeedback';
 
-// Create Supabase client for server-side operations
-const supabase = createClient(
+// Create Supabase client for server-side operations (currently unused but kept for future use)
+const _supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );

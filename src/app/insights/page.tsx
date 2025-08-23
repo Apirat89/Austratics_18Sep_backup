@@ -517,8 +517,8 @@ export default function SA2AnalyticsPage() {
     }).filter(Boolean);
   }, [sa2Statistics]);
 
-  // Calculate distance between two coordinates (Haversine formula)
-  const calculateDistance = useCallback((lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  // Calculate distance between two coordinates (Haversine formula) - currently unused but kept for future use
+  const _calculateDistance = useCallback((lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Earth's radius in kilometers
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -562,7 +562,7 @@ export default function SA2AnalyticsPage() {
       sa2Results.forEach(sa2 => {
         if (sa2.center) {
           const [sa2Lng, sa2Lat] = sa2.center;
-          const distance = calculateDistance(targetLat, targetLng, sa2Lat, sa2Lng);
+          const distance = _calculateDistance(targetLat, targetLng, sa2Lat, sa2Lng);
           
                      // Enrich with analytics data if available
            let enrichedSA2: SearchResult & { distance: number } = { ...sa2, distance } as SearchResult & { distance: number };
@@ -600,7 +600,7 @@ export default function SA2AnalyticsPage() {
       console.error('Error finding closest SA2 regions:', error);
       return [];
     }
-  }, [allSA2Data, calculateDistance]);
+  }, [allSA2Data, _calculateDistance]);
 
   // ✅ NEW: Simple SA2 search function (searches only SA2 data fields)
   const performSimpleSearch = useCallback((query: string) => {

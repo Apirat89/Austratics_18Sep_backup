@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MapPin, DollarSign, ArrowLeft, Scale, Shield, Phone, Mail, Heart, Building, Activity, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,15 +12,8 @@ export default function HomecareComparePage() {
   const searchParams = useSearchParams();
   const [providers, setProviders] = useState<HomecareProvider[]>([]);
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    
     console.log('🔍 COMPARISON PAGE DEBUG: useEffect triggered');
     
     // Get provider names from URL parameters
@@ -33,13 +26,12 @@ export default function HomecareComparePage() {
       return;
     }
 
-    // Handle comma-separated provider names
     const names = providerNames.split(',');
     console.log('📝 Decoded provider names array:', names);
     console.log('🔢 Number of providers to load:', names.length);
     
     loadProviders(names);
-  }, [searchParams, router, mounted]);
+  }, [searchParams, router]);
 
   const loadProviders = async (providerNames: string[]) => {
     console.log('🚀 COMPARISON PAGE DEBUG: loadProviders called');

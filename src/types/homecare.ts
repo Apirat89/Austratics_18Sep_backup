@@ -108,16 +108,124 @@ export interface HomecareCostInfo {
 
 export interface HomecareComplianceInfo {
   provider_id: string;
-  compliance_status: string;
-  last_updated: string;
-  // Add other compliance fields as discovered in the data
+  provider_name: string;
+  compliance_assessment: {
+    current_status: string;
+    current_issues: string[];
+    past_issues: string[];
+  };
+  compliance_statement: {
+    financial_year: string | null;
+    board_assessment: string | null;
+    statement_available: boolean;
+  };
+  service_feedback: {
+    most_compliments: string[];
+    most_concerns: string[];
+  };
+  improvement_focus: string[];
+  url?: string;
+  extraction_date: string;
 }
 
 export interface HomecareFinanceInfo {
   provider_id: string;
-  financial_year: string;
+  provider_name: string;
   last_updated: string;
-  // Add other finance fields as discovered in the data
+  financial_year: string;
+  previous_name: string | null;
+  provider_abn: string;
+  ownership_details: string;
+  financials: {
+    expenditure: {
+      total: number;
+      care_expenses: {
+        total: {
+          value: number;
+          percentage: number;
+        };
+        breakdown: {
+          employee_agency_costs: {
+            value: number;
+            percentage: number;
+          };
+          subcontracted_costs: {
+            value: number;
+            percentage: number;
+          };
+        };
+      };
+      case_management: {
+        value: number;
+        percentage: number;
+      };
+      administration_support: {
+        value: number;
+        percentage: number;
+      };
+      other_expenses: {
+        value: number;
+        percentage: number;
+      };
+    };
+    income: {
+      total: number;
+      care_income: {
+        total: {
+          value: number;
+          percentage: number;
+        };
+        breakdown: {
+          direct_care: {
+            value: number;
+            percentage: number;
+          };
+          subcontracted_care: {
+            value: number;
+            percentage: number;
+          };
+        };
+      };
+      management_service_fees: {
+        total: {
+          value: number;
+          percentage: number;
+        };
+        breakdown: {
+          care_management_service_fees: {
+            value: number;
+            percentage: number;
+          };
+          package_management_service_fees: {
+            value: number;
+            percentage: number;
+          };
+        };
+      };
+      other_income: {
+        value: number;
+        percentage: number;
+      };
+    };
+    budget_surplus_deficit: {
+      value: number;
+      percentage_of_income: number;
+    };
+    staff_pay_rates: {
+      registered_nurse: {
+        hourly_rate: number;
+        sector_average: number;
+      };
+      enrolled_nurse: {
+        hourly_rate: number;
+        sector_average: number;
+      };
+      home_care_worker: {
+        hourly_rate: number;
+        sector_average: number;
+      };
+    };
+  };
 }
 
 export interface HomecareProvider {
