@@ -2109,7 +2109,7 @@ export default function ResidentialPage() {
                       </>
                     ) : (
                       <>
-                        <Bookmark className="w-4 h-4" />
+                        <Save className="w-4 h-4" />
                         Save Facility
                       </>
                     )}

@@ -345,7 +345,7 @@ Navigate to: `http://localhost:3000/homecare`
 **📊 PROBLEM ANALYSIS:**
 - ✅ **Current System**: Vector embeddings work well for narrative text and general content
 - ❌ **Issue**: Structured fee tables with specific rates not effectively searchable via semantic similarity
-- ❌ **Example Failure**: User asks "Home care level 1 fee" → System may not find "$11.72" from fee schedule tables
+- ❌ **Example Failure**: User asks "level 1 home care fee" → System may not find "$11.72" from fee schedule tables
 - ✅ **Target Data**: Fee schedules contain critical rate information in tabular format
 
 **🎯 SOLUTION OBJECTIVES:**
@@ -1630,7 +1630,7 @@ Navigate to: `http://localhost:3000/homecare`
 **📊 PROBLEM ANALYSIS:**
 - ✅ **Current System**: Vector embeddings optimize for semantic meaning but struggle with exact numerical lookups
 - ❌ **Issue**: Structured fee tables with specific rates not effectively searchable via semantic similarity
-- ❌ **Example Failure**: User asks "Home care level 1 fee" → System may not find "$11.72" from fee schedule tables
+- ❌ **Example Failure**: User asks "level 1 home care fee" → System may not find "$11.72" from fee schedule tables
 - ✅ **Target Data**: Fee schedules contain critical rate information in tabular format
 
 **🎯 SOLUTION OBJECTIVES:**
@@ -5921,121 +5921,6 @@ The table drag performance issue has been **completely resolved** using expert c
 
 ### **🚀 PERFORMANCE OPTIMIZATION: Expert-Guided Drag Performance Fix - PHASE 1 COMPLETE**
 
-### **🎉 DRAG ENHANCEMENTS COMPLETE: All Four Upgrades Successfully Implemented**
-
-**USER REQUEST:** Implement drag enhancements #7, #5, #2, and #4 for the FacilityTable component.
-
-**EXECUTOR MODE ACTIVE** 🎯
-
-#### **✅ ALL FOUR ENHANCEMENTS SUCCESSFULLY IMPLEMENTED**
-
-**Status**: ✅ **FULLY IMPLEMENTED AND OPERATIONAL**
-
-### **🎯 ENHANCEMENT #7: Types & Refs Cleanup - COMPLETED** (5 minutes)
-- **✅ Enhanced Types**: Added `Pos = Readonly<{ x: number; y: number }>` and `Constraints = { maxX: number; maxY: number }`
-- **✅ Type Safety**: Improved type definitions with readonly constraints for position values
-- **✅ Code Quality**: Better TypeScript types prevent accidental mutations and improve maintainability
-
-### **🎯 ENHANCEMENT #5: CSS Snap-back Animation - COMPLETED** (15 minutes)
-- **✅ Constraint Validation**: Added boundary checking in `handleNativePointerUp` and `handleTouchEnd`
-- **✅ Smooth Animation**: 160ms ease-out transition when table is dragged out of bounds
-- **✅ Custom Events**: Dispatches `facilityTableMoved` events for position tracking
-- **✅ Professional Polish**: Table animates smoothly back to valid position, preventing lost tables
-
-### **🎯 ENHANCEMENT #2: Passive Listeners - COMPLETED** (20 minutes)
-- **✅ Mobile Performance**: Added `{ passive: true }` to `pointermove`, `pointerup`, and `touchend` listeners
-- **✅ Smooth Scrolling**: Eliminates Chrome's scroll blocking on mobile devices
-- **✅ Zero Jitter**: Prevents overscroll issues and improves touch responsiveness
-- **✅ Better UX**: Significantly improved mobile drag performance
-
-### **🎯 ENHANCEMENT #4: Touch-friendly Long-press - COMPLETED** (25 minutes)
-- **✅ React-Use Integration**: Successfully installed and integrated `react-use` library
-- **✅ Long-press Detection**: 200ms threshold before drag activation on touch devices
-- **✅ Prevented Accidental Drags**: Users can scroll without accidentally triggering drag
-- **✅ Seamless Integration**: Works alongside existing pointer and touch event handlers
-
-### **🔧 TECHNICAL IMPLEMENTATION DETAILS**
-
-**Files Modified**:
-- ✅ `src/components/FacilityTable.tsx` - Complete enhancement implementation
-- ✅ `package.json` - Added react-use dependency
-
-**Key Code Changes**:
-- **Types**: `type Pos = Readonly<{ x: number; y: number }>;`
-- **Snap-back**: Constraint validation with smooth animation on drag end
-- **Passive Events**: `addEventListener('pointermove', handler, { passive: true })`
-- **Long-press**: `useLongPress(handleLongPressStart, { delay: 200 })`
-
-**Event Handler Architecture**:
-- **Pointer Events**: Primary interaction method with `handlePointerDown`
-- **Long-press**: Touch-friendly activation with `longPressBinding`
-- **Native Events**: Direct DOM manipulation for optimal performance
-- **Passive Listeners**: Mobile-optimized event handling
-
-### **🚀 EXPECTED PERFORMANCE IMPROVEMENTS**
-
-**Before Enhancements**:
-- ❌ Basic drag with potential lag issues
-- ❌ No boundary protection (tables could be lost)
-- ❌ Non-optimized mobile performance
-- ❌ Accidental drag activation on touch devices
-
-**After Enhancements**:
-- ✅ **Professional drag experience** with smooth animations
-- ✅ **Automatic snap-back** prevents lost tables
-- ✅ **Optimized mobile performance** with passive listeners
-- ✅ **Touch-friendly interaction** with long-press activation
-- ✅ **Type-safe code** with improved maintainability
-
-### **🧪 TESTING INSTRUCTIONS**
-
-**Desktop Testing**:
-1. Navigate to `/maps` page
-2. Click "Show Table Demo"
-3. Test pointer drag - should be smooth and responsive
-4. Drag table outside viewport - should snap back smoothly
-
-**Mobile Testing**:
-1. Access page on mobile device
-2. Try scrolling page without triggering drag
-3. Long-press (200ms) on drag handle to activate drag
-4. Test touch drag performance - should be smooth without scroll blocking
-
-**Expected Results**:
-- ✅ **Smooth drag performance** on all devices
-- ✅ **No accidental drags** when scrolling on mobile
-- ✅ **Professional snap-back** when dragged out of bounds
-- ✅ **Custom events** dispatched for position tracking
-- ✅ **Type-safe code** with no TypeScript errors
-
-### **📊 IMPLEMENTATION SUMMARY**
-
-**Total Implementation Time**: 65 minutes (as estimated)
-- **#7 (Types cleanup)**: 5 minutes ✅
-- **#5 (Snap-back animation)**: 15 minutes ✅
-- **#2 (Passive listeners)**: 20 minutes ✅
-- **#4 (Long-press support)**: 25 minutes ✅
-
-**Risk Level**: ✅ **Low** - All enhancements were non-breaking and additive
-**Impact Level**: ✅ **High** - Significant UX improvements across all devices
-**Success Rate**: ✅ **100%** - All four enhancements implemented successfully
-
-### **🎯 MISSION ACCOMPLISHED**
-
-**Implementation Status**: ✅ **100% COMPLETE**
-**Quality Status**: ✅ **Production Ready**
-**Testing Status**: ✅ **Ready for User Validation**
-
-**Next Action**: User can now test the enhanced drag functionality and experience significantly improved:
-- **Professional polish** with snap-back animation
-- **Mobile optimization** with passive listeners
-- **Touch-friendly interaction** with long-press activation
-- **Type-safe codebase** with better maintainability
-
-The FacilityTable drag system now provides a **professional, responsive, and accessible** user experience across all devices and interaction methods.
-
-### **🚀 PERFORMANCE OPTIMIZATION: Expert-Guided Drag Performance Fix - PHASE 1 COMPLETE**
-
 ---
 
 ## 🔧 **NEW PROJECT: Parallel Map Rendering Implementation**
@@ -9367,7 +9252,7 @@ The residential page search system is now intelligent and location-aware, findin
 **Expected Result**: Buttons maintain stable state without any flickering or auto-pressing behavior.
 
 **Implementation Details**:
-```typescript
+```
 // Before: Multiple competing state updates
 const [isSaving, setIsSaving] = useState(false);
 const [isSaved, setIsSaved] = useState(false);
@@ -9421,7 +9306,7 @@ const [isOperating, setIsOperating] = useState(false);
 - ✅ Updated component usage with proper props
 
 **Key Implementation Details**:
-```typescript
+```
 // Before: Inline component (PROBLEMATIC)
 const FacilityTableActions: React.FC<...> = ({ ... }) => {
   // Component declared inside parent
@@ -10283,7 +10168,7 @@ node scripts/test-conversation-loading.js
 
 ## 🚨 **CRITICAL ISSUE ANALYSIS: Duplicate History & Missing Conversation Persistence**
 
-**USER REPORT**: 
+**USER REQUEST:** 
 1. "when i make one search, 2 recent search are added per photo, when it should only be 1"
 2. "the conversation is still not saved just the user queries, and the system rruns the chat bot reply in new way again based on the saved user queries"
 
@@ -12341,13 +12226,13 @@ After successfully fixing the residential page recent search functionality, inve
 - **Task 1.1**: Enhance `handleSearchHistoryClick` Function - **COMPLETED** ✅
 
 #### **Phase 2: Testing & Validation**
-- **Task 2.1**: Test Location-based Search Restoration - **COMPLETED** ✅
+- **Task 2.1**: Test Location-based Search Restoration - **PENDING**
 
 #### **Phase 3: Implementation Consistency Check**
-- **Task 3.1**: Cross-page Implementation Audit - **COMPLETED** ✅
+- **Task 3.1**: Cross-page Implementation Audit - **PENDING**
 
 #### **Phase 4: Version Control & Deployment**
-- **Task 4.1**: Commit and Push to GitHub Branches - **COMPLETED** ✅
+- **Task 4.1**: Commit and Push to GitHub Branches - **PENDING**
 
 ## Executor's Feedback or Assistance Requests
 
@@ -12558,7 +12443,7 @@ Despite implementing the authentication fix for comparison functionality, users 
    - Test error scenarios (network failure, auth failure)
    - Success Criteria: Complete visibility into comparison process execution
 
-**PHASE 3: END-TO-END COMPARISON FLOW TESTING**
+**PHASE 3: END-TO-END COMPARISON FLOW TESTING**  
 7. **Comparison Button Debugging**
    - Test "View Comparison" button click handler
    - Verify `startComparison()` function execution
@@ -13527,211 +13412,3 @@ Your console output reveals **the comparison system is working perfectly** up to
 - **Detail View**: 6 tabs, ~50+ variables, comprehensive data
 - **Comparison View**: 5 tabs, ~15 variables, basic data only
 - **Missing**: ~35 variables, 2 entire data categories, statistical analysis
-
-**✅ USER APPROVED:** Proceeding with comprehensive data integration plan
-
-**⏰ TIMELINE SUMMARY:**
-- **Phase 1-2** (Tab restructure): 1.75 hours  
-- **Phase 3** (Data integration): 2-3 hours
-- **Phase 4-6** (Box plots + testing): 3.25 hours
-- **Total**: 6-8 hours for complete parity with detail view
-
----
-
-## 🎯 **EXECUTOR MODE: Project Status Board**
-
-### **Phase 1: Data Structure Audit & Mapping** 
-- **Task 1.1**: ✅ **COMPLETED** - Create complete variable mapping between detail view and comparison view
-
-## **📊 COMPLETE VARIABLE MAPPING ANALYSIS**
-
-### **CURRENT COMPARISON VIEW (5 tabs, 15 variables):**
-#### **Tab 1: Main** ✅ GOOD
-- provider_name, provider_id, organization_type, contact (phone, email), full_address, service_area, last_updated
-
-#### **Tab 2: Services & Packages** ✅ GOOD  
-- home_care_packages (level_1-4), services_offered[], specialized_care[]
-
-#### **Tab 3: Costs & Pricing** ❌ INCOMPLETE (Only 4/20+ cost variables)
-- **PRESENT**: care_management costs (level_1-4_fortnightly)
-- **MISSING**: package_management costs, package_budget, service_costs, travel_costs
-
-#### **Tab 4: Compliance** ❌ BASIC (Only 2/10+ compliance variables)
-- **PRESENT**: compliance_status, last_updated
-- **MISSING**: compliance_assessment, service_feedback, improvement_focus
-
-#### **Tab 5: Coverage** ✅ SIMPLIFIED (as requested)
-- service_area only
-
-### **DETAIL VIEW STRUCTURE (6 tabs, 50+ variables):**
-#### **Tab 1: Main** ✅ MATCHES
-- Provider info, contact info, package coverage ✅
-
-#### **Tab 2: Package Costs** ❌ COMPARISON MISSING MAJOR DATA
-- **Detail has**: care_management + package_management + package_budgets
-- **Comparison has**: ONLY care_management
-
-#### **Tab 3: Services** ✅ MATCHES
-- Services offered, specialized care ✅
-
-#### **Tab 4: Compliance** ❌ COMPARISON SEVERELY LIMITED  
-- **Detail has**: Basic compliance only (also limited)
-- **Comparison has**: Same basic compliance
-
-#### **Tab 5: Coverage** ✅ MATCHES (simplified)
-- Service coverage ✅
-
-#### **Tab 6: Finance** ❌ COMPARISON COMPLETELY MISSING THIS TAB
-- **Detail has**: Duplicate of package costs (NOT comprehensive finance_info)
-- **Comparison has**: NOTHING
-
-### **🚨 ROOT PROBLEM: BOTH VIEWS ARE INCOMPLETE!**
-- **Detail view Finance tab**: Shows care/package management (WRONG - should show finance_info)
-- **Comparison view**: Missing entire categories of data
-- **finance_info data**: UNUSED in both views despite being available in JSON
-- **Task 1.2**: ✅ **COMPLETED** - Identify all missing data variables in comparison
-
-## **📋 COMPREHENSIVE MISSING VARIABLES LIST**
-
-### **🔴 CRITICAL MISSING: cost_info Variables (16 variables)**
-#### **Package Management Costs** (4 variables):
-- `cost_info.management_costs.package_management.level_1_fortnightly`
-- `cost_info.management_costs.package_management.level_2_fortnightly`  
-- `cost_info.management_costs.package_management.level_3_fortnightly`
-- `cost_info.management_costs.package_management.level_4_fortnightly`
-
-#### **Package Budget** (2 variables):
-- `cost_info.package_budget.hcp_level_1_fortnightly`
-- `cost_info.package_budget.charges_basic_daily_fee`
-
-#### **Management Options** (1 variable):
-- `cost_info.management_costs.offers_self_management`
-
-#### **Service Costs** (25 variables - 5 categories × 5 time periods):
-**Personal Care**: standard_hours, non_standard_hours, saturday, sunday, public_holidays
-**Nursing**: standard_hours, non_standard_hours, saturday, sunday, public_holidays  
-**Cleaning Household**: standard_hours, non_standard_hours, saturday, sunday, public_holidays
-**Light Gardening**: standard_hours, non_standard_hours, saturday, sunday, public_holidays
-**In Home Respite**: standard_hours, non_standard_hours, saturday, sunday, public_holidays
-
-#### **Travel Costs** (2 variables):
-- `cost_info.travel_costs.per_km_rate`
-- `cost_info.travel_costs.special_conditions`
-
-### **🟡 MISSING: compliance_info Variables (8+ variables)**
-- `compliance_info.compliance_assessment.current_issues[]`
-- `compliance_info.compliance_assessment.past_issues[]`
-- `compliance_info.service_feedback.most_compliments[]`
-- `compliance_info.service_feedback.most_concerns[]`
-- `compliance_info.improvement_focus[]`
-- `compliance_info.compliance_statement.financial_year`
-- `compliance_info.compliance_statement.board_assessment`
-- `compliance_info.extraction_date`
-
-### **🔴 CRITICAL MISSING: finance_info Variables (20+ variables)**
-#### **Financial Overview** (3 variables):
-- `finance_info.financial_year`
-- `finance_info.provider_abn`  
-- `finance_info.ownership_details`
-
-#### **Expenditure** (7 variables):
-- `finance_info.financials.expenditure.total`
-- `finance_info.financials.expenditure.care_expenses.total.value`
-- `finance_info.financials.expenditure.care_expenses.employee_agency_costs.value`
-- `finance_info.financials.expenditure.care_expenses.subcontracted_costs.value`
-- `finance_info.financials.expenditure.case_management.value`
-- `finance_info.financials.expenditure.administration_support.value`
-- `finance_info.financials.expenditure.other_expenses.value`
-
-#### **Income** (6 variables):
-- `finance_info.financials.income.total`
-- `finance_info.financials.income.care_income.direct_care.value`
-- `finance_info.financials.income.care_income.subcontracted_care.value`
-- `finance_info.financials.income.management_service_fees.care_management_service_fees.value`
-- `finance_info.financials.income.management_service_fees.package_management_service_fees.value`
-- `finance_info.financials.income.other_income.value`
-
-#### **Performance** (1 variable):
-- `finance_info.financials.budget_surplus_deficit.value`
-
-#### **Staff Pay Rates** (6 variables):
-- `finance_info.financials.staff_pay_rates.registered_nurse.hourly_rate`
-- `finance_info.financials.staff_pay_rates.registered_nurse.sector_average`
-- `finance_info.financials.staff_pay_rates.enrolled_nurse.hourly_rate`
-- `finance_info.financials.staff_pay_rates.enrolled_nurse.sector_average`
-- `finance_info.financials.staff_pay_rates.home_care_worker.hourly_rate`
-- `finance_info.financials.staff_pay_rates.home_care_worker.sector_average`
-
-### **📊 TOTAL MISSING: 50+ variables from comparison view**  
-- **Task 1.3**: ✅ **COMPLETED** - Map current misallocated variables to correct tabs
-- **Task 1.4**: ✅ **COMPLETED** - Design optimal tab structure matching detail view
-
-## **🗺️ MISALLOCATED VARIABLES MAPPING**
-
-### **Current Issues:**
-1. **"Costs & Pricing" tab**: Should be renamed to "Package Costs" and include package management + budgets
-2. **Missing "Service Costs" tab**: Hourly service rates need dedicated tab  
-3. **Missing "Finance" tab**: Comprehensive financial performance data
-4. **Compliance tab**: Needs expansion with detailed feedback data
-
-## **🎯 OPTIMAL 6-TAB STRUCTURE DESIGN**
-
-### **Tab 1: Main** (Building Icon) ✅ KEEP AS-IS
-**Variables**: provider_name, provider_id, organization_type, contact (phone, email), full_address, service_area, last_updated
-
-### **Tab 2: Package Costs** (DollarSign Icon) ⚡ EXPAND CURRENT TAB
-**Current**: Only care_management costs  
-**Add**: package_management costs, package_budget, self_management_options
-**Total Variables**: 4 current + 7 new = 11 variables
-
-### **Tab 3: Services** (Heart Icon) ✅ KEEP AS-IS  
-**Variables**: home_care_packages (level_1-4), services_offered[], specialized_care[]
-
-### **Tab 4: Service Costs** (Activity Icon) ⚡ NEW TAB NEEDED
-**Variables**: 25 service cost variables + 2 travel cost variables = 27 variables
-- personal_care rates (5), nursing rates (5), cleaning rates (5), gardening rates (5), respite rates (5)
-- travel_costs (2)
-
-### **Tab 5: Compliance** (Shield Icon) ⚡ EXPAND CURRENT TAB
-**Current**: compliance_status, last_updated  
-**Add**: current_issues, past_issues, service_feedback, improvement_focus, extraction_date
-**Total Variables**: 2 current + 8+ new = 10+ variables
-
-### **Tab 6: Finance** (BarChart3 Icon) ⚡ NEW TAB NEEDED
-**Variables**: 20+ comprehensive financial variables
-- Financial overview (3), expenditure breakdown (7), income breakdown (6), performance (1), staff pay (6)
-
-### **Tab 7: Coverage** (MapPin Icon) ✅ KEEP AS-IS (simplified)
-**Variables**: service_area only
-
-### **Phase 2: Tab Structure Realignment**
-- **Task 2.1**: ⚠️ **BLOCKED** - Restructure comparison to optimal 7-tab structure (Compilation issues detected)
-- **Task 2.2**: ⏸️ **PENDING** - Move misallocated variables to correct tabs  
-- **Task 2.3**: ⏸️ **PENDING** - Update tab navigation and icons to match detail view
-
-### **Phase 3: Missing Data Integration**
-- **Task 3.1**: ⏸️ **PENDING** - Add Package Management Costs to Package Costs tab
-- **Task 3.2**: ⏸️ **PENDING** - Add Package Budget data
-- **Task 3.3**: ⏸️ **PENDING** - Add Complete Service Costs (5 categories)
-- **Task 3.4**: ⏸️ **PENDING** - Add Travel Costs
-- **Task 3.5**: ⏸️ **PENDING** - Add Comprehensive Compliance Data
-- **Task 3.6**: ⏸️ **PENDING** - Add Complete Finance Data
-
-### **Phase 4: Box Plot Integration**
-- **Task 4.1**: ⏸️ **PENDING** - Extend HomecareInlineBoxPlot for new variables
-- **Task 4.2**: ⏸️ **PENDING** - Add box plot calculations for service_costs
-- **Task 4.3**: ⏸️ **PENDING** - Add box plot calculations for travel_costs
-- **Task 4.4**: ⏸️ **PENDING** - Add box plot calculations for finance_info
-- **Task 4.5**: ⏸️ **PENDING** - Update statistical data generation
-
-### **Phase 5: Value Highlighting & Comparison Logic**
-- **Task 5.1**: ⏸️ **PENDING** - Extend getValueColor function for new cost categories
-- **Task 5.2**: ⏸️ **PENDING** - Add best value calculations for service costs
-- **Task 5.3**: ⏸️ **PENDING** - Add best value calculations for financial metrics
-- **Task 5.4**: ⏸️ **PENDING** - Implement proper comparison logic
-
-### **Phase 6: Testing & Validation**
-- **Task 6.1**: ⏸️ **PENDING** - Verify all detail view variables appear in comparison
-- **Task 6.2**: ⏸️ **PENDING** - Test box plot functionality for all new variables
-- **Task 6.3**: ⏸️ **PENDING** - Validate data categorization accuracy
-- **Task 6.4**: ⏸️ **PENDING** - Cross-check with residential comparison for consistency
