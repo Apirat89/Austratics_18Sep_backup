@@ -1162,6 +1162,13 @@ export default function SA2AnalyticsPage() {
     router.push(`/residential?sa2=${encodeURIComponent(savedSearch.sa2_name)}`);
   };
 
+  // Navigate to homecare page with SA2 filter
+  const navigateToHomecareForSA2 = (savedSearch: SavedSA2Search) => {
+    // Navigate to homecare page with SA2 filter
+    // The homecare page will filter by SA2 name
+    router.push(`/homecare?sa2=${encodeURIComponent(savedSearch.sa2_name)}`);
+  };
+
   // Load insights search history for the current user
   const loadInsightsSearchHistory = useCallback(async () => {
     if (!user) return;
@@ -1788,6 +1795,13 @@ export default function SA2AnalyticsPage() {
                               <Building className="h-4 w-4" />
                             </button>
                             <button
+                              onClick={() => navigateToHomecareForSA2(savedSearch)}
+                              className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+                              title="View homecare providers in this SA2 region"
+                            >
+                              <Home className="h-4 w-4" />
+                            </button>
+                            <button
                               onClick={() => deleteSavedSA2SearchHandler(savedSearch.id)}
                               className="p-1 text-gray-400 hover:text-red-600 transition-colors"
                               title="Delete saved search"
@@ -1877,6 +1891,15 @@ export default function SA2AnalyticsPage() {
                         title="View residential aged care facilities in this SA2 region"
                       >
                         <Building className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          router.push(`/homecare?sa2=${encodeURIComponent(selectedSA2.sa2Name)}`);
+                        }}
+                        className="text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg p-1.5 transition-colors"
+                        title="View homecare providers in this SA2 region"
+                      >
+                        <Home className="h-4 w-4" />
                       </button>
                     </div>
                   </CardTitle>

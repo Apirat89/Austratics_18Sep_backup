@@ -92,7 +92,7 @@ interface _HomecareAPIResponse {
 
 export default function HomecarePage() {
   const router = useRouter();
-  const _searchParams = useSearchParams();
+  const searchParams = useSearchParams();
   const [providers, setProviders] = useState<HomecareProvider[]>([]);
   const urlParamProcessedRef = useRef(false);
   const [filteredProviders, setFilteredProviders] = useState<HomecareProvider[]>([]);
@@ -184,6 +184,34 @@ export default function HomecarePage() {
 
     loadUser();
   }, []);
+
+  // Handle SA2 URL parameter for direct navigation from insights page (only on initial load)
+  useEffect(() => {
+    if (!searchParams || urlParamProcessedRef.current) return;
+    
+    const sa2Param = searchParams.get('sa2');
+    if (sa2Param) {
+      // Always populate the search bar with the SA2 name from URL
+      setSearchTerm(sa2Param);
+      console.log('🏠 HOMECARE: Auto-populated search bar from URL:', sa2Param);
+      
+      // If we have saved SA2 regions, try to find and apply the filter
+      if (savedSA2Regions.length > 0 && !selectedSA2Filter) {
+        const matchingSA2 = savedSA2Regions.find(region => 
+          region.sa2_name.toLowerCase() === sa2Param.toLowerCase()
+        );
+        
+        if (matchingSA2) {
+          setSelectedSA2Filter(matchingSA2);
+          console.log('🗺️ HOMECARE: Auto-selected SA2 filter from URL:', matchingSA2.sa2_name);
+        } else {
+          console.log('🏠 HOMECARE: SA2 region not in saved searches, but search bar populated:', sa2Param);
+        }
+      }
+      
+      urlParamProcessedRef.current = true; // Mark as processed
+    }
+  }, [searchParams, savedSA2Regions.length, selectedSA2Filter]); // Use .length for stable dependency
 
   // DEBUG: Monitor selectedForComparison state changes
   useEffect(() => {
