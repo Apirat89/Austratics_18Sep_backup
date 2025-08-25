@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, Home, Phone, Globe, MapPin, DollarSign, FileText, Activity, Heart, Award, BarChart3, BookmarkCheck, Trash2, ArrowLeft, Scale, X, Save, Building2, Building } from 'lucide-react';
+import { Search, Home, Phone, Globe, MapPin, DollarSign, FileText, Activity, Heart, Award, BarChart3, BookmarkCheck, Trash2, ArrowLeft, Scale, X, Save, Building2, Building, Filter, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import HomecareInlineBoxPlot from '@/components/homecare/HomecareInlineBoxPlot';
@@ -34,6 +34,10 @@ import {
   type HomecareComparisonHistoryItem,
   type HomecareComparisonSelection
 } from '../../lib/homecareHistory';
+import {
+  getUserSavedSA2Searches,
+  type SavedSA2Search
+} from '../../lib/savedSA2Searches';
 import HomecareHistoryPanel from '../../components/homecare/HistoryPanel';
 import { getLocationByName } from '../../lib/mapSearchService';
 import { 
@@ -132,6 +136,12 @@ export default function HomecarePage() {
   const [searchRadius, setSearchRadius] = useState(0.18); // ~20km like residential
   const [locationSearchLoading, setLocationSearchLoading] = useState(false);
 
+  // SA2 Region Filtering state - like residential
+  const [savedSA2Regions, setSavedSA2Regions] = useState<SavedSA2Search[]>([]);
+  const [showSA2Dropdown, setShowSA2Dropdown] = useState(false);
+  const [selectedSA2Filter, setSelectedSA2Filter] = useState<SavedSA2Search | null>(null);
+  const [sa2LoadingError, setSA2LoadingError] = useState<string | null>(null);
+
   // Load user and their data
   useEffect(() => {
     const loadUser = async () => {
@@ -155,6 +165,15 @@ export default function HomecarePage() {
           // Load persistent selections
           const selectionsData = await getHomecareComparisonSelections(user.id);
           setPersistentSelections(selectionsData);
+          
+          // Load saved SA2 regions from Supabase
+          try {
+            const sa2Result = await getUserSavedSA2Searches(user.id);
+            setSavedSA2Regions(sa2Result.searches);
+          } catch (error) {
+            console.error('Error loading saved SA2 regions:', error);
+            setSA2LoadingError('Failed to load saved SA2 regions');
+          }
         }
       } catch (error) {
         console.error('Error loading user data:', error);
@@ -419,17 +438,36 @@ export default function HomecarePage() {
     return () => clearTimeout(timeoutId);
   }, [searchTerm, searchRadius, providers]);
 
-  // CLIENT-SIDE FILTERING - like residential
+  // CLIENT-SIDE FILTERING - like residential with SA2 support
   useEffect(() => {
     let filtered = providers;
+
+    // Apply SA2 region filtering first - exactly like residential page
+    if (selectedSA2Filter && selectedSA2Filter.sa2_data) {
+      if (!selectedSA2Filter.sa2_data.postcode_data) {
+        filtered = [];
+      } else {
+        const sa2Postcodes = selectedSA2Filter.sa2_data.postcode_data.map((pc: any) => pc.Post_Code);
+        const sa2Localities = selectedSA2Filter.sa2_data.postcode_data.map((pc: any) => pc.Locality?.toLowerCase());
+
+        filtered = filtered.filter(provider => {
+          const providerPostcode = provider.provider_info.address?.postcode;
+          const providerLocality = provider.provider_info.address?.locality?.toLowerCase();
+          
+          return (providerPostcode && sa2Postcodes.includes(providerPostcode)) ||
+                 (providerLocality && sa2Localities.includes(providerLocality));
+        });
+      }
+      console.log(`🗺️ SA2 FILTER: Found ${filtered.length} providers in region "${selectedSA2Filter.sa2_name}"`);
+    }
 
     // Apply hybrid search (location + text) if search term is provided
     if (searchTerm.trim() !== '') {
       filtered = hybridSearch(filtered, searchTerm, searchCoordinates);
     }
 
-    // Only show results if there's a search term
-    if (searchTerm.trim() === '') {
+    // Show results based on filters applied
+    if (searchTerm.trim() === '' && !selectedSA2Filter) {
       setFilteredProviders([]);
     } else {
       setFilteredProviders(filtered);
@@ -490,7 +528,7 @@ export default function HomecarePage() {
       
       return combinedResults;
     }
-     }, [searchTerm, providers, searchCoordinates, searchRadius, isTextEnhanced]);
+     }, [searchTerm, providers, searchCoordinates, searchRadius, isTextEnhanced, selectedSA2Filter]);
 
 
 
@@ -778,6 +816,34 @@ export default function HomecarePage() {
 
   const isProviderSelected = (provider: HomecareProvider) => {
     return selectedForComparison.some(p => p.provider_id === provider.provider_id);
+  };
+
+  // SA2 Region selection and filtering handlers - like residential
+  const handleSA2RegionSelect = (sa2Region: SavedSA2Search) => {
+    setSelectedSA2Filter(sa2Region);
+    setShowSA2Dropdown(false);
+    // Clear search term when SA2 filter is applied to avoid confusion
+    setSearchTerm('');
+  };
+
+  const handleClearSA2Filter = () => {
+    setSelectedSA2Filter(null);
+    setSearchTerm(''); // Also clear the search bar
+    // Remove the SA2 parameter from URL to prevent re-applying the filter
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.delete('sa2');
+    router.replace(newUrl.pathname + newUrl.search);
+  };
+
+  const handleToggleSA2Dropdown = () => {
+    if (savedSA2Regions.length > 0) {
+      setShowSA2Dropdown(!showSA2Dropdown);
+    }
+  };
+
+  // Handle navigate to insights page
+  const handleGoToInsights = () => {
+    router.push('/insights');
   };
 
   const handleClearComparisonSelections = async () => {
@@ -1126,7 +1192,7 @@ export default function HomecarePage() {
           
           {!showSavedProviders && (
             <>
-              {/* Search Bar */}
+              {/* Search Bar and SA2 Filter */}
               <div className="flex gap-4 items-start">
                 <div className="relative flex-1 max-w-2xl">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -1138,15 +1204,101 @@ export default function HomecarePage() {
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
+                
+                {/* SA2 Region Filter Button */}
+                <div className="relative sa2-dropdown-container">
+                  <button
+                    onClick={handleToggleSA2Dropdown}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors min-w-48 ${
+                      selectedSA2Filter
+                        ? 'bg-green-100 text-green-700 border border-green-200'
+                        : savedSA2Regions.length > 0
+                        ? 'bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-200'
+                        : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                    }`}
+                    disabled={savedSA2Regions.length === 0}
+                    title={savedSA2Regions.length === 0 ? 'No saved SA2 regions available' : 'Filter by saved SA2 region'}
+                  >
+                    <Filter className="w-4 h-4" />
+                    {selectedSA2Filter ? (
+                      <span className="truncate">{selectedSA2Filter.sa2_name}</span>
+                    ) : (
+                      <span>SA2 Regions ({savedSA2Regions.length})</span>
+                    )}
+                    {selectedSA2Filter && (
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClearSA2Filter();
+                        }}
+                        className="text-green-700 hover:text-green-900 ml-1 cursor-pointer"
+                        title="Clear SA2 filter"
+                      >
+                        <X className="w-3 h-3" />
+                      </span>
+                    )}
+                  </button>
+                  
+                  {/* SA2 Dropdown */}
+                  {showSA2Dropdown && savedSA2Regions.length > 0 && (
+                    <div className="absolute top-full right-0 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                      <div className="p-3 border-b border-gray-200 flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900">Saved SA2 Regions</h3>
+                          <p className="text-xs text-gray-500">Filter providers by saved ABS SA2 regions</p>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleGoToInsights();
+                          }}
+                          className="ml-2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                          title="Go to Insights page"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="max-h-60 overflow-y-auto">
+                        {savedSA2Regions.map((sa2Region, index) => (
+                          <div key={index} className="p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer"
+                               onClick={() => handleSA2RegionSelect(sa2Region)}>
+                            <p className="font-medium text-gray-900 text-sm">{sa2Region.sa2_name}</p>
+                            <p className="text-xs text-gray-500">
+                              {sa2Region.sa2_data?.postcode_data?.length || 0} postcodes/localities
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              Saved {new Date(sa2Region.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div className="mt-2 text-sm text-gray-600">
                 <p>
-                  {searchTerm.trim() === ''
+                  {searchTerm.trim() === '' && !selectedSA2Filter
                     ? `Search through ${providers.length} homecare providers using the search bar above`
+                    : selectedSA2Filter && searchTerm.trim() === ''
+                    ? `Showing ${filteredProviders.length} of ${providers.length} providers in "${selectedSA2Filter.sa2_name}" region`
+                    : selectedSA2Filter && searchTerm.trim() !== ''
+                    ? `Showing ${filteredProviders.length} providers matching "${searchTerm}" in "${selectedSA2Filter.sa2_name}" region`
                     : `Showing ${filteredProviders.length} of ${providers.length} providers matching "${searchTerm}"`
                   }
                 </p>
+                {selectedSA2Filter && (
+                  <p className="text-xs text-green-600 mt-1">
+                    🗺️ Filtering by SA2 region: {selectedSA2Filter.sa2_name} 
+                    <button 
+                      onClick={handleClearSA2Filter}
+                      className="ml-2 text-green-700 hover:text-green-900 underline"
+                    >
+                      Clear filter
+                    </button>
+                  </p>
+                )}
               </div>
             </>
           )}
@@ -1169,7 +1321,7 @@ export default function HomecarePage() {
             {!showSavedProviders ? (
               /* Search Results */
               <div>
-                {searchTerm.trim() === '' ? (
+                {(searchTerm.trim() === '' && !selectedSA2Filter) ? (
                   /* Empty State - No Search */
                   <div className="text-center py-12">
                     <Home className="w-16 h-16 text-gray-400 mx-auto mb-4" />
