@@ -27,7 +27,7 @@ interface FacilityData {
   F2016_SA2_Name: string;
   F2016_SA3_Name: string;
   F2016_LGA_Name: string;
-  facilityType: 'residential' | 'mps' | 'home' | 'retirement';
+  facilityType: 'residential' | 'multipurpose_others' | 'home' | 'retirement';
 }
 
 interface FacilityDetailsModalProps {
@@ -76,7 +76,7 @@ export default function FacilityDetailsModal({ facility, isOpen, onClose }: Faci
     switch (type) {
       case 'residential':
         return 'bg-red-100 text-red-800 border-red-200';
-      case 'mps':
+      case 'multipurpose_others':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'home':
         return 'bg-green-100 text-green-800 border-green-200';
@@ -91,7 +91,7 @@ export default function FacilityDetailsModal({ facility, isOpen, onClose }: Faci
     switch (type) {
       case 'residential':
         return <Building className="w-4 h-4" />;
-      case 'mps':
+      case 'multipurpose_others':
         return <Building2 className="w-4 h-4" />;
       case 'home':
         return <Home className="w-4 h-4" />;

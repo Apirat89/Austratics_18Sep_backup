@@ -46,7 +46,7 @@ interface EnhancedFacilityData {
   F2016_SA2_Name: string;
   F2016_SA3_Name: string;
   F2016_LGA_Name: string;
-  facilityType: 'residential' | 'mps' | 'home' | 'retirement';
+  facilityType: 'residential' | 'multipurpose_others' | 'home' | 'retirement';
   
   // Enhanced data for residential facilities
   detailedData?: ResidentialDetailedData;
@@ -162,21 +162,24 @@ class HybridFacilityService {
         Physical_Post_Code: properties.Physical_Post_Code || 0,
         Care_Type: properties.Care_Type || '',
         Residential_Places: properties.Residential_Places || null,
+        // Missing fields in new healthcare data - set to null with fallbacks
         Home_Care_Places: properties.Home_Care_Places || null,
         Home_Care_Max_Places: properties.Home_Care_Max_Places || null,
         Restorative_Care_Places: properties.Restorative_Care_Places || null,
         Provider_Name: properties.Provider_Name || '',
         Organisation_Type: properties.Organisation_Type || '',
-        ABS_Remoteness: properties.ABS_Remoteness || '',
-        Phone: properties.Phone,
-        Email: properties.Email,
-        Website: properties.Website,
+        // Geographic and classification fields missing in new data
+        ABS_Remoteness: properties.ABS_Remoteness || 'Not Available',
+        Phone: properties.Phone || null,
+        Email: properties.Email || null,
+        Website: properties.Website || null,
         Latitude: properties.Latitude || 0,
         Longitude: properties.Longitude || 0,
-        F2019_Aged_Care_Planning_Region: properties.F2019_Aged_Care_Planning_Region || '',
-        F2016_SA2_Name: properties.F2016_SA2_Name || '',
-        F2016_SA3_Name: properties.F2016_SA3_Name || '',
-        F2016_LGA_Name: properties.F2016_LGA_Name || '',
+        // Boundary fields missing in new data - set to fallbacks
+        F2019_Aged_Care_Planning_Region: properties.F2019_Aged_Care_Planning_Region || 'Not Available',
+        F2016_SA2_Name: properties.F2016_SA2_Name || 'Not Available',
+        F2016_SA3_Name: properties.F2016_SA3_Name || 'Not Available',
+        F2016_LGA_Name: properties.F2016_LGA_Name || 'Not Available',
         facilityType
       };
 
@@ -232,11 +235,17 @@ class HybridFacilityService {
     return null;
   }
 
-  private determineFacilityType(careType: string, serviceName?: string): 'residential' | 'mps' | 'home' | 'retirement' {
+  private determineFacilityType(careType: string, serviceName?: string): 'residential' | 'multipurpose_others' | 'home' | 'retirement' {
     if (!careType) return 'residential';
 
     const careTypeMapping = {
-      mps: ['Multi-Purpose Service'],
+      multipurpose_others: [
+        'Multi-Purpose Service',
+        'Transition Care',
+        'Short-Term Restorative Care (STRC)', 
+        'National Aboriginal and Torres Strait Islander Aged Care Program',
+        'Innovative Pool'
+      ],
       residential: ['Residential'],
       home: ['Home Care', 'Community Care'],
       retirement: ['Retirement', 'Retirement Living', 'Retirement Village']
@@ -255,9 +264,9 @@ class HybridFacilityService {
       return 'retirement';
     }
 
-    // Check MPS (most specific)
-    if (careTypeMapping.mps.some(ct => careType.includes(ct))) {
-      return 'mps';
+    // Check multipurpose and specialized services (most specific)
+    if (careTypeMapping.multipurpose_others.some(ct => careType.includes(ct))) {
+      return 'multipurpose_others';
     }
     
     // Check home care

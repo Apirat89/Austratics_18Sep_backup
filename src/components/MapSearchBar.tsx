@@ -33,7 +33,7 @@ interface LocationResult {
   // Facility-specific properties
   address?: string;
   careType?: string;
-  facilityType?: 'residential' | 'mps' | 'home' | 'retirement';
+  facilityType?: 'residential' | 'multipurpose_others' | 'home' | 'retirement';
 }
 
 export default function MapSearchBar({ userId, onSearch, onSavedSearchAdded, onSavedSearchRemoved, currentlyShowing, onClearCurrentlyShowing, className = "" }: MapSearchBarProps) {

@@ -9,7 +9,7 @@ type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality' | 'a
 
 interface FacilityTypes {
   residential: boolean;
-  mps: boolean;
+  multipurpose_others: boolean;
   home: boolean;
   retirement: boolean;
 }

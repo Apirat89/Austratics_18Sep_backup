@@ -55,7 +55,7 @@ interface SearchResult {
   score: number;
   address?: string;
   careType?: string;
-  facilityType?: 'residential' | 'mps' | 'home' | 'retirement';
+  facilityType?: 'residential' | 'multipurpose_others' | 'home' | 'retirement';
   // Enhanced fields for analytics
   analyticsData?: SA2Data;
   population?: number;

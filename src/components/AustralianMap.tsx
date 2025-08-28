@@ -31,7 +31,7 @@ function useDebounce<T>(value: T, delay: number): T {
 
 interface FacilityTypes {
   residential: boolean;
-  mps: boolean;
+  multipurpose_others: boolean;
   home: boolean;
   retirement: boolean;
 }
@@ -63,7 +63,7 @@ interface FacilityData {
   F2016_SA2_Name: string;
   F2016_SA3_Name: string;
   F2016_LGA_Name: string;
-  facilityType: 'residential' | 'mps' | 'home' | 'retirement';
+  facilityType: 'residential' | 'multipurpose_others' | 'home' | 'retirement';
 }
 
 interface AustralianMapProps {
@@ -312,7 +312,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   const getFacilityTypeDisplayName = (facilityType: string): string => {
     switch (facilityType) {
       case 'residential': return 'RESIDENTIAL CARE';
-      case 'mps': return 'MULTI-PURPOSE SERVICE';
+      case 'multipurpose_others': return 'MULTI-PURPOSE SERVICE';
       case 'home': return 'HOME CARE';
       case 'retirement': return 'RETIREMENT LIVING';
       default: return facilityType.toUpperCase();
@@ -369,7 +369,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // Stabilize facilityTypes to prevent unnecessary re-renders
   const stableFacilityTypes = useMemo(() => facilityTypes, [
     facilityTypes.residential,
-    facilityTypes.mps,        // ✅ FIXED: Added missing MPS dependency
+    facilityTypes.multipurpose_others,        // ✅ FIXED: Added missing MPS dependency
     facilityTypes.home,
     facilityTypes.retirement
   ]);
@@ -847,7 +847,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     const popupId = `facility-popup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     // Determine if this facility should show "See Details" button
-    const showSeeDetailsButton = typeKey === 'residential' || typeKey === 'home' || typeKey === 'mps' || typeKey === 'retirement';
+    const showSeeDetailsButton = typeKey === 'residential' || typeKey === 'home' || typeKey === 'multipurpose_others' || typeKey === 'retirement';
 
     // Create beautiful popup with save button  
     const popup = new maptilersdk.Popup({ 
@@ -1149,7 +1149,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       // Define care type mapping
       const careTypeMapping = {
         residential: ['Residential'],
-        mps: ['Multi-Purpose Service'],
+        multipurpose_others: ['Multi-Purpose Service'],
         home: ['Home Care', 'Community Care'],
         retirement: ['Retirement', 'Retirement Living', 'Retirement Village']
       };
@@ -1157,7 +1157,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       // Define colors for each type
       const typeColors = {
         residential: '#E53E3E', // Red
-        mps: '#3182CE',        // Blue
+        multipurpose_others: '#3182CE',        // Blue
         home: '#38A169',       // Green
         retirement: '#9B59B6'   // Purple
       };
@@ -1365,7 +1365,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                   bounds: undefined, // Facilities don't have bounds
                   address: address,
                   careType: careType,
-                  facilityType: typeKey as 'residential' | 'mps' | 'home' | 'retirement'
+                  facilityType: typeKey as 'residential' | 'multipurpose_others' | 'home' | 'retirement'
                 };
 
                 // Save the facility
@@ -1490,7 +1490,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           };
 
           // Determine if this facility should show "See Details" button (only homecare and residential)
-          const showSeeDetailsButton = typeKey === 'residential' || typeKey === 'home' || typeKey === 'mps' || typeKey === 'retirement';
+          const showSeeDetailsButton = typeKey === 'residential' || typeKey === 'home' || typeKey === 'multipurpose_others' || typeKey === 'retirement';
 
           // Create beautiful popup with save button  
           const popup = new maptilersdk.Popup({ 
@@ -1833,7 +1833,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             F2016_SA2_Name: facility.F2016_SA2_Name || '',
             F2016_SA3_Name: facility.F2016_SA3_Name || '',
             F2016_LGA_Name: facility.F2016_LGA_Name || '',
-            facilityType: typeKey as 'residential' | 'mps' | 'home' | 'retirement'
+            facilityType: typeKey as 'residential' | 'multipurpose_others' | 'home' | 'retirement'
           };
 
           // Track popup open/close events for all popups
@@ -2000,7 +2000,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
                   F2016_SA2_Name: facility.F2016_SA2_Name || '',
                   F2016_SA3_Name: facility.F2016_SA3_Name || '',
                   F2016_LGA_Name: facility.F2016_LGA_Name || '',
-                  facilityType: typeKey as 'residential' | 'mps' | 'home' | 'retirement'
+                  facilityType: typeKey as 'residential' | 'multipurpose_others' | 'home' | 'retirement'
                 }));
                 
                 onFacilityTableSelection(clusterFacilityData);

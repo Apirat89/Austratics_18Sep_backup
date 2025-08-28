@@ -26,7 +26,7 @@ interface UserData {
 
 interface FacilityTypes {
   residential: boolean;
-  mps: boolean;
+  multipurpose_others: boolean;
   home: boolean;
   retirement: boolean;
 }
@@ -55,7 +55,7 @@ export interface FacilityData {
   F2016_SA2_Name: string;
   F2016_SA3_Name: string;
   F2016_LGA_Name: string;
-  facilityType: 'residential' | 'mps' | 'home' | 'retirement';
+  facilityType: 'residential' | 'multipurpose_others' | 'home' | 'retirement';
 }
 
 type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality' | 'acpr' | 'mmm';
@@ -69,7 +69,7 @@ export default function MapsPage() {
   // Facility types state (keeping for backwards compatibility)
   const [facilityTypes, setFacilityTypes] = useState<FacilityTypes>({
     residential: true,
-    mps: true,
+    multipurpose_others: true,
     home: true,
     retirement: true
   });
@@ -141,14 +141,14 @@ export default function MapsPage() {
   // Facility Counter state
   const [facilityCountsInViewport, setFacilityCountsInViewport] = useState<{
     residential: number;
-    mps: number;
+    multipurpose_others: number;
     home: number;
     retirement: number;
     total: number;
     loading: boolean;
   }>({
     residential: 0,
-    mps: 0,
+    multipurpose_others: 0,
     home: 0,
     retirement: 0,
     total: 0,
@@ -162,7 +162,7 @@ export default function MapsPage() {
   const [bulkSelectionEnabled, setBulkSelectionEnabled] = useState(false);
   const [bulkSelectionTypes, setBulkSelectionTypes] = useState<FacilityTypes>({
     residential: true,
-    mps: true,
+    multipurpose_others: true,
     home: true,
     retirement: true
   });
@@ -233,13 +233,13 @@ export default function MapsPage() {
   }, [openPopupsCount]);
 
   // Function to calculate selected facility count based on checked types
-  const calculateSelectedFacilityCount = useCallback((counts: { residential: number; mps: number; home: number; retirement: number }, types: FacilityTypes) => {
-    let selectedCount = 0;
-    if (types.residential) selectedCount += counts.residential;
-    if (types.mps) selectedCount += counts.mps;
-    if (types.home) selectedCount += counts.home;
-    if (types.retirement) selectedCount += counts.retirement;
-    return selectedCount;
+  const calculateSelectedFacilityCount = useCallback((counts: { residential: number; multipurpose_others: number; home: number; retirement: number }, types: FacilityTypes) => {
+    let total = 0;
+    if (types.residential) total += counts.residential || 0;
+    if (types.multipurpose_others) total += counts.multipurpose_others || 0;
+    if (types.home) total += counts.home || 0;
+    if (types.retirement) total += counts.retirement || 0;
+    return total;
   }, []);
 
   // Add facility counting functionality
@@ -301,7 +301,7 @@ export default function MapsPage() {
       // Update state
       setFacilityCountsInViewport({
         residential: counts.residential || 0,
-        mps: counts.mps || 0,
+        multipurpose_others: counts.multipurpose_others || 0,
         home: counts.home || 0,
         retirement: counts.retirement || 0,
         total: total,
@@ -310,14 +310,14 @@ export default function MapsPage() {
       
       // Update bulk selection enabled state based on selected facility limit (not total)
       const selectedCount = calculateSelectedFacilityCount(
-        { residential: counts.residential || 0, mps: counts.mps || 0, home: counts.home || 0, retirement: counts.retirement || 0 },
+        { residential: counts.residential || 0, multipurpose_others: counts.multipurpose_others || 0, home: counts.home || 0, retirement: counts.retirement || 0 },
         bulkSelectionTypes
       );
       setBulkSelectionEnabled(selectedCount <= 100 && selectedCount > 0);
 
       console.log('🔢 Facility counts updated:', {
         residential: counts.residential || 0,
-        mps: counts.mps || 0,
+        multipurpose_others: counts.multipurpose_others || 0,
         home: counts.home || 0,
         retirement: counts.retirement || 0,
         total: total
@@ -349,7 +349,7 @@ export default function MapsPage() {
   useEffect(() => {
     if (!facilityCountsInViewport.loading) {
       const selectedCount = calculateSelectedFacilityCount(
-        { residential: facilityCountsInViewport.residential, mps: facilityCountsInViewport.mps, home: facilityCountsInViewport.home, retirement: facilityCountsInViewport.retirement },
+        { residential: facilityCountsInViewport.residential, multipurpose_others: facilityCountsInViewport.multipurpose_others, home: facilityCountsInViewport.home, retirement: facilityCountsInViewport.retirement },
         bulkSelectionTypes
       );
       setBulkSelectionEnabled(selectedCount <= 100 && selectedCount > 0);
@@ -382,16 +382,22 @@ export default function MapsPage() {
   };
 
   // Function to determine facility type from Care_Type
-  const determineFacilityType = (careType: string): 'residential' | 'mps' | 'home' | 'retirement' => {
+  const determineFacilityType = (careType: string): 'residential' | 'multipurpose_others' | 'home' | 'retirement' => {
     const careTypeMapping = {
       residential: ['Residential'],
-      mps: ['Multi-Purpose Service'],
+      multipurpose_others: [
+        'Multi-Purpose Service',
+        'Transition Care',
+        'Short-Term Restorative Care (STRC)',
+        'National Aboriginal and Torres Strait Islander Aged Care Program', 
+        'Innovative Pool'
+      ],
       home: ['Home Care', 'Community Care'],
       retirement: ['Retirement', 'Retirement Living', 'Retirement Village']
     };
 
-    if (careTypeMapping.mps.some(ct => careType.includes(ct))) {
-      return 'mps';
+    if (careTypeMapping.multipurpose_others.some(ct => careType.includes(ct))) {
+      return 'multipurpose_others';
     } else if (careTypeMapping.residential.some(ct => careType.includes(ct))) {
       return 'residential';
     } else if (careTypeMapping.home.some(ct => careType.includes(ct))) {
@@ -407,7 +413,7 @@ export default function MapsPage() {
   const getFacilityTypeName = (facilityType: string): string => {
     switch (facilityType) {
       case 'residential': return 'Residential Care';
-      case 'mps': return 'Multi-Purpose Service';
+      case 'multipurpose_others': return 'Multi-Purpose and Others';
       case 'home': return 'Home Care';
       case 'retirement': return 'Retirement Living';
       default: return facilityType;
@@ -1135,15 +1141,15 @@ export default function MapsPage() {
                             <input
                               type="checkbox"
                               id="select-mps"
-                              checked={bulkSelectionTypes.mps}
-                              onChange={(e) => setBulkSelectionTypes(prev => ({ ...prev, mps: e.target.checked }))}
+                              checked={bulkSelectionTypes.multipurpose_others}
+                              onChange={(e) => setBulkSelectionTypes(prev => ({ ...prev, multipurpose_others: e.target.checked }))}
                               className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                             />
                             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                             <span className="text-sm text-gray-700">Multi-Purpose Service</span>
                           </div>
                           <span className="text-sm font-medium text-gray-900">
-                            {facilityCountsInViewport.loading ? '...' : facilityCountsInViewport.mps.toLocaleString()}
+                            {facilityCountsInViewport.loading ? '...' : facilityCountsInViewport.multipurpose_others.toLocaleString()}
                           </span>
                         </div>
 

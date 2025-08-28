@@ -11,7 +11,7 @@ interface SearchResult {
   // Facility-specific properties
   address?: string;
   careType?: string;
-  facilityType?: 'residential' | 'mps' | 'home' | 'retirement';
+  facilityType?: 'residential' | 'multipurpose_others' | 'home' | 'retirement';
 }
 
 interface GeoJSONFeature {
@@ -279,10 +279,17 @@ async function buildHealthcareFacilityIndex(): Promise<SearchResult[]> {
 
     const searchResults: SearchResult[] = [];
 
-    // Define care type mapping similar to the map component
+    // Define care type mapping for the new classification system
     const careTypeMapping = {
-      residential: ['Residential', 'Multi-Purpose Service'],
-      home: ['Home Care', 'Community Care'],
+      residential: ['Residential'], // Only pure residential facilities
+      multipurpose_others: [
+        'Multi-Purpose Service',
+        'Transition Care', 
+        'Short-Term Restorative Care (STRC)',
+        'National Aboriginal and Torres Strait Islander Aged Care Program',
+        'Innovative Pool'
+      ],
+      home: ['Home Care', 'Community Care'], 
       retirement: ['Retirement', 'Retirement Living', 'Retirement Village']
     };
 
@@ -291,9 +298,10 @@ async function buildHealthcareFacilityIndex(): Promise<SearchResult[]> {
         const props = feature.properties;
         const serviceName = props?.Service_Name || '';
         const careType = props?.Care_Type || '';
-        const address = props?.Address || '';
-        const state = props?.State || '';
-        const postcode = props?.Postcode || '';
+        // Updated field mappings for new healthcare data structure
+        const address = props?.Physical_Address || '';
+        const state = props?.Physical_State || '';
+        const postcode = props?.Physical_Post_Code || '';
         
         // Extract coordinates
         const geometry = feature.geometry;
@@ -309,15 +317,16 @@ async function buildHealthcareFacilityIndex(): Promise<SearchResult[]> {
         }
 
         // Determine facility type based on care type
-        let facilityType: 'residential' | 'mps' | 'home' | 'retirement' | null = null;
+        // Updated classification system: pure residential vs multipurpose/specialized services
+        let facilityType: 'residential' | 'multipurpose_others' | 'home' | 'retirement' | null = null;
         
         if (careTypeMapping.residential.some(ct => careType.includes(ct))) {
           facilityType = 'residential';
-        } else if (careTypeMapping.home.some(ct => careType.includes(ct)) || 
-                   (careType.includes('Multi-Purpose Service') && props?.Home_Care_Places > 0)) {
+        } else if (careTypeMapping.multipurpose_others.some(ct => careType.includes(ct))) {
+          facilityType = 'multipurpose_others';
+        } else if (careTypeMapping.home.some(ct => careType.includes(ct))) {
           facilityType = 'home';
-        } else if (careTypeMapping.retirement.some(ct => careType.toLowerCase().includes(ct.toLowerCase())) ||
-                   serviceName.toLowerCase().includes('retirement')) {
+        } else if (careTypeMapping.retirement.some(ct => careType.toLowerCase().includes(ct.toLowerCase()))) {
           facilityType = 'retirement';
         }
 

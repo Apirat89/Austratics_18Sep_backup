@@ -15,15 +15,16 @@ export interface LocationData {
   id?: string;          // Stable unique identifier
   name: string;
   area?: string;        // Human-readable area description
-  type: 'lga' | 'sa2' | 'sa3' | 'sa4' | 'postcode' | 'locality' | 'facility';
   code?: string;
+  type: 'lga' | 'sa2' | 'sa3' | 'sa4' | 'postcode' | 'locality' | 'facility';
   state?: string;
   center?: [number, number];
   bounds?: [number, number, number, number];
+  score?: number; // Make optional for compatibility
   // Facility-specific properties
   address?: string;
   careType?: string;
-  facilityType?: 'residential' | 'mps' | 'home' | 'retirement';
+  facilityType?: 'residential' | 'multipurpose_others' | 'home' | 'retirement';
 }
 
 export interface SavedSearchesResponse {

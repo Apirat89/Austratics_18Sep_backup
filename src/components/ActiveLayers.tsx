@@ -5,9 +5,9 @@ import { Eye, EyeOff, X, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface FacilityTypes {
   residential: boolean;
+  multipurpose_others: boolean;
   home: boolean;
   retirement: boolean;
-  mps: boolean;
 }
 
 type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality' | 'acpr' | 'mmm';
@@ -142,7 +142,7 @@ export default function ActiveLayers({
                   <span className="text-xs text-gray-700">Residential Care</span>
                 </div>
               )}
-              {facilityTypes.mps && (
+              {facilityTypes.multipurpose_others && (
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full border border-white" style={{backgroundColor: '#3182CE'}}></div>
                   <span className="text-xs text-gray-700">Multi-Purpose Service</span>
