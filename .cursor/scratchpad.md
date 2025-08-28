@@ -18461,6 +18461,21 @@ Check browser console for debug messages:
 
 **🎯 RESULT**: 20km radius button is now always active and functional!
 
+### **📦 SIMPLIFIED VERSION DEPLOYED TO GITHUB** ✅
+**New Commit ID**: `241d5da`  
+**Branches Updated**: 
+- ✅ `development` → Pushed successfully
+- ✅ `main` → Merged and pushed successfully
+
+**Deployment Summary**:
+- **Runtime Error**: ✅ Fixed - Maps page loading successfully
+- **Complexity Removed**: 127 lines deleted, 31 lines added  
+- **User Request**: ✅ Button always enabled throughout (no zoom restrictions)
+- **Core Feature**: ✅ Maintained - 20km radius circles with facility colors
+- **UX**: ✅ Simplified - Clean on/off toggle functionality
+
+**🌐 LIVE ON GITHUB**: Both branches now contain the simplified, always-enabled 20km radius feature!
+
 ### **📦 PREVIOUS GITHUB DEPLOYMENT** ✅
 **Commit ID**: `0d8b09f`  
 **Branches Updated**: 
@@ -18515,3 +18530,5 @@ Check browser console for debug messages:
 - **🔑 CRITICAL**: **Scale control reading beats zoom level approximation** - Reading the actual scale legend text that users see provides perfect accuracy, while zoom level approximations can be wildly inaccurate
 - **DOM element fallbacks essential** - Multiple selector strategies ensure compatibility across different MapTiler/MapLibre versions
 - **Unit conversion robustness** - Supporting multiple units (km, m, mi, ft) with flexible parsing handles various scale display formats
+- **⚡ SIMPLICITY WINS**: **Complex threshold detection can introduce runtime errors** - Simple always-enabled features are more reliable than complex conditional logic, especially when UX requirements change
+- **🧹 Technical debt cleanup**: **Removing unused state and callbacks prevents dependency array issues** - Clean state management reduces bugs and improves maintainability
