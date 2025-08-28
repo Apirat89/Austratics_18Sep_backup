@@ -118,8 +118,7 @@ export default function MapsPage() {
   // Data Layers state
   const [dataLayersExpanded, setDataLayersExpanded] = useState(false);
   
-  // ✅ NEW: 20km radius feature state
-  const [isWithin20kmThreshold, setIsWithin20kmThreshold] = useState(false);
+  // ✅ NEW: 20km radius feature state (always enabled)
   const [showRadius, setShowRadius] = useState(false);
   
   // Flag to control when map highlights should update the search bar
@@ -1034,18 +1033,7 @@ export default function MapsPage() {
     }, 0);
   }, []);
 
-  // ✅ NEW: 20km radius feature - handle zoom threshold changes
-  const handleZoomThresholdChange = useCallback((isWithinThreshold: boolean) => {
-    console.log(`🔍 Maps Page: Zoom threshold changed - within 20km threshold: ${isWithinThreshold}`);
-    setIsWithin20kmThreshold(isWithinThreshold);
-    
-    // Auto-hide radius circles when zooming out beyond threshold
-    if (!isWithinThreshold && showRadius) {
-      setShowRadius(false);
-    }
-  }, [showRadius]);
-
-  // ✅ NEW: 20km radius feature - toggle radius visibility
+  // ✅ NEW: 20km radius feature - toggle radius visibility (always enabled)
   const handleRadiusToggle = useCallback(() => {
     setShowRadius(!showRadius);
   }, [showRadius]);
@@ -1283,18 +1271,13 @@ export default function MapsPage() {
                      <div className="mt-2">
                       <button
                         onClick={handleRadiusToggle}
-                        disabled={!isWithin20kmThreshold}
                         className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
-                          isWithin20kmThreshold
-                            ? showRadius
-                              ? 'bg-orange-600 text-white hover:bg-orange-700'
-                              : 'bg-orange-600 text-white hover:bg-orange-700'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          showRadius
+                            ? 'bg-orange-600 text-white hover:bg-orange-700'
+                            : 'bg-orange-600 text-white hover:bg-orange-700'
                         }`}
                         title={
-                          !isWithin20kmThreshold
-                            ? 'Available when zoomed to 20km or closer'
-                            : showRadius
+                          showRadius
                             ? 'Hide 20km radius circles around facilities'
                             : 'Show 20km radius circles around facilities'
                         }
@@ -1683,7 +1666,6 @@ export default function MapsPage() {
                 onFacilityDetailsClick={navigateToFacilityDetails}
                 loadingComplete={loadingComplete}
                 onFacilityTableSelection={handleFacilityTableSelection}
-                onZoomThresholdChange={handleZoomThresholdChange}
                 showRadius={showRadius}
                 onHeatmapRenderComplete={() => {
                   console.log('🎉 Maps Page: Heatmap render complete, calling DataLayers callback');

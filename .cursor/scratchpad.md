@@ -18441,9 +18441,27 @@ Check browser console for debug messages:
 - `📏 Parsed scale: X km` - Scale value successfully read
 - `⚠️ Scale control not found...` - Fallback to zoom threshold
 
-**🚀 SOLUTION DEPLOYED - SHOULD NOW WORK CORRECTLY!**
+**🚨 RUNTIME ERROR DETECTED - SIMPLIFYING FEATURE**
 
-### **📦 GITHUB DEPLOYMENT COMPLETED** ✅
+## **🛠️ EXECUTOR MODE: REMOVING 20KM DETECTION LOGIC**
+
+### **✅ Task: Simplify to Always-Active Button** - **COMPLETED** ✅
+**Objective**: Remove threshold detection, make 20km radius button always enabled
+**Issue**: Runtime error with `showRadius` dependency + user wants simpler UX
+**Solution**: Keep button and circles, remove all zoom/scale detection logic
+
+**🔧 CHANGES IMPLEMENTED**:
+- ✅ **Removed**: `isWithin20kmThreshold` state variable
+- ✅ **Removed**: `handleZoomThresholdChange` callback function
+- ✅ **Removed**: `onZoomThresholdChange` prop from AustralianMap
+- ✅ **Removed**: All scale control reading functions (`parseMapScaleInKm`, `readMapScaleInKm`, `createIsWithin20kmThreshold`)
+- ✅ **Removed**: Zoom threshold tracking (`currentZoom`, `isWithin20kmThresholdRef`)
+- ✅ **Simplified**: Button now always enabled with simple on/off toggle
+- ✅ **Fixed**: Runtime error resolved, maps page loading successfully
+
+**🎯 RESULT**: 20km radius button is now always active and functional!
+
+### **📦 PREVIOUS GITHUB DEPLOYMENT** ✅
 **Commit ID**: `0d8b09f`  
 **Branches Updated**: 
 - ✅ `development` → Pushed successfully

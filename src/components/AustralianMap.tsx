@@ -99,9 +99,7 @@ interface AustralianMapProps {
   onHeatmapRenderComplete?: () => void;
   // ✅ NEW: Facility table selection callback to replace popup system
   onFacilityTableSelection?: (facilities: FacilityData[]) => void;
-  // ✅ NEW: 20km radius feature - zoom threshold callback
-  onZoomThresholdChange?: (isWithin20kmThreshold: boolean) => void;
-  // ✅ NEW: 20km radius feature - circle visibility control
+  // ✅ NEW: 20km radius feature - circle visibility control (always enabled)
   showRadius?: boolean;
 }
 
@@ -238,79 +236,7 @@ const isPointInGeometryWithTolerance = (point: [number, number], geometry: any, 
   return false;
 };
 
-// ✅ NEW: 20km radius feature - scale control reading functions
-const parseMapScaleInKm = (scaleText: string): number | null => {
-  if (!scaleText) return null;
-  
-  // Parse formats like: "20 km", "500 m", "5 mi", "2000 ft", "20km", "500m"
-  const match = scaleText.match(/(\d+(?:\.\d+)?)\s*(km|m|mi|ft|miles?|kilometers?|meters?|feet)/i);
-  if (!match) return null;
-  
-  const [, value, unit] = match;
-  const numValue = parseFloat(value);
-  
-  // Convert to kilometers
-  switch(unit.toLowerCase()) {
-    case 'km':
-    case 'kilometers': 
-    case 'kilometer': 
-      return numValue;
-    case 'm':
-    case 'meters':
-    case 'meter':
-      return numValue / 1000;
-    case 'mi':
-    case 'miles':
-    case 'mile':
-      return numValue * 1.60934;
-    case 'ft':
-    case 'feet':
-    case 'foot':
-      return numValue * 0.0003048;
-    default: 
-      return null;
-  }
-};
 
-const readMapScaleInKm = (): number | null => {
-  // Try multiple possible scale control selectors
-  const possibleSelectors = [
-    '.maplibregl-ctrl-scale',
-    '.mapboxgl-ctrl-scale', 
-    '.maplibre-scale-control',
-    '[class*="scale"]'
-  ];
-  
-  for (const selector of possibleSelectors) {
-    const scaleElement = document.querySelector(selector);
-    if (scaleElement?.textContent) {
-      console.log(`🔍 Found scale control with selector "${selector}": "${scaleElement.textContent}"`);
-      const scaleKm = parseMapScaleInKm(scaleElement.textContent);
-      if (scaleKm !== null) {
-        console.log(`📏 Parsed scale: ${scaleKm}km`);
-        return scaleKm;
-      }
-    }
-  }
-  
-  console.log('⚠️ Scale control not found, falling back to zoom threshold');
-  return null;
-};
-
-// ✅ NEW: 20km radius feature - improved threshold detection (will be used inside component)
-const createIsWithin20kmThreshold = (mapInstance: maptilersdk.Map | null) => {
-  return (): boolean => {
-    // Primary method: Read actual scale control
-    const scaleKm = readMapScaleInKm();
-    if (scaleKm !== null) {
-      return scaleKm <= 20;
-    }
-    
-    // Fallback method: Use zoom level approximation
-    const zoomLevel = mapInstance?.getZoom() || 0;
-    return zoomLevel >= 11;
-  };
-};
 
 // ✅ NEW: 20km radius feature - facility type colors (matching existing marker colors)
 const getFacilityTypeColor = (facilityType: string): string => {
@@ -359,7 +285,6 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   loadingComplete = false,
   onHeatmapRenderComplete,
   onFacilityTableSelection,
-  onZoomThresholdChange,
   showRadius = false
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -406,16 +331,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // Track facility data for each open popup (for Save All functionality)
   const openPopupFacilitiesRef = useRef<Map<maptilersdk.Popup, FacilityData>>(new Map());
   
-  // ✅ NEW: 20km radius feature - zoom threshold tracking
-  const [currentZoom, setCurrentZoom] = useState<number>(0);
-  const isWithin20kmThresholdRef = useRef<boolean>(false);
-  
-  // ✅ NEW: 20km radius feature - circle rendering state
+  // ✅ NEW: 20km radius feature - circle rendering state (always enabled)
   const circlesRef = useRef<HTMLDivElement | null>(null);
-  const [visibleFacilities, setVisibleFacilities] = useState<FacilityData[]>([]);
-  
-  // ✅ NEW: 20km radius feature - threshold detection function
-  const isWithin20kmThreshold = createIsWithin20kmThreshold(map.current);
 
   // ✅ NEW: Track cluster popup states for toggle behavior (Task 3.4)
   const clusterPopupStatesRef = useRef<Map<string, { isOpen: boolean, popups: maptilersdk.Popup[] }>>(new Map());
@@ -537,12 +454,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     map.current.on('load', () => {
       setIsLoaded(true);
       
-      // ✅ NEW: 20km radius feature - initial zoom threshold check
-      const initialZoom = map.current?.getZoom() || 0;
-      setCurrentZoom(initialZoom);
-      const initialIsWithin20kmThreshold = isWithin20kmThreshold();
-      isWithin20kmThresholdRef.current = initialIsWithin20kmThreshold;
-      onZoomThresholdChange?.(initialIsWithin20kmThreshold);
+
       
       // Add click handler
       if (map.current) {
@@ -560,15 +472,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
             viewportChangeCallbackRef.current();
           }
           
-          // ✅ NEW: 20km radius feature - zoom threshold detection
-          const zoom = map.current?.getZoom() || 0;
-          setCurrentZoom(zoom);
-          
-          const newIsWithin20kmThreshold = isWithin20kmThreshold();
-          if (newIsWithin20kmThreshold !== isWithin20kmThresholdRef.current) {
-            isWithin20kmThresholdRef.current = newIsWithin20kmThreshold;
-            onZoomThresholdChange?.(newIsWithin20kmThreshold);
-          }
+
           
           // Removed magic wand zoom level detection - replaced with bulk selection system
         });
@@ -3171,7 +3075,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // ✅ NEW: Update circles when relevant state changes
   useEffect(() => {
     updateRadiusCircles();
-  }, [showRadius, currentZoom, updateRadiusCircles]);
+  }, [showRadius, updateRadiusCircles]);
 
   // ✅ NEW: Update circles when map moves or zooms
   useEffect(() => {
