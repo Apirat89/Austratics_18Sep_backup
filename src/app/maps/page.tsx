@@ -118,6 +118,10 @@ export default function MapsPage() {
   // Data Layers state
   const [dataLayersExpanded, setDataLayersExpanded] = useState(false);
   
+  // ✅ NEW: 20km radius feature state
+  const [isWithin20kmThreshold, setIsWithin20kmThreshold] = useState(false);
+  const [showRadius, setShowRadius] = useState(false);
+  
   // Flag to control when map highlights should update the search bar
   const shouldUpdateSearchFromHighlight = useRef<boolean>(true);
   
@@ -1030,6 +1034,22 @@ export default function MapsPage() {
     }, 0);
   }, []);
 
+  // ✅ NEW: 20km radius feature - handle zoom threshold changes
+  const handleZoomThresholdChange = useCallback((isWithinThreshold: boolean) => {
+    console.log(`🔍 Maps Page: Zoom threshold changed - within 20km threshold: ${isWithinThreshold}`);
+    setIsWithin20kmThreshold(isWithinThreshold);
+    
+    // Auto-hide radius circles when zooming out beyond threshold
+    if (!isWithinThreshold && showRadius) {
+      setShowRadius(false);
+    }
+  }, [showRadius]);
+
+  // ✅ NEW: 20km radius feature - toggle radius visibility
+  const handleRadiusToggle = useCallback(() => {
+    setShowRadius(!showRadius);
+  }, [showRadius]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -1124,12 +1144,12 @@ export default function MapsPage() {
 
                 {/* Content */}
                 {facilityCountExpanded && (
-                  <div className="px-4 pb-4">
-                    <div className="space-y-3">
+                  <div className="px-4 pb-3">
+                    <div className="space-y-2">
                       {/* Facility Type Selection */}
-                      <div className="space-y-2">
+                      <div className="space-y-1.5">
                         {/* Residential Care */}
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                        <div className="flex items-center justify-between p-1.5 rounded-lg bg-gray-50">
                           <div className="flex items-center gap-3">
                             <input
                               type="checkbox"
@@ -1147,7 +1167,7 @@ export default function MapsPage() {
                         </div>
 
                         {/* Multi-Purpose Service */}
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                        <div className="flex items-center justify-between p-1.5 rounded-lg bg-gray-50">
                           <div className="flex items-center gap-3">
                             <input
                               type="checkbox"
@@ -1165,7 +1185,7 @@ export default function MapsPage() {
                         </div>
 
                         {/* Home Care */}
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                        <div className="flex items-center justify-between p-1.5 rounded-lg bg-gray-50">
                           <div className="flex items-center gap-3">
                             <input
                               type="checkbox"
@@ -1183,7 +1203,7 @@ export default function MapsPage() {
                         </div>
 
                         {/* Retirement Living */}
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                        <div className="flex items-center justify-between p-1.5 rounded-lg bg-gray-50">
                           <div className="flex items-center gap-3">
                             <input
                               type="checkbox"
@@ -1202,8 +1222,8 @@ export default function MapsPage() {
                       </div>
 
                       {/* Total Count and Selected Count */}
-                      <div className="border-t border-gray-200 pt-3 space-y-2">
-                        <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 border border-blue-200">
+                      <div className="border-t border-gray-200 pt-2 space-y-1.5">
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-blue-50 border border-blue-200">
                           <div className="flex items-center gap-3">
                             <BarChart3 className="w-4 h-4 text-blue-600" />
                             <span className="text-sm font-medium text-blue-800">Total in View</span>
@@ -1212,7 +1232,7 @@ export default function MapsPage() {
                             {facilityCountsInViewport.loading ? '...' : facilityCountsInViewport.total.toLocaleString()}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 border border-green-200">
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-green-50 border border-green-200">
                           <div className="flex items-center gap-3">
                             <span className="text-green-600">🎯</span>
                             <span className="text-sm font-medium text-green-800">Selected for Bulk</span>
@@ -1225,7 +1245,7 @@ export default function MapsPage() {
                     </div>
 
                     {/* Info */}
-                    <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
                       <div className="text-sm text-green-800">
                         🔄 Counts update automatically as you zoom and pan the map.
                         <br />
@@ -1234,7 +1254,7 @@ export default function MapsPage() {
                     </div>
 
                     {/* Select All Button */}
-                    <div className="mt-4">
+                    <div className="mt-3">
                       <button
                         onClick={handleBulkSelection}
                         disabled={!bulkSelectionEnabled || facilityCountsInViewport.loading}
@@ -1256,6 +1276,42 @@ export default function MapsPage() {
                         ) : (
                           `Too Many (${calculateSelectedFacilityCount(facilityCountsInViewport, bulkSelectionTypes)}/100)`
                         )}
+                      </button>
+                    </div>
+
+                                         {/* ✅ NEW: 20km Radius Toggle Button */}
+                     <div className="mt-2">
+                      <button
+                        onClick={handleRadiusToggle}
+                        disabled={!isWithin20kmThreshold}
+                        className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+                          isWithin20kmThreshold
+                            ? showRadius
+                              ? 'bg-orange-600 text-white hover:bg-orange-700'
+                              : 'bg-orange-600 text-white hover:bg-orange-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                        title={
+                          !isWithin20kmThreshold
+                            ? 'Available when zoomed to 20km or closer'
+                            : showRadius
+                            ? 'Hide 20km radius circles around facilities'
+                            : 'Show 20km radius circles around facilities'
+                        }
+                      >
+                        <div className="flex items-center gap-2">
+                          <svg 
+                            className="w-4 h-4" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth={2} 
+                            viewBox="0 0 24 24"
+                          >
+                            <circle cx="12" cy="12" r="10" strokeDasharray="3,2" />
+                            <circle cx="12" cy="12" r="2" fill="currentColor" />
+                          </svg>
+                          <span>{showRadius ? 'Hide 20km Radius' : 'Show 20km Radius'}</span>
+                        </div>
                       </button>
                     </div>
                   </div>
@@ -1627,6 +1683,8 @@ export default function MapsPage() {
                 onFacilityDetailsClick={navigateToFacilityDetails}
                 loadingComplete={loadingComplete}
                 onFacilityTableSelection={handleFacilityTableSelection}
+                onZoomThresholdChange={handleZoomThresholdChange}
+                showRadius={showRadius}
                 onHeatmapRenderComplete={() => {
                   console.log('🎉 Maps Page: Heatmap render complete, calling DataLayers callback');
                   // ✅ FIXED: Add safety check and async execution to prevent setState during render

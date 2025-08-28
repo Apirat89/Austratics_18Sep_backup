@@ -99,6 +99,10 @@ interface AustralianMapProps {
   onHeatmapRenderComplete?: () => void;
   // ✅ NEW: Facility table selection callback to replace popup system
   onFacilityTableSelection?: (facilities: FacilityData[]) => void;
+  // ✅ NEW: 20km radius feature - zoom threshold callback
+  onZoomThresholdChange?: (isWithin20kmThreshold: boolean) => void;
+  // ✅ NEW: 20km radius feature - circle visibility control
+  showRadius?: boolean;
 }
 
 // Expose methods to parent component
@@ -234,6 +238,107 @@ const isPointInGeometryWithTolerance = (point: [number, number], geometry: any, 
   return false;
 };
 
+// ✅ NEW: 20km radius feature - scale control reading functions
+const parseMapScaleInKm = (scaleText: string): number | null => {
+  if (!scaleText) return null;
+  
+  // Parse formats like: "20 km", "500 m", "5 mi", "2000 ft", "20km", "500m"
+  const match = scaleText.match(/(\d+(?:\.\d+)?)\s*(km|m|mi|ft|miles?|kilometers?|meters?|feet)/i);
+  if (!match) return null;
+  
+  const [, value, unit] = match;
+  const numValue = parseFloat(value);
+  
+  // Convert to kilometers
+  switch(unit.toLowerCase()) {
+    case 'km':
+    case 'kilometers': 
+    case 'kilometer': 
+      return numValue;
+    case 'm':
+    case 'meters':
+    case 'meter':
+      return numValue / 1000;
+    case 'mi':
+    case 'miles':
+    case 'mile':
+      return numValue * 1.60934;
+    case 'ft':
+    case 'feet':
+    case 'foot':
+      return numValue * 0.0003048;
+    default: 
+      return null;
+  }
+};
+
+const readMapScaleInKm = (): number | null => {
+  // Try multiple possible scale control selectors
+  const possibleSelectors = [
+    '.maplibregl-ctrl-scale',
+    '.mapboxgl-ctrl-scale', 
+    '.maplibre-scale-control',
+    '[class*="scale"]'
+  ];
+  
+  for (const selector of possibleSelectors) {
+    const scaleElement = document.querySelector(selector);
+    if (scaleElement?.textContent) {
+      console.log(`🔍 Found scale control with selector "${selector}": "${scaleElement.textContent}"`);
+      const scaleKm = parseMapScaleInKm(scaleElement.textContent);
+      if (scaleKm !== null) {
+        console.log(`📏 Parsed scale: ${scaleKm}km`);
+        return scaleKm;
+      }
+    }
+  }
+  
+  console.log('⚠️ Scale control not found, falling back to zoom threshold');
+  return null;
+};
+
+// ✅ NEW: 20km radius feature - improved threshold detection (will be used inside component)
+const createIsWithin20kmThreshold = (mapInstance: maptilersdk.Map | null) => {
+  return (): boolean => {
+    // Primary method: Read actual scale control
+    const scaleKm = readMapScaleInKm();
+    if (scaleKm !== null) {
+      return scaleKm <= 20;
+    }
+    
+    // Fallback method: Use zoom level approximation
+    const zoomLevel = mapInstance?.getZoom() || 0;
+    return zoomLevel >= 11;
+  };
+};
+
+// ✅ NEW: 20km radius feature - facility type colors (matching existing marker colors)
+const getFacilityTypeColor = (facilityType: string): string => {
+  const typeColors = {
+    residential: '#E53E3E', // Red
+    multipurpose_others: '#3182CE', // Blue
+    home: '#38A169', // Green
+    retirement: '#9B59B6' // Purple
+  };
+  return typeColors[facilityType as keyof typeof typeColors] || '#666666';
+};
+
+// ✅ NEW: 20km radius feature - calculate 20km radius in pixels
+const calculate20kmRadiusInPixels = (map: maptilersdk.Map | null, centerLat: number): number => {
+  if (!map) return 0;
+  
+  const zoom = map.getZoom();
+  const earthCircumferenceMeters = 40075000; // Earth's circumference in meters
+  const pixelsPerMeter = (256 * Math.pow(2, zoom)) / earthCircumferenceMeters;
+  
+  // Adjust for latitude (Mercator projection stretches near poles)
+  const latRadians = (centerLat * Math.PI) / 180;
+  const latitudeAdjustment = Math.cos(latRadians);
+  
+  const radius20kmMeters = 20000; // 20km in meters
+  return radius20kmMeters * pixelsPerMeter * latitudeAdjustment;
+};
+
 const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   className = "",
   facilityTypes,
@@ -253,7 +358,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   onFacilityDetailsClick,
   loadingComplete = false,
   onHeatmapRenderComplete,
-  onFacilityTableSelection
+  onFacilityTableSelection,
+  onZoomThresholdChange,
+  showRadius = false
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
@@ -298,6 +405,17 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   
   // Track facility data for each open popup (for Save All functionality)
   const openPopupFacilitiesRef = useRef<Map<maptilersdk.Popup, FacilityData>>(new Map());
+  
+  // ✅ NEW: 20km radius feature - zoom threshold tracking
+  const [currentZoom, setCurrentZoom] = useState<number>(0);
+  const isWithin20kmThresholdRef = useRef<boolean>(false);
+  
+  // ✅ NEW: 20km radius feature - circle rendering state
+  const circlesRef = useRef<HTMLDivElement | null>(null);
+  const [visibleFacilities, setVisibleFacilities] = useState<FacilityData[]>([]);
+  
+  // ✅ NEW: 20km radius feature - threshold detection function
+  const isWithin20kmThreshold = createIsWithin20kmThreshold(map.current);
 
   // ✅ NEW: Track cluster popup states for toggle behavior (Task 3.4)
   const clusterPopupStatesRef = useRef<Map<string, { isOpen: boolean, popups: maptilersdk.Popup[] }>>(new Map());
@@ -419,6 +537,13 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     map.current.on('load', () => {
       setIsLoaded(true);
       
+      // ✅ NEW: 20km radius feature - initial zoom threshold check
+      const initialZoom = map.current?.getZoom() || 0;
+      setCurrentZoom(initialZoom);
+      const initialIsWithin20kmThreshold = isWithin20kmThreshold();
+      isWithin20kmThresholdRef.current = initialIsWithin20kmThreshold;
+      onZoomThresholdChange?.(initialIsWithin20kmThreshold);
+      
       // Add click handler
       if (map.current) {
         map.current.on('click', handleMapClick);
@@ -433,6 +558,16 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         map.current.on('zoomend', () => {
           if (viewportChangeCallbackRef.current) {
             viewportChangeCallbackRef.current();
+          }
+          
+          // ✅ NEW: 20km radius feature - zoom threshold detection
+          const zoom = map.current?.getZoom() || 0;
+          setCurrentZoom(zoom);
+          
+          const newIsWithin20kmThreshold = isWithin20kmThreshold();
+          if (newIsWithin20kmThreshold !== isWithin20kmThresholdRef.current) {
+            isWithin20kmThresholdRef.current = newIsWithin20kmThreshold;
+            onZoomThresholdChange?.(newIsWithin20kmThreshold);
           }
           
           // Removed magic wand zoom level detection - replaced with bulk selection system
@@ -2965,6 +3100,100 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     }
   }, [isLoaded]);
 
+  // ✅ NEW: 20km radius feature - Circle rendering system
+  const updateRadiusCircles = useCallback(() => {
+    const circleContainer = circlesRef.current;
+    if (!circleContainer || !map.current || !showRadius) {
+      // Clear existing circles when not showing
+      if (circleContainer) {
+        circleContainer.innerHTML = '';
+      }
+      return;
+    }
+
+    // Get current map bounds to only show circles for visible facilities
+    const bounds = map.current.getBounds();
+    const facilitiesToShow = allFacilitiesRef.current?.filter(facility => {
+      if (!facility.Latitude || !facility.Longitude) return false;
+      
+      // Check if facility is within current map bounds
+      return (
+        facility.Longitude >= bounds.getWest() &&
+        facility.Longitude <= bounds.getEast() &&
+        facility.Latitude >= bounds.getSouth() &&
+        facility.Latitude <= bounds.getNorth()
+      );
+    }) || [];
+
+    // Clear existing circles
+    circleContainer.innerHTML = '';
+
+    // Create SVG container
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'radius-circles-svg');
+    svg.style.position = 'absolute';
+    svg.style.top = '0';
+    svg.style.left = '0';
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+    svg.style.pointerEvents = 'none';
+    svg.style.zIndex = '1';
+
+    // Render circle for each visible facility
+    facilitiesToShow.forEach(facility => {
+      const lat = facility.Latitude;
+      const lng = facility.Longitude;
+      
+      // Convert lat/lng to pixel coordinates
+      const pixelCoords = map.current?.project([lng, lat]);
+      if (!pixelCoords) return;
+      
+      // Calculate 20km radius in pixels for this latitude
+      const radiusPixels = calculate20kmRadiusInPixels(map.current, lat);
+      
+      // Create circle element
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', pixelCoords.x.toString());
+      circle.setAttribute('cy', pixelCoords.y.toString());
+      circle.setAttribute('r', radiusPixels.toString());
+      circle.setAttribute('fill', 'none');
+      circle.setAttribute('stroke', getFacilityTypeColor(facility.facilityType || 'residential'));
+      circle.setAttribute('stroke-width', '2');
+      circle.setAttribute('stroke-dasharray', '8,4');
+      circle.setAttribute('opacity', '0.7');
+      
+      svg.appendChild(circle);
+    });
+
+    circleContainer.appendChild(svg);
+  }, [showRadius]);
+
+  // ✅ NEW: Update circles when relevant state changes
+  useEffect(() => {
+    updateRadiusCircles();
+  }, [showRadius, currentZoom, updateRadiusCircles]);
+
+  // ✅ NEW: Update circles when map moves or zooms
+  useEffect(() => {
+    if (!map.current) return;
+
+    const handleMapUpdate = () => {
+      if (showRadius) {
+        updateRadiusCircles();
+      }
+    };
+
+    map.current.on('move', handleMapUpdate);
+    map.current.on('zoom', handleMapUpdate);
+
+    return () => {
+      if (map.current) {
+        map.current.off('move', handleMapUpdate);
+        map.current.off('zoom', handleMapUpdate);
+      }
+    };
+  }, [showRadius, updateRadiusCircles]);
+
   // Function to clear last search result (called when search is explicitly cancelled)
   const clearLastSearchResult = useCallback(() => {
     setLastSearchResult(null);
@@ -3078,6 +3307,13 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         ref={mapContainer}
         className="w-full h-full min-h-[400px] rounded-lg"
         style={{ minHeight: '500px' }}
+      />
+      
+      {/* ✅ NEW: 20km radius circles container */}
+      <div 
+        ref={circlesRef}
+        className="absolute inset-0 pointer-events-none"
+        style={{ zIndex: 1 }}
       />
       
       {/* Removed magic wand UI components - replaced with bulk selection system */}
