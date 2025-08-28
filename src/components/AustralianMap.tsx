@@ -847,7 +847,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     const popupId = `facility-popup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     // Determine if this facility should show "See Details" button
-    const showSeeDetailsButton = typeKey === 'residential' || typeKey === 'home' || typeKey === 'multipurpose_others' || typeKey === 'retirement';
+    const showSeeDetailsButton = typeKey === 'residential' || typeKey === 'home';
 
     // Create beautiful popup with save button  
     const popup = new maptilersdk.Popup({ 

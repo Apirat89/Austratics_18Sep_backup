@@ -213,6 +213,20 @@ export default function HomecarePage() {
     }
   }, [searchParams, savedSA2Regions.length, selectedSA2Filter]); // Use .length for stable dependency
 
+  // Handle address URL parameter for direct navigation from maps page
+  useEffect(() => {
+    if (!searchParams || urlParamProcessedRef.current) return;
+    
+    const addressParam = searchParams.get('address');
+    if (addressParam) {
+      // Always populate the search bar with the facility address from URL
+      setSearchTerm(addressParam);
+      console.log('🏠 HOMECARE: Auto-populated search bar from address URL:', addressParam);
+      
+      urlParamProcessedRef.current = true; // Mark as processed
+    }
+  }, [searchParams]);
+
   // DEBUG: Monitor selectedForComparison state changes
   useEffect(() => {
     console.log('🔍 COMPARISON STATE CHANGE DETECTED');

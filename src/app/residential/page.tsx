@@ -491,6 +491,20 @@ export default function ResidentialPage() {
     }
   }, [searchParams, savedSA2Regions.length, selectedSA2Filter]); // Use .length for stable dependency
 
+  // Handle address URL parameter for direct navigation from maps page
+  useEffect(() => {
+    if (!searchParams || urlParamProcessedRef.current) return;
+    
+    const addressParam = searchParams.get('address');
+    if (addressParam) {
+      // Always populate the search bar with the facility address from URL
+      setSearchTerm(addressParam);
+      console.log('Auto-populated search bar from address URL:', addressParam);
+      
+      urlParamProcessedRef.current = true; // Mark as processed
+    }
+  }, [searchParams]);
+
   // TEXT-FIRST search resolution effect - prioritizes text search with location enhancement
   useEffect(() => {
     const performTextFirstSearch = async (term: string) => {

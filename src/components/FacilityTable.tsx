@@ -541,10 +541,6 @@ const FacilityTable: React.FC<FacilityTableProps> = ({
                     <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-medium text-gray-700 border-b md:table-cell hidden">Address</th>
                     <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-medium text-gray-700 border-b md:table-cell hidden">Capacity</th>
                     <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-medium text-gray-700 border-b lg:table-cell hidden">Provider</th>
-                    <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-medium text-gray-700 border-b lg:table-cell hidden">Phone</th>
-                    <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-medium text-gray-700 border-b xl:table-cell hidden">Planning Region</th>
-                    <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-medium text-gray-700 border-b xl:table-cell hidden">Remoteness</th>
-                    <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-medium text-gray-700 border-b xl:table-cell hidden">SA2 Area</th>
                     <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-medium text-gray-700 border-b">Actions</th>
                   </tr>
                 </thead>
@@ -573,18 +569,6 @@ const FacilityTable: React.FC<FacilityTableProps> = ({
                       </td>
                       <td className="p-2 sm:p-3 border-b lg:table-cell hidden">
                         <div className="text-xs sm:text-sm text-gray-900">{facility.Provider_Name}</div>
-                      </td>
-                      <td className="p-2 sm:p-3 border-b lg:table-cell hidden">
-                        <div className="text-xs sm:text-sm text-gray-900">{facility.Phone || 'Not provided'}</div>
-                      </td>
-                      <td className="p-2 sm:p-3 border-b xl:table-cell hidden">
-                        <div className="text-xs sm:text-sm text-gray-900">{facility.F2019_Aged_Care_Planning_Region}</div>
-                      </td>
-                      <td className="p-2 sm:p-3 border-b xl:table-cell hidden">
-                        <div className="text-xs sm:text-sm text-gray-900">{facility.ABS_Remoteness}</div>
-                      </td>
-                      <td className="p-2 sm:p-3 border-b xl:table-cell hidden">
-                        <div className="text-xs sm:text-sm text-gray-900">{facility.F2016_SA2_Name}</div>
                       </td>
                       <td className="p-2 sm:p-3 border-b">
                         <FacilityTableActions 

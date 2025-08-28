@@ -19,6 +19,9 @@ export const FacilityTableActions: React.FC<FacilityTableActionsProps> = React.m
   const [isSaved, setIsSaved] = useState<boolean | null>(null); // null = loading/unknown
   const [isOperating, setIsOperating] = useState(false);
 
+  // Check if detail button should be enabled based on facility type
+  const isDetailButtonEnabled = facility.facilityType === 'residential' || facility.facilityType === 'home';
+
   // Single initialization effect - only check saved state on mount
   useEffect(() => {
     const checkInitialSavedState = async () => {
@@ -82,9 +85,18 @@ export const FacilityTableActions: React.FC<FacilityTableActionsProps> = React.m
   return (
     <div className="flex gap-1 sm:gap-2">
       <button
-        onClick={() => onFacilityDetails(facility)}
-        disabled={isLoading}
-        className="bg-blue-600 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        onClick={() => isDetailButtonEnabled ? onFacilityDetails(facility) : undefined}
+        disabled={isLoading || !isDetailButtonEnabled}
+        className={`px-2 sm:px-3 py-1 rounded text-xs sm:text-sm transition-colors ${
+          isDetailButtonEnabled
+            ? 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
+            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+        }`}
+        title={
+          !isDetailButtonEnabled 
+            ? 'Details only available for Residential Care and Home Care facilities'
+            : 'View facility details'
+        }
       >
         Details
       </button>

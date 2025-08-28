@@ -431,6 +431,17 @@ export default function MapsPage() {
     window.history.pushState({}, '', url.toString());
   }, []);
 
+  // Function to navigate to facility details page with address filter
+  const navigateToFacilityDetails = useCallback((facility: FacilityData) => {
+    if (facility.facilityType === 'residential') {
+      // Navigate to residential page with address filter
+      router.push(`/residential?address=${encodeURIComponent(facility.Physical_Address)}`);
+    } else if (facility.facilityType === 'home') {
+      // Navigate to homecare page with address filter
+      router.push(`/homecare?address=${encodeURIComponent(facility.Physical_Address)}`);
+    }
+  }, [router]);
+
   // Function to handle facility table selection (for demonstration)
   const handleFacilityTableSelection = useCallback((facilities: FacilityData[]) => {
     setSelectedFacilities(facilities);
@@ -1475,7 +1486,7 @@ export default function MapsPage() {
           {/* Facility Table - Modal */}
           <FacilityTable
             facilities={selectedFacilities}
-            onFacilityDetails={openFacilityDetails}
+            onFacilityDetails={navigateToFacilityDetails}
             onSaveFacility={async (facility) => {
               if (!user?.id) {
                 alert('Please sign in to save facilities');
@@ -1613,7 +1624,7 @@ export default function MapsPage() {
                 heatmapSubcategory={heatmapSubcategory}
                 onHeatmapMinMaxCalculated={handleHeatmapMinMaxCalculated}
                 onRankedDataCalculated={handleRankedDataCalculated}
-                onFacilityDetailsClick={openFacilityDetails}
+                onFacilityDetailsClick={navigateToFacilityDetails}
                 loadingComplete={loadingComplete}
                 onFacilityTableSelection={handleFacilityTableSelection}
                 onHeatmapRenderComplete={() => {
