@@ -604,7 +604,7 @@ RESPONSE:`;
         throw new Error('No response generated from Gemini');
       }
 
-      let responseText = result.response.text();
+      const responseText = result.response.text();
       return responseText;
     } catch (error) {
       console.error('Error generating contextual answer:', error);
@@ -892,7 +892,7 @@ RESPONSE:`;
         throw new Error('No response generated from Gemini');
       }
 
-      let responseText = result.response.text();
+      const responseText = result.response.text();
 
       // No need to validate page numbers since we don't use them
 

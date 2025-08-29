@@ -213,7 +213,7 @@ class HybridFacilityService {
     if (!serviceName) return null;
 
     // Try exact match first
-    let match = residentialMap.get(serviceName);
+    const match = residentialMap.get(serviceName);
     if (match) {
       return match;
     }

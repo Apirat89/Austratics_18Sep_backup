@@ -99,8 +99,9 @@ interface AustralianMapProps {
   onHeatmapRenderComplete?: () => void;
   // ✅ NEW: Facility table selection callback to replace popup system
   onFacilityTableSelection?: (facilities: FacilityData[]) => void;
-  // ✅ NEW: 20km radius feature - circle visibility control (always enabled)
-  showRadius?: boolean;
+  // ✅ NEW: Enhanced radius feature with dropdown selector and facility type integration
+  radiusType?: 'off' | 'urban' | 'suburban' | 'rural';
+  bulkSelectionTypes?: FacilityTypes;
 }
 
 // Expose methods to parent component
@@ -250,7 +251,8 @@ const getFacilityTypeColor = (facilityType: string): string => {
 };
 
 // ✅ NEW: 20km radius feature - calculate 20km radius in pixels
-const calculate20kmRadiusInPixels = (map: maptilersdk.Map | null, centerLat: number): number => {
+// ✅ NEW: Enhanced circle radius calculation for dynamic distances (20km/30km/60km)
+const calculateRadiusInPixels = (map: maptilersdk.Map | null, centerLat: number, radiusKm: number): number => {
   if (!map) return 0;
   
   const zoom = map.getZoom();
@@ -261,8 +263,8 @@ const calculate20kmRadiusInPixels = (map: maptilersdk.Map | null, centerLat: num
   const latRadians = (centerLat * Math.PI) / 180;
   const latitudeAdjustment = Math.cos(latRadians);
   
-  const radius20kmMeters = 20000; // 20km in meters
-  return radius20kmMeters * pixelsPerMeter * latitudeAdjustment;
+  const radiusMeters = radiusKm * 1000; // Convert km to meters
+  return radiusMeters * pixelsPerMeter * latitudeAdjustment;
 };
 
 const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
@@ -285,7 +287,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   loadingComplete = false,
   onHeatmapRenderComplete,
   onFacilityTableSelection,
-  showRadius = false
+  radiusType = 'off',
+  bulkSelectionTypes
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
@@ -3007,7 +3010,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // ✅ NEW: 20km radius feature - Circle rendering system
   const updateRadiusCircles = useCallback(() => {
     const circleContainer = circlesRef.current;
-    if (!circleContainer || !map.current || !showRadius) {
+    const isRadiusActive = radiusType && radiusType !== 'off';
+    
+    if (!circleContainer || !map.current || !isRadiusActive) {
       // Clear existing circles when not showing
       if (circleContainer) {
         circleContainer.innerHTML = '';
@@ -3017,16 +3022,38 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
 
     // Get current map bounds to only show circles for visible facilities
     const bounds = map.current.getBounds();
+    
+    // Get radius distance based on current selection
+    const getRadiusDistance = (type: string): number => {
+      const mapping = { off: 0, urban: 20, suburban: 30, rural: 60 };
+      return mapping[type as keyof typeof mapping] || 0;
+    };
+    
+    const radiusKm = getRadiusDistance(radiusType || 'off');
+    if (radiusKm === 0) {
+      // Clear circles for 'off' state
+      circleContainer.innerHTML = '';
+      return;
+    }
+
     const facilitiesToShow = allFacilitiesRef.current?.filter(facility => {
       if (!facility.Latitude || !facility.Longitude) return false;
       
       // Check if facility is within current map bounds
-      return (
+      const inViewport = (
         facility.Longitude >= bounds.getWest() &&
         facility.Longitude <= bounds.getEast() &&
         facility.Latitude >= bounds.getSouth() &&
         facility.Latitude <= bounds.getNorth()
       );
+      
+      // ✅ NEW: Check if facility type is selected (integration with facility checkboxes)
+      if (!inViewport) return false;
+      
+      const facilityTypeKey = facility.facilityType as keyof FacilityTypes;
+      const isTypeSelected = bulkSelectionTypes?.[facilityTypeKey] === true;
+      
+      return isTypeSelected;
     }) || [];
 
     // Clear existing circles
@@ -3052,8 +3079,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
       const pixelCoords = map.current?.project([lng, lat]);
       if (!pixelCoords) return;
       
-      // Calculate 20km radius in pixels for this latitude
-      const radiusPixels = calculate20kmRadiusInPixels(map.current, lat);
+      // ✅ UPDATED: Calculate dynamic radius in pixels for this latitude
+      const radiusPixels = calculateRadiusInPixels(map.current, lat, radiusKm);
       
       // Create circle element
       const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -3070,19 +3097,20 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     });
 
     circleContainer.appendChild(svg);
-  }, [showRadius]);
+  }, [radiusType, bulkSelectionTypes]);
 
   // ✅ NEW: Update circles when relevant state changes
   useEffect(() => {
     updateRadiusCircles();
-  }, [showRadius, updateRadiusCircles]);
+  }, [radiusType, updateRadiusCircles]);
 
   // ✅ NEW: Update circles when map moves or zooms
   useEffect(() => {
     if (!map.current) return;
 
     const handleMapUpdate = () => {
-      if (showRadius) {
+      const isRadiusActive = radiusType && radiusType !== 'off';
+      if (isRadiusActive) {
         updateRadiusCircles();
       }
     };
@@ -3096,7 +3124,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         map.current.off('zoom', handleMapUpdate);
       }
     };
-  }, [showRadius, updateRadiusCircles]);
+  }, [radiusType, updateRadiusCircles]);
 
   // Function to clear last search result (called when search is explicitly cancelled)
   const clearLastSearchResult = useCallback(() => {

@@ -97,6 +97,16 @@ export default function MapsPage() {
   const [stylesPreloaded, setStylesPreloaded] = useState(false);
   const [stylePreloadProgress, setStylePreloadProgress] = useState({ current: 0, total: 5 });
   
+  // ✅ NEW: Enhanced radius feature with multiple distance options
+  type RadiusType = 'off' | 'urban' | 'suburban' | 'rural';
+  const [radiusType, setRadiusType] = useState<RadiusType>('urban'); // Default to Urban (20km)
+
+  // Radius distance mapping
+  const getRadiusDistance = (type: RadiusType): number => {
+    const mapping = { off: 0, urban: 20, suburban: 30, rural: 60 };
+    return mapping[type];
+  };
+  
   // Facility Table state
   const [tableVisible, setTableVisible] = useState(false);
   const [selectedFacilities, setSelectedFacilities] = useState<FacilityData[]>([]);
@@ -118,8 +128,7 @@ export default function MapsPage() {
   // Data Layers state
   const [dataLayersExpanded, setDataLayersExpanded] = useState(false);
   
-  // ✅ NEW: 20km radius feature state (always enabled)
-  const [showRadius, setShowRadius] = useState(false);
+
   
   // Flag to control when map highlights should update the search bar
   const shouldUpdateSearchFromHighlight = useRef<boolean>(true);
@@ -1033,10 +1042,10 @@ export default function MapsPage() {
     }, 0);
   }, []);
 
-  // ✅ NEW: 20km radius feature - toggle radius visibility (always enabled)
-  const handleRadiusToggle = useCallback(() => {
-    setShowRadius(!showRadius);
-  }, [showRadius]);
+  // ✅ NEW: Enhanced radius feature - dropdown selector with facility type integration
+  const handleRadiusTypeChange = useCallback((newType: RadiusType) => {
+    setRadiusType(newType);
+  }, []);
 
   if (isLoading) {
     return (
@@ -1267,35 +1276,22 @@ export default function MapsPage() {
                       </button>
                     </div>
 
-                                         {/* ✅ NEW: 20km Radius Toggle Button */}
+                                         {/* ✅ NEW: Enhanced Radius Selector Dropdown */}
                      <div className="mt-2">
-                      <button
-                        onClick={handleRadiusToggle}
-                        className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
-                          showRadius
-                            ? 'bg-orange-600 text-white hover:bg-orange-700'
-                            : 'bg-orange-600 text-white hover:bg-orange-700'
-                        }`}
-                        title={
-                          showRadius
-                            ? 'Hide 20km radius circles around facilities'
-                            : 'Show 20km radius circles around facilities'
-                        }
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Radius Display
+                      </label>
+                      <select
+                        value={radiusType}
+                        onChange={(e) => handleRadiusTypeChange(e.target.value as RadiusType)}
+                        className="w-full py-2.5 px-3 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:border-gray-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors"
+                        title="Select radius distance to display around facilities"
                       >
-                        <div className="flex items-center gap-2">
-                          <svg 
-                            className="w-4 h-4" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            strokeWidth={2} 
-                            viewBox="0 0 24 24"
-                          >
-                            <circle cx="12" cy="12" r="10" strokeDasharray="3,2" />
-                            <circle cx="12" cy="12" r="2" fill="currentColor" />
-                          </svg>
-                          <span>{showRadius ? 'Hide 20km Radius' : 'Show 20km Radius'}</span>
-                        </div>
-                      </button>
+                        <option value="off">Off</option>
+                        <option value="urban">Urban (20km)</option>
+                        <option value="suburban">Suburban (30km)</option>
+                        <option value="rural">Rural (60km)</option>
+                      </select>
                     </div>
                   </div>
                 )}
@@ -1666,7 +1662,8 @@ export default function MapsPage() {
                 onFacilityDetailsClick={navigateToFacilityDetails}
                 loadingComplete={loadingComplete}
                 onFacilityTableSelection={handleFacilityTableSelection}
-                showRadius={showRadius}
+                radiusType={radiusType}
+                bulkSelectionTypes={bulkSelectionTypes}
                 onHeatmapRenderComplete={() => {
                   console.log('🎉 Maps Page: Heatmap render complete, calling DataLayers callback');
                   // ✅ FIXED: Add safety check and async execution to prevent setState during render

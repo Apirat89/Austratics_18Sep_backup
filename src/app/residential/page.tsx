@@ -1128,7 +1128,7 @@ export default function ResidentialPage() {
     const isPositive = variance > 0;
     const isNeutral = Math.abs(variance) < 2; // Within 2% is neutral
     
-    let colorClass = isNeutral ? 'text-gray-600' : 
+    const colorClass = isNeutral ? 'text-gray-600' : 
                      isPositive ? 'text-red-600' : 'text-green-600';
     
     return (
