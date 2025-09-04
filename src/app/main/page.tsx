@@ -199,7 +199,7 @@ export default function MainPage() {
         {/* Prompt Area */}
         <PromptArea 
           onSubmit={handlePromptSubmit} 
-          placeholder={isSubmitting ? "Sending your message..." : "Need a hand? Ask me anything, mate. (Ask FAQ)"}
+          placeholder={isSubmitting ? "Sending your message..." : "Please submit your feedback, requests for support, or requests for additional features here"}
         />
       </div>
     </div>
