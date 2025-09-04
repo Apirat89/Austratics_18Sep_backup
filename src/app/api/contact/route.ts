@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import emailService from '../../../lib/emailService';
-import { getCurrentUser } from '../../../lib/auth';
+import { createServerSupabaseClient } from '../../../lib/supabase';
 
 // Rate limiting store (in production, use Redis or database)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
@@ -139,10 +139,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<ContactRe
   const clientIP = getClientIP(request);
   
   try {
-    // Check user authentication
-    const currentUser = await getCurrentUser();
+    // Check user authentication (server-side)
+    const supabase = await createServerSupabaseClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     
-    if (!currentUser || !currentUser.email) {
+    if (authError || !user || !user.email) {
       return NextResponse.json(
         {
           success: false,
@@ -214,7 +215,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ContactRe
     
     // Sanitize input and use authenticated user's email
     const contactData: ContactRequest = {
-      email: currentUser.email!, // We've already verified this exists above
+      email: user.email!, // We've already verified this exists above
       message: sanitizeInput(body.message),
       category: body.category ? sanitizeInput(body.category) : undefined
     };

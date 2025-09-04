@@ -23,6 +23,9 @@ export default function MainPage() {
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [navigating, setNavigating] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitMessage, setSubmitMessage] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -89,10 +92,48 @@ export default function MainPage() {
     router.push(card.route);
   };
 
-  const handlePromptSubmit = (message: string) => {
-    console.log('Main prompt submitted:', message);
-    // Handle main page queries here
-    // You could integrate with an AI service to handle general queries
+  const handlePromptSubmit = async (message: string) => {
+    if (isSubmitting) return; // Prevent double submission
+    
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    setSubmitMessage('');
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: message,
+          category: 'Main Page Feedback'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setSubmitMessage(data.message || 'Thank you for your message!');
+        // Auto-dismiss success message after 5 seconds
+        setTimeout(() => setSubmitStatus('idle'), 5000);
+      } else {
+        setSubmitStatus('error');
+        if (response.status === 401) {
+          setSubmitMessage('Please sign in to send feedback.');
+        } else if (response.status === 429) {
+          setSubmitMessage('Too many requests. Please try again later.');
+        } else {
+          setSubmitMessage(data.message || 'Failed to send message. Please try again.');
+        }
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+      setSubmitMessage('Network error. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isLoading) {
@@ -146,8 +187,20 @@ export default function MainPage() {
               ))}
         </div>
 
+        {/* Status Message */}
+        {submitStatus !== 'idle' && (
+          <div className={`mb-4 p-4 rounded-lg ${
+            submitStatus === 'success' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700'
+          }`}>
+            {submitMessage}
+          </div>
+        )}
+
         {/* Prompt Area */}
-        <PromptArea onSubmit={handlePromptSubmit} />
+        <PromptArea 
+          onSubmit={handlePromptSubmit} 
+          placeholder={isSubmitting ? "Sending your message..." : "Need a hand? Ask me anything, mate. (Ask FAQ)"}
+        />
       </div>
     </div>
   );
