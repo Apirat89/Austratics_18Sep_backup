@@ -66,3 +66,5 @@ tasks/ ship-fast-ts/
 Maps_ABS_CSV/*.geojson
 public/maps/*.geojson
 tmp/
+# Temporary reset token storage for development
+.tmp-reset-tokens.json

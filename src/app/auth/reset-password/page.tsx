@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import PasswordStrengthIndicator from '../../../components/PasswordStrengthIndicator';
+import PasswordInput from '../../../components/PasswordInput';
 
 export default function ResetPassword() {
   const [formData, setFormData] = useState({
@@ -50,9 +51,11 @@ export default function ResetPassword() {
     // Set random background photo
     const randomPhoto = backgroundPhotos[Math.floor(Math.random() * backgroundPhotos.length)];
     setBackgroundPhoto(randomPhoto);
+  }, []);
 
+  useEffect(() => {
     // Get token from URL parameters
-    const token = searchParams.get('token');
+    const token = searchParams?.get('token');
     
     if (token) {
       setResetToken(token);
@@ -228,37 +231,25 @@ export default function ResetPassword() {
 
             <form className="space-y-6" onSubmit={handleSubmit}>
               {/* New Password Input */}
-              <div className="flex flex-col">
-                <label className="text-[#0d141c] text-sm font-medium mb-2">
-                  New Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder="Enter your new password"
-                  className="w-full resize-none overflow-hidden rounded-xl text-[#0d141c] focus:outline-0 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 border border-gray-200 bg-blue-50/30 focus:bg-white focus:border-blue-500 h-14 placeholder:text-[#49719c] p-4 text-base font-normal leading-normal transition-all duration-200"
-                  required
-                />
-                <PasswordStrengthIndicator password={formData.password} />
-              </div>
+              <PasswordInput
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter your new password"
+                label="New Password"
+                required
+              />
+              <PasswordStrengthIndicator password={formData.password} />
 
               {/* Confirm Password Input */}
-              <div className="flex flex-col">
-                <label className="text-[#0d141c] text-sm font-medium mb-2">
-                  Confirm New Password
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  placeholder="Confirm your new password"
-                  className="w-full resize-none overflow-hidden rounded-xl text-[#0d141c] focus:outline-0 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 border border-gray-200 bg-blue-50/30 focus:bg-white focus:border-blue-500 h-14 placeholder:text-[#49719c] p-4 text-base font-normal leading-normal transition-all duration-200"
-                  required
-                />
-              </div>
+              <PasswordInput
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                placeholder="Confirm your new password"
+                label="Confirm New Password"
+                required
+              />
 
               {/* Reset Password Button */}
               <button

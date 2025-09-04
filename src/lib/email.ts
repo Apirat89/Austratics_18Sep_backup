@@ -1,6 +1,4 @@
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import nodemailer from 'nodemailer';
 
 export interface PasswordResetEmailData {
   to: string;
@@ -109,35 +107,12 @@ Best regards,
 Aged Care Analytics Team
   `;
 
-  try {
-    const result = await resend.emails.send({
-      from: 'Aged Care Analytics <noreply@your-domain.com>', // Replace with your domain
-      to: [to],
-      subject: '🔒 Password Reset Request - Aged Care Analytics',
-      html: emailHtml,
-      text: emailText,
-    });
-
-    return { success: true, messageId: result.data?.id };
-  } catch (error) {
-    console.error('Email sending error:', error);
-    return { success: false, error: error };
-  }
-}
-
-// Alternative: Nodemailer for any SMTP provider (Gmail, Outlook, etc.)
-export async function sendPasswordResetEmailSMTP({ to, resetToken, resetUrl, userEmail }: PasswordResetEmailData) {
-  // This is an alternative if you prefer to use your own SMTP server
-  // You can uncomment and configure this if you want to use Gmail/Outlook instead of Resend
-  
-  /*
-  import nodemailer from 'nodemailer';
-  
-  const transporter = nodemailer.createTransporter({
-    service: 'gmail', // or 'outlook', 'yahoo', etc.
+  // Gmail SMTP Configuration
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD, // Use app password for Gmail
+      pass: process.env.EMAIL_PASSWORD,
     },
   });
 
@@ -156,5 +131,4 @@ export async function sendPasswordResetEmailSMTP({ to, resetToken, resetUrl, use
     console.error('Email sending error:', error);
     return { success: false, error: error };
   }
-  */
 } 

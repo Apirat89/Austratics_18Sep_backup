@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import PasswordInput from '../components/PasswordInput';
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -199,29 +200,18 @@ export default function Home() {
               </div>
 
               {/* Password Input */}
-              <div>
-                <label style={{ color: '#0d141c', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem', display: 'block' }}>
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder="Enter your password"
-                  style={{
-                    width: '100%',
-                    height: '3.5rem',
-                    padding: '1rem',
-                    borderRadius: '0.75rem',
-                    border: '1px solid #d1d5db',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    fontSize: '1rem',
-                    transition: 'all 0.2s'
-                  }}
-                  required
-                />
-              </div>
+              <PasswordInput
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter your password"
+                label="Password"
+                required
+                className="w-full h-14 px-4 pr-12 rounded-xl border border-gray-300 text-base transition-all duration-200"
+                style={{
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                }}
+              />
 
               {/* Remember Me & Forgot Password */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

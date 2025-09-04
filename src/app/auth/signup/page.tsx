@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import PasswordStrengthIndicator from '../../../components/PasswordStrengthIndicator';
+import PasswordInput from '../../../components/PasswordInput';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -203,37 +204,25 @@ export default function SignUp() {
               </div>
 
               {/* Password Input */}
-              <div className="flex flex-col">
-                <label className="text-[#0d141c] text-sm font-medium mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder="Enter your password"
-                  className="w-full resize-none overflow-hidden rounded-xl text-[#0d141c] focus:outline-0 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 border border-gray-200 bg-blue-50/30 focus:bg-white focus:border-blue-500 h-14 placeholder:text-[#49719c] p-4 text-base font-normal leading-normal transition-all duration-200"
-                  required
-                />
-                <PasswordStrengthIndicator password={formData.password} />
-              </div>
+              <PasswordInput
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter your password"
+                label="Password"
+                required
+              />
+              <PasswordStrengthIndicator password={formData.password} />
 
               {/* Confirm Password Input */}
-              <div className="flex flex-col">
-                <label className="text-[#0d141c] text-sm font-medium mb-2">
-                  Confirm Password
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  placeholder="Confirm your password"
-                  className="w-full resize-none overflow-hidden rounded-xl text-[#0d141c] focus:outline-0 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 border border-gray-200 bg-blue-50/30 focus:bg-white focus:border-blue-500 h-14 placeholder:text-[#49719c] p-4 text-base font-normal leading-normal transition-all duration-200"
-                  required
-                />
-              </div>
+              <PasswordInput
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                placeholder="Confirm your password"
+                label="Confirm Password"
+                required
+              />
 
               {/* Terms & Conditions */}
               <div className="flex items-start">
