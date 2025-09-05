@@ -326,9 +326,9 @@ export class RegulationChatService {
         console.log(`📄 Not a fee query - using vector search`);
       }
 
-      // Step 4: Search for relevant documents (fallback to vector search)
-      const citations = await this.searchRelevantDocuments(question, 7);
-      console.log(`📄 Found ${citations.length} relevant document sections`);
+      // Step 4: Search for relevant documents using ultimate retrieval pipeline
+      const citations = await this.searchRelevantDocumentsUltimate(question, 8);
+      console.log(`📄 Ultimate regulatory search found ${citations.length} relevant document sections`);
 
       if (citations.length === 0) {
         const response: ChatResponse = {
@@ -587,14 +587,15 @@ CITATION EXAMPLES:
 
 RESPONSE:`;
 
-      // Use Gemini 2.0 Flash with optimized parameters for conversation
+      // Use Gemini 2.5 Flash with optimized parameters for conversation and enhanced reasoning
       const model = this.genAI.getGenerativeModel({ 
-        model: 'gemini-2.0-flash-exp',
+        model: 'gemini-2.5-flash',
         generationConfig: {
-          temperature: 0.05, // Slightly higher for more natural conversation
-          maxOutputTokens: 2000, // Increased for conversational responses
-          topP: 0.8,
-          topK: 20
+          temperature: 0.05, // Low for legal accuracy while allowing natural conversation
+          maxOutputTokens: 3000, // Increased for comprehensive legal responses with all validation steps
+          topP: 0.85, // Slightly higher for better legal reasoning diversity  
+          topK: 25 // Increased for more nuanced legal terminology selection
+          // Note: Thinking budget parameter will be added when SDK supports it
         }
       });
 
@@ -708,6 +709,92 @@ RESPONSE:`;
       .trim();
     
     return normalized.substring(0, 100); // Use first 100 chars as hash
+  }
+
+  // =============================================================================
+  // HYBRID SEARCH METHODS (SEMANTIC + LEXICAL) - REGULATORY DOCUMENTS
+  // =============================================================================
+
+  /**
+   * Hybrid search combining vector similarity with full-text search for regulatory documents
+   */
+  private async searchRelevantDocumentsHybrid(
+    query: string, 
+    limit = 8,
+    semanticWeight = 0.7,
+    lexicalWeight = 0.3
+  ): Promise<DocumentCitation[]> {
+    try {
+      console.log(`🔀 Starting hybrid regulatory search for: "${query}"`);
+      
+      // Generate embedding for the query
+      const queryEmbedding = await this.getPdfProcessor().generateEmbedding(query);
+      
+      // Perform hybrid search using RPC function
+      const { data, error } = await this.supabase.rpc('match_documents_hybrid', {
+        query_embedding: queryEmbedding,
+        lex_query: query,
+        match_count: limit * 2, // Get more candidates for reranking
+        semantic_weight: semanticWeight,
+        lexical_weight: lexicalWeight
+      });
+
+      if (error) {
+        throw new Error(`Regulatory hybrid search error: ${error.message}`);
+      }
+
+      console.log(`📊 Hybrid regulatory search returned ${data?.length || 0} candidates`);
+      
+      // Transform results into citation format
+      const citations: DocumentCitation[] = (data || []).map((chunk: any) => ({
+        document_name: chunk.document_name,
+        document_type: chunk.document_type || 'Regulatory',
+        section_title: chunk.section_title,
+        page_number: chunk.page_number,
+        content_snippet: chunk.content,
+        similarity_score: chunk.hybrid_score, // Use hybrid score as similarity
+        actual_pdf_pages: chunk.actual_pdf_pages,
+        display_title: documentTitleService.getDocumentTitle(chunk.document_name)
+      }));
+
+      console.log(`⭐ Hybrid regulatory search completed with ${citations.length} results`);
+      
+      // Validate citations to prevent phantom page numbers
+      return this.validateCitations(citations);
+    } catch (error) {
+      console.error('Error in hybrid regulatory search:', error);
+      // Fallback to basic search if hybrid fails
+      console.log('🔄 Falling back to basic regulatory search');
+      return this.searchRelevantDocuments(query, limit);
+    }
+  }
+
+  /**
+   * Ultimate regulatory search with hybrid → basic fallback
+   */
+  private async searchRelevantDocumentsUltimate(query: string, limit = 8): Promise<DocumentCitation[]> {
+    try {
+      console.log(`🚀 Starting ultimate regulatory search pipeline for: "${query}"`);
+      
+      // Try hybrid search first
+      const hybridResults = await this.searchRelevantDocumentsHybrid(query, limit);
+      
+      if (hybridResults.length > 0) {
+        console.log(`✅ Ultimate regulatory search completed with ${hybridResults.length} hybrid results`);
+        return hybridResults;
+      }
+      
+      // Fallback to basic search
+      console.log('🔄 Hybrid returned no results, trying basic regulatory search');
+      const basicResults = await this.searchRelevantDocuments(query, limit);
+      console.log(`✅ Ultimate regulatory search completed with ${basicResults.length} basic results`);
+      
+      return basicResults;
+    } catch (error) {
+      console.error('Error in ultimate regulatory search:', error);
+      // Final fallback to basic search
+      return this.searchRelevantDocuments(query, limit);
+    }
   }
 
   /**
@@ -875,9 +962,9 @@ CITATION EXAMPLES:
 
 RESPONSE:`;
 
-      // Use Gemini 2.0 Flash with optimized legal parameters
+      // Use Gemini 2.5 Flash with optimized legal parameters
       const model = this.genAI.getGenerativeModel({ 
-        model: 'gemini-2.0-flash-exp',
+        model: 'gemini-2.5-flash',
         generationConfig: {
           temperature: 0.03, // Even lower temperature for maximum precision
           maxOutputTokens: 1800, // Sufficient for complete legal content

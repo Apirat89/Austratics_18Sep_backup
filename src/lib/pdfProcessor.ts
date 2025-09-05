@@ -309,7 +309,7 @@ export class PDFProcessor {
 
   /**
    * Generate embeddings for text using Gemini's embedding model
-   * NOTE: For the chatbot, we'll use gemini-2.0-flash-exp for the best chat performance
+   * NOTE: For the chatbot, we'll use gemini-2.5-flash for the best chat performance
    */
   async generateEmbedding(text: string): Promise<number[]> {
     try {

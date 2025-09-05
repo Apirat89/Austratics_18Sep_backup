@@ -2,54 +2,41 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, ArrowLeft, History, X, Plus, Copy, RotateCcw, Check } from 'lucide-react';
+import { HelpCircle, ArrowLeft, History, X, Bookmark, Plus, Copy, RotateCcw, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import RegulationHistoryPanel from '@/components/regulation/RegulationHistoryPanel';
+import FAQHistoryPanel from '@/components/faq/FAQHistoryPanel';
 
 import { getCurrentUser } from '@/lib/auth';
 import { renderMarkdown } from '@/lib/markdownRenderer';
 import {
-  RegulationSearchHistoryItem,
-  RegulationBookmark,
-  UnifiedHistoryItem,
-  UnifiedBookmark,
-  saveRegulationSearchToHistory,
-  getUnifiedSearchHistory,
-  getUnifiedBookmarks,
-  deleteUnifiedHistoryItem,
-  deleteUnifiedBookmark,
-  clearUnifiedSearchHistory,
-  clearUnifiedBookmarks,
-  saveRegulationBookmark,
-  isRegulationBookmarkNameTaken,
-  getRegulationBookmarkCount,
-  adaptUnifiedHistoryToOld,
-  adaptUnifiedBookmarksToOld
-} from '@/lib/regulationHistory';
+  FAQSearchHistoryItem,
+  FAQBookmark,
+  saveFAQSearchToHistory,
+  getFAQSearchHistory,
+  getFAQBookmarks,
+  deleteFAQSearchHistoryItem,
+  clearFAQSearchHistory,
+  deleteFAQBookmark,
+  clearFAQBookmarks,
+  saveFAQBookmark,
+  isFAQBookmarkNameTaken,
+  getFAQBookmarkCount
+} from '@/lib/faqHistory';
+import { FAQCitation } from '@/types/faq';
 
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-  citations?: DocumentCitation[];
+  citations?: FAQCitation[];
   isLoading?: boolean;
-}
-
-interface DocumentCitation {
-  document_name: string;
-  document_type: string;
-  section_title?: string;
-  page_number: number;
-  content_snippet: string;
-  similarity_score: number;
-  display_title?: string; // Professional document title for display
 }
 
 interface ChatResponse {
   message: string;
-  citations: DocumentCitation[];
+  citations: FAQCitation[];
   context_used: number;
   processing_time: number;
   conversation_id?: number;
@@ -75,16 +62,21 @@ export default function FAQPage() {
     {
       id: '1',
       role: 'assistant',
-      content: `👋 Welcome to the FAQ (Chatbot)!
+      content: `🤝 Welcome to the Giantash FAQ Assistant!
 
-I can help you find answers to frequently asked questions about:
-• **Home Care** features and functionality
-• **Residential Care** search and comparison tools
-• **Maps** navigation and facility information
-• **News** updates and filtering options
-• **SA2 Analytics** and demographic insights
+I'm here to help you learn how to use the Giantash Aged Care Analytics platform effectively. I can provide step-by-step guidance from our user guides:
 
-Ask me anything about how to use the platform features, navigate the interface, or understand the data and tools available. I'll provide detailed answers to help you get the most out of the system.`,
+📋 **Available User Guides:**
+• **Home Care** - Search and compare homecare providers
+• **Residential Care** - Find and analyze residential aged care facilities  
+• **Maps Feature** - Navigate facilities using our interactive map
+• **News** - Stay updated with aged care industry news
+• **SA2 Analysis** - Understand demographic and statistical data
+
+**How to get started:**
+Ask me questions like "How do I search for homecare providers?" or "How do I use the maps feature?" and I'll provide clear, step-by-step instructions with references to the relevant user guides.
+
+💡 **Tip:** Be specific about which feature you need help with for the most accurate guidance!`,
       timestamp: new Date('2024-01-01T00:00:00Z'),
       citations: []
     }
@@ -94,10 +86,8 @@ Ask me anything about how to use the platform features, navigate the interface, 
   const [isLoading, setIsLoading] = useState(false);
   const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(true);
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
-  const [searchHistory, setSearchHistory] = useState<RegulationSearchHistoryItem[]>([]);
-  const [bookmarks, setBookmarks] = useState<RegulationBookmark[]>([]);
-  const [unifiedHistory, setUnifiedHistory] = useState<UnifiedHistoryItem[]>([]);
-  const [unifiedBookmarks, setUnifiedBookmarks] = useState<UnifiedBookmark[]>([]);
+  const [searchHistory, setSearchHistory] = useState<FAQSearchHistoryItem[]>([]);
+  const [bookmarks, setBookmarks] = useState<FAQBookmark[]>([]);
   const [showBookmarkModal, setShowBookmarkModal] = useState(false);
   const [bookmarkName, setBookmarkName] = useState('');
   const [bookmarkDescription, setBookmarkDescription] = useState('');
@@ -126,19 +116,14 @@ Ask me anything about how to use the platform features, navigate the interface, 
         setCurrentUser(user);
         
         if (user) {
-                  // Load unified search history and bookmarks
-        const [unifiedHistoryData, unifiedBookmarksData] = await Promise.all([
-          getUnifiedSearchHistory(user.id),
-          getUnifiedBookmarks(user.id)
-        ]);
-        
-        // Set unified data
-        setUnifiedHistory(unifiedHistoryData);
-        setUnifiedBookmarks(unifiedBookmarksData);
-        
-        // Convert to old format for backward compatibility with existing UI
-        setSearchHistory(adaptUnifiedHistoryToOld(unifiedHistoryData));
-        setBookmarks(adaptUnifiedBookmarksToOld(unifiedBookmarksData));
+          // Load FAQ search history and bookmarks
+          const [historyData, bookmarksData] = await Promise.all([
+            getFAQSearchHistory(user.id),
+            getFAQBookmarks(user.id)
+          ]);
+          
+          setSearchHistory(historyData);
+          setBookmarks(bookmarksData);
         }
       } catch (error) {
         console.error('Error loading user and data:', error);
@@ -151,53 +136,49 @@ Ask me anything about how to use the platform features, navigate the interface, 
   // Load conversations from API
   const loadConversations = async (): Promise<Conversation[]> => {
     try {
-      const response = await fetch('/api/regulation/chat?action=conversations&limit=20');
+      const response = await fetch('/api/faq/chat?action=get_conversations&limit=20');
       const data = await response.json();
       
       if (data.success) {
-        return data.data;
+        return data.conversations || [];
       } else {
-        console.error('Failed to load conversations:', data.error);
+        console.error('Failed to load FAQ conversations:', data.error);
         return [];
       }
     } catch (error) {
-      console.error('Error loading conversations:', error);
+      console.error('Error loading FAQ conversations:', error);
       return [];
     }
   };
 
-  // Helper function to refresh unified data
-  const refreshUnifiedData = async () => {
+  // Helper function to refresh FAQ data
+  const refreshFAQData = async () => {
     if (currentUser) {
-      const [updatedUnifiedHistory, updatedUnifiedBookmarks] = await Promise.all([
-        getUnifiedSearchHistory(currentUser.id),
-        getUnifiedBookmarks(currentUser.id)
+      const [updatedHistory, updatedBookmarks] = await Promise.all([
+        getFAQSearchHistory(currentUser.id),
+        getFAQBookmarks(currentUser.id)
       ]);
       
-      setUnifiedHistory(updatedUnifiedHistory);
-      setUnifiedBookmarks(updatedUnifiedBookmarks);
-      
-      // Update adapted data for backward compatibility
-      setSearchHistory(adaptUnifiedHistoryToOld(updatedUnifiedHistory));
-      setBookmarks(adaptUnifiedBookmarksToOld(updatedUnifiedBookmarks));
+      setSearchHistory(updatedHistory);
+      setBookmarks(updatedBookmarks);
     }
   };
 
   // Load conversation history
   const loadConversationHistory = async (conversationId: number): Promise<ChatMessage[]> => {
-    console.log('📖 LOAD DEBUG: loadConversationHistory called for conversation:', conversationId);
+    console.log('📖 FAQ LOAD DEBUG: loadConversationHistory called for conversation:', conversationId);
     try {
-      const url = `/api/regulation/chat?action=conversation-history&conversation_id=${conversationId}`;
-      console.log('📖 LOAD DEBUG: fetching URL:', url);
+      const url = `/api/faq/chat?action=get_conversation_messages&conversation_id=${conversationId}`;
+      console.log('📖 FAQ LOAD DEBUG: fetching URL:', url);
       
       const response = await fetch(url);
       const data = await response.json();
       
-      console.log('📖 LOAD DEBUG: API response status:', response.status);
-      console.log('📖 LOAD DEBUG: API response data:', data);
+      console.log('📖 FAQ LOAD DEBUG: API response status:', response.status);
+      console.log('📖 FAQ LOAD DEBUG: API response data:', data);
       
       if (data.success) {
-        const messages = data.data.map((msg: any) => ({
+        const messages = data.messages.map((msg: any) => ({
           id: msg.id.toString(),
           role: msg.role,
           content: msg.content,
@@ -205,14 +186,14 @@ Ask me anything about how to use the platform features, navigate the interface, 
           citations: msg.citations || []
         }));
         
-        console.log('✅ LOAD DEBUG: Successfully mapped', messages.length, 'messages');
+        console.log('✅ FAQ LOAD DEBUG: Successfully mapped', messages.length, 'messages');
         return messages;
       } else {
-        console.error('❌ LOAD DEBUG: Failed to load conversation history:', data.error);
+        console.error('❌ FAQ LOAD DEBUG: Failed to load conversation history:', data.error);
         return [];
       }
     } catch (error) {
-      console.error('❌ LOAD DEBUG: Error loading conversation history:', error);
+      console.error('❌ FAQ LOAD DEBUG: Error loading conversation history:', error);
       return [];
     }
   };
@@ -222,22 +203,21 @@ Ask me anything about how to use the platform features, navigate the interface, 
     if (!currentUser) return;
 
     try {
-      const response = await fetch('/api/regulation/chat', {
+      const response = await fetch('/api/faq/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          action: 'create-conversation',
-          title: 'New FAQ Chat',
-          first_message: 'Hello'
+          action: 'create_conversation',
+          title: 'New FAQ Chat'
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        const newConversationId = data.data.conversation_id;
+        const newConversationId = data.conversation_id;
         setCurrentConversationId(newConversationId);
         
         // Reset to welcome message
@@ -245,63 +225,70 @@ Ask me anything about how to use the platform features, navigate the interface, 
           {
             id: '1',
             role: 'assistant',
-            content: `👋 Welcome to the FAQ (Chatbot)!
+            content: `🤝 Welcome to the Giantash FAQ Assistant!
 
-I can help you find answers to frequently asked questions about:
-• **Home Care** features and functionality
-• **Residential Care** search and comparison tools
-• **Maps** navigation and facility information
-• **News** updates and filtering options
-• **SA2 Analytics** and demographic insights
+I'm here to help you learn how to use the Giantash Aged Care Analytics platform effectively. I can provide step-by-step guidance from our user guides:
 
-Ask me anything about how to use the platform features, navigate the interface, or understand the data and tools available. I'll provide detailed answers to help you get the most out of the system.`,
+📋 **Available User Guides:**
+• **Home Care** - Search and compare homecare providers
+• **Residential Care** - Find and analyze residential aged care facilities  
+• **Maps Feature** - Navigate facilities using our interactive map
+• **News** - Stay updated with aged care industry news
+• **SA2 Analysis** - Understand demographic and statistical data
+
+**How to get started:**
+Ask me questions like "How do I search for homecare providers?" or "How do I use the maps feature?" and I'll provide clear, step-by-step instructions with references to the relevant user guides.
+
+💡 **Tip:** Be specific about which feature you need help with for the most accurate guidance!`,
             timestamp: new Date(),
             citations: []
           }
         ]);
-        
-
         
         // Focus on input
         setTimeout(() => {
           inputRef.current?.focus();
         }, 100);
       } else {
-        console.error('Failed to create conversation:', data.error);
+        console.error('Failed to create FAQ conversation:', data.error);
       }
     } catch (error) {
-      console.error('Error creating conversation:', error);
+      console.error('Error creating FAQ conversation:', error);
     }
   };
 
   // Switch to existing conversation
   const switchToConversation = async (conversationId: number) => {
-    console.log('🔄 SWITCH DEBUG: switchToConversation called with ID:', conversationId);
+    console.log('🔄 FAQ SWITCH DEBUG: switchToConversation called with ID:', conversationId);
     try {
       const history = await loadConversationHistory(conversationId);
-      console.log('📚 SWITCH DEBUG: loaded history length:', history.length);
-      console.log('📚 SWITCH DEBUG: history preview:', history.map(m => ({ role: m.role, preview: m.content.substring(0, 50) + '...' })));
+      console.log('📚 FAQ SWITCH DEBUG: loaded history length:', history.length);
       
       if (history.length > 0) {
         setMessages(history);
-        console.log('✅ SWITCH DEBUG: Messages set from history');
+        console.log('✅ FAQ SWITCH DEBUG: Messages set from history');
       } else {
-        console.log('⚠️ SWITCH DEBUG: No history found, showing welcome message');
+        console.log('⚠️ FAQ SWITCH DEBUG: No history found, showing welcome message');
         // If no history, show welcome message
         setMessages([
           {
             id: '1',
             role: 'assistant',
-            content: `👋 Welcome to the FAQ (Chatbot)!
+            content: `🤝 Welcome to the Giantash FAQ Assistant!
 
-I can help you find answers to frequently asked questions about:
-• **Home Care** features and functionality
-• **Residential Care** search and comparison tools
-• **Maps** navigation and facility information
-• **News** updates and filtering options
-• **SA2 Analytics** and demographic insights
+I'm here to help you learn how to use the Giantash Aged Care Analytics platform effectively. I can provide step-by-step guidance from our user guides:
 
-Ask me anything about how to use the platform features, navigate the interface, or understand the data and tools available. I'll provide detailed answers to help you get the most out of the system.`,
+📋 **Available User Guides:**
+• **Home Care** - Search and compare homecare providers
+• **Residential Care** - Find and analyze residential aged care facilities  
+• **Maps Feature** - Navigate facilities using our interactive map
+• **News** - Stay updated with aged care industry news
+• **SA2 Analysis** - Understand demographic and statistical data
+
+**How to get started:**
+Ask me questions like "How do I search for homecare providers?" or "How do I use the maps feature?" and I'll provide clear, step-by-step instructions with references to the relevant user guides.
+
+💡 **Tip:** Be specific about which feature you need help with for the most accurate guidance!`,
             timestamp: new Date(),
             citations: []
           }
@@ -309,16 +296,17 @@ Ask me anything about how to use the platform features, navigate the interface, 
       }
       
       setCurrentConversationId(conversationId);
-      console.log('🔄 SWITCH DEBUG: currentConversationId set to:', conversationId);
+      console.log('✅ FAQ SWITCH DEBUG: Conversation switched to ID:', conversationId);
     } catch (error) {
-      console.error('❌ SWITCH DEBUG: Error switching to conversation:', error);
+      console.error('❌ FAQ SWITCH DEBUG: Error switching to conversation:', error);
     }
   };
 
-  const sendMessage = async (messageText?: string) => {
-    const messageToSend = messageText || inputMessage.trim();
+  const sendMessage = async (messageOverride?: string) => {
+    const messageToSend = messageOverride || inputMessage.trim();
     if (!messageToSend || isLoading) return;
 
+    // Add user message immediately
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -326,10 +314,11 @@ Ask me anything about how to use the platform features, navigate the interface, 
       timestamp: new Date()
     };
 
+    // Add loading message
     const loadingMessage: ChatMessage = {
       id: (Date.now() + 1).toString(),
       role: 'assistant',
-      content: '🤔 Searching through FAQ documents...',
+      content: 'Searching FAQ guides...',
       timestamp: new Date(),
       isLoading: true
     };
@@ -343,32 +332,32 @@ Ask me anything about how to use the platform features, navigate the interface, 
       // If no conversation exists, create one
       let conversationId = currentConversationId;
       if (!conversationId && currentUser) {
-        const createResponse = await fetch('/api/regulation/chat', {
+        const createResponse = await fetch('/api/faq/chat', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            action: 'create-conversation',
-            title: messageToSend.slice(0, 50),
-            first_message: messageToSend
+            action: 'create_conversation',
+            title: messageToSend.slice(0, 50)
           }),
         });
 
         const createData = await createResponse.json();
         if (createData.success) {
-          conversationId = createData.data.conversation_id;
+          conversationId = createData.conversation_id;
           setCurrentConversationId(conversationId);
         }
       }
 
       // Send message with conversation context
-      const response = await fetch('/api/regulation/chat', {
+      const response = await fetch('/api/faq/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          action: 'ask',
           question: messageToSend,
           conversation_id: conversationId,
           conversation_history: messages.filter(m => !m.isLoading).slice(-5) // Last 5 messages for context
@@ -378,7 +367,7 @@ Ask me anything about how to use the platform features, navigate the interface, 
       const data = await response.json();
 
       if (data.success) {
-        const chatResponse: ChatResponse = data.data;
+        const chatResponse: ChatResponse = data.data || data;
         setLastResponse(chatResponse);
         
         const assistantMessage: ChatMessage = {
@@ -394,37 +383,27 @@ Ask me anything about how to use the platform features, navigate the interface, 
         // Save to search history if user is logged in
         if (currentUser) {
           const responsePreview = chatResponse.message.slice(0, 150);
-          const documentTypes = [...new Set(chatResponse.citations.map(c => c.document_type))];
+          const documentTypes = [...new Set(chatResponse.citations.map(c => c.guide_category || 'faq'))];
           
-          // Save with conversation_id for ChatGPT-like instant loading
-          const finalConversationId = chatResponse.conversation_id || conversationId;
-          
-          await saveRegulationSearchToHistory(
+          await saveFAQSearchToHistory(
             currentUser.id,
             messageToSend,
             responsePreview,
             chatResponse.citations.length,
             documentTypes,
             chatResponse.processing_time,
-            finalConversationId || undefined
+            conversationId || undefined
           );
 
-          // Refresh unified search history
-          const updatedUnifiedHistory = await getUnifiedSearchHistory(currentUser.id);
-          console.log('📚 HISTORY DEBUG: Updated unified history:', updatedUnifiedHistory.map(h => ({ 
-            search_term: h.search_term, 
-            conversation_id: (h as any).conversation_id,
-            source_type: h.source_type 
-          })));
-          
-          setUnifiedHistory(updatedUnifiedHistory);
-          setSearchHistory(adaptUnifiedHistoryToOld(updatedUnifiedHistory));
+          // Refresh FAQ search history
+          const updatedHistory = await getFAQSearchHistory(currentUser.id);
+          setSearchHistory(updatedHistory);
         }
       } else {
         throw new Error(data.error || 'Failed to get response');
       }
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error sending FAQ message:', error);
       
       const errorMessage: ChatMessage = {
         id: (Date.now() + 3).toString(),
@@ -446,23 +425,21 @@ Ask me anything about how to use the platform features, navigate the interface, 
     }
   };
 
-  const handleSearchSelect = (search: RegulationSearchHistoryItem) => {
-    console.log('🔍 CLICK DEBUG: handleSearchSelect called with:', search);
-    console.log('🔍 CLICK DEBUG: search object keys:', Object.keys(search));
-    console.log('🔍 CLICK DEBUG: conversation_id value:', (search as any)?.conversation_id);
+  const handleSearchSelect = (search: FAQSearchHistoryItem) => {
+    console.log('🔍 FAQ CLICK DEBUG: handleSearchSelect called with:', search);
     
-    const cid = (search as any)?.conversation_id;
+    const cid = search.conversation_id;
     if (cid) {
-      console.log('✅ LOADING SAVED CONVERSATION:', cid);
+      console.log('✅ FAQ LOADING SAVED CONVERSATION:', cid);
       switchToConversation(Number(cid));
     } else {
-      console.log('❌ NO CONVERSATION_ID - REGENERATING:', search.search_term);
+      console.log('❌ FAQ NO CONVERSATION_ID - REGENERATING:', search.search_term);
       sendMessage(search.search_term);
     }
   };
 
-  const handleBookmarkSelect = (bookmark: RegulationBookmark) => {
-    const cid = (bookmark as any)?.conversation_id;
+  const handleBookmarkSelect = (bookmark: FAQBookmark) => {
+    const cid = bookmark.conversation_id;
     if (cid) {
       // Load saved conversation – NO regeneration  
       switchToConversation(Number(cid));
@@ -474,75 +451,41 @@ Ask me anything about how to use the platform features, navigate the interface, 
 
   const handleDeleteSearchItem = async (itemId: number) => {
     if (currentUser) {
-      // Find the unified history item to determine its source type
-      const unifiedItem = unifiedHistory.find(item => item.id === itemId);
-      
-      if (unifiedItem) {
-        const success = await deleteUnifiedHistoryItem(currentUser.id, unifiedItem);
-        if (success) {
-          // Update unified history state
-          const updatedUnifiedHistory = unifiedHistory.filter(item => item.id !== itemId);
-          setUnifiedHistory(updatedUnifiedHistory);
-          
-          // Update adapted history state for backward compatibility
-          setSearchHistory(adaptUnifiedHistoryToOld(updatedUnifiedHistory));
-        }
-      } else {
-        // Fallback to old method if not found in unified history
-        const success = false; // Simplified for FAQ page
-        if (success) {
-          setSearchHistory(prev => prev.filter(item => item.id !== itemId));
-        }
+      const success = await deleteFAQSearchHistoryItem(currentUser.id, itemId);
+      if (success) {
+        setSearchHistory(prev => prev.filter(item => item.id !== itemId));
       }
     }
   };
 
   const handleClearSearchHistory = async () => {
     if (currentUser) {
-      const success = await clearUnifiedSearchHistory(currentUser.id);
+      const success = await clearFAQSearchHistory(currentUser.id);
       
       if (success) {
-        // Reload unified history to get accurate state after clearing
-        const updatedUnifiedHistory = await getUnifiedSearchHistory(currentUser.id);
-        setUnifiedHistory(updatedUnifiedHistory);
-        setSearchHistory(adaptUnifiedHistoryToOld(updatedUnifiedHistory));
+        // Reload search history to get accurate state after clearing
+        const updatedHistory = await getFAQSearchHistory(currentUser.id);
+        setSearchHistory(updatedHistory);
       }
     }
   };
 
   const handleDeleteBookmark = async (bookmarkId: number) => {
     if (currentUser) {
-      // Find the unified bookmark item to determine its source type
-      const unifiedBookmark = unifiedBookmarks.find(item => item.id === bookmarkId);
-      
-      if (unifiedBookmark) {
-        const success = await deleteUnifiedBookmark(currentUser.id, unifiedBookmark);
-        if (success) {
-          // Update unified bookmarks state
-          const updatedUnifiedBookmarks = unifiedBookmarks.filter(item => item.id !== bookmarkId);
-          setUnifiedBookmarks(updatedUnifiedBookmarks);
-          
-          // Update adapted bookmarks state for backward compatibility
-          setBookmarks(adaptUnifiedBookmarksToOld(updatedUnifiedBookmarks));
-        }
-      } else {
-        // Fallback to old method if not found in unified bookmarks
-        const success = false; // Simplified for FAQ page
-        if (success) {
-          setBookmarks(prev => prev.filter(item => item.id !== bookmarkId));
-        }
+      const success = await deleteFAQBookmark(currentUser.id, bookmarkId);
+      if (success) {
+        setBookmarks(prev => prev.filter(item => item.id !== bookmarkId));
       }
     }
   };
 
   const handleClearBookmarks = async () => {
     if (currentUser) {
-      const success = await clearUnifiedBookmarks(currentUser.id);
+      const success = await clearFAQBookmarks(currentUser.id);
       if (success) {
-        // Reload unified bookmarks to get accurate state after clearing
-        const updatedUnifiedBookmarks = await getUnifiedBookmarks(currentUser.id);
-        setUnifiedBookmarks(updatedUnifiedBookmarks);
-        setBookmarks(adaptUnifiedBookmarksToOld(updatedUnifiedBookmarks));
+        // Reload bookmarks to get accurate state after clearing
+        const updatedBookmarks = await getFAQBookmarks(currentUser.id);
+        setBookmarks(updatedBookmarks);
       }
     }
   };
@@ -557,7 +500,7 @@ Ask me anything about how to use the platform features, navigate the interface, 
     setBookmarkDescription('');
   };
 
-  const handleBookmarkFromHistory = (search: RegulationSearchHistoryItem) => {
+  const handleBookmarkFromHistory = (search: FAQSearchHistoryItem) => {
     if (!currentUser) {
       alert('User not authenticated');
       return;
@@ -583,23 +526,23 @@ Ask me anything about how to use the platform features, navigate the interface, 
     }
 
     // Check if bookmark name is taken
-    const isTaken = await isRegulationBookmarkNameTaken(currentUser.id, bookmarkName.trim());
+    const isTaken = await isFAQBookmarkNameTaken(currentUser.id, bookmarkName.trim());
     if (isTaken) {
       alert('A bookmark with this name already exists. Please choose a different name.');
       return;
     }
 
     // Check bookmark limit
-    const bookmarkCount = await getRegulationBookmarkCount(currentUser.id);
+    const bookmarkCount = await getFAQBookmarkCount(currentUser.id);
     if (bookmarkCount >= 20) {
       alert('You have reached the maximum of 20 bookmarks. Please delete some bookmarks first.');
       return;
     }
 
     const responsePreview = lastResponse?.message.slice(0, 150);
-    const documentTypes = lastResponse ? [...new Set(lastResponse.citations.map(c => c.document_type))] : [];
+    const documentTypes = lastResponse ? [...new Set(lastResponse.citations.map(c => c.guide_category || 'faq'))] : [];
 
-    const success = await saveRegulationBookmark(
+    const success = await saveFAQBookmark(
       currentUser.id,
       bookmarkName.trim(),
       lastSearchTerm,
@@ -611,8 +554,8 @@ Ask me anything about how to use the platform features, navigate the interface, 
     );
 
     if (success) {
-      // Refresh unified data to include new bookmark
-      await refreshUnifiedData();
+      // Refresh FAQ data to include new bookmark
+      await refreshFAQData();
       setShowBookmarkModal(false);
       setBookmarkName('');
       setBookmarkDescription('');
@@ -627,106 +570,177 @@ Ask me anything about how to use the platform features, navigate the interface, 
 
   const getDocumentTypeColor = (type: string): string => {
     const colorMap: Record<string, string> = {
-      'aged_care_act': 'bg-blue-100 text-blue-800 border-blue-200',
-      'chsp_support_at_home': 'bg-green-100 text-green-800 border-green-200',
-      'home_care_package': 'bg-purple-100 text-purple-800 border-purple-200',
-      'fees_and_subsidies': 'bg-orange-100 text-orange-800 border-orange-200',
-      'residential_funding': 'bg-red-100 text-red-800 border-red-200',
-      'retirement_village_act': 'bg-indigo-100 text-indigo-800 border-indigo-200',
-      'support_at_home_program': 'bg-teal-100 text-teal-800 border-teal-200',
+      'homecare': 'bg-blue-100 text-blue-800 border-blue-200',
+      'residential': 'bg-green-100 text-green-800 border-green-200',
+      'maps': 'bg-purple-100 text-purple-800 border-purple-200',
+      'news': 'bg-orange-100 text-orange-800 border-orange-200',
+      'sa2': 'bg-red-100 text-red-800 border-red-200',
       'other': 'bg-gray-100 text-gray-800 border-gray-200'
     };
-    return colorMap[type] || colorMap['other'];
+    return colorMap[type.toLowerCase()] || colorMap['other'];
   };
 
-  const handleCopyMessage = async (messageContent: string, messageId: string) => {
+  const copyToClipboard = async (text: string, messageId: string) => {
     try {
-      // Remove HTML formatting for clean copy
-      const plainText = messageContent.replace(/<[^>]*>/g, '');
-      await navigator.clipboard.writeText(plainText);
+      await navigator.clipboard.writeText(text);
       setCopiedMessageId(messageId);
-      
-      // Clear the copied indicator after 2 seconds
       setTimeout(() => setCopiedMessageId(null), 2000);
-    } catch (error) {
-      console.error('Failed to copy message:', error);
-      alert('Failed to copy message to clipboard');
+    } catch (err) {
+      console.error('Failed to copy: ', err);
     }
   };
 
-  const handleRetryResponse = async (originalQuestion: string, messageId: string) => {
-    if (isLoading || retryingMessageId) return;
-    
-    setRetryingMessageId(messageId);
-    
-    // Find the message index and create a new loading message
-    const messageIndex = messages.findIndex(msg => msg.id === messageId);
+  const retryMessage = async (messageId: string) => {
+    const messageIndex = messages.findIndex(m => m.id === messageId);
     if (messageIndex === -1) return;
 
+    const userMessage = messages[messageIndex - 1];
+    if (!userMessage || userMessage.role !== 'user') return;
+
+    setRetryingMessageId(messageId);
+    
+    // Remove the error message and add a new loading message
     const loadingMessage: ChatMessage = {
-      id: Date.now().toString(),
+      id: (Date.now() + 1).toString(),
       role: 'assistant',
-      content: '🔄 Regenerating response...',
+      content: 'Retrying FAQ search...',
       timestamp: new Date(),
       isLoading: true
     };
 
-    // Replace the current message with loading message
-    const updatedMessages = [...messages];
-    updatedMessages[messageIndex] = loadingMessage;
-    setMessages(updatedMessages);
+    const newMessages = messages.slice(0, messageIndex).concat([loadingMessage]);
+    setMessages(newMessages);
 
+    // Retry the message
     try {
-      const response = await fetch('/api/regulation/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          question: originalQuestion,
-          conversation_id: currentConversationId,
-          conversation_history: messages.filter(m => !m.isLoading && m.id !== messageId).slice(-5)
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        const chatResponse: ChatResponse = data.data;
-        setLastResponse(chatResponse);
-        
-        const newAssistantMessage: ChatMessage = {
-          id: Date.now().toString(),
-          role: 'assistant',
-          content: chatResponse.message,
-          timestamp: new Date(),
-          citations: chatResponse.citations
-        };
-
-        // Replace loading message with new response
-        const finalMessages = [...messages];
-        finalMessages[messageIndex] = newAssistantMessage;
-        setMessages(finalMessages);
-      } else {
-        throw new Error(data.error || 'Failed to regenerate response');
-      }
-    } catch (error) {
-      console.error('Error regenerating response:', error);
-      
-      const errorMessage: ChatMessage = {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: '❌ Sorry, I encountered an error while regenerating the response. Please try again.',
-        timestamp: new Date()
-      };
-
-      // Replace loading message with error message
-      const finalMessages = [...messages];
-      finalMessages[messageIndex] = errorMessage;
-      setMessages(finalMessages);
+      await sendMessage(userMessage.content);
     } finally {
       setRetryingMessageId(null);
     }
+  };
+
+  const renderMessage = (message: ChatMessage, index: number) => {
+    return (
+      <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+        <div
+          className={`max-w-4xl rounded-2xl px-6 py-4 ${
+            message.role === 'user'
+              ? 'bg-blue-600 text-white ml-12'
+              : 'bg-white border border-gray-200 mr-12 shadow-sm'
+          }`}
+        >
+          {message.isLoading ? (
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              <span className="text-gray-600">{message.content}</span>
+            </div>
+          ) : (
+            <div>
+              <div 
+                className={`prose max-w-none ${
+                  message.role === 'user' ? 'prose-invert' : ''
+                }`} 
+                dangerouslySetInnerHTML={{ 
+                  __html: renderMarkdown(message.content) 
+                }} 
+              />
+
+              {message.role === 'assistant' && !message.isLoading && (
+                <div className="flex items-center gap-2 mt-3 pt-2 border-t border-gray-100">
+                  <button
+                    onClick={() => copyToClipboard(message.content, message.id)}
+                    className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
+                    title="Copy response"
+                  >
+                    {copiedMessageId === message.id ? (
+                      <>
+                        <Check className="w-3 h-3" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+
+                  {message.content.includes('❌') && (
+                    <button
+                      onClick={() => retryMessage(message.id)}
+                      disabled={retryingMessageId === message.id}
+                      className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors disabled:opacity-50"
+                      title="Retry request"
+                    >
+                      <RotateCcw className={`w-3 h-3 ${retryingMessageId === message.id ? 'animate-spin' : ''}`} />
+                      Retry
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Citations */}
+          {message.citations && message.citations.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                📚 Source User Guides:
+              </h4>
+              <div className="space-y-3">
+                {message.citations.map((citation, index) => (
+                  <div
+                    key={index}
+                    className="bg-white border border-gray-200 rounded-lg p-3 text-sm"
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900 text-xs mb-1">
+                          📄 {citation.document_name}
+                        </div>
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs ${getDocumentTypeColor(citation.guide_category || 'other')}`}
+                        >
+                          {citation.guide_category?.replace(/_/g, ' ').toUpperCase() || 'FAQ GUIDE'}
+                        </Badge>
+                      </div>
+                    </div>
+                    
+                    {citation.section_title && (
+                      <div className="text-xs text-gray-600 mb-2 font-medium">
+                        Section: {citation.section_title}
+                      </div>
+                    )}
+                    
+                    <div className="text-xs text-gray-600 leading-relaxed">
+                      {citation.content_preview}
+                    </div>
+                    
+                    <div className="mt-2 text-xs text-gray-400">
+                      Relevance: {Math.round(citation.similarity * 100)}%
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Timestamp */}
+          <div className={`text-xs mt-2 ${
+            message.role === 'user' ? 'text-blue-200' : 'text-gray-500'
+          }`} suppressHydrationWarning>
+            {message.timestamp && !isNaN(message.timestamp.getTime()) 
+              ? message.timestamp.toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })
+              : 'Invalid time'
+            }
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -739,20 +753,20 @@ Ask me anything about how to use the platform features, navigate the interface, 
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <History className="w-5 h-5 text-blue-600" />
-                History & Bookmarks
+                FAQ History & Bookmarks
               </h3>
               <div className="flex items-center gap-2">
                 <button
                   onClick={createNewConversation}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  title="New Chat"
+                  title="New FAQ Chat"
                 >
                   <Plus className="w-4 h-4 text-gray-600" />
                 </button>
                 <button
                   onClick={() => setIsHistoryPanelVisible(false)}
                   className="p-1 hover:bg-gray-100 rounded transition-colors"
-                  title="Hide History Panel"
+                  title="Hide FAQ History Panel"
                 >
                   <X className="w-4 h-4 text-gray-500" />
                 </button>
@@ -760,9 +774,9 @@ Ask me anything about how to use the platform features, navigate the interface, 
             </div>
           </div>
           
-          {/* Full History & Bookmarks Content */}
+          {/* Full FAQ History & Bookmarks Content */}
           <div className="flex-1 overflow-hidden">
-            <RegulationHistoryPanel
+            <FAQHistoryPanel
               searchHistory={searchHistory}
               bookmarks={bookmarks}
               isOpen={true}
@@ -787,7 +801,7 @@ Ask me anything about how to use the platform features, navigate the interface, 
             <button
               onClick={() => setIsHistoryPanelVisible(true)}
               className="group p-2 hover:bg-gray-100 transition-colors duration-200 rounded"
-              title="Show History & Bookmarks"
+              title="Show FAQ History & Bookmarks"
             >
               <History className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors duration-200" />
             </button>
@@ -806,7 +820,7 @@ Ask me anything about how to use the platform features, navigate the interface, 
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <BookOpen className="w-8 h-8 text-blue-600" />
+                <HelpCircle className="w-8 h-8 text-blue-600" />
                 <h1 className="text-3xl font-bold text-gray-900">FAQ (Chatbot)</h1>
               </div>
               
@@ -816,7 +830,7 @@ Ask me anything about how to use the platform features, navigate the interface, 
                 <button
                   onClick={createNewConversation}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-                  title="Start New Chat"
+                  title="Start New FAQ Chat"
                 >
                   <Plus className="w-4 h-4" />
                   New Chat
@@ -835,10 +849,10 @@ Ask me anything about how to use the platform features, navigate the interface, 
             </div>
             
             <p className="text-lg text-gray-600">
-              Get instant answers to frequently asked questions about platform features and functionality
+              Get step-by-step guidance on using platform features from our user guides
             </p>
             <p className="text-sm text-gray-500 mt-2">
-              ⚠️ <strong>Important:</strong> AI-generated responses may contain errors. Always verify information with actual platform behavior and consult help documentation for authoritative guidance.
+              📚 <strong>User Guides Available:</strong> Home Care, Residential Care, Maps, News, SA2 Analysis
             </p>
           </div>
         </div>
@@ -851,7 +865,7 @@ Ask me anything about how to use the platform features, navigate the interface, 
                 💬 FAQ Chat
               </CardTitle>
               <p className="text-gray-600">
-                Ask questions about platform features, navigation, tools, and data functionality
+                Ask questions about platform features, navigation, tools, and user guide instructions
               </p>
             </CardHeader>
             
@@ -859,172 +873,61 @@ Ask me anything about how to use the platform features, navigate the interface, 
               {/* Messages Container */}
               <div className="h-[600px] overflow-y-auto bg-white">
                 <div className="p-6 space-y-6">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-lg p-4 ${
-                          message.role === 'user'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-50 text-gray-900 border border-gray-200'
-                        }`}
-                      >
-                        {/* Message Content */}
-                        <div className="break-words">
-                          {message.isLoading ? (
-                            <div className="flex items-center space-x-2">
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                              <span>{message.content}</span>
-                            </div>
-                          ) : (
-                            <div 
-                              dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }}
-                              style={{ lineHeight: '1.6' }}
-                            />
-                          )}
-                        </div>
-
-                        {/* Citations */}
-                        {message.citations && message.citations.length > 0 && (
-                          <div className="mt-4 pt-4 border-t border-gray-200">
-                            <h4 className="text-sm font-semibold text-gray-700 mb-3">
-                              📚 Source Documents:
-                            </h4>
-                            <div className="space-y-3">
-                              {message.citations.map((citation, index) => (
-                                <div
-                                  key={index}
-                                  className="bg-white border border-gray-200 rounded-lg p-3 text-sm"
-                                >
-                                  <div className="flex items-start justify-between gap-3 mb-2">
-                                    <div className="flex-1">
-                                      <div className="font-medium text-gray-900 text-xs mb-1">
-                                        📄 {citation.display_title || formatDocumentName(citation.document_name)}
-                                      </div>
-                                      <Badge 
-                                        variant="outline" 
-                                        className={`text-xs ${getDocumentTypeColor(citation.document_type)}`}
-                                      >
-                                        {citation.document_type.replace(/_/g, ' ').toUpperCase()}
-                                      </Badge>
-                                    </div>
-                                  </div>
-                                  
-                                  {citation.section_title && (
-                                    <div className="text-xs text-gray-600 mb-2 font-medium">
-                                      Section: {citation.section_title}
-                                    </div>
-                                  )}
-                                  
-                                  <div className="text-xs text-gray-600 leading-relaxed">
-                                    {citation.content_snippet}
-                                  </div>
-                                  
-                                  <div className="mt-2 text-xs text-gray-400">
-                                    Relevance: {Math.round(citation.similarity_score * 100)}%
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Timestamp */}
-                        <div className={`text-xs mt-2 ${
-                          message.role === 'user' ? 'text-blue-200' : 'text-gray-500'
-                        }`} suppressHydrationWarning>
-                          {message.timestamp && !isNaN(message.timestamp.getTime()) 
-                            ? message.timestamp.toLocaleTimeString() 
-                            : 'Just now'}
-                        </div>
-
-                        {/* Action Buttons - Copy, Retry, and Feedback for assistant messages (excluding welcome message) */}
-                        {message.role === 'assistant' && !message.isLoading && message.id !== '1' && (
-                          <div className="flex items-center gap-2 mt-3 pt-2 border-t border-gray-200">
-                            {/* Copy Button */}
-                            <button
-                              onClick={() => handleCopyMessage(message.content, message.id)}
-                              disabled={copiedMessageId === message.id}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300"
-                              title="Copy response"
-                            >
-                              {copiedMessageId === message.id ? (
-                                <>
-                                  <Check className="w-4 h-4" />
-                                  <span className="hidden sm:inline">Copied!</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Copy className="w-4 h-4" />
-                                  <span className="hidden sm:inline">Copy</span>
-                                </>
-                              )}
-                            </button>
-
-                            {/* Retry Button */}
-                            <button
-                              onClick={() => handleRetryResponse(lastSearchTerm, message.id)}
-                              disabled={retryingMessageId === message.id || isLoading}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Regenerate response"
-                            >
-                              <RotateCcw className={`w-4 h-4 ${retryingMessageId === message.id ? 'animate-spin' : ''}`} />
-                              <span className="hidden sm:inline">
-                                {retryingMessageId === message.id ? 'Retrying...' : 'Retry'}
-                              </span>
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                  {messages.map(renderMessage)}
                   <div ref={messagesEndRef} />
                 </div>
               </div>
 
               {/* Input Area */}
               <div className="border-t border-gray-200 bg-gray-50 p-4">
-                <div className="flex space-x-3">
+                <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="flex space-x-3">
                   <textarea
                     ref={inputRef}
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Ask about platform features, navigation, search tools, comparison functionality, or any other question about using the system..."
-                    className="flex-1 resize-none bg-white border-2 border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 max-h-32 shadow-sm"
+                    placeholder={
+                      !currentUser 
+                        ? "Please sign in to use the FAQ assistant..." 
+                        : "Ask me how to use any feature of the Giantash platform..."
+                    }
+                    disabled={isLoading || !currentUser}
                     rows={2}
-                    disabled={isLoading}
+                    className="flex-1 resize-none bg-white border-2 border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                   />
                   <button
-                    onClick={() => sendMessage()}
-                    disabled={!inputMessage.trim() || isLoading}
+                    type="submit"
+                    disabled={isLoading || !inputMessage.trim() || !currentUser}
                     className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium whitespace-nowrap"
                   >
-                    {isLoading ? '⏳' : '📤'} Send
+                    {isLoading ? '⏳' : '📤'} {isLoading ? 'Searching...' : 'Ask'}
                   </button>
-                </div>
+                </form>
+                
+                {!currentUser && (
+                  <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p className="text-amber-800 text-sm">
+                      🔐 <strong>Sign In Required:</strong> Please sign in to use the FAQ assistant and get personalized help with the Giantash platform.
+                    </p>
+                  </div>
+                )}
                 
                 <div className="mt-2 text-xs text-gray-500 text-center">
-                  💡 Try asking: "How do I search for home care providers?" or "What filters are available in the maps page?"
+                  💡 Try asking: "How do I search for homecare providers?" or "How do I use the maps feature?"
                 </div>
               </div>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Info Footer */}
-        <div className="text-center pb-8 text-sm text-gray-600">
-          <p>
-            🔒 Your questions are processed securely. This assistant provides help with platform features and functionality.
-          </p>
-          <p className="mt-2 text-xs text-gray-500">
-            Disclaimer: This AI assistant provides information about platform features for reference purposes only. Always verify functionality by testing features directly in the interface.
-          </p>
-          <p className="mt-1 text-xs text-orange-600 font-medium">
-            ⚠️ FAQ Version: This chatbot helps with platform questions. For regulatory information, use the Regulation Assistant.
-          </p>
+          {/* Info Footer */}
+          <div className="text-center pb-8 text-sm text-gray-600 mt-8">
+            <p>
+              🔒 Your questions are processed securely. This assistant provides help with platform features using user guides.
+            </p>
+            <p className="mt-2 text-xs text-gray-500">
+              Disclaimer: This FAQ assistant provides guidance about platform features based on user guides. Test features directly to confirm functionality.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -1056,7 +959,7 @@ Ask me anything about how to use the platform features, navigate the interface, 
                 <textarea
                   value={bookmarkDescription}
                   onChange={(e) => setBookmarkDescription(e.target.value)}
-                  placeholder="Add notes about this FAQ..."
+                  placeholder="Add notes about this FAQ search..."
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows={3}
                   maxLength={250}
@@ -1065,7 +968,7 @@ Ask me anything about how to use the platform features, navigate the interface, 
               
               <div className="bg-gray-50 rounded-lg p-3">
                 <p className="text-sm text-gray-600">
-                  <strong>Question:</strong> {lastSearchTerm}
+                  <strong>Search:</strong> {lastSearchTerm}
                 </p>
               </div>
             </div>

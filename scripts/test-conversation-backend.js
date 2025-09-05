@@ -132,7 +132,7 @@ async function testConversationBackend() {
     } else {
       try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         
         const result = await model.generateContent('Test connection - respond with "Connected"');
         const response = result.response.text();

@@ -1,0 +1,379 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { faqChatService, ChatResponse } from '../../../../lib/faqChat';
+
+// Rate limiting configuration
+const rateLimitMap = new Map<string, { count: number; lastRequest: number }>();
+const RATE_LIMIT_MAX_REQUESTS = 10;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+
+function checkRateLimit(identifier: string): boolean {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(identifier);
+
+  if (!userLimit) {
+    rateLimitMap.set(identifier, { count: 1, lastRequest: now });
+    return true;
+  }
+
+  // Reset count if window has passed
+  if (now - userLimit.lastRequest > RATE_LIMIT_WINDOW_MS) {
+    rateLimitMap.set(identifier, { count: 1, lastRequest: now });
+    return true;
+  }
+
+  // Check if under limit
+  if (userLimit.count < RATE_LIMIT_MAX_REQUESTS) {
+    userLimit.count += 1;
+    userLimit.lastRequest = now;
+    return true;
+  }
+
+  return false;
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { action, question, conversation_id, user_message, conversation_history } = body;
+
+    if (!action) {
+      return NextResponse.json({ error: 'Action is required' }, { status: 400 });
+    }
+
+    // Create Supabase client for server-side operations
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+        },
+      }
+    );
+
+    // Get current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Authentication required for FAQ chat' }, { status: 401 });
+    }
+
+    // Rate limiting check
+    const rateLimitKey = `faq_${user.id}`;
+    if (!checkRateLimit(rateLimitKey)) {
+      return NextResponse.json({ 
+        error: 'Rate limit exceeded. Please wait before sending more messages.',
+        rateLimitExceeded: true
+      }, { status: 429 });
+    }
+
+    console.log(`📝 FAQ API: Processing ${action} action for user ${user.id}`);
+
+    let response: ChatResponse;
+
+    switch (action) {
+      case 'ask':
+        // Handle single FAQ question
+        if (!question) {
+          return NextResponse.json({ error: 'Question is required for ask action' }, { status: 400 });
+        }
+
+        console.log(`❓ FAQ Ask: "${question}"`);
+        
+        response = await faqChatService.processConversationalQuery(question, {
+          user_id: user.id,
+          conversation_id,
+          conversation_history: conversation_history || []
+        });
+        
+        console.log(`✅ FAQ Ask completed in ${response.processing_time}ms`);
+        break;
+
+      case 'create_conversation':
+        // Create a new FAQ conversation
+        if (!user_message) {
+          return NextResponse.json({ error: 'User message is required for create_conversation action' }, { status: 400 });
+        }
+
+        console.log(`💬 FAQ Create Conversation: "${user_message}"`);
+        
+        response = await faqChatService.processConversationalQuery(user_message, {
+          user_id: user.id,
+          conversation_history: []
+        });
+        
+        console.log(`✅ FAQ Conversation created in ${response.processing_time}ms`);
+        break;
+
+      case 'add_message':
+        // Add message to existing FAQ conversation
+        if (!conversation_id || !user_message) {
+          return NextResponse.json({ 
+            error: 'Conversation ID and user message are required for add_message action' 
+          }, { status: 400 });
+        }
+
+        console.log(`📩 FAQ Add Message to conversation ${conversation_id}: "${user_message}"`);
+        
+        response = await faqChatService.processConversationalQuery(user_message, {
+          user_id: user.id,
+          conversation_id,
+          conversation_history: conversation_history || []
+        });
+        
+        console.log(`✅ FAQ Message added in ${response.processing_time}ms`);
+        break;
+
+      case 'get_conversations':
+        // Get user's FAQ conversations
+        console.log(`📋 FAQ Get conversations for user ${user.id}`);
+        
+        try {
+          const conversations = await faqChatService.getUserConversations(user.id);
+          return NextResponse.json({ 
+            conversations,
+            action: 'get_conversations'
+          });
+        } catch (error) {
+          console.error('❌ FAQ Error getting conversations:', error);
+          return NextResponse.json({ error: 'Failed to retrieve FAQ conversations' }, { status: 500 });
+        }
+
+      case 'get_conversation_messages':
+        // Get messages from a specific FAQ conversation
+        if (!conversation_id) {
+          return NextResponse.json({ error: 'Conversation ID is required' }, { status: 400 });
+        }
+
+        console.log(`📄 FAQ Get messages for conversation ${conversation_id}`);
+        
+        try {
+          const messages = await faqChatService.getConversationMessages(conversation_id);
+          return NextResponse.json({ 
+            messages,
+            conversation_id,
+            action: 'get_conversation_messages'
+          });
+        } catch (error) {
+          console.error('❌ FAQ Error getting conversation messages:', error);
+          return NextResponse.json({ error: 'Failed to retrieve FAQ conversation messages' }, { status: 500 });
+        }
+
+      case 'bookmark_message':
+        // Bookmark a FAQ message
+        const { message_id, bookmark_note } = body;
+        
+        if (!message_id) {
+          return NextResponse.json({ error: 'Message ID is required for bookmarking' }, { status: 400 });
+        }
+
+        console.log(`🔖 FAQ Bookmark message ${message_id}`);
+        
+        try {
+          // Insert bookmark into faq_bookmarks table
+          const { data, error } = await supabase
+            .from('faq_bookmarks')
+            .insert({
+              user_id: user.id,
+              message_id,
+              conversation_id,
+              bookmark_note: bookmark_note || null
+            })
+            .select()
+            .single();
+
+          if (error) {
+            throw error;
+          }
+
+          return NextResponse.json({ 
+            success: true,
+            bookmark: data,
+            action: 'bookmark_message'
+          });
+        } catch (error) {
+          console.error('❌ FAQ Error bookmarking message:', error);
+          return NextResponse.json({ error: 'Failed to bookmark FAQ message' }, { status: 500 });
+        }
+
+      case 'submit_feedback':
+        // Submit feedback on FAQ response
+        const { feedback_type, feedback_text, response_helpful } = body;
+        
+        if (!message_id) {
+          return NextResponse.json({ error: 'Message ID is required for feedback' }, { status: 400 });
+        }
+
+        console.log(`📝 FAQ Submit feedback for message ${message_id}: ${feedback_type}`);
+        
+        try {
+          // Insert feedback into faq_feedback table
+          const { data, error } = await supabase
+            .from('faq_feedback')
+            .insert({
+              user_id: user.id,
+              message_id,
+              conversation_id,
+              feedback_type,
+              feedback_text: feedback_text || null,
+              response_helpful: response_helpful || null
+            })
+            .select()
+            .single();
+
+          if (error) {
+            throw error;
+          }
+
+          return NextResponse.json({ 
+            success: true,
+            feedback: data,
+            action: 'submit_feedback'
+          });
+        } catch (error) {
+          console.error('❌ FAQ Error submitting feedback:', error);
+          return NextResponse.json({ error: 'Failed to submit FAQ feedback' }, { status: 500 });
+        }
+
+      default:
+        return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
+    }
+
+    // Return the chat response for ask, create_conversation, and add_message actions
+    return NextResponse.json({
+      ...response,
+      action,
+      success: true
+    });
+
+  } catch (error) {
+    console.error('❌ FAQ API Error:', error);
+    
+    // Handle specific error types
+    if (error instanceof Error) {
+      if (error.message.includes('rate limit')) {
+        return NextResponse.json({ 
+          error: 'Rate limit exceeded. Please try again later.',
+          rateLimitExceeded: true 
+        }, { status: 429 });
+      }
+      
+      if (error.message.includes('authentication') || error.message.includes('unauthorized')) {
+        return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+      }
+    }
+
+    return NextResponse.json({ 
+      error: 'Internal server error while processing FAQ request',
+      success: false 
+    }, { status: 500 });
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    // Handle GET requests for retrieving FAQ conversations or search history
+    const { searchParams } = new URL(request.url);
+    const action = searchParams.get('action');
+
+    if (!action) {
+      return NextResponse.json({ error: 'Action parameter is required' }, { status: 400 });
+    }
+
+    // Create Supabase client
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+        },
+      }
+    );
+
+    // Get current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    switch (action) {
+      case 'get_search_history':
+        console.log(`📋 FAQ Get search history for user ${user.id}`);
+        
+        try {
+          const { data, error } = await supabase
+            .from('faq_search_history')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(50);
+
+          if (error) {
+            throw error;
+          }
+
+          return NextResponse.json({ 
+            searchHistory: data || [],
+            action: 'get_search_history'
+          });
+        } catch (error) {
+          console.error('❌ FAQ Error getting search history:', error);
+          return NextResponse.json({ error: 'Failed to retrieve FAQ search history' }, { status: 500 });
+        }
+
+      case 'get_bookmarks':
+        console.log(`🔖 FAQ Get bookmarks for user ${user.id}`);
+        
+        try {
+          const { data, error } = await supabase
+            .from('faq_bookmarks')
+            .select(`
+              *,
+              faq_messages(
+                id,
+                content,
+                role,
+                created_at,
+                citations
+              ),
+              faq_conversations(
+                id,
+                title,
+                created_at
+              )
+            `)
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+
+          if (error) {
+            throw error;
+          }
+
+          return NextResponse.json({ 
+            bookmarks: data || [],
+            action: 'get_bookmarks'
+          });
+        } catch (error) {
+          console.error('❌ FAQ Error getting bookmarks:', error);
+          return NextResponse.json({ error: 'Failed to retrieve FAQ bookmarks' }, { status: 500 });
+        }
+
+      default:
+        return NextResponse.json({ error: `Unknown GET action: ${action}` }, { status: 400 });
+    }
+
+  } catch (error) {
+    console.error('❌ FAQ API GET Error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+} 

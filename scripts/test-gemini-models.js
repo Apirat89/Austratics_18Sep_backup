@@ -64,7 +64,7 @@ async function testAllModels() {
   console.log('🚀 Testing all Gemini models used in the chat service...\n');
   
   const models = [
-    { name: 'gemini-2.0-flash-exp', description: 'Main model used in RegulationChatService' },
+    { name: 'gemini-2.5-flash', description: 'Main model used in RegulationChatService' },
     { name: 'gemini-1.5-flash', description: 'Alternative stable model' },
     { name: 'gemini-1.5-pro', description: 'Alternative pro model' }
   ];
@@ -97,14 +97,14 @@ async function generateReport(results) {
     failing.forEach(([name]) => console.log(`   - ${name}`));
     console.log();
     
-    if (failing.some(([name]) => name === 'gemini-2.0-flash-exp')) {
+    if (failing.some(([name]) => name === 'gemini-2.5-flash')) {
       console.log('🚨 **CRITICAL: Main chat model is failing!**');
       console.log('This explains why conversations are not being saved.');
       console.log('The chat service fails to generate AI responses, so the entire conversation flow breaks.\n');
       
       if (working.length > 0) {
         console.log('🔧 **SOLUTION: Update RegulationChatService to use a working model**');
-        console.log(`Recommended: Change 'gemini-2.0-flash-exp' to '${working[0][0]}' in src/lib/regulationChat.ts`);
+        console.log(`Recommended: Change 'gemini-2.5-flash' to '${working[0][0]}' in src/lib/regulationChat.ts`);
       } else {
         console.log('🔧 **SOLUTION: Fix Gemini API access**');
         console.log('1. Check if GEMINI_API_KEY is valid');

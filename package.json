@@ -31,6 +31,7 @@
     "flexsearch": "^0.8.205",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.511.0",
+    "mammoth": "^1.10.0",
     "natural": "^8.1.0",
     "next": "15.3.3",
     "nodemailer": "^7.0.6",
