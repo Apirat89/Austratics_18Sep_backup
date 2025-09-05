@@ -7,7 +7,8 @@ import {
   BarChart3,
   Building,
   Home,
-  Newspaper
+  Newspaper,
+  HelpCircle
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser } from '../../lib/auth';
@@ -84,6 +85,11 @@ export default function MainPage() {
       title: "Regulation (BETA)", 
       icon: BookOpen,
       route: "/regulation"
+    },
+    {
+      title: "FAQ (Chatbot)",
+      icon: HelpCircle,
+      route: "/faq"
     }
   ];
 

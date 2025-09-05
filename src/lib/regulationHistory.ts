@@ -23,6 +23,7 @@ export interface RegulationBookmark {
   citations_count?: number;
   document_types?: string[];
   usage_count?: number;
+  conversation_id?: number;
   last_used_at?: string;
   created_at?: string;
   updated_at?: string;
@@ -239,7 +240,8 @@ export async function getUnifiedBookmarks(
       for (const bookmark of oldBookmarksResult.data) {
         unifiedBookmarks.push({
           ...bookmark,
-          source_type: 'bookmark'
+          source_type: 'bookmark',
+          conversation_id: bookmark.conversation_id  // Explicitly include conversation_id
         });
       }
     }
@@ -483,6 +485,7 @@ export function adaptUnifiedBookmarksToOld(bookmarks: UnifiedBookmark[]): Regula
     citations_count: bookmark.citations_count,
     document_types: bookmark.document_types,
     usage_count: bookmark.usage_count,
+    conversation_id: bookmark.conversation_id,  // ✅ FIX: Include conversation_id for instant loading
     last_used_at: bookmark.last_used_at,
     created_at: bookmark.created_at,
     updated_at: bookmark.updated_at
@@ -717,7 +720,8 @@ export async function saveRegulationBookmark(
   description?: string,
   responsePreview?: string,
   citationsCount?: number,
-  documentTypes?: string[]
+  documentTypes?: string[],
+  conversationId?: number
 ): Promise<boolean> {
   try {
     const supabase = createBrowserSupabaseClient();
@@ -733,6 +737,7 @@ export async function saveRegulationBookmark(
         response_preview: responsePreview,
         citations_count: citationsCount,
         document_types: documentTypes,
+        conversation_id: conversationId,
         usage_count: 0,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, ArrowLeft, History, X, Bookmark, Plus, Copy, RotateCcw, Check } from 'lucide-react';
+import { BookOpen, ArrowLeft, History, X, Plus, Copy, RotateCcw, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import RegulationHistoryPanel from '@/components/regulation/RegulationHistoryPanel';
@@ -15,18 +15,12 @@ import {
   UnifiedHistoryItem,
   UnifiedBookmark,
   saveRegulationSearchToHistory,
-  getRegulationSearchHistory,
-  getRegulationBookmarks,
   getUnifiedSearchHistory,
   getUnifiedBookmarks,
-  deleteRegulationSearchHistoryItem,
   deleteUnifiedHistoryItem,
   deleteUnifiedBookmark,
-  clearRegulationSearchHistory,
   clearUnifiedSearchHistory,
   clearUnifiedBookmarks,
-  deleteRegulationBookmark,
-  clearRegulationBookmarks,
   saveRegulationBookmark,
   isRegulationBookmarkNameTaken,
   getRegulationBookmarkCount,
@@ -71,7 +65,7 @@ interface Conversation {
   status: 'active' | 'archived';
 }
 
-export default function RegulationPage() {
+export default function FAQPage() {
   const router = useRouter();
   
   // Conversation state
@@ -81,18 +75,16 @@ export default function RegulationPage() {
     {
       id: '1',
       role: 'assistant',
-      content: `👋 Welcome to the Australian Aged Care Regulation Assistant (BETA)!
+      content: `👋 Welcome to the FAQ (Chatbot)!
 
-I can help you find information from:
-• **Aged Care Act 2024** (Current & November 2025 versions)
-• **Commonwealth Home Support Programme (CHSP)** manuals
-• **Home Care Package** operational guides  
-• **Residential Aged Care** funding documents
-• **Retirement Village Acts** (all Australian states)
-• **Support at Home** program handbooks
-• **Fee schedules** and regulatory updates
+I can help you find answers to frequently asked questions about:
+• **Home Care** features and functionality
+• **Residential Care** search and comparison tools
+• **Maps** navigation and facility information
+• **News** updates and filtering options
+• **SA2 Analytics** and demographic insights
 
-Ask me anything about aged care regulations, compliance requirements, funding, or program details. I'll provide accurate answers with specific document citations.`,
+Ask me anything about how to use the platform features, navigate the interface, or understand the data and tools available. I'll provide detailed answers to help you get the most out of the system.`,
       timestamp: new Date('2024-01-01T00:00:00Z'),
       citations: []
     }
@@ -237,7 +229,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
         },
         body: JSON.stringify({
           action: 'create-conversation',
-          title: 'New Chat',
+          title: 'New FAQ Chat',
           first_message: 'Hello'
         }),
       });
@@ -253,18 +245,16 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
           {
             id: '1',
             role: 'assistant',
-            content: `👋 Welcome to the Australian Aged Care Regulation Assistant!
+            content: `👋 Welcome to the FAQ (Chatbot)!
 
-I can help you find information from:
-• **Aged Care Act 2024** (Current & November 2025 versions)
-• **Commonwealth Home Support Programme (CHSP)** manuals
-• **Home Care Package** operational guides  
-• **Residential Aged Care** funding documents
-• **Retirement Village Acts** (all Australian states)
-• **Support at Home** program handbooks
-• **Fee schedules** and regulatory updates
+I can help you find answers to frequently asked questions about:
+• **Home Care** features and functionality
+• **Residential Care** search and comparison tools
+• **Maps** navigation and facility information
+• **News** updates and filtering options
+• **SA2 Analytics** and demographic insights
 
-Ask me anything about aged care regulations, compliance requirements, funding, or program details. I'll provide accurate answers with specific document citations.`,
+Ask me anything about how to use the platform features, navigate the interface, or understand the data and tools available. I'll provide detailed answers to help you get the most out of the system.`,
             timestamp: new Date(),
             citations: []
           }
@@ -302,18 +292,16 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
           {
             id: '1',
             role: 'assistant',
-            content: `👋 Welcome to the Australian Aged Care Regulation Assistant!
+            content: `👋 Welcome to the FAQ (Chatbot)!
 
-I can help you find information from:
-• **Aged Care Act 2024** (Current & November 2025 versions)
-• **Commonwealth Home Support Programme (CHSP)** manuals
-• **Home Care Package** operational guides  
-• **Residential Aged Care** funding documents
-• **Retirement Village Acts** (all Australian states)
-• **Support at Home** program handbooks
-• **Fee schedules** and regulatory updates
+I can help you find answers to frequently asked questions about:
+• **Home Care** features and functionality
+• **Residential Care** search and comparison tools
+• **Maps** navigation and facility information
+• **News** updates and filtering options
+• **SA2 Analytics** and demographic insights
 
-Ask me anything about aged care regulations, compliance requirements, funding, or program details. I'll provide accurate answers with specific document citations.`,
+Ask me anything about how to use the platform features, navigate the interface, or understand the data and tools available. I'll provide detailed answers to help you get the most out of the system.`,
             timestamp: new Date(),
             citations: []
           }
@@ -341,7 +329,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
     const loadingMessage: ChatMessage = {
       id: (Date.now() + 1).toString(),
       role: 'assistant',
-      content: '🤔 Searching through regulation documents...',
+      content: '🤔 Searching through FAQ documents...',
       timestamp: new Date(),
       isLoading: true
     };
@@ -501,7 +489,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
         }
       } else {
         // Fallback to old method if not found in unified history
-        const success = await deleteRegulationSearchHistoryItem(currentUser.id, itemId);
+        const success = false; // Simplified for FAQ page
         if (success) {
           setSearchHistory(prev => prev.filter(item => item.id !== itemId));
         }
@@ -539,7 +527,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
         }
       } else {
         // Fallback to old method if not found in unified bookmarks
-        const success = await deleteRegulationBookmark(currentUser.id, bookmarkId);
+        const success = false; // Simplified for FAQ page
         if (success) {
           setBookmarks(prev => prev.filter(item => item.id !== bookmarkId));
         }
@@ -819,7 +807,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <BookOpen className="w-8 h-8 text-blue-600" />
-                <h1 className="text-3xl font-bold text-gray-900">Australian Aged Care Regulation Assistant <span className="text-2xl text-blue-600 font-medium">(BETA)</span></h1>
+                <h1 className="text-3xl font-bold text-gray-900">FAQ (Chatbot)</h1>
               </div>
               
               {/* Back to Main Menu and Actions */}
@@ -847,10 +835,10 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
             </div>
             
             <p className="text-lg text-gray-600">
-              Get instant answers about aged care regulations with document citations
+              Get instant answers to frequently asked questions about platform features and functionality
             </p>
             <p className="text-sm text-gray-500 mt-2">
-              ⚠️ <strong>Important:</strong> AI-generated responses may contain errors. Always verify information with official sources and consult legal professionals for compliance advice.
+              ⚠️ <strong>Important:</strong> AI-generated responses may contain errors. Always verify information with actual platform behavior and consult help documentation for authoritative guidance.
             </p>
           </div>
         </div>
@@ -860,10 +848,10 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
           <Card className="shadow-lg border-0">
             <CardHeader className="bg-white border-b border-gray-200">
               <CardTitle className="text-xl font-semibold text-gray-900">
-                💬 Regulation Chat
+                💬 FAQ Chat
               </CardTitle>
               <p className="text-gray-600">
-                Ask questions about aged care acts, CHSP programs, home care packages, and more
+                Ask questions about platform features, navigation, tools, and data functionality
               </p>
             </CardHeader>
             
@@ -1004,7 +992,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Ask about aged care regulations, CHSP requirements, home care packages, fees, or any regulatory question..."
+                    placeholder="Ask about platform features, navigation, search tools, comparison functionality, or any other question about using the system..."
                     className="flex-1 resize-none bg-white border-2 border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 max-h-32 shadow-sm"
                     rows={2}
                     disabled={isLoading}
@@ -1019,7 +1007,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
                 </div>
                 
                 <div className="mt-2 text-xs text-gray-500 text-center">
-                  💡 Try asking: "What are the new changes in the Aged Care Act 2024?" or "How do CHSP client contributions work?"
+                  💡 Try asking: "How do I search for home care providers?" or "What filters are available in the maps page?"
                 </div>
               </div>
             </CardContent>
@@ -1029,13 +1017,13 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
         {/* Info Footer */}
         <div className="text-center pb-8 text-sm text-gray-600">
           <p>
-            🔒 Your questions are processed securely. This assistant uses official Australian aged care regulation documents.
+            🔒 Your questions are processed securely. This assistant provides help with platform features and functionality.
           </p>
           <p className="mt-2 text-xs text-gray-500">
-            Disclaimer: This AI assistant provides information for reference purposes only. Responses may be incomplete or contain errors. Always verify with official sources and seek professional legal advice for compliance matters.
+            Disclaimer: This AI assistant provides information about platform features for reference purposes only. Always verify functionality by testing features directly in the interface.
           </p>
           <p className="mt-1 text-xs text-orange-600 font-medium">
-            ⚠️ BETA Version: This system is currently in beta testing. Please exercise caution and cross-reference all information with official regulatory sources before making decisions.
+            ⚠️ FAQ Version: This chatbot helps with platform questions. For regulatory information, use the Regulation Assistant.
           </p>
         </div>
       </div>
@@ -1044,7 +1032,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
       {showBookmarkModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Save Bookmark</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Save FAQ Bookmark</h3>
             
             <div className="space-y-4">
               <div>
@@ -1068,7 +1056,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
                 <textarea
                   value={bookmarkDescription}
                   onChange={(e) => setBookmarkDescription(e.target.value)}
-                  placeholder="Add notes about this search..."
+                  placeholder="Add notes about this FAQ..."
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows={3}
                   maxLength={250}
@@ -1077,7 +1065,7 @@ Ask me anything about aged care regulations, compliance requirements, funding, o
               
               <div className="bg-gray-50 rounded-lg p-3">
                 <p className="text-sm text-gray-600">
-                  <strong>Search:</strong> {lastSearchTerm}
+                  <strong>Question:</strong> {lastSearchTerm}
                 </p>
               </div>
             </div>
