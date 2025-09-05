@@ -20819,6 +20819,58 @@ POST /api/contact 200 in 7319ms
 
 **Ready for production use!** 🎉
 
+---
+
+## 🚀 **HYBRID SEARCH DEPLOYMENT COMPLETED**
+
+### ✅ **Successfully Pushed to Both GitHub Branches**
+- **Main Branch**: ✅ Updated with hybrid search infrastructure
+- **Development Branch**: ✅ Merged and updated 
+- **Commit**: `feat: Hybrid Search Infrastructure for FAQ & Regulatory Chatbots`
+- **Files**: 32 files changed, 8,146 insertions
+
+### 🔧 **SQL Migration Required - Manual Step**
+
+The hybrid search infrastructure code has been **successfully pushed to both GitHub branches** (`main` and `development`), but the SQL migration needs to be applied manually:
+
+#### **Required Action:**
+1. **Copy the SQL content** from `sql/add_hybrid_search_infrastructure.sql`
+2. **Execute in Supabase Dashboard**:
+   - Go to Supabase Dashboard → SQL Editor
+   - Paste and run the SQL migration
+   - This will create the hybrid search functions and tsvector columns
+
+#### **What's Deployed in Code:**
+- ✅ **FAQ System**: Complete hybrid search pipeline (`searchRelevantFAQDocumentsUltimate`)
+- ✅ **Regulatory System**: Complete hybrid search pipeline (`searchRelevantDocumentsUltimate`) 
+- ✅ **Fallback Chain**: Hybrid → Enhanced → Basic search with error resilience
+- ✅ **Both Branches Updated**: `main` and `development` have identical code
+
+#### **Current Status:**
+- **Code**: ✅ Ready and deployed
+- **Database**: ⏳ Awaiting manual SQL execution
+- **Expected Impact**: 70% semantic + 30% lexical search will dramatically improve "basic question" success rate
+
+#### **Log Evidence:**
+```
+🚀 Starting ultimate FAQ search pipeline
+🔀 Starting hybrid FAQ search for: "user query"
+Error: Could not find the function public.match_faq_documents_hybrid
+🔄 Falling back to enhanced search
+✅ Ultimate search completed with 8 enhanced results
+```
+
+**Once SQL migration is applied, logs will show:**
+```
+🚀 Starting ultimate FAQ search pipeline
+🔀 Starting hybrid FAQ search for: "user query"  
+📊 Hybrid search returned 16 candidates
+⭐ Hybrid search + LLM reranking selected top 8 results
+✅ Ultimate search completed with 8 hybrid results
+```
+
+---
+
 ## Lessons
 
 *To be updated as implementation progresses*
