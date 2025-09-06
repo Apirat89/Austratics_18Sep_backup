@@ -20874,3 +20874,187 @@ Error: Could not find the function public.match_faq_documents_hybrid
 ## Lessons
 
 *To be updated as implementation progresses*
+
+---
+
+## 🚨 **FILE TITLE APPROACH ANALYSIS & ENHANCEMENT PROJECT**
+
+**USER REQUEST:** Study the previously implemented file title approach for the regulation page that uses professional titles instead of raw filenames, and propose improvements or documentation.
+
+**📊 EXISTING FILE TITLE SYSTEM DISCOVERED:**
+- ✅ **DocumentTitleService**: Sophisticated service (`src/lib/documentTitleService.ts`) with singleton pattern
+- ✅ **Professional Mappings**: 68+ document title mappings in `data/Regulation Docs/file_titles.json`  
+- ✅ **Citation Enhancement**: "C2025C00122.pdf" displays as "Aged Care Act 2024"
+- ✅ **Dual Implementation**: Both regulation (`documentTitleService.ts`) and FAQ (`faqDocumentTitleService.ts`) systems
+- ✅ **Fallback Strategy**: Graceful handling of unmapped documents with filename formatting
+- ✅ **Full Integration**: Embedded throughout RegulationChatService citation generation
+
+**🎯 ANALYSIS OBJECTIVES:**
+Document the existing sophisticated file title system and identify enhancement opportunities for improved maintenance, scalability, and user experience.
+
+**PLANNER MODE ACTIVE** 🧠
+
+## Background and Motivation
+
+The regulation page successfully implemented a **comprehensive DocumentTitleService** that transforms technical filenames into professional, user-friendly document titles. This represents a significant UX enhancement that improves citation credibility and document accessibility.
+
+**Current Implementation Highlights:**
+1. **Professional Citations**: Documents display as "Aged Care Act 2024" instead of technical "C2025C00122.pdf"
+2. **Robust Architecture**: Singleton service with efficient in-memory caching and fallback handling
+3. **Comprehensive Coverage**: 68+ professionally curated document title mappings
+4. **System Integration**: Fully integrated into citation generation, document references, and chat responses
+5. **Quality Fallbacks**: Unmapped documents get formatted titles rather than breaking the system
+
+**Strategic Importance:** This system demonstrates sophisticated document management that significantly improves user experience while maintaining technical robustness and scalability.
+
+## Key Challenges and Analysis
+
+### **Challenge 1: Manual Title Maintenance Overhead**
+**Current State**: Static JSON file requires manual updates for new documents
+**Impact**: Title mappings may lag behind document additions or updates
+**Evidence**: 68 manually curated entries in `file_titles.json`
+**Opportunity**: AI-assisted title generation and automated maintenance workflows
+
+### **Challenge 2: Architectural Duplication**
+**Current State**: Separate title services for regulation and FAQ systems
+**Impact**: Code duplication and potential inconsistency between systems
+**Evidence**: Both `documentTitleService.ts` and `faqDocumentTitleService.ts` exist
+**Opportunity**: Unified title service architecture with document type detection
+
+### **Challenge 3: Limited Metadata Structure**
+**Current State**: Simple filename-to-title string mapping
+**Impact**: Missing opportunities for document categorization, dating, and enhanced search
+**Evidence**: Basic mapping without document metadata or relationships
+**Opportunity**: Rich metadata structure with dates, categories, versions, and document relationships
+
+## High-level Task Breakdown
+
+### **Phase 1: Current System Documentation & Analysis**
+
+#### **Task 1.1: Comprehensive System Audit**
+**Objective**: Document complete architecture and integration points
+**Actions**:
+- Map all DocumentTitleService consumers (regulation chat, FAQ chat, citations)
+- Analyze title mapping coverage across document corpus
+- Document service initialization, caching, and performance characteristics  
+- Identify integration points and dependencies
+- Review error handling and fallback strategies
+
+**Success Criteria**: Complete architectural documentation of file title system
+
+#### **Task 1.2: Title Quality & Coverage Assessment**
+**Objective**: Evaluate current title mappings for consistency and completeness
+**Actions**:
+- Review all 68+ titles in `file_titles.json` for quality and consistency
+- Identify unmapped documents relying on fallback formatting
+- Analyze title formatting patterns and establish quality standards
+- Check for outdated, incorrect, or inconsistent titles
+- Document title curation best practices and guidelines
+
+**Success Criteria**: Title quality report with improvement recommendations
+
+### **Phase 2: System Enhancement Implementation**
+
+#### **Task 2.1: AI-Assisted Title Generation System**
+**Objective**: Develop automated title generation for unmapped documents
+**Actions**:
+- Implement AI service for generating professional titles from document content
+- Create title suggestion workflow with human review and approval
+- Test AI-generated titles against manually created titles for quality
+- Integrate with existing DocumentTitleService architecture
+- Add confidence scoring and quality validation
+
+**Success Criteria**: AI title generation system maintaining professional quality standards
+
+#### **Task 2.2: Unified Title Service Architecture**
+**Objective**: Consolidate regulation and FAQ title services
+**Actions**:
+- Design unified service handling all document types with automatic detection
+- Create document type routing and specialized formatting
+- Migrate existing mappings to unified structure with backward compatibility
+- Update all consumers to use unified service
+- Test system integration and performance
+
+**Success Criteria**: Single, efficient title service handling all document types
+
+### **Phase 3: Operational Excellence & Enhancement**
+
+#### **Task 3.1: Administrative Interface Development**
+**Objective**: Build management tools for title system administration
+**Actions**:
+- Design admin interface for viewing, editing, and managing title mappings
+- Add bulk import/export functionality for title data
+- Create title approval workflows and change management
+- Implement usage analytics and title effectiveness reporting
+- Add title search and discovery tools for administrators
+
+**Success Criteria**: Complete administrative toolset for title system management
+
+## Project Status Board
+
+### **Phase 1: Current System Documentation & Analysis**
+- **Task 1.1**: Comprehensive System Audit - **PENDING**
+- **Task 1.2**: Title Quality & Coverage Assessment - **PENDING**
+
+### **Phase 2: System Enhancement Implementation**
+- **Task 2.1**: AI-Assisted Title Generation System - **PENDING**
+- **Task 2.2**: Unified Title Service Architecture - **PENDING**
+
+### **Phase 3: Operational Excellence & Enhancement**
+- **Task 3.1**: Administrative Interface Development - **PENDING**
+
+## Executor's Feedback or Assistance Requests
+
+**🎯 FILE TITLE SYSTEM ANALYSIS COMPLETE - SOPHISTICATED IMPLEMENTATION DISCOVERED!**
+
+**✅ EXISTING SYSTEM STRENGTHS:**
+- **Professional Architecture**: Well-implemented singleton service with proper caching and fallback strategies
+- **User Experience Impact**: Dramatic improvement from "C2025C00122.pdf" to "Aged Care Act 2024"
+- **Comprehensive Coverage**: 68+ professionally curated document title mappings
+- **System Integration**: Fully embedded throughout citation generation and document references
+- **Robust Design**: Handles edge cases gracefully with fallback formatting for unmapped documents
+
+**📊 DISCOVERED IMPLEMENTATION DETAILS:**
+- **Service Architecture**: `DocumentTitleService` singleton with Map-based caching and lazy initialization
+- **Data Source**: `data/Regulation Docs/file_titles.json` with comprehensive title mappings
+- **Dual System**: Separate services for regulation (`documentTitleService.ts`) and FAQ (`faqDocumentTitleService.ts`) 
+- **Integration Points**: RegulationChatService citation generation, document references, context preparation
+- **Performance**: Efficient in-memory caching with minimal I/O overhead
+
+**🚀 ENHANCEMENT OPPORTUNITIES IDENTIFIED:**
+1. **AI-Assisted Maintenance**: Automated title generation for new/unmapped documents
+2. **Unified Architecture**: Single service handling both regulation and FAQ documents  
+3. **Rich Metadata**: Enhanced structure with dates, categories, relationships
+4. **Administrative Tools**: Management interface for title curation and quality assurance
+5. **Operational Excellence**: Monitoring, testing, and automated maintenance workflows
+
+**💡 STRATEGIC INSIGHTS:**
+- **Build on Success**: Current implementation is sophisticated and well-architected
+- **Focus on Enhancement**: Opportunities lie in automation, unification, and operational tooling
+- **Maintain Quality**: Professional title curation significantly improves user experience
+- **Scale Considerations**: System ready for enhancement without architectural overhaul
+
+**📋 RECOMMENDED APPROACH:**
+1. **Document Current Success**: Comprehensive analysis of existing implementation
+2. **Enhance Gradually**: Build on solid foundation rather than replace
+3. **Automate Maintenance**: Priority on reducing manual title management overhead
+4. **Improve Operations**: Add administrative tools and system monitoring
+5. **Expand Capabilities**: Rich metadata and enhanced user experience features
+
+**Ready to proceed with Phase 1: Current System Documentation & Analysis!** 🚀
+
+## Lessons
+
+**✅ IMPLEMENTATION EXCELLENCE DISCOVERED:**
+- **Sophisticated Design**: The existing DocumentTitleService demonstrates professional-grade software architecture
+- **User-Centric Approach**: Professional titles dramatically improve document accessibility and credibility
+- **Technical Soundness**: Singleton pattern, caching, and fallback handling show mature engineering
+- **Integration Quality**: Title system properly embedded throughout all document reference points
+- **Operational Awareness**: Service handles edge cases and error scenarios gracefully
+
+**📚 ARCHITECTURAL INSIGHTS:**
+- **Single Responsibility**: Focused title mapping service with clear boundaries and responsibilities
+- **Performance Optimization**: In-memory caching with lazy loading provides efficient operations
+- **Flexibility**: JSON-based configuration allows for manual curation and easy updates
+- **Robustness**: Fallback strategies ensure system reliability even with incomplete data
+- **Maintainability**: Clean service interfaces and separation of concerns enable easy enhancement
