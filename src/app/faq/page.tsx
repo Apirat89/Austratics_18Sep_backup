@@ -12,16 +12,26 @@ import { renderMarkdown } from '@/lib/markdownRenderer';
 import {
   FAQSearchHistoryItem,
   FAQBookmark,
+  UnifiedFAQHistoryItem,
+  UnifiedFAQBookmark,
   saveFAQSearchToHistory,
   getFAQSearchHistory,
   getFAQBookmarks,
+  getUnifiedFAQHistory,
+  getUnifiedFAQBookmarks,
   deleteFAQSearchHistoryItem,
+  deleteUnifiedFAQHistoryItem,
+  deleteUnifiedFAQBookmark,
   clearFAQSearchHistory,
+  clearUnifiedFAQHistory,
+  clearUnifiedFAQBookmarks,
   deleteFAQBookmark,
   clearFAQBookmarks,
   saveFAQBookmark,
   isFAQBookmarkNameTaken,
-  getFAQBookmarkCount
+  getFAQBookmarkCount,
+  adaptUnifiedFAQHistoryToOld,
+  adaptUnifiedFAQBookmarksToOld
 } from '@/lib/faqHistory';
 import { FAQCitation } from '@/types/faq';
 
@@ -88,6 +98,8 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
   const [searchHistory, setSearchHistory] = useState<FAQSearchHistoryItem[]>([]);
   const [bookmarks, setBookmarks] = useState<FAQBookmark[]>([]);
+  const [unifiedHistory, setUnifiedHistory] = useState<UnifiedFAQHistoryItem[]>([]);
+  const [unifiedBookmarks, setUnifiedBookmarks] = useState<UnifiedFAQBookmark[]>([]);
   const [showBookmarkModal, setShowBookmarkModal] = useState(false);
   const [bookmarkName, setBookmarkName] = useState('');
   const [bookmarkDescription, setBookmarkDescription] = useState('');
@@ -116,14 +128,19 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
         setCurrentUser(user);
         
         if (user) {
-          // Load FAQ search history and bookmarks
-          const [historyData, bookmarksData] = await Promise.all([
-            getFAQSearchHistory(user.id),
-            getFAQBookmarks(user.id)
+          // Load unified search history and bookmarks
+          const [unifiedHistoryData, unifiedBookmarksData] = await Promise.all([
+            getUnifiedFAQHistory(user.id),
+            getUnifiedFAQBookmarks(user.id)
           ]);
           
-          setSearchHistory(historyData);
-          setBookmarks(bookmarksData);
+          // Set unified data
+          setUnifiedHistory(unifiedHistoryData);
+          setUnifiedBookmarks(unifiedBookmarksData);
+          
+          // Convert to old format for backward compatibility with existing UI
+          setSearchHistory(adaptUnifiedFAQHistoryToOld(unifiedHistoryData));
+          setBookmarks(adaptUnifiedFAQBookmarksToOld(unifiedBookmarksData));
         }
       } catch (error) {
         console.error('Error loading user and data:', error);
@@ -151,16 +168,20 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
     }
   };
 
-  // Helper function to refresh FAQ data
-  const refreshFAQData = async () => {
+  // Helper function to refresh unified FAQ data
+  const refreshUnifiedFAQData = async () => {
     if (currentUser) {
-      const [updatedHistory, updatedBookmarks] = await Promise.all([
-        getFAQSearchHistory(currentUser.id),
-        getFAQBookmarks(currentUser.id)
+      const [updatedUnifiedHistory, updatedUnifiedBookmarks] = await Promise.all([
+        getUnifiedFAQHistory(currentUser.id),
+        getUnifiedFAQBookmarks(currentUser.id)
       ]);
       
-      setSearchHistory(updatedHistory);
-      setBookmarks(updatedBookmarks);
+      setUnifiedHistory(updatedUnifiedHistory);
+      setUnifiedBookmarks(updatedUnifiedBookmarks);
+      
+      // Update adapted data for backward compatibility
+      setSearchHistory(adaptUnifiedFAQHistoryToOld(updatedUnifiedHistory));
+      setBookmarks(adaptUnifiedFAQBookmarksToOld(updatedUnifiedBookmarks));
     }
   };
 
@@ -168,7 +189,7 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
   const loadConversationHistory = async (conversationId: number): Promise<ChatMessage[]> => {
     console.log('📖 FAQ LOAD DEBUG: loadConversationHistory called for conversation:', conversationId);
     try {
-      const url = `/api/faq/chat?action=get_conversation_messages&conversation_id=${conversationId}`;
+      const url = `/api/faq/chat?action=conversation-history&conversation_id=${conversationId}`;
       console.log('📖 FAQ LOAD DEBUG: fetching URL:', url);
       
       const response = await fetch(url);
@@ -178,7 +199,7 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
       console.log('📖 FAQ LOAD DEBUG: API response data:', data);
       
       if (data.success) {
-        const messages = data.messages.map((msg: any) => ({
+        const messages = data.data.map((msg: any) => ({
           id: msg.id.toString(),
           role: msg.role,
           content: msg.content,
@@ -209,15 +230,16 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          action: 'create_conversation',
-          title: 'New FAQ Chat'
+          action: 'create-conversation',
+          title: 'New Chat',
+          first_message: 'Hello'
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        const newConversationId = data.conversation_id;
+        const newConversationId = data.data.conversation_id;
         setCurrentConversationId(newConversationId);
         
         // Reset to welcome message
@@ -338,14 +360,14 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            action: 'create_conversation',
+            action: 'create-conversation',
             title: messageToSend.slice(0, 50)
           }),
         });
 
         const createData = await createResponse.json();
         if (createData.success) {
-          conversationId = createData.conversation_id;
+          conversationId = createData.data.conversation_id;
           setCurrentConversationId(conversationId);
         }
       }
@@ -395,9 +417,16 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
             conversationId || undefined
           );
 
-          // Refresh FAQ search history
-          const updatedHistory = await getFAQSearchHistory(currentUser.id);
-          setSearchHistory(updatedHistory);
+          // Refresh unified search history (matching regulation page)
+          const updatedUnifiedHistory = await getUnifiedFAQHistory(currentUser.id);
+          console.log('📚 FAQ HISTORY DEBUG: Updated unified history:', updatedUnifiedHistory.map(h => ({ 
+            search_term: h.search_term, 
+            conversation_id: h.conversation_id,
+            source_type: h.source_type 
+          })));
+          
+          setUnifiedHistory(updatedUnifiedHistory);
+          setSearchHistory(adaptUnifiedFAQHistoryToOld(updatedUnifiedHistory));
         }
       } else {
         throw new Error(data.error || 'Failed to get response');
@@ -451,41 +480,74 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
 
   const handleDeleteSearchItem = async (itemId: number) => {
     if (currentUser) {
-      const success = await deleteFAQSearchHistoryItem(currentUser.id, itemId);
-      if (success) {
-        setSearchHistory(prev => prev.filter(item => item.id !== itemId));
+      // Find the unified history item to determine its source type
+      const unifiedItem = unifiedHistory.find(item => item.id === itemId);
+      
+      if (unifiedItem) {
+        const success = await deleteUnifiedFAQHistoryItem(currentUser.id, unifiedItem);
+        if (success) {
+          // Update unified history state
+          const updatedUnifiedHistory = unifiedHistory.filter(item => item.id !== itemId);
+          setUnifiedHistory(updatedUnifiedHistory);
+          
+          // Update adapted history state for backward compatibility
+          setSearchHistory(adaptUnifiedFAQHistoryToOld(updatedUnifiedHistory));
+        }
+      } else {
+        // Fallback to old method if not found in unified history
+        const success = await deleteFAQSearchHistoryItem(currentUser.id, itemId);
+        if (success) {
+          setSearchHistory(prev => prev.filter(item => item.id !== itemId));
+        }
       }
     }
   };
 
   const handleClearSearchHistory = async () => {
     if (currentUser) {
-      const success = await clearFAQSearchHistory(currentUser.id);
-      
+      const success = await clearUnifiedFAQHistory(currentUser.id);
       if (success) {
-        // Reload search history to get accurate state after clearing
-        const updatedHistory = await getFAQSearchHistory(currentUser.id);
-        setSearchHistory(updatedHistory);
+        // Reload unified history to get accurate state after clearing
+        const updatedUnifiedHistory = await getUnifiedFAQHistory(currentUser.id);
+        setUnifiedHistory(updatedUnifiedHistory);
+        setSearchHistory(adaptUnifiedFAQHistoryToOld(updatedUnifiedHistory));
       }
     }
   };
 
   const handleDeleteBookmark = async (bookmarkId: number) => {
     if (currentUser) {
-      const success = await deleteFAQBookmark(currentUser.id, bookmarkId);
-      if (success) {
-        setBookmarks(prev => prev.filter(item => item.id !== bookmarkId));
+      // Find the unified bookmark item to determine its source type
+      const unifiedBookmark = unifiedBookmarks.find(item => item.id === bookmarkId);
+      
+      if (unifiedBookmark) {
+        const success = await deleteUnifiedFAQBookmark(currentUser.id, unifiedBookmark);
+        if (success) {
+          // Update unified bookmarks state
+          const updatedUnifiedBookmarks = unifiedBookmarks.filter(item => item.id !== bookmarkId);
+          setUnifiedBookmarks(updatedUnifiedBookmarks);
+          
+          // Update adapted bookmarks state for backward compatibility
+          setBookmarks(adaptUnifiedFAQBookmarksToOld(updatedUnifiedBookmarks));
+        }
+      } else {
+        // Fallback to old method if not found in unified bookmarks
+        const success = await deleteFAQBookmark(currentUser.id, bookmarkId);
+        if (success) {
+          setBookmarks(prev => prev.filter(item => item.id !== bookmarkId));
+        }
       }
     }
   };
 
   const handleClearBookmarks = async () => {
     if (currentUser) {
-      const success = await clearFAQBookmarks(currentUser.id);
+      const success = await clearUnifiedFAQBookmarks(currentUser.id);
       if (success) {
-        // Reload bookmarks to get accurate state after clearing
-        const updatedBookmarks = await getFAQBookmarks(currentUser.id);
-        setBookmarks(updatedBookmarks);
+        // Reload unified bookmarks to get accurate state after clearing
+        const updatedUnifiedBookmarks = await getUnifiedFAQBookmarks(currentUser.id);
+        setUnifiedBookmarks(updatedUnifiedBookmarks);
+        setBookmarks(adaptUnifiedFAQBookmarksToOld(updatedUnifiedBookmarks));
       }
     }
   };
@@ -555,7 +617,7 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
 
     if (success) {
       // Refresh FAQ data to include new bookmark
-      await refreshFAQData();
+      await refreshUnifiedFAQData();
       setShowBookmarkModal(false);
       setBookmarkName('');
       setBookmarkDescription('');

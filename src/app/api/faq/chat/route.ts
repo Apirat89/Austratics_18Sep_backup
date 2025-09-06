@@ -77,6 +77,31 @@ export async function POST(request: NextRequest) {
     let response: ChatResponse;
 
     switch (action) {
+      case 'create-conversation':
+        // Create a new FAQ conversation (matching regulation API exactly)
+        const { title, first_message } = body;
+        
+        if (!first_message || typeof first_message !== 'string') {
+          return NextResponse.json(
+            { error: 'First message is required for creating a conversation' },
+            { status: 400 }
+          );
+        }
+
+        console.log(`💬 FAQ Create Conversation: "${first_message}"`);
+        
+        response = await faqChatService.processConversationalQuery(first_message, {
+          user_id: user.id,
+          conversation_history: []
+        });
+
+        console.log(`✅ FAQ Conversation created in ${response.processing_time}ms`);
+
+        return NextResponse.json({
+          success: true,
+          data: { conversation_id: response.conversation_id }
+        });
+
       case 'ask':
         // Handle single FAQ question
         if (!question) {
@@ -92,23 +117,13 @@ export async function POST(request: NextRequest) {
         });
         
         console.log(`✅ FAQ Ask completed in ${response.processing_time}ms`);
-        break;
-
-      case 'create_conversation':
-        // Create a new FAQ conversation
-        if (!user_message) {
-          return NextResponse.json({ error: 'User message is required for create_conversation action' }, { status: 400 });
-        }
-
-        console.log(`💬 FAQ Create Conversation: "${user_message}"`);
         
-        response = await faqChatService.processConversationalQuery(user_message, {
-          user_id: user.id,
-          conversation_history: []
+        return NextResponse.json({
+          success: true,
+          data: response
         });
-        
-        console.log(`✅ FAQ Conversation created in ${response.processing_time}ms`);
-        break;
+
+
 
       case 'add_message':
         // Add message to existing FAQ conversation
@@ -127,7 +142,11 @@ export async function POST(request: NextRequest) {
         });
         
         console.log(`✅ FAQ Message added in ${response.processing_time}ms`);
-        break;
+        
+        return NextResponse.json({
+          success: true,
+          data: response
+        });
 
       case 'get_conversations':
         // Get user's FAQ conversations
@@ -135,33 +154,13 @@ export async function POST(request: NextRequest) {
         
         try {
           const conversations = await faqChatService.getUserConversations(user.id);
-          return NextResponse.json({ 
-            conversations,
-            action: 'get_conversations'
+          return NextResponse.json({
+            success: true,
+            data: conversations
           });
         } catch (error) {
           console.error('❌ FAQ Error getting conversations:', error);
           return NextResponse.json({ error: 'Failed to retrieve FAQ conversations' }, { status: 500 });
-        }
-
-      case 'get_conversation_messages':
-        // Get messages from a specific FAQ conversation
-        if (!conversation_id) {
-          return NextResponse.json({ error: 'Conversation ID is required' }, { status: 400 });
-        }
-
-        console.log(`📄 FAQ Get messages for conversation ${conversation_id}`);
-        
-        try {
-          const messages = await faqChatService.getConversationMessages(conversation_id);
-          return NextResponse.json({ 
-            messages,
-            conversation_id,
-            action: 'get_conversation_messages'
-          });
-        } catch (error) {
-          console.error('❌ FAQ Error getting conversation messages:', error);
-          return NextResponse.json({ error: 'Failed to retrieve FAQ conversation messages' }, { status: 500 });
         }
 
       case 'bookmark_message':
@@ -244,13 +243,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
     }
 
-    // Return the chat response for ask, create_conversation, and add_message actions
-    return NextResponse.json({
-      ...response,
-      action,
-      success: true
-    });
-
   } catch (error) {
     console.error('❌ FAQ API Error:', error);
     
@@ -307,6 +299,26 @@ export async function GET(request: NextRequest) {
     }
 
     switch (action) {
+      case 'conversation-history':
+        // Get conversation history (matching regulation API pattern)
+        const conversationId = searchParams.get('conversation_id');
+        if (!conversationId) {
+          return NextResponse.json({ error: 'Conversation ID is required' }, { status: 400 });
+        }
+
+        console.log(`📖 FAQ Get conversation history for conversation ${conversationId}`);
+        
+        try {
+          const history = await faqChatService.getConversationMessages(parseInt(conversationId));
+          return NextResponse.json({
+            success: true,
+            data: history
+          });
+        } catch (error) {
+          console.error('❌ FAQ Error getting conversation history:', error);
+          return NextResponse.json({ error: 'Failed to retrieve FAQ conversation history' }, { status: 500 });
+        }
+
       case 'get_search_history':
         console.log(`📋 FAQ Get search history for user ${user.id}`);
         
@@ -322,9 +334,9 @@ export async function GET(request: NextRequest) {
             throw error;
           }
 
-          return NextResponse.json({ 
-            searchHistory: data || [],
-            action: 'get_search_history'
+          return NextResponse.json({
+            success: true,
+            data: data || []
           });
         } catch (error) {
           console.error('❌ FAQ Error getting search history:', error);
@@ -359,9 +371,9 @@ export async function GET(request: NextRequest) {
             throw error;
           }
 
-          return NextResponse.json({ 
-            bookmarks: data || [],
-            action: 'get_bookmarks'
+          return NextResponse.json({
+            success: true,
+            data: data || []
           });
         } catch (error) {
           console.error('❌ FAQ Error getting bookmarks:', error);
