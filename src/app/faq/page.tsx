@@ -72,9 +72,9 @@ export default function FAQPage() {
     {
       id: '1',
       role: 'assistant',
-      content: `🤝 Welcome to the Giantash FAQ Assistant!
+      content: `🤝 Welcome to the Austratics FAQ Assistant!
 
-I'm here to help you learn how to use the Giantash Aged Care Analytics platform effectively. I can provide step-by-step guidance from our user guides:
+I'm here to help you learn how to use the Austratics Aged Care Analytics platform effectively. I can provide step-by-step guidance from our user guides:
 
 📋 **Available User Guides:**
 • **Home Care** - Search and compare homecare providers
@@ -219,11 +219,16 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
     }
   };
 
-  // Create new conversation
+  // Create new conversation with enhanced error handling
   const createNewConversation = async () => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.log('❌ No user authenticated for new conversation');
+      return;
+    }
 
     try {
+      console.log('🚀 Creating new FAQ conversation...');
+      
       const response = await fetch('/api/faq/chat', {
         method: 'POST',
         headers: {
@@ -231,14 +236,23 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
         },
         body: JSON.stringify({
           action: 'create-conversation',
-          title: 'New Chat',
-          first_message: 'Hello'
+          title: 'New FAQ Chat'
+          // Remove first_message to avoid "Hello" pollution
         }),
       });
 
-      const data = await response.json();
+      console.log('📡 Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Server error:', errorText);
+        throw new Error(`Server error: ${response.status} - ${errorText}`);
+      }
 
-      if (data.success) {
+      const data = await response.json();
+      console.log('✅ Response data:', data);
+
+      if (data.success && data.data?.conversation_id) {
         const newConversationId = data.data.conversation_id;
         setCurrentConversationId(newConversationId);
         
@@ -247,9 +261,9 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
           {
             id: '1',
             role: 'assistant',
-            content: `🤝 Welcome to the Giantash FAQ Assistant!
+            content: `🤝 Welcome to the Austratics FAQ Assistant!
 
-I'm here to help you learn how to use the Giantash Aged Care Analytics platform effectively. I can provide step-by-step guidance from our user guides:
+I'm here to help you learn how to use the Austratics Aged Care Analytics platform effectively. I can provide step-by-step guidance from our user guides:
 
 📋 **Available User Guides:**
 • **Home Care** - Search and compare homecare providers
@@ -271,11 +285,23 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
         setTimeout(() => {
           inputRef.current?.focus();
         }, 100);
+        
+        console.log('✅ New conversation created:', newConversationId);
       } else {
-        console.error('Failed to create FAQ conversation:', data.error);
+        throw new Error(data.error || 'Invalid response structure');
       }
     } catch (error) {
-      console.error('Error creating FAQ conversation:', error);
+      console.error('❌ Error creating FAQ conversation:', error);
+      
+      // User-friendly error handling
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      if (errorMessage.includes('Authentication') || errorMessage.includes('401')) {
+        alert('Please sign in to create a new conversation.');
+      } else if (errorMessage.includes('Rate limit') || errorMessage.includes('429')) {
+        alert('Too many requests. Please wait a moment before creating a new conversation.');
+      } else {
+        alert('Failed to create new conversation. Please try again.');
+      }
     }
   };
 
@@ -296,9 +322,9 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
           {
             id: '1',
             role: 'assistant',
-            content: `🤝 Welcome to the Giantash FAQ Assistant!
+            content: `🤝 Welcome to the Austratics FAQ Assistant!
 
-I'm here to help you learn how to use the Giantash Aged Care Analytics platform effectively. I can provide step-by-step guidance from our user guides:
+I'm here to help you learn how to use the Austratics Aged Care Analytics platform effectively. I can provide step-by-step guidance from our user guides:
 
 📋 **Available User Guides:**
 • **Home Care** - Search and compare homecare providers
@@ -361,7 +387,8 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
           },
           body: JSON.stringify({
             action: 'create-conversation',
-            title: messageToSend.slice(0, 50)
+            title: messageToSend.slice(0, 50),
+            first_message: messageToSend  // Add for compatibility and intent alignment
           }),
         });
 
@@ -951,7 +978,7 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
                     placeholder={
                       !currentUser 
                         ? "Please sign in to use the FAQ assistant..." 
-                        : "Ask me how to use any feature of the Giantash platform..."
+                        : "Ask me how to use any feature of the Austratics platform..."
                     }
                     disabled={isLoading || !currentUser}
                     rows={2}
@@ -969,7 +996,7 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
                 {!currentUser && (
                   <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                     <p className="text-amber-800 text-sm">
-                      🔐 <strong>Sign In Required:</strong> Please sign in to use the FAQ assistant and get personalized help with the Giantash platform.
+                      🔐 <strong>Sign In Required:</strong> Please sign in to use the FAQ assistant and get personalized help with the Austratics platform.
                     </p>
                   </div>
                 )}

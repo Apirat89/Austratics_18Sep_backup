@@ -75,27 +75,38 @@ export class FAQDocumentProcessor {
       // Read the DOCX file
       const fileBuffer = fs.readFileSync(filePath);
       
-      // Extract text with options to preserve structure
-      const result = await mammoth.extractRawText({ 
-        buffer: fileBuffer,
-        convertImage: mammoth.images.imgElement(function(image: any) {
-          // Skip images in FAQ processing
-          return '';
+      // Extract both raw text and markdown for heading structure
+      const [textResult, markdownResult] = await Promise.all([
+        mammoth.extractRawText({ 
+          buffer: fileBuffer,
+          convertImage: mammoth.images.imgElement(function(image: any) {
+            // Skip images in FAQ processing
+            return '';
+          })
+        }),
+        mammoth.convertToMarkdown({ 
+          buffer: fileBuffer,
+          convertImage: mammoth.images.imgElement(function(image: any) {
+            // Skip images in FAQ processing
+            return '';
+          })
         })
-      });
+      ]);
       
-      console.log(`📄 Extracted ${result.value.length} characters from ${path.basename(filePath)}`);
+      console.log(`📄 Extracted ${textResult.value.length} characters from ${path.basename(filePath)}`);
+      console.log(`📋 Extracted markdown with heading structure (${markdownResult.value.length} chars)`);
       
       // Process any warnings
-      if (result.messages && result.messages.length > 0) {
-        console.log(`⚠️  Processing messages:`, result.messages.length);
+      if (textResult.messages && textResult.messages.length > 0) {
+        console.log(`⚠️  Processing messages:`, textResult.messages.length);
       }
       
       return {
-        text: result.value,
+        text: textResult.value,
         metadata: {
-          originalLength: result.value.length,
-          warnings: result.messages || [],
+          originalLength: textResult.value.length,
+          markdown: markdownResult.value,
+          warnings: textResult.messages || [],
           extractedAt: new Date().toISOString()
         }
       };
@@ -103,6 +114,183 @@ export class FAQDocumentProcessor {
       console.error(`❌ Error extracting text from ${filePath}:`, error);
       throw error;
     }
+  }
+
+  /**
+   * Pre-clean extracted text to remove UI artifacts and noise
+   * Removes placeholder text, alt text, and accessibility tips that contaminate search results
+   */
+  private preClean(text: string): string {
+    return text
+      .replace(/(?:^|\s)(Screenshot placeholder:).*?(?=(?:\n|$))/gi, ' ')
+      .replace(/(?:^|\s)(Alt(?:ernative)?\s*text:).*?(?=(?:\n|$))/gi, ' ')
+      .replace(/Accessibility tip:.*?(?=(?:\n|$))/gi, ' ')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
+  /**
+   * Simple token counting (approximates GPT-3 tokenization)
+   * Uses whitespace and punctuation splitting as recommended in user analysis
+   */
+  private countTokens(text: string): number {
+    if (!text || text.trim().length === 0) return 0;
+    
+    // Split on whitespace and punctuation, filter empty strings
+    const tokens = text
+      .split(/[\s\.,!?;:()\[\]{}'"‚""''`~\-–—]+/)
+      .filter(token => token.length > 0);
+    
+    return tokens.length;
+  }
+
+  /**
+   * Extract heading hierarchy from markdown text
+   * Returns sections with heading paths for context integration
+   */
+  private extractHeadingHierarchy(markdown: string): Array<{
+    content: string;
+    headingPath: string[];
+    level: number;
+  }> {
+    const lines = markdown.split('\n');
+    const sections: Array<{
+      content: string;
+      headingPath: string[];
+      level: number;
+    }> = [];
+    
+    const headingStack: Array<{title: string; level: number}> = [];
+    let currentContent: string[] = [];
+    
+    for (const line of lines) {
+      const headingMatch = line.match(/^(#{1,6})\s+(.+)/);
+      
+      if (headingMatch) {
+        // Save current section if it has content
+        if (currentContent.length > 0) {
+          const headingPath = headingStack.map(h => h.title);
+          sections.push({
+            content: currentContent.join('\n').trim(),
+            headingPath: [...headingPath],
+            level: headingStack.length > 0 ? headingStack[headingStack.length - 1].level : 0
+          });
+          currentContent = [];
+        }
+        
+        const level = headingMatch[1].length;
+        const title = headingMatch[2].trim();
+        
+        // Update heading stack based on level
+        while (headingStack.length > 0 && headingStack[headingStack.length - 1].level >= level) {
+          headingStack.pop();
+        }
+        
+        headingStack.push({ title, level });
+      } else {
+        // Add content line
+        if (line.trim()) {
+          currentContent.push(line);
+        }
+      }
+    }
+    
+    // Add final section
+    if (currentContent.length > 0) {
+      const headingPath = headingStack.map(h => h.title);
+      sections.push({
+        content: currentContent.join('\n').trim(),
+        headingPath: [...headingPath],
+        level: headingStack.length > 0 ? headingStack[headingStack.length - 1].level : 0
+      });
+    }
+    
+    console.log(`📊 Extracted ${sections.length} sections with heading hierarchy`);
+    return sections;
+  }
+
+  /**
+   * Split text into token-based chunks with heading context integration
+   * Implements heading-aware chunking with token limits as specified in user analysis  
+   */
+  private chunkTextWithHeadingContext(
+    text: string,
+    markdown: string,
+    documentName: string, 
+    guideCategory: string,
+    maxTokens: number = 450,
+    overlapTokens: number = 50
+  ): FAQRawChunk[] {
+    const chunks: FAQRawChunk[] = [];
+    
+    // Extract sections with heading hierarchy
+    const sections = this.extractHeadingHierarchy(markdown);
+    
+    let globalChunkIndex = 0;
+    
+    for (const section of sections) {
+      if (!section.content.trim()) continue;
+      
+      // Create heading context prefix as specified in user analysis
+      const headingPrefix = section.headingPath.length > 0 
+        ? `${section.headingPath.join(' > ')}\n\n`
+        : '';
+      
+      // Split section content into sentences
+      const sentences = section.content.split(/[.!?]+/).filter(s => s.trim().length > 0);
+      
+      let currentChunk = '';
+      
+      for (let i = 0; i < sentences.length; i++) {
+        const sentence = sentences[i].trim();
+        if (!sentence) continue;
+        
+        const sentenceWithPeriod = sentence + '.';
+        const testChunk = headingPrefix + currentChunk + ' ' + sentenceWithPeriod;
+        const tokenCount = this.countTokens(testChunk);
+        
+        // Check if adding this sentence would exceed token limit
+        if (tokenCount > maxTokens && currentChunk.trim()) {
+          // Add the current chunk with heading context
+          const finalContent = headingPrefix + currentChunk.trim();
+          
+          chunks.push({
+            content: finalContent,
+            section_title: section.headingPath.length > 0 
+              ? section.headingPath[section.headingPath.length - 1] 
+              : undefined,
+            page_number: Math.ceil(globalChunkIndex / 10) + 1, // Approximate page numbers
+            chunk_index: globalChunkIndex
+          });
+          
+          // Start new chunk with token-based overlap
+          const words = currentChunk.trim().split(/\s+/);
+          const overlapWords = words.slice(-overlapTokens); // Approximate overlap
+          currentChunk = overlapWords.join(' ') + ' ' + sentenceWithPeriod;
+          globalChunkIndex++;
+        } else {
+          currentChunk += (currentChunk ? ' ' : '') + sentenceWithPeriod;
+        }
+      }
+      
+      // Add final chunk from this section if it has content
+      if (currentChunk.trim()) {
+        const finalContent = headingPrefix + currentChunk.trim();
+        
+        chunks.push({
+          content: finalContent,
+          section_title: section.headingPath.length > 0 
+            ? section.headingPath[section.headingPath.length - 1] 
+            : undefined,
+          page_number: Math.ceil(globalChunkIndex / 10) + 1,
+          chunk_index: globalChunkIndex
+        });
+        globalChunkIndex++;
+      }
+    }
+    
+    console.log(`📊 Heading-aware chunking: ${chunks.length} chunks created with structural context`);
+    return chunks;
   }
 
   /**
@@ -180,72 +368,6 @@ export class FAQDocumentProcessor {
   }
 
   /**
-   * Generate text chunks from FAQ content
-   */
-  private chunkText(
-    text: string, 
-    documentName: string, 
-    guideCategory: string
-  ): FAQRawChunk[] {
-    const chunks: FAQRawChunk[] = [];
-    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-    
-    let currentChunk = '';
-    let chunkIndex = 0;
-    let currentSection = '';
-    
-    for (let i = 0; i < sentences.length; i++) {
-      const sentence = sentences[i].trim();
-      if (!sentence) continue;
-      
-      // Check if this sentence might be a section header
-      if (sentence.length < 100 && (
-        sentence.includes(':') || 
-        /^[A-Z][^.]*$/.test(sentence) ||
-        sentence.includes('Step') ||
-        sentence.includes('Chapter')
-      )) {
-        currentSection = sentence;
-      }
-      
-      // Check if adding this sentence would exceed chunk size
-      if (currentChunk.length + sentence.length + 2 > this.maxChunkSize) {
-        if (currentChunk.trim()) {
-          // Add the current chunk
-          chunks.push({
-            content: currentChunk.trim(),
-            section_title: currentSection || undefined,
-            page_number: Math.ceil((i + 1) / 50), // Approximate page numbers
-            chunk_index: chunkIndex
-          });
-          
-          // Start new chunk with overlap
-          const overlapStart = Math.max(0, currentChunk.length - this.chunkOverlap);
-          currentChunk = currentChunk.substring(overlapStart) + ' ' + sentence + '.';
-          chunkIndex++;
-        } else {
-          currentChunk = sentence + '.';
-        }
-      } else {
-        currentChunk += (currentChunk ? ' ' : '') + sentence + '.';
-      }
-    }
-    
-    // Add final chunk if it has content
-    if (currentChunk.trim()) {
-      chunks.push({
-        content: currentChunk.trim(),
-        section_title: currentSection || undefined,
-        page_number: Math.ceil(chunks.length / 10) + 1,
-        chunk_index: chunkIndex
-      });
-    }
-    
-    console.log(`📝 Created ${chunks.length} chunks from ${documentName}`);
-    return chunks;
-  }
-
-  /**
    * Generate embedding for text using Gemini
    */
   private async generateEmbedding(text: string): Promise<number[]> {
@@ -309,8 +431,11 @@ export class FAQDocumentProcessor {
       // Extract text from DOCX
       const { text, metadata } = await this.extractTextFromDOCX(filePath);
       
+      // Pre-clean extracted text
+      const preCleanedText = this.preClean(text);
+      
       // Clean extracted text
-      const cleanText = this.cleanExtractedText(text);
+      const cleanText = this.cleanExtractedText(preCleanedText);
       
       // Determine guide category and document info
       const guideCategory = this.getGuideCategory(filePath);
@@ -323,7 +448,7 @@ export class FAQDocumentProcessor {
       console.log(`📋 Document: ${professionalTitle} (${guideCategory})`);
       
       // Generate raw chunks
-      const rawChunks = this.chunkText(cleanText, documentName, guideCategory);
+      const rawChunks = this.chunkTextWithHeadingContext(cleanText, metadata.markdown, documentName, guideCategory);
       
       // Create document chunks with embeddings
       const chunks: FAQDocumentChunk[] = [];
