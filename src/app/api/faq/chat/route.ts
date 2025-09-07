@@ -38,7 +38,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { action, question, conversation_id, user_message, conversation_history } = body;
 
+    // DEBUG: Log the received body to debug 400 errors
+    console.log(`🔍 FAQ API DEBUG - Received body:`, JSON.stringify(body, null, 2));
+
     if (!action) {
+      console.log(`❌ FAQ API ERROR: No action provided`);
       return NextResponse.json({ error: 'Action is required' }, { status: 400 });
     }
 
@@ -78,28 +82,29 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case 'create-conversation':
-        // Create a new FAQ conversation (matching regulation API exactly)
+        // Create a lightweight FAQ conversation (DB-only operation)
         const { title, first_message } = body;
         
-        if (!first_message || typeof first_message !== 'string') {
-          return NextResponse.json(
-            { error: 'First message is required for creating a conversation' },
-            { status: 400 }
-          );
-        }
-
-        console.log(`💬 FAQ Create Conversation: "${first_message}"`);
+        console.log(`🔍 CREATE-CONVERSATION DEBUG (Lightweight):`);
+        console.log(`- title: "${title}" (type: ${typeof title})`);
+        console.log(`- first_message: "${first_message}" (type: ${typeof first_message})`);
         
-        response = await faqChatService.processConversationalQuery(first_message, {
+        // No validation required - make optional for flexibility
+        console.log(`💬 FAQ Create lightweight conversation`);
+        
+        // Create conversation using direct service call (DB-only)
+        const conversationId = await faqChatService.createConversation({
           user_id: user.id,
-          conversation_history: []
+          title: typeof title === 'string' && title.trim() ? title.trim() : 'New FAQ Chat',
+          // Use first_message only for auto-generating title if title wasn't provided
+          first_message: typeof first_message === 'string' ? first_message : ''
         });
 
-        console.log(`✅ FAQ Conversation created in ${response.processing_time}ms`);
+        console.log(`✅ FAQ Conversation created (DB-only): ${conversationId}`);
 
         return NextResponse.json({
           success: true,
-          data: { conversation_id: response.conversation_id }
+          data: { conversation_id: conversationId }
         });
 
       case 'ask':
@@ -245,10 +250,14 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ FAQ API Error:', error);
+    console.error('- Error type:', typeof error);
+    console.error('- Error message:', error instanceof Error ? error.message : String(error));
+    console.error('- Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     
     // Handle specific error types
     if (error instanceof Error) {
       if (error.message.includes('rate limit')) {
+        console.log('🚫 Rate limit error detected');
         return NextResponse.json({ 
           error: 'Rate limit exceeded. Please try again later.',
           rateLimitExceeded: true 
@@ -256,6 +265,7 @@ export async function POST(request: NextRequest) {
       }
       
       if (error.message.includes('authentication') || error.message.includes('unauthorized')) {
+        console.log('🔐 Authentication error detected');
         return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
       }
     }

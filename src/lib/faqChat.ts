@@ -844,6 +844,12 @@ Return JSON array of {index, score}. Question: "${question}"\n\nChunks:\n${packe
     conversationContext: string = ''
   ): Promise<string> {
     try {
+      // DEBUG: Log input parameters
+      console.log(`🔍 generateFAQAnswer DEBUG:`);
+      console.log(`- Question: "${question}"`);
+      console.log(`- Citations count: ${citations.length}`);
+      console.log(`- Conversation context length: ${conversationContext.length} chars`);
+
       // Sort citations by relevance score (highest first)
       const sortedCitations = [...citations].sort((a, b) => b.similarity - a.similarity);
 
@@ -867,63 +873,148 @@ ${'='.repeat(80)}`;
 
       const context = contextChunks.join('\n\n');
 
-      // FAQ-specific prompt optimized for user guide content
-      const prompt = `You are a helpful assistant specialized in explaining how to use the Giantash Aged Care Analytics platform. You provide clear, step-by-step guidance based on the official user guides.
+      // DEBUG: Log context info
+      console.log(`- Context chunks created: ${contextChunks.length}`);
+      console.log(`- Total context length: ${context.length} chars`);
+      if (context.length === 0) {
+        console.log(`⚠️  WARNING: Empty context string generated from citations!`);
+      }
 
-🎯 PRIMARY GOAL: Help users understand and effectively use the platform features with practical, actionable instructions.
+      // Simplified, robust prompt optimized for reliability
+      const prompt = `You are a helpful assistant for the Austratics Aged Care Analytics platform. Provide clear, step-by-step guidance using ONLY the user guide content below.
 
-📋 RESPONSE REQUIREMENTS:
-1. Provide clear, step-by-step instructions when explaining how to use features
-2. Use friendly, accessible language while being thorough and accurate
-3. Structure responses with helpful formatting (numbered steps, bullet points, etc.)
-4. Reference the specific user guides when providing information
-5. Focus on practical usage and troubleshooting
-6. Include tips and best practices when relevant
+**Instructions:**
+1. Start by rephrasing the user's question to show understanding
+2. Provide detailed, step-by-step instructions using the guide content
+3. Use clear formatting with numbered steps and bullet points
+4. Reference specific user guides when providing information
+5. Include practical tips and examples when available
 
-📝 CITATION FORMAT:
-1. Use this format: [Guide Name] or [Guide Name - Section] 
-2. Use the professional guide titles provided, not file names
-3. Be specific about which feature or section you're referencing
+${conversationContext ? `**Previous Conversation:**\n${conversationContext}\n` : ''}
 
-🔍 CONTENT EVALUATION:
-- Prioritize information marked with 🎯 HIGH RELEVANCE
-- Combine information from multiple user guides when helpful
-- Provide complete workflows and user journeys when possible
-- Include context about when and why to use specific features
-
-${conversationContext ? `
-🗣️ CONVERSATION CONTEXT:
-${conversationContext}
-
-Consider this conversation history when crafting your response to provide continuity and avoid repetition.
-` : ''}
-
-📚 USER GUIDE CONTENT:
+**User Guide Content:**
 ${context}
 
-❓ USER QUESTION: ${question}
+**User Question:** ${question}
 
-Please provide a comprehensive, helpful answer based on the user guide content above. Structure your response with clear headings and actionable steps where appropriate.`;
+**Your Response:**`;
 
-      // Generate response using Gemini 2.5 Flash
+      // Generate response using Gemini 2.5 Flash with enhanced configuration
       const model = this.genAI.getGenerativeModel({ 
         model: 'gemini-2.5-flash',
         generationConfig: {
-          maxOutputTokens: 1000,
-          temperature: 0.3 // Lower temperature for consistent, helpful responses
+          maxOutputTokens: 2500,      // Increased for longer, more detailed responses
+          temperature: 0.4,           // Slightly higher for more thoughtful variations
+          topK: 40,                   // Allow more diverse word choices
+          topP: 0.95,                 // High nucleus sampling for coherent long-form text
+          candidateCount: 1           // Single candidate for consistency
         }
       });
 
+      // DEBUG: Log prompt info
+      console.log(`- Final prompt length: ${prompt.length} chars`);
+      
       const result = await model.generateContent(prompt);
       const response = result.response;
-      const answer = response.text();
+      
+      // DEBUG: Log raw response info
+      console.log(`- Raw Gemini response object:`, response);
+      console.log(`- Response candidates:`, response.candidates?.length);
+      
+      let answer = response.text()?.trim() || '';
+
+      // DEBUG: Initial extraction attempt
+      console.log(`- Initial answer length: ${answer.length} chars`);
+
+      // FALLBACK 1: Mine candidate parts if .text() is empty
+      if (!answer && response.candidates) {
+        console.log(`🔄 Fallback 1: Extracting from candidates...`);
+        const fromCandidates = response.candidates
+          .map(c => 
+            (c?.content?.parts || [])
+              .map(p => (typeof p.text === 'string' ? p.text : ''))
+              .join('')
+          )
+          .find(t => t && t.trim());
+
+        if (fromCandidates && fromCandidates.trim()) {
+          answer = fromCandidates.trim();
+          console.log(`✅ Fallback 1 success: ${answer.length} chars`);
+        } else {
+          console.log(`❌ Fallback 1 failed: No valid candidate content`);
+        }
+      }
+
+      // FALLBACK 2: Retry with shorter prompt + lighter model
+      if (!answer) {
+        console.log(`🔄 Fallback 2: Retry with simpler model...`);
+        try {
+          const shortContext = contextChunks.slice(0, 4).join('\n\n'); // top 3-4 chunks
+          const retryPrompt = `Answer the user's question using ONLY the context below.
+Be concise, step-by-step, and cite [Guide - Section] inline.
+
+QUESTION: ${question}
+
+CONTEXT:
+${shortContext}`;
+
+          const retryModel = this.genAI.getGenerativeModel({
+            model: 'gemini-1.5-flash',
+            generationConfig: { 
+              maxOutputTokens: 1024, 
+              temperature: 0.2, 
+              topP: 0.9 
+            }
+          });
+
+          const retryResult = await retryModel.generateContent(retryPrompt);
+          const retryAnswer = retryResult.response.text()?.trim() || '';
+          
+          if (retryAnswer) {
+            answer = retryAnswer;
+            console.log(`✅ Fallback 2 success: ${answer.length} chars`);
+          } else {
+            console.log(`❌ Fallback 2 failed: Empty retry response`);
+          }
+        } catch (error) {
+          console.log(`❌ Fallback 2 error:`, error);
+        }
+      }
+
+      // FALLBACK 3: Extractive answer built from citations
+      if (!answer) {
+        console.log(`🔄 Fallback 3: Creating extractive answer...`);
+        const bulletLines = sortedCitations.slice(0, 5).map(c => {
+          const sec = c.section_title ? ` – ${c.section_title}` : '';
+          return `- **[${c.document_name}${sec}]** ${c.content_preview}`;
+        }).join('\n');
+
+        answer = `Here's what the user guides say:
+
+${bulletLines}
+
+**Tip:** Ask a follow-up if you need steps for a specific screen.`;
+
+        console.log(`✅ Fallback 3 success: ${answer.length} chars (extractive)`);
+      }
+
+      // Final validation
+      if (answer.length === 0) {
+        console.log(`❌ CRITICAL: All fallbacks failed! Using emergency response.`);
+        answer = "I apologize, but I'm having trouble generating a response right now. Please try rephrasing your question or try again in a moment.";
+      } else {
+        console.log(`- Final answer preview: "${answer.substring(0, 100)}..."`);
+      }
 
       console.log(`✅ Generated FAQ answer (${answer.length} chars)`);
       
       return answer;
 
     } catch (error) {
-      console.error('Error generating FAQ answer:', error);
+      console.error('❌ Error generating FAQ answer:', error);
+      console.error('- Error type:', typeof error);
+      console.error('- Error message:', error instanceof Error ? error.message : String(error));
+      console.error('- Error stack:', error instanceof Error ? error.stack : 'No stack trace');
       throw error;
     }
   }
