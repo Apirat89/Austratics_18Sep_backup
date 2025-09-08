@@ -1256,6 +1256,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           markerElement.style.cursor = 'pointer';
           markerElement.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
           markerElement.style.zIndex = '10'; // Base level for normal markers, below heatmap menus (z-30)
+          
+          // ✅ ADD: Facility type metadata for instant visibility control
+          markerElement.setAttribute('data-facility-type', typeKey); // Base level for normal markers, below heatmap menus (z-30)
 
           // Extract facility details
           const serviceName = facility.Service_Name || 'Unknown Service';
@@ -2130,6 +2133,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   useEffect(() => {
     if (!map.current || !isLoaded || facilityLoading) return;
     
+
+    
     // Removed problematic coordination that created deadlock
     // The LayerManager now handles heatmap coordination properly
     
@@ -2179,6 +2184,24 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     
     updateFacilities();
   }, [isLoaded, debouncedFacilityTypes, clearAllMarkers, addHealthcareFacilities, facilityLoading, heatmapDataReady, heatmapVisible]);
+
+  // ✅ INSTANT VISIBILITY SYSTEM: Toggle marker visibility without rebuilding (like count/radius systems)
+  useEffect(() => {
+    if (!map.current || !isLoaded) return;
+    
+    // Get all existing marker elements from DOM
+    const markerElements = document.querySelectorAll('.aged-care-marker[data-facility-type]');
+    
+    // Show/hide markers based on current facility type selection
+    markerElements.forEach((markerElement) => {
+      const facilityType = markerElement.getAttribute('data-facility-type');
+      if (facilityType) {
+        const isEnabled = facilityTypes[facilityType as keyof FacilityTypes];
+        (markerElement as HTMLElement).style.display = isEnabled ? 'block' : 'none';
+      }
+    });
+    
+  }, [facilityTypes, isLoaded]); // Uses non-debounced facilityTypes for instant response
 
   // Helper function to get the right property field for each layer type
   const getPropertyField = (layerType: GeoLayerType): string => {

@@ -1,5 +1,276 @@
 # Project Scratchpad
 
+## 🚨 **MAPS FACILITY TOGGLE PERFORMANCE OPTIMIZATION**
+
+**USER REQUEST:** 
+The facility toggle visibility fix works, but can we optimize it to be truly instantaneous without causing other map layers and components to refresh? Should be like how count and radius work - instant and isolated, not affecting other map objects.
+
+**PLANNER MODE ACTIVE** 🧠
+
+## Background and Motivation
+
+The facility toggle visibility issue has been resolved (markers now hide/show when toggled), but the current implementation has a performance issue:
+
+**Current Behavior:**
+1. ✅ **Markers hide/show correctly** when facility types are toggled
+2. ❌ **Other map layers refresh** during marker toggles (heatmaps, boundaries, etc.)
+3. ❌ **300ms debounced full rebuild** system causes unnecessary operations
+
+**Target Behavior (like count/radius systems):**
+1. ✅ **Instant response** - no debounce delay
+2. ✅ **Isolated updates** - only affects markers, not other map layers
+3. ✅ **Minimal operations** - show/hide existing markers, don't rebuild
+
+**Key Requirements:**
+1. **True Instant Response**: Zero delay marker visibility toggle
+2. **Layer Isolation**: No impact on heatmaps, boundaries, or other map components
+3. **Performance Optimization**: Avoid unnecessary marker clearing and rebuilding
+4. **Preserve Existing Functionality**: Count, radius, and debounced rebuilding still work
+
+## Key Challenges and Analysis
+
+### **Challenge 1: Full Rebuild Performance Impact**
+**Current State**: Marker toggles trigger `clearAllMarkers()` + `addHealthcareFacilities()` full rebuild cycle
+**Impact**: Unnecessary operations that may affect other map layers and cause visible refresh
+**Evidence**: useEffect with 300ms debounce rebuilds everything on facility type changes
+**Solution**: Implement instant show/hide of existing markers instead of rebuild
+
+### **Challenge 2: Debounced System Side Effects**
+**Current State**: 300ms debounced `debouncedFacilityTypes` triggers map-wide updates
+**Impact**: Delay + potential coordination with heatmap/boundary systems causes refresh
+**Evidence**: useEffect dependencies may trigger other map operations during debounced updates
+**Solution**: Bypass debounced system for instant visibility toggles
+
+### **Challenge 3: Count/Radius System Analysis**
+**Current State**: Count and radius systems respond instantly without affecting other layers
+**Impact**: These systems likely use direct show/hide operations on existing elements
+**Evidence**: Need to study how count updates and radius circles work for instant response
+**Solution**: Apply same instant visibility pattern to markers
+
+### **Challenge 4: Marker Element Access**
+**Current State**: Markers are tracked in `markersRef.current` array
+**Impact**: We need direct access to individual markers for instant show/hide operations
+**Evidence**: Each marker has facility type metadata for filtering
+**Solution**: Add facility type tracking to markers for selective show/hide
+
+## High-level Task Breakdown
+
+### **Phase 1: Performance Analysis & Pattern Study**
+
+#### **Task 1.1: Analyze Count/Radius Systems**
+**Objective**: Understand how count and radius systems achieve instant, isolated updates
+**Actions**:
+- Study count update mechanism - likely direct state updates without map operations
+- Study radius circle system - likely CSS visibility toggles on existing elements
+- Compare with current marker system that uses full rebuild
+- Identify what makes these systems instant and non-disruptive
+
+**Success Criteria**: Clear understanding of instant update patterns
+
+#### **Task 1.2: Identify Current Performance Bottlenecks**
+**Objective**: Understand why marker toggles affect other map layers
+**Actions**:
+- Analyze useEffect dependencies and what other operations they trigger
+- Study `clearAllMarkers()` + `addHealthcareFacilities()` cycle impacts
+- Check if debounced system causes coordination with heatmap/boundary updates
+- Identify specific operations causing visible refresh
+
+**Success Criteria**: Clear understanding of performance impact points
+
+#### **Task 1.3: Design Dual-Layer Architecture**
+**Objective**: Plan instant visibility layer + existing debounced rebuild layer
+**Actions**:
+- Design marker metadata tracking for facility type identification
+- Plan instant show/hide mechanism (CSS display/visibility)
+- Ensure existing debounced system remains for data updates
+- Define clear separation between instant visibility and marker lifecycle
+
+**Success Criteria**: Architectural plan for performance optimization
+
+### **Phase 2: Instant Visibility Implementation**
+
+#### **Task 2.1: Add Marker Metadata Tracking**
+**Objective**: Enable identification of markers by facility type for selective show/hide
+**Actions**:
+- Add facility type data attribute to marker elements during creation
+- Update marker creation in `addHealthcareFacilities` to include metadata
+- Ensure metadata is accessible for visibility operations
+- Test metadata persistence and accuracy
+
+**Success Criteria**: All markers can be identified by facility type
+
+#### **Task 2.2: Create Instant Visibility Toggle System**
+**Objective**: Implement immediate show/hide without affecting other layers
+**Actions**:
+- Create `toggleMarkerVisibility()` function for direct CSS manipulation
+- Add immediate useEffect listener on `facilityTypes` (non-debounced)
+- Use CSS `display: none/block` or `visibility: hidden/visible` for instant response
+- Ensure no side effects on heatmaps, boundaries, or other map components
+
+**Success Criteria**: Markers show/hide instantly without affecting other layers
+
+#### **Task 2.3: Preserve Debounced System for Lifecycle**
+**Objective**: Keep existing rebuild system for actual data updates
+**Actions**:
+- Maintain existing debounced system for marker creation/removal
+- Ensure instant visibility and debounced lifecycle work together
+- Handle edge cases where visibility and lifecycle conflict
+- Add performance monitoring to verify layer isolation
+
+**Success Criteria**: Both instant visibility and full rebuild coexist properly
+
+### **Phase 3: Performance Validation & Optimization**
+
+#### **Task 3.1: Performance Testing**
+**Objective**: Verify optimization achieves instant response without side effects
+**Actions**:
+- Test marker toggle speed (should be <10ms response)
+- Verify other map layers remain unaffected during toggles
+- Check memory usage and marker element management
+- Test rapid toggle sequences and edge cases
+
+**Success Criteria**: Instant response with no performance regressions
+
+#### **Task 3.2: Integration Testing**
+**Objective**: Ensure optimization works with all map features
+**Actions**:
+- Test with heatmaps active - should not refresh during marker toggles
+- Test with different map styles - boundaries should remain stable
+- Test with search results and navigation operations
+- Verify compatibility with radius and count systems
+
+**Success Criteria**: Seamless integration with all existing map features
+
+## Project Status Board
+
+### **✅ PHASE 1 COMPLETED - BASIC VISIBILITY FIXED**
+- **Root Cause Investigation**: **COMPLETED** ✅ (State connection issue)
+- **Basic Fix Implementation**: **COMPLETED** ✅ (1-line change)
+- **Visibility Working**: **CONFIRMED** ✅ (Markers show/hide on toggle)
+
+### **✅ PHASE 2 COMPLETED - PERFORMANCE ANALYSIS**
+- **Task 1.1**: Analyze Count/Radius Systems - **COMPLETED** ✅
+- **Task 1.2**: Identify Current Performance Bottlenecks - **COMPLETED** ✅
+- **Task 1.3**: Design Dual-Layer Architecture - **COMPLETED** ✅
+
+### **✅ PHASE 3 COMPLETED - INSTANT VISIBILITY IMPLEMENTATION**
+- **Task 2.1**: Add Marker Metadata Tracking - **COMPLETED** ✅
+- **Task 2.2**: Create Instant Visibility Toggle System - **COMPLETED** ✅
+- **Task 2.3**: Preserve Debounced System for Lifecycle - **COMPLETED** ✅
+
+### **❌ TESTING PHASE - FAILED**
+- **Instant Response Testing**: **IMPLEMENTED BUT STILL REFRESHING LAYERS** ❌
+- **Layer Isolation Verification**: **FAILED - OTHER LAYERS STILL AFFECTED** ❌
+
+### **🔍 CONSULTATION PREPARATION - PLANNER MODE**
+- **Technical Summary**: **IN PROGRESS** 🔄
+- **Related Files Documentation**: **IN PROGRESS** 🔄
+- **Issue Analysis for External Review**: **IN PROGRESS** 🔄
+
+## Executor's Feedback or Assistance Requests
+
+**❌ DUAL-LAYER IMPLEMENTATION FAILED - STILL REFRESHING LAYERS**
+
+**CONSULTATION TECHNICAL SUMMARY:**
+
+### **🎯 PROBLEM STATEMENT:**
+Maps page facility checkboxes should toggle marker visibility instantly (like count/radius systems) without causing heatmap/boundary layers to refresh. Current implementation still triggers layer refreshes despite dual-layer approach.
+
+### **📁 RELATED FILES & COMPONENTS:**
+
+#### **Primary Files:**
+1. **`src/app/maps/page.tsx`** - Main maps page component
+   - State management: `facilityTypes`, `bulkSelectionTypes` (line ~180-200)
+   - Checkbox UI handlers (around line ~1400-1600)
+   - AustralianMap component rendering (line ~1648)
+
+2. **`src/components/AustralianMap.tsx`** - Core map component  
+   - Marker creation/lifecycle: `addHealthcareFacilities()` (line ~1200-1400)
+   - Debounced facility updates useEffect (line ~2130-2186)
+   - NEW: Instant visibility useEffect (line ~2188-2203) 
+   - Radius system: `updateRadiusCircles()` (line ~3013-3102)
+
+#### **Key Systems:**
+3. **Count System** (Working Instantly):
+   - `calculateSelectedFacilityCount()` in page.tsx
+   - `updateFacilityCounts()` callback system
+   - Uses non-debounced state, pure calculation
+
+4. **Radius System** (Working Instantly):  
+   - `updateRadiusCircles()` in AustralianMap.tsx
+   - Direct DOM manipulation, CSS updates
+   - Independent of marker lifecycle
+
+5. **Marker System** (Still Problematic):
+   - **Layer 1**: Instant visibility via CSS `display: none/block`  
+   - **Layer 2**: Debounced lifecycle with `clearAllMarkers()` + `addHealthcareFacilities()`
+
+### **🔧 TECHNICAL COMPLEXITY:**
+
+#### **Dependencies in Marker useEffect:**
+```typescript
+}, [isLoaded, debouncedFacilityTypes, clearAllMarkers, addHealthcareFacilities, 
+    facilityLoading, heatmapDataReady, heatmapVisible]);
+```
+
+#### **Suspected Root Cause:**
+- **`heatmapDataReady, heatmapVisible`** dependencies may be causing cascade effects
+- MapBox GL JS layer coordination system might be interconnected
+- useEffect dependency chain may trigger multiple renders
+
+#### **State Flow Issues:**
+- `bulkSelectionTypes` (UI) → `facilityTypes` (prop) → both instant AND debounced systems
+- Dual useEffects may be interfering with each other
+- DOM queries in instant system may trigger reflows affecting other layers
+
+### **🎯 WHAT NEEDS EXPERT REVIEW:**
+
+1. **MapBox Layer Management**: How to isolate marker visibility from heatmap layer updates
+2. **useEffect Coordination**: Dependency array causing cascade refreshes  
+3. **DOM Performance**: Whether CSS `display` toggles can affect other map layers
+4. **State Architecture**: If dual-layer approach is fundamentally flawed for MapBox GL JS
+
+### **💡 ALTERNATIVE APPROACHES TO EXPLORE:**
+1. **Pure MapBox Layers**: Use MapBox's native layer visibility toggle instead of HTML markers
+2. **Marker Pool Pattern**: Pre-create hidden markers, toggle visibility without DOM changes
+3. **State-Only Solution**: Keep all markers visible, filter at click/interaction level
+4. **Separate Map Instances**: Completely isolate marker layer from other systems
+
+**This requires deeper MapBox GL JS expertise to resolve the layer coordination issue.**
+
+## Lessons
+
+**✅ STATE MANAGEMENT DEBUGGING:**
+- **Issue**: Multiple similar state variables (`facilityTypes` vs `bulkSelectionTypes`) can create disconnect bugs
+- **Debug Approach**: Console logging reveals when state changes aren't propagating to components
+- **Solution**: Trace data flow from UI events → state updates → component props
+
+**✅ SURGICAL DEBUGGING TECHNIQUE:**
+- **Step 1**: Add targeted debug logging at critical points (useEffect triggers, prop changes)
+- **Step 2**: Test actual user interactions to see what logs appear/missing
+- **Step 3**: Follow the data trail to find where the disconnect occurs
+- **Result**: Often the simplest fixes (1-line change) solve complex-seeming problems
+
+**✅ REACT STATE ARCHITECTURE:**
+- **Best Practice**: State variables should have clear, single purposes
+- **Anti-pattern**: Having two state variables for the same logical concept
+- **Prevention**: Use consistent naming and ensure UI connects to the correct state
+
+**✅ PERFORMANCE OPTIMIZATION INSIGHTS:**
+- **Issue**: Working features may still have performance problems (marker toggles cause layer refreshes)
+- **Analysis**: Compare instant systems (count/radius) vs slow systems (markers) to identify patterns
+- **Solution**: Dual-layer architecture - instant visibility layer + existing lifecycle layer
+- **Key Insight**: Sometimes "working" is just the first step; true optimization requires studying best-performing patterns
+
+**✅ DUAL-LAYER ARCHITECTURE PATTERN:**
+- **Layer 1 (User Experience)**: Instant visual feedback using CSS manipulation on existing DOM elements
+- **Layer 2 (Data Management)**: Existing debounced system handles actual data lifecycle
+- **Benefits**: Users see instant response, while complex operations happen in background without interference
+- **Implementation**: Add metadata during creation, use direct DOM queries for instant operations
+- **Critical Success Factor**: Keep layers completely independent to avoid side effects
+
+---
+
 ## 🎉 **FAQ VECTORIZATION & GEMINI 2.5 FLASH UPGRADE PROJECT - COMPLETED!** 🎉
 
 **USER REQUEST:** 

@@ -1645,7 +1645,7 @@ export default function MapsPage() {
               <AustralianMap
                 ref={mapRef}
                 className="w-full h-full"
-                facilityTypes={facilityTypes}
+                facilityTypes={bulkSelectionTypes}
                 selectedGeoLayer={selectedGeoLayer}
                 selectedMapStyle={selectedMapStyle}
                 mapNavigation={mapNavigation}
