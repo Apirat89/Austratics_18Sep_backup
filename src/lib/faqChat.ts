@@ -82,23 +82,29 @@ export class FAQChatService {
     // 1) Split "...: ### Heading" / "...: ## Heading" onto a new line
     md = md.replace(/:\s*(#{1,6}\s+)/g, ':\n\n$1');
 
-    // 2) Normalize bullets "* " -> "- "
+    // 2) Move inline headings to new lines with blank lines
+    md = md.replace(/([^\n])\s+(#{1,6}\s+[^\n]+)/g, '$1\n\n$2');
+
+    // 3) Convert inline bullets to proper list items: "text: * item" -> "text:\n- item"
+    md = md.replace(/([^\n])\s+\*\s+/g, '$1\n- ');
+
+    // 4) Normalize bullets "* " -> "- " (at line start)
     md = md.replace(/^\s*\*\s+/gm, '- ');
 
-    // 3) Normalize ordered list markers "1) " -> "1. "
+    // 5) Normalize ordered list markers "1) " -> "1. "
     md = md.replace(/^(\s*\d+)\)\s+/gm, '$1. ');
 
-    // 4) Ensure a blank line BEFORE any block element (headings, lists, blockquotes, fences)
+    // 6) Ensure a blank line BEFORE any block element (headings, lists, blockquotes, fences)
     md = md.replace(/([^\n])\n(#{1,6}\s)/g, '$1\n\n$2');      // before headings
     md = md.replace(/([^\n])\n(-\s|\d+\.\s|>\s|```)/g, '$1\n\n$2'); // before lists/quotes/fences
 
-    // 5) Ensure a blank line AFTER headings (when next line is plain text)
+    // 7) Ensure a blank line AFTER headings (when next line is plain text)
     md = md.replace(/(#{1,6}\s.*)\n(?!\n|#{1,6}\s|-\s|\d+\.\s|>\s|```)/g, '$1\n\n');
 
-    // 6) Collapse 3+ blank lines to exactly 2
+    // 8) Collapse 3+ blank lines to exactly 2
     md = md.replace(/\n{3,}/g, '\n\n');
 
-    // 7) Trim trailing spaces per line
+    // 9) Trim trailing spaces per line
     md = md.replace(/[ \t]+$/gm, '');
 
     return md.trim();
