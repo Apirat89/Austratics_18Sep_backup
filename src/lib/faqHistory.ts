@@ -167,19 +167,35 @@ export async function saveFAQBookmark(
 ): Promise<boolean> {
   try {
     const supabase = createBrowserSupabaseClient();
+
+    // Validate conversation existence before saving to prevent FK errors
+    let safeConversationId: number | undefined = undefined;
+    if (conversationId) {
+      const { data: conv } = await supabase
+        .from('faq_conversations')
+        .select('id')
+        .eq('id', conversationId)
+        .eq('user_id', userId)
+        .maybeSingle();
+      safeConversationId = conv?.id ?? undefined;
+      
+      if (conversationId && !safeConversationId) {
+        console.warn(`FAQ Bookmark: Conversation ${conversationId} not found or not owned by user, saving without conversation link`);
+      }
+    }
     
     // Create new bookmark or update existing one (upsert) - matching regulation pattern
     const { error: insertError } = await supabase
       .from('faq_search_bookmarks')
       .upsert({
         user_id: userId,
-        bookmark_name: bookmarkName,
+        bookmark_name: bookmarkName.trim(),
         search_term: searchTerm,
         description: description,
         response_preview: responsePreview,
-        citation_count: citationCount,
-        document_types: documentTypes,
-        conversation_id: conversationId,
+        citation_count: citationCount ?? 0,
+        document_types: documentTypes ?? [],
+        conversation_id: safeConversationId ?? null,
         use_count: 0,
         created_at: new Date().toISOString(),
         last_used: new Date().toISOString()
@@ -273,30 +289,29 @@ export async function clearFAQBookmarks(userId: string): Promise<boolean> {
   }
 }
 
-export async function isFAQBookmarkNameTaken(userId: string, bookmarkName: string, excludeId?: number): Promise<boolean> {
+export async function isFAQBookmarkNameTaken(
+  userId: string,
+  bookmarkName: string,
+  excludeId?: number
+): Promise<boolean> {
   try {
     const supabase = createBrowserSupabaseClient();
-    
-    let query = supabase
+    let q = supabase
       .from('faq_search_bookmarks')
       .select('id')
       .eq('user_id', userId)
-      .eq('bookmark_name', bookmarkName);
-    
-    if (excludeId) {
-      query = query.neq('id', excludeId);
-    }
-    
-    const { data, error } = await query.single();
+      .eq('bookmark_name', bookmarkName.trim());
 
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error checking FAQ bookmark name:', error.message || error);
+    if (excludeId) q = q.neq('id', excludeId);
+
+    const { data, error } = await q.maybeSingle();
+    if (error) {
+      console.error('Error checking FAQ bookmark name:', error);
       return false;
     }
-
     return !!data;
-  } catch (error) {
-    console.error('Error checking FAQ bookmark name:', error);
+  } catch (e) {
+    console.error('Error checking FAQ bookmark name:', e);
     return false;
   }
 }
@@ -649,13 +664,20 @@ export async function deleteUnifiedFAQBookmark(
     const supabase = createBrowserSupabaseClient();
     
     if (item.source_type === 'bookmark') {
+      // Delete search result bookmarks from faq_search_bookmarks table
       const { error } = await supabase
-        .from('faq_bookmarks')
+        .from('faq_search_bookmarks')
         .delete()
         .eq('id', item.id)
         .eq('user_id', userId);
       
-      return !error;
+      if (error) {
+        console.error('Error deleting FAQ search bookmark:', error);
+        return false;
+      }
+      
+      console.log('FAQ search bookmark deleted successfully:', item.id);
+      return true;
     } else if (item.source_type === 'conversation') {
       // Unbookmark the conversation
       const { error } = await supabase

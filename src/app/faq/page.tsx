@@ -489,8 +489,8 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
       console.log('✅ FAQ LOADING SAVED CONVERSATION:', cid);
       switchToConversation(Number(cid));
     } else {
-      console.log('❌ FAQ NO CONVERSATION_ID - REGENERATING:', search.search_term);
-      sendMessage(search.search_term);
+      console.log('ℹ️ FAQ LEGACY RECORD - NO CONVERSATION LINK:', search.search_term);
+      alert('This saved item has no linked conversation. (Legacy record)');
     }
   };
 
@@ -500,8 +500,8 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
       // Load saved conversation – NO regeneration  
       switchToConversation(Number(cid));
     } else {
-      // Fallback to legacy behavior: re-run the query
-      sendMessage(bookmark.search_term);
+      console.log('ℹ️ FAQ LEGACY BOOKMARK - NO CONVERSATION LINK:', bookmark.bookmark_name);
+      alert('This bookmark has no linked conversation. (Legacy record)');
     }
   };
 

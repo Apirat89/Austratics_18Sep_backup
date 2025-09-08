@@ -174,52 +174,82 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: 'Failed to retrieve FAQ conversations' }, { status: 500 });
         }
 
-      case 'bookmark_message':
+      case 'bookmark_message': {
         // Bookmark a FAQ message
-        const { message_id, bookmark_note } = body;
-        
+        const { message_id, notes, title, tags } = body;
         if (!message_id) {
           return NextResponse.json({ error: 'Message ID is required for bookmarking' }, { status: 400 });
         }
 
         console.log(`🔖 FAQ Bookmark message ${message_id}`);
-        
+
         try {
-          // Insert bookmark into faq_bookmarks table
+          // Load message for preview & to infer conversation
+          const { data: msg, error: msgErr } = await supabase
+            .from('faq_messages')
+            .select('id, content, conversation_id, message_index')
+            .eq('id', message_id)
+            .maybeSingle();
+
+          if (msgErr || !msg) {
+            return NextResponse.json({ error: 'Message not found' }, { status: 404 });
+          }
+
+          // Security: ensure message belongs to a conversation owned by this user
+          const { data: conv, error: convErr } = await supabase
+            .from('faq_conversations')
+            .select('id')
+            .eq('id', msg.conversation_id)
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          if (convErr || !conv) {
+            return NextResponse.json({ error: 'Unauthorized to bookmark this message' }, { status: 403 });
+          }
+
+          const preview = (msg.content || '').slice(0, 200);
+
           const { data, error } = await supabase
             .from('faq_bookmarks')
             .insert({
               user_id: user.id,
-              message_id,
-              conversation_id,
-              bookmark_note: bookmark_note || null
+              bookmark_type: 'message',
+              message_id: msg.id,
+              conversation_id: null,           // MUST be null for message bookmarks
+              title: title ?? `Message #${msg.message_index}`,
+              notes: notes ?? null,
+              tags: Array.isArray(tags) ? tags : null,
+              preview_text: preview,
+              guide_categories: null,
             })
             .select()
-            .single();
+            .maybeSingle();
 
           if (error) {
-            throw error;
+            console.error('❌ FAQ Error bookmarking message:', error);
+            return NextResponse.json({ error: 'Failed to bookmark FAQ message' }, { status: 500 });
           }
 
           return NextResponse.json({ 
-            success: true,
-            bookmark: data,
-            action: 'bookmark_message'
+            success: true, 
+            data: data, 
+            action: 'bookmark_message' 
           });
         } catch (error) {
           console.error('❌ FAQ Error bookmarking message:', error);
           return NextResponse.json({ error: 'Failed to bookmark FAQ message' }, { status: 500 });
         }
+      }
 
       case 'submit_feedback':
         // Submit feedback on FAQ response
-        const { feedback_type, feedback_text, response_helpful } = body;
+        const { message_id: feedback_message_id, feedback_type, feedback_text, response_helpful } = body;
         
-        if (!message_id) {
+        if (!feedback_message_id) {
           return NextResponse.json({ error: 'Message ID is required for feedback' }, { status: 400 });
         }
 
-        console.log(`📝 FAQ Submit feedback for message ${message_id}: ${feedback_type}`);
+        console.log(`📝 FAQ Submit feedback for message ${feedback_message_id}: ${feedback_type}`);
         
         try {
           // Insert feedback into faq_feedback table
@@ -227,7 +257,7 @@ export async function POST(request: NextRequest) {
             .from('faq_feedback')
             .insert({
               user_id: user.id,
-              message_id,
+              message_id: feedback_message_id,
               conversation_id,
               feedback_type,
               feedback_text: feedback_text || null,
@@ -242,13 +272,135 @@ export async function POST(request: NextRequest) {
 
           return NextResponse.json({ 
             success: true,
-            feedback: data,
+            data: data,
             action: 'submit_feedback'
           });
         } catch (error) {
           console.error('❌ FAQ Error submitting feedback:', error);
           return NextResponse.json({ error: 'Failed to submit FAQ feedback' }, { status: 500 });
         }
+
+      case 'save-search-history': {
+        // Save search query to history
+        const {
+          search_term,
+          response_preview,
+          citation_count,
+          document_types,
+          processing_time,
+          conversation_id,
+        } = body;
+
+        console.log(`💾 FAQ Save search history: "${search_term}"`);
+
+        try {
+          // Verify conversation exists if provided; otherwise set null to avoid FK error
+          let convId: number | null = null;
+          if (conversation_id) {
+            const { data: conv } = await supabase
+              .from('faq_conversations')
+              .select('id')
+              .eq('id', conversation_id)
+              .eq('user_id', user.id)
+              .maybeSingle();
+            convId = conv?.id ?? null;
+          }
+
+          const { error } = await supabase.from('faq_search_history').insert({
+            user_id: user.id,
+            search_term,
+            results_count: citation_count ?? 0,
+            response_generated: !!response_preview,
+            guide_category: Array.isArray(document_types) && document_types.length ? document_types[0] : null,
+            conversation_id: convId,
+            ai_processing_time_ms: processing_time ?? null,
+          });
+
+          if (error) throw error;
+
+          return NextResponse.json({ 
+            success: true,
+            data: { message: 'Search history saved successfully' }
+          });
+        } catch (error) {
+          console.error('❌ FAQ save-search-history failed:', error);
+          return NextResponse.json({ 
+            success: false,
+            error: 'Failed to save search history' 
+          }, { status: 500 });
+        }
+      }
+
+      case 'delete-search-history-item': {
+        // Delete specific search history item
+        const { item_id } = body;
+        if (!item_id) {
+          return NextResponse.json({ 
+            success: false,
+            error: 'item_id is required' 
+          }, { status: 400 });
+        }
+
+        console.log(`🗑️ FAQ Delete search history item: ${item_id}`);
+
+        try {
+          const { error } = await supabase
+            .from('faq_search_history')
+            .delete()
+            .eq('id', item_id)
+            .eq('user_id', user.id);
+
+          if (error) {
+            console.error('❌ FAQ delete-search-history-item failed:', error);
+            return NextResponse.json({ 
+              success: false,
+              error: 'Failed to delete history item' 
+            }, { status: 500 });
+          }
+
+          return NextResponse.json({ 
+            success: true,
+            data: { message: 'History item deleted successfully' }
+          });
+        } catch (error) {
+          console.error('❌ FAQ delete-search-history-item failed:', error);
+          return NextResponse.json({ 
+            success: false,
+            error: 'Failed to delete history item' 
+          }, { status: 500 });
+        }
+      }
+
+      case 'clear-search-history': {
+        // Clear all search history for user
+        console.log(`🧹 FAQ Clear search history for user ${user.id}`);
+
+        try {
+          const { error } = await supabase
+            .from('faq_search_history')
+            .delete()
+            .eq('user_id', user.id);
+
+          if (error) {
+            console.error('❌ FAQ clear-search-history failed:', error);
+            return NextResponse.json({ 
+              success: false,
+              error: 'Failed to clear search history' 
+            }, { status: 500 });
+          }
+
+          return NextResponse.json({ 
+            success: true,
+            data: { message: 'Search history cleared successfully' }
+          });
+        } catch (error) {
+          console.error('❌ FAQ clear-search-history failed:', error);
+          return NextResponse.json({ 
+            success: false,
+            error: 'Failed to clear search history' 
+          }, { status: 500 });
+        }
+      }
 
       default:
         return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
