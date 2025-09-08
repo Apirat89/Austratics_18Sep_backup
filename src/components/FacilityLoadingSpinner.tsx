@@ -15,18 +15,12 @@ export default function FacilityLoadingSpinner({
   console.log('🎯 SPINNER DEBUG: Spinner should be visible now!');
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
-      {/* Map area backdrop */}
-      <div className="absolute inset-0 bg-black bg-opacity-30 pointer-events-auto" />
+    <div className="flex items-center gap-2 py-1">
+      {/* Compact spinner */}
+      <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin flex-shrink-0" />
       
-      {/* Spinner container */}
-      <div className="relative bg-white rounded-lg shadow-lg p-6 flex flex-col items-center space-y-4 pointer-events-auto">
-        {/* Minimal spinner */}
-        <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
-        
-        {/* Loading message */}
-        <p className="text-gray-700 text-sm font-medium">{message}</p>
-      </div>
+      {/* Loading message */}
+      <span className="text-gray-600 text-xs font-medium">{message}</span>
     </div>
   );
 } 

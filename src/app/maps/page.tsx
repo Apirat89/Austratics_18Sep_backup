@@ -830,11 +830,11 @@ export default function MapsPage() {
       console.log('🔄 SPINNER DEBUG: Showing spinner for user-initiated change');
       setFacilitySpinnerVisible(true);
     } else {
-      // Keep spinner visible for minimum 2 seconds for testing
+      // Keep spinner visible for 6 seconds to match facility loading time
       setTimeout(() => {
-        console.log('🔄 SPINNER DEBUG: Hiding spinner after 2s delay');
+        console.log('🔄 SPINNER DEBUG: Hiding spinner after 6s delay');
         setFacilitySpinnerVisible(false);
-      }, 2000);
+      }, 6000);
     }
   }, [initialLoadComplete]);
 
@@ -1171,6 +1171,15 @@ export default function MapsPage() {
                 >
                   <BarChart3 className="h-5 w-5 text-gray-600" />
                   <span className="text-sm font-medium text-gray-900">Facility Selection</span>
+                  
+                  {/* ✅ NEW: Inline facility loading spinner */}
+                  {facilitySpinnerVisible && (
+                    <FacilityLoadingSpinner 
+                      visible={facilitySpinnerVisible}
+                      message="Updating..."
+                    />
+                  )}
+                  
                   {facilityCountExpanded ? (
                     <ChevronUp className="h-4 w-4 text-gray-400 ml-auto" />
                   ) : (
@@ -1745,34 +1754,8 @@ export default function MapsPage() {
               />
             </MapLoadingCoordinator>
             
-            {/* ✅ NEW: Facility Loading Spinner */}
-            <FacilityLoadingSpinner visible={facilitySpinnerVisible} />
-            
-                         {/* ✅ DEBUG: Manual Test Button */}
-             <div className="absolute top-4 right-4 z-50 space-x-2">
-               <button 
-                 onClick={() => {
-                   console.log('🧪 MANUAL TEST: Showing spinner for 3 seconds');
-                   setFacilitySpinnerVisible(true);
-                   setTimeout(() => {
-                     console.log('🧪 MANUAL TEST: Hiding spinner');
-                     setFacilitySpinnerVisible(false);
-                   }, 3000);
-                 }}
-                 className="bg-red-500 text-white px-3 py-1 rounded text-xs"
-               >
-                 Test 3s
-               </button>
-               <button 
-                 onClick={() => {
-                   console.log('🧪 MANUAL TEST: Instant toggle');
-                   setFacilitySpinnerVisible(!facilitySpinnerVisible);
-                 }}
-                 className="bg-blue-500 text-white px-3 py-1 rounded text-xs"
-               >
-                 Toggle
-               </button>
-             </div>
+
+
           </div>
         </main>
       </div>
