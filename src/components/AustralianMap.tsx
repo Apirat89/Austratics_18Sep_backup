@@ -408,7 +408,10 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   // Removed magic wand event handlers - replaced with bulk selection system
 
   // Stabilize facilityTypes to prevent unnecessary re-renders
-  const stableFacilityTypes = useMemo(() => facilityTypes, [
+  const stableFacilityTypes = useMemo(() => {
+    console.log('🔄 SPINNER DEBUG: stableFacilityTypes updated:', facilityTypes);
+    return facilityTypes;
+  }, [
     facilityTypes.residential,
     facilityTypes.multipurpose_others,        // ✅ FIXED: Added missing MPS dependency
     facilityTypes.home,
@@ -417,6 +420,11 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   
   // ✅ PHASE 3: Add debouncing for rapid facility changes (300ms delay)
   const debouncedFacilityTypes = useDebounce(stableFacilityTypes, 300);
+  
+  // Debug: Log when debounced types change
+  useEffect(() => {
+    console.log('🔄 SPINNER DEBUG: debouncedFacilityTypes changed:', debouncedFacilityTypes);
+  }, [debouncedFacilityTypes]);
 
   // Map style mapping
   const getMapStyle = (style: MapStyleType) => {
@@ -2144,6 +2152,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     const updateFacilities = async () => {
       console.log('🏥 AustralianMap: Starting coordinated facility update');
       setFacilityLoading(true);
+      console.log('🔄 SPINNER DEBUG: Calling onFacilityLoadingChange(true)');
       onFacilityLoadingChange?.(true);
       
       try {
@@ -2183,6 +2192,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         }
       } finally {
         setFacilityLoading(false);
+        console.log('🔄 SPINNER DEBUG: Calling onFacilityLoadingChange(false)');
         onFacilityLoadingChange?.(false);
       }
     };

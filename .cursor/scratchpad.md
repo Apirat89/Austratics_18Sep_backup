@@ -177,7 +177,79 @@ The facility toggle visibility issue has been resolved (markers now hide/show wh
 - **Loading Duration Study**: **COMPLETED** ✅
 - **Spinner Integration Design**: **COMPLETED** ✅
 - **UX Implementation Plan**: **COMPLETED** ✅
-- **User Decision Points**: **AWAITING USER APPROVAL** ⏳
+- **User Decision Points**: **COMPLETED** ✅
+- **Implementation**: **COMPLETED** ✅
+- **Deployment**: **PUSHED TO BOTH BRANCHES** ✅
+
+### **❌ SPINNER NOT VISIBLE - DEBUGGING REQUIRED**
+- **Implementation Verification**: **COMPLETED** ✅ (Code integration correct)
+- **State Flow Investigation**: **COMPLETED** ✅ (Added comprehensive debug logging)
+- **Component Integration Check**: **COMPLETED** ✅ (Import/props verified)
+- **CSS Bug Fix**: **COMPLETED** ✅ (Fixed border-3 → border-4)
+- **State Chain Debugging**: **COMPLETED** ✅ (Added facility type flow tracing)
+- **Manual Test Button**: **COMPLETED** ✅ (Added UI test trigger)
+- **Ready for Advanced Testing**: **AWAITING USER TEST** ⏳
+
+---
+
+## **SPINNER DEBUGGING - SYSTEMATIC INVESTIGATION**
+
+### **Background and Motivation**
+
+**Current Issue:**
+- User reports spinner not appearing when facility checkboxes are toggled
+- Development server running successfully, maps page loading correctly
+- Implementation was completed and deployed but not visually functional
+
+**Critical Investigation Points:**
+- Component import/export issues
+- State flow from checkbox → callback → spinner visibility
+- CSS styling conflicts or z-index issues  
+- JavaScript console errors preventing execution
+
+### **Key Challenges and Analysis**
+
+**Challenge 1: Component Integration**
+- FacilityLoadingSpinner may not be properly imported in MapsPage
+- Props may not be passed correctly to component
+- Component may not be rendering in expected location
+
+**Challenge 2: State Flow Issues**
+- facilitySpinnerVisible state may not be updating
+- onFacilityLoadingChange callback may not be firing
+- facilityLoading state in AustralianMap may not be changing
+
+**Challenge 3: CSS/Styling Problems**
+- z-index conflicts with other map elements
+- CSS classes not applying correctly
+- Component may be rendering but invisible due to styling
+
+**Challenge 4: Timing Issues**
+- Loading duration may be too short to observe
+- Spinner may appear/disappear before user notices
+- Debounce timing may be interfering with visibility
+
+### **High-level Task Breakdown**
+
+#### **Phase 1: Code Verification** 
+- **Task 1.1**: Verify FacilityLoadingSpinner import/export in MapsPage
+- **Task 1.2**: Check component props and state connections
+- **Task 1.3**: Validate callback integration in AustralianMap
+
+#### **Phase 2: State Flow Testing**
+- **Task 2.1**: Add console logs to trace state changes
+- **Task 2.2**: Verify facilityLoading state changes on checkbox toggle
+- **Task 2.3**: Confirm callback execution and spinner state updates
+
+#### **Phase 3: Visual Debugging**
+- **Task 3.1**: Check browser console for JavaScript errors
+- **Task 3.2**: Inspect component rendering in DevTools
+- **Task 3.3**: Verify CSS styling and z-index values
+
+#### **Phase 4: Timing Analysis**
+- **Task 4.1**: Extend spinner duration for testing visibility
+- **Task 4.2**: Add manual test triggers for spinner state
+- **Task 4.3**: Validate timing matches facility loading cycle
 
 ---
 
@@ -371,6 +443,59 @@ interface FacilityLoadingSpinnerProps {
 
 ---
 
+**✅ FACILITY LOADING SPINNER - IMPLEMENTATION COMPLETE!**
+
+**SUCCESSFUL IMPLEMENTATION DELIVERED:**
+- **Callback Architecture**: Added `onFacilityLoadingChange` prop to AustralianMap component
+- **State Integration**: Connected to existing `facilityLoading` state lifecycle (300ms debounce + loading time)
+- **Spinner Component**: Created `FacilityLoadingSpinner` with over-map-center placement and minimal design
+- **User Preferences Applied**: 1A (center), 2A ("Loading facilities..."), 3A (minimal), 4B (map-area backdrop)
+- **Build Verification**: TypeScript compilation successful, no import/export errors
+- **Version Control**: Committed to both main and development branches (commit: b028358)
+
+**🎯 IMPLEMENTATION DETAILS:**
+- **Files Created**: `src/components/FacilityLoadingSpinner.tsx`
+- **Files Modified**: `src/app/maps/page.tsx`, `src/components/AustralianMap.tsx`
+- **Architecture**: Callback pattern for state exposure, responsive CSS positioning
+- **Visual Specs**: Semi-transparent backdrop, white container, rotating spinner, clean typography
+
+**✅ READY FOR TESTING:**
+The facility loading spinner will now appear over the map center whenever facility types are toggled, showing "Loading facilities..." with a minimal rotating spinner. Duration matches the exact facility loading time (300ms debounce + variable rebuild time).
+
+**User can now test the facility checkboxes to see the loading feedback in action!** 🎉
+
+---
+
+**🔍 SPINNER DEBUGGING - INVESTIGATION COMPLETE**
+
+**ISSUE IDENTIFIED & FIXED:**
+- **CSS Bug Found**: Used invalid Tailwind class `border-3` (should be `border-4`)
+- **Code Integration**: ✅ All imports, state, and callbacks are correctly implemented
+- **Component Flow**: ✅ FacilityLoadingSpinner → MapsPage → AustralianMap chain verified
+- **Debug Logging**: Added comprehensive console logs to trace state flow
+
+**🔧 FIXES APPLIED:**
+1. **CSS Fix**: Changed `border-3` to `border-4` in spinner component (border-3 doesn't exist in Tailwind)
+2. **Debug Logging**: Added logs to trace:
+   - `onFacilityLoadingChange(true/false)` calls in AustralianMap
+   - `handleFacilityLoadingChange()` execution in MapsPage  
+   - `FacilityLoadingSpinner` render with visibility state
+
+**🎯 READY FOR RE-TESTING:**
+The CSS bug likely caused the spinner border to be invisible. With `border-4`, the spinner should now be visible. 
+
+**Test Steps:**
+1. **Refresh** the browser page to get the updated code
+2. **Open browser console** (F12) to see debug logs
+3. **Toggle any facility checkbox** (Residential, Home Care, etc.)
+4. **Look for**: 
+   - Console logs showing state changes
+   - **Spinner appearing** over map center with loading message
+
+**If spinner still not visible, the console logs will show exactly where the issue is in the state flow.** 🔍
+
+---
+
 **❌ DUAL-LAYER IMPLEMENTATION FAILED - STILL REFRESHING LAYERS**
 
 **CONSULTATION TECHNICAL SUMMARY:**
@@ -476,6 +601,20 @@ Maps page facility checkboxes should toggle marker visibility instantly (like co
 - **Sync both main and development branches** to keep team aligned on progress
 - **Document incomplete features** so other developers understand current state and limitations
 - **Push early and often** when working on complex technical challenges requiring consultation
+
+**✅ CALLBACK PATTERN FOR STATE EXPOSURE:**
+- **Expose internal states via callbacks** when parent components need access to child component state
+- **Use optional callbacks** (`onStateChange?: (state) => void`) for clean component interfaces
+- **Connect callbacks to existing state lifecycle** rather than duplicating state management
+- **Callback pattern is cleaner than ref-based access** for simple state communication
+- **Remember to include callbacks in dependency arrays** for useEffect hooks that depend on them
+
+**✅ DEBUGGING INVISIBLE COMPONENTS:**
+- **Invalid CSS classes** can make components render but be invisible (e.g., `border-3` doesn't exist in Tailwind)
+- **Add systematic debug logging** to trace state flow: parent → child → component render
+- **Verify CSS framework classes** are valid before assuming state/logic issues
+- **Console logs are essential** for debugging React component visibility issues
+- **Always test with browser refresh** after making changes to ensure updated code loads
 
 ---
 

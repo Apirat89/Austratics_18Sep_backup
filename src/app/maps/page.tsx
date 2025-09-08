@@ -809,6 +809,7 @@ export default function MapsPage() {
 
   // ✅ NEW: Handle facility loading state changes for spinner
   const handleFacilityLoadingChange = useCallback((isLoading: boolean) => {
+    console.log('🔄 SPINNER DEBUG: Loading state changed:', isLoading);
     setFacilitySpinnerVisible(isLoading);
   }, []);
 
@@ -1689,6 +1690,19 @@ export default function MapsPage() {
             
             {/* ✅ NEW: Facility Loading Spinner */}
             <FacilityLoadingSpinner visible={facilitySpinnerVisible} />
+            
+            {/* ✅ DEBUG: Manual Test Button */}
+            <div className="absolute top-4 right-4 z-50">
+              <button 
+                onClick={() => {
+                  console.log('🧪 MANUAL TEST: Toggling spinner');
+                  setFacilitySpinnerVisible(!facilitySpinnerVisible);
+                }}
+                className="bg-red-500 text-white px-3 py-1 rounded text-xs"
+              >
+                Test Spinner
+              </button>
+            </div>
           </div>
         </main>
       </div>
