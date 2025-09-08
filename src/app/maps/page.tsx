@@ -810,7 +810,17 @@ export default function MapsPage() {
   // ✅ NEW: Handle facility loading state changes for spinner
   const handleFacilityLoadingChange = useCallback((isLoading: boolean) => {
     console.log('🔄 SPINNER DEBUG: Loading state changed:', isLoading);
-    setFacilitySpinnerVisible(isLoading);
+    
+    if (isLoading) {
+      // Show spinner immediately
+      setFacilitySpinnerVisible(true);
+    } else {
+      // Keep spinner visible for minimum 2 seconds for testing
+      setTimeout(() => {
+        console.log('🔄 SPINNER DEBUG: Hiding spinner after 2s delay');
+        setFacilitySpinnerVisible(false);
+      }, 2000);
+    }
   }, []);
 
   const handleTopBottomPanelToggle = useCallback(() => {
@@ -1691,18 +1701,31 @@ export default function MapsPage() {
             {/* ✅ NEW: Facility Loading Spinner */}
             <FacilityLoadingSpinner visible={facilitySpinnerVisible} />
             
-            {/* ✅ DEBUG: Manual Test Button */}
-            <div className="absolute top-4 right-4 z-50">
-              <button 
-                onClick={() => {
-                  console.log('🧪 MANUAL TEST: Toggling spinner');
-                  setFacilitySpinnerVisible(!facilitySpinnerVisible);
-                }}
-                className="bg-red-500 text-white px-3 py-1 rounded text-xs"
-              >
-                Test Spinner
-              </button>
-            </div>
+                         {/* ✅ DEBUG: Manual Test Button */}
+             <div className="absolute top-4 right-4 z-50 space-x-2">
+               <button 
+                 onClick={() => {
+                   console.log('🧪 MANUAL TEST: Showing spinner for 3 seconds');
+                   setFacilitySpinnerVisible(true);
+                   setTimeout(() => {
+                     console.log('🧪 MANUAL TEST: Hiding spinner');
+                     setFacilitySpinnerVisible(false);
+                   }, 3000);
+                 }}
+                 className="bg-red-500 text-white px-3 py-1 rounded text-xs"
+               >
+                 Test 3s
+               </button>
+               <button 
+                 onClick={() => {
+                   console.log('🧪 MANUAL TEST: Instant toggle');
+                   setFacilitySpinnerVisible(!facilitySpinnerVisible);
+                 }}
+                 className="bg-blue-500 text-white px-3 py-1 rounded text-xs"
+               >
+                 Toggle
+               </button>
+             </div>
           </div>
         </main>
       </div>
