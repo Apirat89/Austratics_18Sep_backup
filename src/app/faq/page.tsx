@@ -726,9 +726,10 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
           ) : (
             <div>
               <div 
-                className={`prose max-w-none ${
-                  message.role === 'user' ? 'prose-invert' : ''
-                }`} 
+                className={`prose max-w-none
+                           prose-headings:mt-4 prose-headings:mb-2
+                           prose-p:my-3 prose-ul:my-3 prose-ol:my-3
+                           ${message.role === 'user' ? 'prose-invert' : ''}`} 
                 dangerouslySetInnerHTML={{ 
                   __html: renderMarkdown(message.content) 
                 }} 

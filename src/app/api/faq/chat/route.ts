@@ -123,6 +123,9 @@ export async function POST(request: NextRequest) {
         
         console.log(`✅ FAQ Ask completed in ${response.processing_time}ms`);
         
+        // Ensure no citations are ever returned to clients
+        response.citations = [];
+        
         return NextResponse.json({
           success: true,
           data: response
@@ -147,6 +150,9 @@ export async function POST(request: NextRequest) {
         });
         
         console.log(`✅ FAQ Message added in ${response.processing_time}ms`);
+        
+        // Ensure no citations are ever returned to clients  
+        response.citations = [];
         
         return NextResponse.json({
           success: true,
@@ -320,9 +326,16 @@ export async function GET(request: NextRequest) {
         
         try {
           const history = await faqChatService.getConversationMessages(parseInt(conversationId));
+          
+          // Strip citations from all historical messages  
+          const citationFreeHistory = history.map(message => ({
+            ...message,
+            citations: [] // Remove any stored citations from history
+          }));
+          
           return NextResponse.json({
             success: true,
-            data: history
+            data: citationFreeHistory
           });
         } catch (error) {
           console.error('❌ FAQ Error getting conversation history:', error);

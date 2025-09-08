@@ -246,7 +246,7 @@ export function createContinuousVisualMap(field: string, data: SA2Record[], titl
 // Animation configurations
 export const CHART_ANIMATIONS = {
   animationDuration: 1000,
-  animationEasing: 'cubicOut',
+  animationEasing: 'cubicOut' as const,
   animationDelay: function(idx: number) {
     return idx * 20;
   }

@@ -62,6 +62,49 @@ export class FAQChatService {
   }
 
   // =============================================================================
+  // RESPONSE FORMATTING HELPERS
+  // =============================================================================
+
+  /**
+   * Strip any bracketed source mentions from model responses
+   */
+  private stripSourceMentions(text: string): string {
+    // Remove bracketed citation-like spans such as [Something - Section]
+    return text.replace(/\[[^\]\[\n]{2,80}\]/g, '').replace(/\s{2,}/g, ' ').trim();
+  }
+
+  /**
+   * Format Markdown text with strict spacing and structure rules
+   */
+  private formatMarkdownStrict(md: string): string {
+    if (!md) return md;
+
+    // 1) Split "...: ### Heading" / "...: ## Heading" onto a new line
+    md = md.replace(/:\s*(#{1,6}\s+)/g, ':\n\n$1');
+
+    // 2) Normalize bullets "* " -> "- "
+    md = md.replace(/^\s*\*\s+/gm, '- ');
+
+    // 3) Normalize ordered list markers "1) " -> "1. "
+    md = md.replace(/^(\s*\d+)\)\s+/gm, '$1. ');
+
+    // 4) Ensure a blank line BEFORE any block element (headings, lists, blockquotes, fences)
+    md = md.replace(/([^\n])\n(#{1,6}\s)/g, '$1\n\n$2');      // before headings
+    md = md.replace(/([^\n])\n(-\s|\d+\.\s|>\s|```)/g, '$1\n\n$2'); // before lists/quotes/fences
+
+    // 5) Ensure a blank line AFTER headings (when next line is plain text)
+    md = md.replace(/(#{1,6}\s.*)\n(?!\n|#{1,6}\s|-\s|\d+\.\s|>\s|```)/g, '$1\n\n');
+
+    // 6) Collapse 3+ blank lines to exactly 2
+    md = md.replace(/\n{3,}/g, '\n\n');
+
+    // 7) Trim trailing spaces per line
+    md = md.replace(/[ \t]+$/gm, '');
+
+    return md.trim();
+  }
+
+  // =============================================================================
   // CONVERSATION MANAGEMENT METHODS
   // =============================================================================
 
@@ -253,20 +296,20 @@ export class FAQChatService {
       if (citations.length === 0) {
         const response: ChatResponse = {
           message: "I couldn't find any relevant information in the FAQ user guides to answer your question. Please try asking about specific features like homecare provider search, residential facility comparison, maps navigation, news reading, or SA2 analysis.",
-          citations: [],
+          citations: [], // Always empty - no citations ever returned
           context_used: 0,
           processing_time: Date.now() - startTime,
           conversation_id: actualConversationId,
           message_id: userMessageId
         };
 
-        // Add assistant message to conversation
+        // Add assistant message to conversation with no citations
         if (actualConversationId) {
           await this.addMessageToConversation(
             actualConversationId,
             'assistant',
             response.message,
-            [],
+            [], // Never store citations
             response.processing_time
           );
         }
@@ -285,20 +328,20 @@ export class FAQChatService {
 
       const response: ChatResponse = {
         message: answer,
-        citations,
-        context_used: citations.length,
+        citations: [], // Always empty - no citations ever returned to users
+        context_used: citations.length, // Keep for analytics but don't expose citations
         processing_time: processingTime,
         conversation_id: actualConversationId,
         message_id: userMessageId
       };
 
-      // Step 6: Add assistant response to conversation
+      // Step 6: Add assistant response to conversation with no citations
       if (actualConversationId) {
         await this.addMessageToConversation(
           actualConversationId,
           'assistant',
           response.message,
-          response.citations,
+          [], // Never store citations in database
           response.processing_time
         );
       }
@@ -310,7 +353,7 @@ export class FAQChatService {
       
       const errorResponse: ChatResponse = {
         message: "I'm sorry, I encountered an error while processing your question. Please try again or rephrase your question.",
-        citations: [],
+        citations: [], // Always empty - no citations ever returned
         context_used: 0,
         processing_time: Date.now() - startTime,
         conversation_id: actualConversationId
@@ -880,19 +923,26 @@ ${'='.repeat(80)}`;
         console.log(`⚠️  WARNING: Empty context string generated from citations!`);
       }
 
-      // Simplified, robust prompt optimized for reliability
-      const prompt = `You are a helpful assistant for the Austratics Aged Care Analytics platform. Provide clear, step-by-step guidance using ONLY the user guide content below.
+      // Citation-free prompt optimized for clean, self-contained responses
+      const prompt = `You are a helpful assistant for the Austratics Aged Care Analytics platform. Provide clear, step-by-step guidance using the provided information.
 
 **Instructions:**
 1. Start by rephrasing the user's question to show understanding
-2. Provide detailed, step-by-step instructions using the guide content
+2. Provide detailed, step-by-step instructions using the content below
 3. Use clear formatting with numbered steps and bullet points
-4. Reference specific user guides when providing information
-5. Include practical tips and examples when available
+4. Write authoritative, self-contained answers without referencing source documents
+5. Do NOT reference, cite, name, or link to any documents or sources. Write a complete answer.
+
+**FORMAT STRICTLY AS MARKDOWN:**
+- Use H2 (##) for main sections and H3 (###) for subsections
+- Always put a blank line before and after each heading
+- Use numbered lists with "1.", "2.", ... and bullets with "- "
+- Never place a heading on the same line as narrative text; headings start on a new line
+- Use **bold** for UI labels (button names, menu items)
 
 ${conversationContext ? `**Previous Conversation:**\n${conversationContext}\n` : ''}
 
-**User Guide Content:**
+**Content:**
 ${context}
 
 **User Question:** ${question}
@@ -951,7 +1001,8 @@ ${context}
         try {
           const shortContext = contextChunks.slice(0, 4).join('\n\n'); // top 3-4 chunks
           const retryPrompt = `Answer the user's question using ONLY the context below.
-Be concise, step-by-step, and cite [Guide - Section] inline.
+Be concise, step-by-step, and provide a complete self-contained answer.
+Format as clean Markdown with proper headings (##, ###) and bullet points (-).
 
 QUESTION: ${question}
 
@@ -981,24 +1032,23 @@ ${shortContext}`;
         }
       }
 
-      // FALLBACK 3: Extractive answer built from citations
+      // FALLBACK 3: Citation-free extractive answer
       if (!answer) {
-        console.log(`🔄 Fallback 3: Creating extractive answer...`);
+        console.log(`🔄 Fallback 3: Creating citation-free extractive answer...`);
         const bulletLines = sortedCitations.slice(0, 5).map(c => {
-          const sec = c.section_title ? ` – ${c.section_title}` : '';
-          return `- **[${c.document_name}${sec}]** ${c.content_preview}`;
-        }).join('\n');
+          return `• ${c.content_preview}`;
+        }).join('\n\n');
 
-        answer = `Here's what the user guides say:
+        answer = `## Here's what I found to help with your question:
 
 ${bulletLines}
 
-**Tip:** Ask a follow-up if you need steps for a specific screen.`;
+**Tip:** Ask a follow-up if you need more specific guidance.`;
 
-        console.log(`✅ Fallback 3 success: ${answer.length} chars (extractive)`);
+        console.log(`✅ Fallback 3 success: ${answer.length} chars (citation-free extractive)`);
       }
 
-      // Final validation
+      // Final validation and citation sanitization
       if (answer.length === 0) {
         console.log(`❌ CRITICAL: All fallbacks failed! Using emergency response.`);
         answer = "I apologize, but I'm having trouble generating a response right now. Please try rephrasing your question or try again in a moment.";
@@ -1006,7 +1056,21 @@ ${bulletLines}
         console.log(`- Final answer preview: "${answer.substring(0, 100)}..."`);
       }
 
-      console.log(`✅ Generated FAQ answer (${answer.length} chars)`);
+      // Apply defensive citation sanitization - strip any bracketed references
+      const originalLength = answer.length;
+      answer = this.stripSourceMentions(answer);
+      if (answer.length !== originalLength) {
+        console.log(`🧹 Stripped ${originalLength - answer.length} chars of citation references`);
+      }
+
+      // Apply strict Markdown formatting for professional presentation
+      const preFormattingLength = answer.length;
+      answer = this.formatMarkdownStrict(answer);
+      if (answer.length !== preFormattingLength) {
+        console.log(`📝 Applied formatting changes: ${Math.abs(answer.length - preFormattingLength)} char difference`);
+      }
+
+      console.log(`✅ Generated formatted, citation-free FAQ answer (${answer.length} chars)`);
       
       return answer;
 
