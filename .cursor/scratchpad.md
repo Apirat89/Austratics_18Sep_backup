@@ -1,6 +1,54 @@
 # Project Scratchpad
 
-## 🎯 **MAPS SPINNER UX IMPROVEMENTS**
+## ✅ **FACILITY LOADING SPINNER REMOVED - COMPLETED**
+
+**EXECUTOR MODE ACTIVE** ⚙️
+
+**USER REQUEST:** Remove facility loading spinner as there's already a preloading status at bottom right of map
+
+**✅ COMPLETED REMOVALS:**
+- ❌ Removed `FacilityLoadingSpinner` component import from maps page
+- ❌ Removed `facilitySpinnerVisible` state variable
+- ❌ Removed `handleFacilityLoadingChange` callback function  
+- ❌ Removed `onFacilityLoadingChange` prop from AustralianMap usage
+- ❌ Removed `onFacilityLoadingChange` prop from AustralianMap interface
+- ❌ Removed callback usages in AustralianMap component (`onFacilityLoadingChange?.(true/false)`)
+- ❌ Deleted `src/components/FacilityLoadingSpinner.tsx` file entirely
+
+**🎯 RESULT:**
+- **No facility loading spinner** shown during facility updates
+- **Existing bottom-right preloading status** remains as primary loading indicator
+- **Clean codebase** with no redundant loading components
+- **All linter errors resolved**
+- **Build successful** - No compilation errors related to removed spinner code
+- **Application running** - Development server starts without issues
+
+## ✅ **WEBPACK RUNTIME ERROR FIXED - COMPLETED**
+
+**EXECUTOR MODE ACTIVE** ⚙️
+
+**USER ISSUE:** Runtime Error - "Cannot read properties of undefined (reading 'call')" in webpack runtime and _not-found page
+
+**✅ ROOT CAUSE IDENTIFIED:**
+- **Missing `not-found.tsx` file** - Next.js 13+ app router requires this file for 404 handling
+- **Webpack trying to generate `_not-found/page.js`** but source file didn't exist
+- **Server-side rendering failure** during page generation
+
+**✅ SOLUTION IMPLEMENTED:**
+- **Created `src/app/not-found.tsx`** with proper 404 page component
+- **Added Next.js Link navigation** back to home page
+- **Styled with Tailwind** for consistent UI
+- **Follows Next.js app router conventions** for error pages
+
+**🎯 RESULT:**
+- **Webpack runtime error resolved** - No more undefined 'call' errors
+- **Development server running** - Process 81858 active without issues  
+- **404 page functional** - Proper error handling for missing routes
+- **Clean error handling** - Users see friendly 404 instead of runtime crashes
+
+---
+
+## 🚨 **MAPS FACILITY TOGGLE PERFORMANCE OPTIMIZATION**
 
 **USER REQUEST:** 
 1. ✅ No spinner on map load now (working!)

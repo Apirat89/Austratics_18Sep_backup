@@ -13,7 +13,6 @@ import SavedSearches, { SavedSearchesRef } from '../../components/SavedSearches'
 import TopBottomPanel from '../../components/TopBottomPanel';
 import FacilityDetailsModal from '../../components/FacilityDetailsModal';
 import FacilityTable from '../../components/FacilityTable';
-import FacilityLoadingSpinner from '../../components/FacilityLoadingSpinner';
 import { RankedSA2Data } from '../../components/HeatmapDataService';
 import { getLocationByName } from '../../lib/mapSearchService';
 import { Map, Settings, User, Menu, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
@@ -102,11 +101,7 @@ export default function MapsPage() {
   type RadiusType = 'off' | 'urban' | 'suburban' | 'rural';
   const [radiusType, setRadiusType] = useState<RadiusType>('urban');
 
-  // ✅ NEW: Facility loading spinner state
-  const [facilitySpinnerVisible, setFacilitySpinnerVisible] = useState(false);
-  
-  // ✅ NEW: Track initial load completion to prevent spinner during page load
-  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
 
   // Radius distance mapping
   const getRadiusDistance = (type: RadiusType): number => {
@@ -815,28 +810,7 @@ export default function MapsPage() {
     // Panel will only show when user manually toggles it or expands data layers
   }, []);
 
-  // ✅ NEW: Handle facility loading state changes for spinner
-  const handleFacilityLoadingChange = useCallback((isLoading: boolean) => {
-    console.log('🔄 SPINNER DEBUG: Loading state changed:', isLoading, 'initialLoadComplete:', initialLoadComplete);
-    
-    // Only show spinner if initial load is complete (prevent showing during page load)
-    if (!initialLoadComplete) {
-      console.log('🔄 SPINNER DEBUG: Skipping spinner - initial load not complete');
-      return;
-    }
-    
-    if (isLoading) {
-      // Show spinner immediately
-      console.log('🔄 SPINNER DEBUG: Showing spinner for user-initiated change');
-      setFacilitySpinnerVisible(true);
-    } else {
-      // Keep spinner visible for 6 seconds to match facility loading time
-      setTimeout(() => {
-        console.log('🔄 SPINNER DEBUG: Hiding spinner after 6s delay');
-        setFacilitySpinnerVisible(false);
-      }, 6000);
-    }
-  }, [initialLoadComplete]);
+
 
   const handleTopBottomPanelToggle = useCallback(() => {
     const newVisible = !topBottomPanelVisible;
@@ -1064,10 +1038,6 @@ export default function MapsPage() {
   const handleLoadingComplete = useCallback(() => {
     console.log('🎉 Maps Page: Loading sequence completed, enabling interactive features');
     setLoadingComplete(true);
-    
-    // ✅ NEW: Mark initial load as complete - now spinner can show for user actions
-    console.log('🔄 SPINNER DEBUG: Initial load complete - spinner now enabled for user actions');
-    setInitialLoadComplete(true);
   }, []);
 
   // ✅ NEW: Handle heatmap loading completion - stores callback to be called by LayerManager
@@ -1171,14 +1141,6 @@ export default function MapsPage() {
                 >
                   <BarChart3 className="h-5 w-5 text-gray-600" />
                   <span className="text-sm font-medium text-gray-900">Facility Selection</span>
-                  
-                  {/* ✅ NEW: Inline facility loading spinner */}
-                  {facilitySpinnerVisible && (
-                    <FacilityLoadingSpinner 
-                      visible={facilitySpinnerVisible}
-                      message="Updating..."
-                    />
-                  )}
                   
                   {facilityCountExpanded ? (
                     <ChevronUp className="h-4 w-4 text-gray-400 ml-auto" />
@@ -1740,7 +1702,6 @@ export default function MapsPage() {
                 onFacilityTableSelection={handleFacilityTableSelection}
                 radiusType={radiusType}
                 bulkSelectionTypes={bulkSelectionTypes}
-                onFacilityLoadingChange={handleFacilityLoadingChange}
                 onHeatmapRenderComplete={() => {
                   console.log('🎉 Maps Page: Heatmap render complete, calling DataLayers callback');
                   // ✅ FIXED: Add safety check and async execution to prevent setState during render
@@ -1753,8 +1714,6 @@ export default function MapsPage() {
                 }}
               />
             </MapLoadingCoordinator>
-            
-
 
           </div>
         </main>
