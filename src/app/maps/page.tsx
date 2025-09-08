@@ -103,7 +103,10 @@ export default function MapsPage() {
   const [radiusType, setRadiusType] = useState<RadiusType>('urban');
 
   // ✅ NEW: Facility loading spinner state
-  const [facilitySpinnerVisible, setFacilitySpinnerVisible] = useState(false); // Default to Urban (20km)
+  const [facilitySpinnerVisible, setFacilitySpinnerVisible] = useState(false);
+  
+  // ✅ NEW: Track initial load completion to prevent spinner during page load
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   // Radius distance mapping
   const getRadiusDistance = (type: RadiusType): number => {
@@ -182,6 +185,11 @@ export default function MapsPage() {
     home: true,
     retirement: true
   });
+
+  // ✅ DEBUG: Log when bulkSelectionTypes changes (prop passed to AustralianMap as facilityTypes)
+  useEffect(() => {
+    console.log('🔄 PROP FLOW DEBUG: bulkSelectionTypes changed (will be passed as facilityTypes prop):', bulkSelectionTypes);
+  }, [bulkSelectionTypes]);
   
   // Map reference for calling map methods
   const mapRef = useRef<AustralianMapRef>(null);
@@ -809,10 +817,17 @@ export default function MapsPage() {
 
   // ✅ NEW: Handle facility loading state changes for spinner
   const handleFacilityLoadingChange = useCallback((isLoading: boolean) => {
-    console.log('🔄 SPINNER DEBUG: Loading state changed:', isLoading);
+    console.log('🔄 SPINNER DEBUG: Loading state changed:', isLoading, 'initialLoadComplete:', initialLoadComplete);
+    
+    // Only show spinner if initial load is complete (prevent showing during page load)
+    if (!initialLoadComplete) {
+      console.log('🔄 SPINNER DEBUG: Skipping spinner - initial load not complete');
+      return;
+    }
     
     if (isLoading) {
       // Show spinner immediately
+      console.log('🔄 SPINNER DEBUG: Showing spinner for user-initiated change');
       setFacilitySpinnerVisible(true);
     } else {
       // Keep spinner visible for minimum 2 seconds for testing
@@ -821,7 +836,7 @@ export default function MapsPage() {
         setFacilitySpinnerVisible(false);
       }, 2000);
     }
-  }, []);
+  }, [initialLoadComplete]);
 
   const handleTopBottomPanelToggle = useCallback(() => {
     const newVisible = !topBottomPanelVisible;
@@ -1049,6 +1064,10 @@ export default function MapsPage() {
   const handleLoadingComplete = useCallback(() => {
     console.log('🎉 Maps Page: Loading sequence completed, enabling interactive features');
     setLoadingComplete(true);
+    
+    // ✅ NEW: Mark initial load as complete - now spinner can show for user actions
+    console.log('🔄 SPINNER DEBUG: Initial load complete - spinner now enabled for user actions');
+    setInitialLoadComplete(true);
   }, []);
 
   // ✅ NEW: Handle heatmap loading completion - stores callback to be called by LayerManager
@@ -1172,7 +1191,14 @@ export default function MapsPage() {
                               type="checkbox"
                               id="select-residential"
                               checked={bulkSelectionTypes.residential}
-                              onChange={(e) => setBulkSelectionTypes(prev => ({ ...prev, residential: e.target.checked }))}
+                              onChange={(e) => {
+                                console.log('🔄 CHECKBOX DEBUG: Residential checkbox changed to:', e.target.checked);
+                                setBulkSelectionTypes(prev => {
+                                  const updated = { ...prev, residential: e.target.checked };
+                                  console.log('🔄 CHECKBOX DEBUG: Updated bulkSelectionTypes:', updated);
+                                  return updated;
+                                });
+                              }}
                               className="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
                             />
                             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
@@ -1190,7 +1216,14 @@ export default function MapsPage() {
                               type="checkbox"
                               id="select-mps"
                               checked={bulkSelectionTypes.multipurpose_others}
-                              onChange={(e) => setBulkSelectionTypes(prev => ({ ...prev, multipurpose_others: e.target.checked }))}
+                              onChange={(e) => {
+                                console.log('🔄 CHECKBOX DEBUG: Multi-Purpose checkbox changed to:', e.target.checked);
+                                setBulkSelectionTypes(prev => {
+                                  const updated = { ...prev, multipurpose_others: e.target.checked };
+                                  console.log('🔄 CHECKBOX DEBUG: Updated bulkSelectionTypes:', updated);
+                                  return updated;
+                                });
+                              }}
                               className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                             />
                             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
@@ -1208,7 +1241,14 @@ export default function MapsPage() {
                               type="checkbox"
                               id="select-home"
                               checked={bulkSelectionTypes.home}
-                              onChange={(e) => setBulkSelectionTypes(prev => ({ ...prev, home: e.target.checked }))}
+                              onChange={(e) => {
+                                console.log('🔄 CHECKBOX DEBUG: Home Care checkbox changed to:', e.target.checked);
+                                setBulkSelectionTypes(prev => {
+                                  const updated = { ...prev, home: e.target.checked };
+                                  console.log('🔄 CHECKBOX DEBUG: Updated bulkSelectionTypes:', updated);
+                                  return updated;
+                                });
+                              }}
                               className="w-4 h-4 text-green-600 rounded border-gray-300 focus:ring-green-500"
                             />
                             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -1226,7 +1266,14 @@ export default function MapsPage() {
                               type="checkbox"
                               id="select-retirement"
                               checked={bulkSelectionTypes.retirement}
-                              onChange={(e) => setBulkSelectionTypes(prev => ({ ...prev, retirement: e.target.checked }))}
+                              onChange={(e) => {
+                                console.log('🔄 CHECKBOX DEBUG: Retirement checkbox changed to:', e.target.checked);
+                                setBulkSelectionTypes(prev => {
+                                  const updated = { ...prev, retirement: e.target.checked };
+                                  console.log('🔄 CHECKBOX DEBUG: Updated bulkSelectionTypes:', updated);
+                                  return updated;
+                                });
+                              }}
                               className="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
                             />
                             <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
