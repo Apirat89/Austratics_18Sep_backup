@@ -13,6 +13,7 @@ import SavedSearches, { SavedSearchesRef } from '../../components/SavedSearches'
 import TopBottomPanel from '../../components/TopBottomPanel';
 import FacilityDetailsModal from '../../components/FacilityDetailsModal';
 import FacilityTable from '../../components/FacilityTable';
+import FacilityLoadingSpinner from '../../components/FacilityLoadingSpinner';
 import { RankedSA2Data } from '../../components/HeatmapDataService';
 import { getLocationByName } from '../../lib/mapSearchService';
 import { Map, Settings, User, Menu, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
@@ -99,7 +100,10 @@ export default function MapsPage() {
   
   // ✅ NEW: Enhanced radius feature with multiple distance options
   type RadiusType = 'off' | 'urban' | 'suburban' | 'rural';
-  const [radiusType, setRadiusType] = useState<RadiusType>('urban'); // Default to Urban (20km)
+  const [radiusType, setRadiusType] = useState<RadiusType>('urban');
+
+  // ✅ NEW: Facility loading spinner state
+  const [facilitySpinnerVisible, setFacilitySpinnerVisible] = useState(false); // Default to Urban (20km)
 
   // Radius distance mapping
   const getRadiusDistance = (type: RadiusType): number => {
@@ -801,6 +805,11 @@ export default function MapsPage() {
     
     // Don't auto-show panel - let user choose when to view rankings
     // Panel will only show when user manually toggles it or expands data layers
+  }, []);
+
+  // ✅ NEW: Handle facility loading state changes for spinner
+  const handleFacilityLoadingChange = useCallback((isLoading: boolean) => {
+    setFacilitySpinnerVisible(isLoading);
   }, []);
 
   const handleTopBottomPanelToggle = useCallback(() => {
@@ -1664,6 +1673,7 @@ export default function MapsPage() {
                 onFacilityTableSelection={handleFacilityTableSelection}
                 radiusType={radiusType}
                 bulkSelectionTypes={bulkSelectionTypes}
+                onFacilityLoadingChange={handleFacilityLoadingChange}
                 onHeatmapRenderComplete={() => {
                   console.log('🎉 Maps Page: Heatmap render complete, calling DataLayers callback');
                   // ✅ FIXED: Add safety check and async execution to prevent setState during render
@@ -1676,6 +1686,9 @@ export default function MapsPage() {
                 }}
               />
             </MapLoadingCoordinator>
+            
+            {/* ✅ NEW: Facility Loading Spinner */}
+            <FacilityLoadingSpinner visible={facilitySpinnerVisible} />
           </div>
         </main>
       </div>

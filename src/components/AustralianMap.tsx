@@ -102,6 +102,8 @@ interface AustralianMapProps {
   // ✅ NEW: Enhanced radius feature with dropdown selector and facility type integration
   radiusType?: 'off' | 'urban' | 'suburban' | 'rural';
   bulkSelectionTypes?: FacilityTypes;
+  // ✅ NEW: Facility loading state callback for spinner
+  onFacilityLoadingChange?: (isLoading: boolean) => void;
 }
 
 // Expose methods to parent component
@@ -288,7 +290,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
   onHeatmapRenderComplete,
   onFacilityTableSelection,
   radiusType = 'off',
-  bulkSelectionTypes
+  bulkSelectionTypes,
+  onFacilityLoadingChange
 }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
@@ -2141,6 +2144,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     const updateFacilities = async () => {
       console.log('🏥 AustralianMap: Starting coordinated facility update');
       setFacilityLoading(true);
+      onFacilityLoadingChange?.(true);
       
       try {
         // Clear existing markers
@@ -2179,6 +2183,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         }
       } finally {
         setFacilityLoading(false);
+        onFacilityLoadingChange?.(false);
       }
     };
     

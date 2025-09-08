@@ -172,7 +172,204 @@ The facility toggle visibility issue has been resolved (markers now hide/show wh
 - **Main Branch**: **PUSHED TO GITHUB** ✅ (commit: 1b569f1)
 - **Changes Synchronized**: **BOTH BRANCHES UPDATED** ✅
 
+### **🆕 NEW REQUEST - FACILITY LOADING SPINNER**
+- **Background Analysis**: **COMPLETED** ✅
+- **Loading Duration Study**: **COMPLETED** ✅
+- **Spinner Integration Design**: **COMPLETED** ✅
+- **UX Implementation Plan**: **COMPLETED** ✅
+- **User Decision Points**: **AWAITING USER APPROVAL** ⏳
+
+---
+
+## **FACILITY LOADING SPINNER - PLANNING ANALYSIS**
+
+### **Background and Motivation**
+
+**Current User Experience Gap:**
+- Facility checkboxes toggle instantly (Layer 1 CSS visibility)  
+- But actual facility rebuild happens with 300ms debounce + loading time (Layer 2)
+- Users see instant marker changes but don't know background processing is occurring
+- No visual feedback during the facility rebuild/coordination cycle
+- **Problem**: Users may toggle rapidly thinking nothing is happening
+
+**User Experience Goal:**
+- Show loading spinner during facility rebuild operations
+- Spinner duration should match actual map loading time
+- Provide clear visual feedback that system is processing the change
+- Maintain instant visual feedback while indicating background work
+
+### **Key Challenges and Analysis**
+
+**Challenge 1: Dual Loading States**
+- **Layer 1**: Instant CSS visibility changes (immediate)
+- **Layer 2**: Debounced facility rebuilds (`clearAllMarkers()` + `addHealthcareFacilities()`)
+- **Timing Issue**: Spinner should appear during Layer 2 operations, not Layer 1
+
+**Challenge 2: Loading Duration Synchronization** 
+- Current facility loading uses `setFacilityLoading(true/false)` state
+- 300ms debounce delay + actual loading time varies by facility count
+- Spinner must start with debounce timer and end with actual loading completion
+
+**Challenge 3: Multiple Rapid Toggles**
+- Users may toggle multiple checkboxes quickly
+- Debounced system queues/cancels operations
+- Spinner should reflect actual loading state, not individual toggle events
+
+**Challenge 4: Visual Integration**
+- Spinner placement: Over map? In sidebar? As overlay?
+- Should not interfere with other map interactions
+- Must be visible but not obtrusive
+
+### **High-level Task Breakdown**
+
+#### **Phase 1: Loading State Analysis** 
+- **Task 1.1**: Study existing `facilityLoading` state lifecycle
+- **Task 1.2**: Measure actual facility loading durations 
+- **Task 1.3**: Identify trigger points for spinner display
+
+#### **Phase 2: Spinner Component Design**
+- **Task 2.1**: Create reusable loading spinner component
+- **Task 2.2**: Design optimal placement and styling
+- **Task 2.3**: Plan responsive behavior for different screen sizes
+
+#### **Phase 3: State Integration**
+- **Task 3.1**: Connect spinner to `facilityLoading` state
+- **Task 3.2**: Handle rapid toggle scenarios properly
+- **Task 3.3**: Ensure spinner appears/disappears with actual loading cycle
+
+#### **Phase 4: UX Enhancement**
+- **Task 4.1**: Add loading message/context
+- **Task 4.2**: Test user experience flow
+- **Task 4.3**: Optimize timing and visual feedback
+
+---
+
+## **IMPLEMENTATION RECOMMENDATIONS**
+
+### **🔍 Current System Analysis:**
+
+**Existing Loading State Management:**
+- **Location**: `src/components/AustralianMap.tsx` line 372
+- **State**: `const [facilityLoading, setFacilityLoading] = useState<boolean>(false)`
+- **Lifecycle**: 
+  - `setFacilityLoading(true)` - When facility update starts (line 2143)
+  - `setFacilityLoading(false)` - When facility update completes/fails (line 2179)
+  - **Duration**: 300ms debounce + actual loading time (varies by facility count)
+
+**Problem**: `facilityLoading` state is internal to AustralianMap component, not accessible to parent for spinner display.
+
+### **💡 Proposed Solution Architecture:**
+
+#### **Option A: Callback Pattern (Recommended)**
+```typescript
+// In AustralianMapProps interface:
+onFacilityLoadingChange?: (isLoading: boolean) => void;
+
+// In parent component (MapsPage):
+const [facilitySpinnerVisible, setFacilitySpinnerVisible] = useState(false);
+
+// Callback handler:
+const handleFacilityLoadingChange = (isLoading: boolean) => {
+  setFacilitySpinnerVisible(isLoading);
+};
+```
+
+#### **Option B: Ref-based Access**
+```typescript
+// Add to AustralianMapRef interface:
+getFacilityLoadingState: () => boolean;
+
+// Access from parent:
+const isLoading = mapRef.current?.getFacilityLoadingState();
+```
+
+### **🎨 Spinner Component Design:**
+
+#### **Placement Options:**
+1. **Over Map Center** (Recommended): Fixed position overlay with backdrop
+2. **In Sidebar**: Next to facility checkboxes 
+3. **In Status Bar**: Bottom of screen with loading text
+
+#### **Visual Specifications:**
+```typescript
+// Spinner Component Props:
+interface FacilityLoadingSpinnerProps {
+  visible: boolean;
+  message?: string; // "Loading facilities..." 
+  size?: 'small' | 'medium' | 'large';
+  placement?: 'center' | 'sidebar' | 'status';
+}
+```
+
+#### **Styling Guidelines:**
+- **Backdrop**: Semi-transparent overlay (rgba(0,0,0,0.3))
+- **Spinner**: CSS animation with facility-themed colors
+- **Message**: "Loading facilities..." with fade-in/out transitions
+- **Duration Match**: Exact timing with `facilityLoading` state changes
+
+### **🔧 Implementation Sequence:**
+
+#### **Phase 1: Expose Loading State (Priority 1)**
+1. Add `onFacilityLoadingChange` callback to `AustralianMapProps`
+2. Connect callback to existing `setFacilityLoading()` calls
+3. Handle callback in parent component `MapsPage`
+
+#### **Phase 2: Create Spinner Component (Priority 2)**  
+1. Design reusable `FacilityLoadingSpinner` component
+2. Implement responsive positioning and animations
+3. Add customizable loading messages
+
+#### **Phase 3: Integration & Testing (Priority 3)**
+1. Connect spinner to facility loading state
+2. Test rapid toggle scenarios 
+3. Verify timing accuracy with actual loading durations
+
+### **📋 DECISION POINTS FOR USER APPROVAL:**
+
+1. **Spinner Placement**: Over map center vs. in sidebar vs. status bar?
+2. **Loading Message**: "Loading facilities..." vs. "Updating map..." vs. custom?
+3. **Visual Style**: Minimal spinner vs. branded loading animation?
+4. **Backdrop**: Full screen overlay vs. localized to map area?
+
+**Ready to proceed with implementation once placement and styling preferences are confirmed.** 🚀
+
 ## Executor's Feedback or Assistance Requests
+
+**✅ FACILITY LOADING SPINNER - PLANNING COMPLETE**
+
+**COMPREHENSIVE ANALYSIS COMPLETED:**
+- **Current System**: Analyzed existing `facilityLoading` state lifecycle (300ms debounce + variable loading time)
+- **Architecture Options**: Designed callback pattern vs. ref-based access for state exposure
+- **Component Design**: Specified spinner placement options, visual guidelines, and responsive behavior
+- **Implementation Sequence**: Created 3-phase approach with clear priorities and dependencies
+
+**🎯 USER DECISION REQUIRED:**
+
+**Please choose preferences for:**
+
+1. **Spinner Placement:**
+   - A) **Over Map Center** (Recommended - most visible)
+   - B) **In Sidebar** (Next to facility checkboxes)
+   - C) **Status Bar** (Bottom of screen)
+
+2. **Loading Message:**
+   - A) "Loading facilities..."
+   - B) "Updating map..."
+   - C) Custom message (please specify)
+
+3. **Visual Style:**
+   - A) **Minimal spinner** (Simple rotating circle)
+   - B) **Branded animation** (Custom facility-themed loader)
+
+4. **Backdrop:**
+   - A) **Full screen overlay** (Prevents interaction)
+   - B) **Map area only** (Sidebar remains interactive)
+
+**Once preferences are provided, I can proceed immediately to Phase 1 implementation (exposing the loading state via callback pattern).** 
+
+**The technical architecture is ready - just need styling/UX decisions!** ⚡
+
+---
 
 **❌ DUAL-LAYER IMPLEMENTATION FAILED - STILL REFRESHING LAYERS**
 
