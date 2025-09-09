@@ -6,6 +6,10 @@ export interface AuthenticatedUser {
   email: string;
   role: 'user' | 'staff' | 'owner';
   permissions: Record<string, any>;
+  // New company fields
+  companyId?: string;
+  companyName?: string;
+  status: 'active' | 'suspended' | 'deleted';
 }
 
 export interface AuthResult {
@@ -33,10 +37,21 @@ export async function authenticateAdmin(request: NextRequest): Promise<AuthResul
       };
     }
 
-    // Get user profile with role
+    // Get user profile with role and company info
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('id, email, role, permissions')
+      .select(`
+        id, 
+        email, 
+        role, 
+        permissions, 
+        company_id,
+        status,
+        companies:company_id (
+          id,
+          name
+        )
+      `)
       .eq('id', user.id)
       .single();
 
@@ -44,6 +59,15 @@ export async function authenticateAdmin(request: NextRequest): Promise<AuthResul
       return {
         success: false,
         error: 'User profile not found',
+        statusCode: 403
+      };
+    }
+
+    // Check if user account is active
+    if (profile.status !== 'active') {
+      return {
+        success: false,
+        error: `Account is ${profile.status}. Please contact support.`,
         statusCode: 403
       };
     }
@@ -63,7 +87,10 @@ export async function authenticateAdmin(request: NextRequest): Promise<AuthResul
         id: profile.id,
         email: profile.email,
         role: profile.role,
-        permissions: profile.permissions || {}
+        permissions: profile.permissions || {},
+        companyId: profile.company_id,
+        companyName: profile.companies?.[0]?.name,
+        status: profile.status
       }
     };
 
@@ -95,10 +122,21 @@ export async function authenticateUser(request: NextRequest): Promise<AuthResult
       };
     }
 
-    // Get user profile
+    // Get user profile with company info
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('id, email, role, permissions')
+      .select(`
+        id, 
+        email, 
+        role, 
+        permissions, 
+        company_id,
+        status,
+        companies:company_id (
+          id,
+          name
+        )
+      `)
       .eq('id', user.id)
       .single();
 
@@ -110,13 +148,25 @@ export async function authenticateUser(request: NextRequest): Promise<AuthResult
       };
     }
 
+    // Check if user account is active
+    if (profile.status !== 'active') {
+      return {
+        success: false,
+        error: `Account is ${profile.status}. Please contact support.`,
+        statusCode: 403
+      };
+    }
+
     return {
       success: true,
       user: {
         id: profile.id,
         email: profile.email,
         role: profile.role,
-        permissions: profile.permissions || {}
+        permissions: profile.permissions || {},
+        companyId: profile.company_id,
+        companyName: profile.companies?.[0]?.name,
+        status: profile.status
       }
     };
 
@@ -144,20 +194,57 @@ export function hasPermission(user: AuthenticatedUser, permission: string): bool
 }
 
 /**
- * Check if user can access resource (owner can access all, staff can access own)
+ * Check if user can access resource (owner can access all, staff can access own company)
  */
-export function canAccessResource(user: AuthenticatedUser, resourceUserId?: string): boolean {
+export function canAccessResource(user: AuthenticatedUser, resourceUserId?: string, resourceCompanyId?: string): boolean {
   // Owners can access all resources
   if (user.role === 'owner') {
     return true;
   }
 
-  // Staff can only access their own resources
+  // Staff can access resources from their own company
   if (user.role === 'staff') {
+    // If checking user resource, allow if same user or same company
+    if (resourceUserId && resourceUserId === user.id) {
+      return true;
+    }
+    
+    // If checking company resource, allow if same company
+    if (resourceCompanyId && resourceCompanyId === user.companyId) {
+      return true;
+    }
+    
+    // If no specific resource checks, only allow own resources
     return !resourceUserId || resourceUserId === user.id;
   }
 
   return false;
+}
+
+/**
+ * Check if user can access company data
+ */
+export function canAccessCompany(user: AuthenticatedUser, companyId: string): boolean {
+  // Owners can access all companies
+  if (user.role === 'owner') {
+    return true;
+  }
+
+  // Staff can only access their own company
+  return user.companyId === companyId;
+}
+
+/**
+ * Get accessible company IDs for user (for database filtering)
+ */
+export function getAccessibleCompanyIds(user: AuthenticatedUser): string[] {
+  // Owners can access all companies (return empty array = no filter needed)
+  if (user.role === 'owner') {
+    return [];
+  }
+
+  // Staff can only access their own company
+  return user.companyId ? [user.companyId] : [];
 }
 
 /**
