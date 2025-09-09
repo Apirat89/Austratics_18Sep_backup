@@ -15,9 +15,10 @@ import FacilityDetailsModal from '../../components/FacilityDetailsModal';
 import FacilityTable from '../../components/FacilityTable';
 import { RankedSA2Data } from '../../components/HeatmapDataService';
 import { getLocationByName } from '../../lib/mapSearchService';
-import { Map, Settings, User, Menu, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
+import { Map, User, Menu, BarChart3, ChevronDown, ChevronUp, LogOut } from 'lucide-react';
 import MapLoadingCoordinator from '../../components/MapLoadingCoordinator';
 import { useTelemetry } from '../../lib/telemetry';
+import { signOut } from '../../lib/auth';
 
 interface UserData {
   email: string;
@@ -184,6 +185,35 @@ export default function MapsPage() {
     home: true,
     retirement: true
   });
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+
+  // Handle sign out
+  const handleSignOut = async () => {
+    try {
+      setSigningOut(true);
+      const result = await signOut();
+      
+      if (result.success) {
+        // Redirect to sign-in page after successful sign out
+        router.push('/auth/signin');
+      } else {
+        console.error('Sign out failed:', result.error);
+        setSigningOut(false);
+      }
+    } catch (error) {
+      console.error('Sign out error:', error);
+      setSigningOut(false);
+    }
+  };
+
+  // Get user initials for avatar
+  const getInitials = (name: string): string => {
+    if (!name) return 'U';
+    const names = name.trim().split(' ');
+    if (names.length === 1) return names[0].charAt(0).toUpperCase();
+    return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+  };
 
   // ✅ DEBUG: Log when bulkSelectionTypes changes (prop passed to AustralianMap as facilityTypes)
   useEffect(() => {
@@ -1378,25 +1408,56 @@ export default function MapsPage() {
               <button className="w-full p-2 hover:bg-gray-100 rounded-lg transition-colors">
                 <User className="h-5 w-5 text-gray-600 mx-auto" />
               </button>
-              <button className="w-full p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <Settings className="h-5 w-5 text-gray-600 mx-auto" />
-              </button>
             </>
           ) : (
             <>
-              <button className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-100 rounded-lg transition-colors">
-                <Settings className="h-4 w-4 text-gray-600" />
-                <span className="text-sm text-gray-700">Settings & help</span>
-              </button>
-              <div className="flex items-center gap-3 p-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium text-white">A</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {user?.name || 'User'}
-                  </p>
-                </div>
+              {/* Username with Sign-out Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  disabled={signingOut}
+                >
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-white">
+                      {getInitials(user?.name || '')}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {user?.name || 'User'}
+                    </p>
+                  </div>
+                  <ChevronDown 
+                    className={`h-4 w-4 text-gray-500 transition-transform ${
+                      userDropdownOpen ? 'rotate-180' : ''
+                    }`} 
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {userDropdownOpen && (
+                  <>
+                    {/* Backdrop */}
+                    <div 
+                      className="fixed inset-0 z-40"
+                      onClick={() => setUserDropdownOpen(false)}
+                    />
+                    {/* Sign-out Popup - Opens Above Button */}
+                    <div className="absolute left-2 bottom-full mb-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                      <div className="py-1">
+                        <button
+                          onClick={handleSignOut}
+                          disabled={signingOut}
+                          className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <LogOut className="h-4 w-4 text-red-500" />
+                          {signingOut ? 'Signing out...' : 'Sign out'}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </>
           )}

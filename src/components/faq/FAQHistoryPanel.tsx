@@ -399,11 +399,6 @@ const FAQHistoryPanel: React.FC<FAQHistoryPanelProps> = ({
         <div className="text-xs text-gray-500 text-center">
           FAQ Assistant History
         </div>
-        {currentUser && (
-          <div className="text-xs text-gray-400 text-center mt-1">
-            User: {currentUser.id.substring(0, 8)}...
-          </div>
-        )}
       </div>
     </div>
   );

@@ -2,13 +2,19 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { HelpCircle, ArrowLeft, History, X, Bookmark, Plus, Copy, RotateCcw, Check } from 'lucide-react';
+import { HelpCircle, ArrowLeft, History, X, Bookmark, Plus, Copy, RotateCcw, Check, ChevronDown, LogOut } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import FAQHistoryPanel from '@/components/faq/FAQHistoryPanel';
 
-import { getCurrentUser } from '@/lib/auth';
+import { getCurrentUser, signOut } from '@/lib/auth';
 import { renderMarkdown } from '@/lib/markdownRenderer';
+
+interface UserData {
+  email: string;
+  name: string;
+  id: string;
+}
 import {
   FAQSearchHistoryItem,
   FAQBookmark,
@@ -96,6 +102,10 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
   const [isLoading, setIsLoading] = useState(false);
   const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(true);
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
+  const [user, setUser] = useState<UserData | null>(null);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [searchHistory, setSearchHistory] = useState<FAQSearchHistoryItem[]>([]);
   const [bookmarks, setBookmarks] = useState<FAQBookmark[]>([]);
   const [unifiedHistory, setUnifiedHistory] = useState<UnifiedFAQHistoryItem[]>([]);
@@ -116,6 +126,32 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Handle sign out
+  const handleSignOut = async () => {
+    try {
+      setSigningOut(true);
+      const result = await signOut();
+      
+      if (result.success) {
+        router.push('/auth/signin');
+      } else {
+        console.error('Sign out failed:', result.error);
+        setSigningOut(false);
+      }
+    } catch (error) {
+      console.error('Sign out error:', error);
+      setSigningOut(false);
+    }
+  };
+
+  // Get user initials for avatar
+  const getInitials = (name: string): string => {
+    if (!name) return 'U';
+    const names = name.trim().split(' ');
+    if (names.length === 1) return names[0].charAt(0).toUpperCase();
+    return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -124,14 +160,21 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
   useEffect(() => {
     const loadUserAndData = async () => {
       try {
-        const user = await getCurrentUser();
-        setCurrentUser(user);
+        const currentUser = await getCurrentUser();
+        setCurrentUser(currentUser);
         
-        if (user) {
+        if (currentUser) {
+          // Set Maps-style user data
+          setUser({
+            email: currentUser.email || '',
+            name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User',
+            id: currentUser.id
+          });
+          
           // Load unified search history and bookmarks
           const [unifiedHistoryData, unifiedBookmarksData] = await Promise.all([
-            getUnifiedFAQHistory(user.id),
-            getUnifiedFAQBookmarks(user.id)
+            getUnifiedFAQHistory(currentUser.id),
+            getUnifiedFAQBookmarks(currentUser.id)
           ]);
           
           // Set unified data
@@ -141,9 +184,16 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
           // Convert to old format for backward compatibility with existing UI
           setSearchHistory(adaptUnifiedFAQHistoryToOld(unifiedHistoryData));
           setBookmarks(adaptUnifiedFAQBookmarksToOld(unifiedBookmarksData));
+        } else {
+          // No user found - redirect to sign-in
+          router.push('/auth/signin');
+          return;
         }
       } catch (error) {
         console.error('Error loading user and data:', error);
+        router.push('/auth/signin');
+      } finally {
+        setIsAuthLoading(false);
       }
     };
 
@@ -833,6 +883,23 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
     );
   };
 
+  // Authentication loading
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Authentication check
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Fixed History & Bookmarks Panel - Always Visible */}
@@ -1078,6 +1145,59 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
                 Save Bookmark
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Username Display - Bottom Left */}
+      {user && (
+        <div className="fixed bottom-4 left-4 z-50">
+          <div className="relative">
+            <button
+              onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+              className="flex items-center gap-3 p-2 bg-white rounded-lg shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              disabled={signingOut}
+            >
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <span className="text-sm font-medium text-white">
+                  {getInitials(user?.name || '')}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {user?.name || 'User'}
+                </p>
+              </div>
+              <ChevronDown 
+                className={`h-4 w-4 text-gray-500 transition-transform ${
+                  userDropdownOpen ? 'rotate-180' : ''
+                }`} 
+              />
+            </button>
+
+            {/* Dropdown Menu */}
+            {userDropdownOpen && (
+              <>
+                {/* Backdrop */}
+                <div 
+                  className="fixed inset-0 z-40"
+                  onClick={() => setUserDropdownOpen(false)}
+                />
+                {/* Sign-out Popup - Opens Above Button */}
+                <div className="absolute left-0 bottom-full mb-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="py-1">
+                    <button
+                      onClick={handleSignOut}
+                      disabled={signingOut}
+                      className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <LogOut className="h-4 w-4 text-red-500" />
+                      {signingOut ? 'Signing out...' : 'Sign out'}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
