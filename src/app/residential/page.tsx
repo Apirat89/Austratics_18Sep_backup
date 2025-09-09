@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Scale, CheckSquare, Square, Eye, X, Filter, ExternalLink, Save } from 'lucide-react';
+import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Scale, CheckSquare, Square, Eye, X, Filter, ExternalLink, Save, ChevronDown, LogOut } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InlineBoxPlot from '@/components/residential/InlineBoxPlot';
 
 import HistoryPanel from '@/components/residential/HistoryPanel';
-import { getCurrentUser } from '../../lib/auth';
+import { getCurrentUser, signOut } from '../../lib/auth';
 import { 
   saveResidentialFacility, 
   getUserSavedResidentialFacilities, 
@@ -314,6 +314,12 @@ interface ResidentialFacility {
 
 // Remove the old SavedFacility interface - we'll use SavedResidentialFacility from the service
 
+interface UserData {
+  email: string;
+  name: string;
+  id: string;
+}
+
 export default function ResidentialPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -329,6 +335,11 @@ export default function ResidentialPage() {
   const [showSavedFacilities, setShowSavedFacilities] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userLoading, setUserLoading] = useState(true);
+  
+  // Maps-style authentication states
+  const [user, setUser] = useState<UserData | null>(null);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   
   // Statistical data for inline box plots
   const [statisticsData, setStatisticsData] = useState<any>(null);
@@ -356,6 +367,32 @@ export default function ResidentialPage() {
   const [selectedSA2Filter, setSelectedSA2Filter] = useState<SavedSA2Search | null>(null);
   const [sa2LoadingError, setSA2LoadingError] = useState<string | null>(null);
 
+  // Handle sign out
+  const handleSignOut = async () => {
+    try {
+      setSigningOut(true);
+      const result = await signOut();
+      
+      if (result.success) {
+        router.push('/auth/signin');
+      } else {
+        console.error('Sign out failed:', result.error);
+        setSigningOut(false);
+      }
+    } catch (error) {
+      console.error('Sign out error:', error);
+      setSigningOut(false);
+    }
+  };
+
+  // Get user initials for avatar
+  const getInitials = (name: string): string => {
+    if (!name) return 'U';
+    const names = name.trim().split(' ');
+    if (names.length === 1) return names[0].charAt(0).toUpperCase();
+    return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+  };
+
   // NEW: Text-first search with location enhancement state
   const [searchCoordinates, setSearchCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [isLocationSearchActive, setIsLocationSearchActive] = useState(false); // True when location enhancement is active
@@ -369,24 +406,37 @@ export default function ResidentialPage() {
     const loadUserAndData = async () => {
       try {
         // Get current user
-        const user = await getCurrentUser();
-        setCurrentUser(user);
+        const currentUser = await getCurrentUser();
         
-        if (user) {
+        if (!currentUser) {
+          router.push('/auth/signin');
+          return;
+        }
+
+        setCurrentUser(currentUser);
+        
+        // Set Maps-style user data
+        setUser({
+          email: currentUser.email || '',
+          name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User',
+          id: currentUser.id
+        });
+        
+        if (currentUser) {
           // Load saved facilities from Supabase
-          const result = await getUserSavedResidentialFacilities(user.id);
+          const result = await getUserSavedResidentialFacilities(currentUser.id);
           setSavedFacilities(result.facilities);
           
           // Load search history from Supabase
-          const searches = await getResidentialSearchHistory(user.id, 10);
+          const searches = await getResidentialSearchHistory(currentUser.id, 10);
           setSearchHistory(searches);
           
           // Load comparison history from Supabase
-          const comparisons = await getResidentialComparisonHistory(user.id, 10);
+          const comparisons = await getResidentialComparisonHistory(currentUser.id, 10);
           setRecentComparisons(comparisons);
           
           // Load persistent comparison selections from Supabase
-          const selections = await getResidentialComparisonSelections(user.id);
+          const selections = await getResidentialComparisonSelections(currentUser.id);
           setPersistentSelections(selections);
           
           // Sync selectedForComparison with persistent selections
@@ -395,7 +445,7 @@ export default function ResidentialPage() {
           
           // Load saved SA2 regions from Supabase
           try {
-            const sa2Result = await getUserSavedSA2Searches(user.id);
+            const sa2Result = await getUserSavedSA2Searches(currentUser.id);
             setSavedSA2Regions(sa2Result.searches);
           } catch (error) {
             console.error('Error loading saved SA2 regions:', error);
@@ -404,13 +454,14 @@ export default function ResidentialPage() {
         }
       } catch (error) {
         console.error('Error loading user and data:', error);
+        router.push('/auth/signin');
       } finally {
         setUserLoading(false);
       }
     };
     
     loadUserAndData();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const loadFacilities = async () => {
@@ -2914,6 +2965,59 @@ export default function ResidentialPage() {
       
       {/* End Main Content Area */}
       </div>
+      
+      {/* Username Display - Bottom Left */}
+      {user && (
+        <div className="fixed bottom-4 left-4 z-50">
+          <div className="relative">
+            <button
+              onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+              className="flex items-center gap-3 p-2 bg-white rounded-lg shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              disabled={signingOut}
+            >
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <span className="text-sm font-medium text-white">
+                  {getInitials(user?.name || '')}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {user?.name || 'User'}
+                </p>
+              </div>
+              <ChevronDown 
+                className={`h-4 w-4 text-gray-500 transition-transform ${
+                  userDropdownOpen ? 'rotate-180' : ''
+                }`} 
+              />
+            </button>
+
+            {/* Dropdown Menu */}
+            {userDropdownOpen && (
+              <>
+                {/* Backdrop */}
+                <div 
+                  className="fixed inset-0 z-40"
+                  onClick={() => setUserDropdownOpen(false)}
+                />
+                {/* Sign-out Popup - Opens Above Button */}
+                <div className="absolute left-0 bottom-full mb-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="py-1">
+                    <button
+                      onClick={handleSignOut}
+                      disabled={signingOut}
+                      className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <LogOut className="h-4 w-4 text-red-500" />
+                      {signingOut ? 'Signing out...' : 'Sign out'}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
       
       {/* End Main Flex Container */}
     </div>

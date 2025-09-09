@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCurrentUser } from '../../lib/auth';
+import { getCurrentUser, signOut } from '../../lib/auth';
 import BackToMainButton from '../../components/BackToMainButton';
-import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Save, Trash2, History, ArrowLeft, Globe, Building, Home, ExternalLink, X } from 'lucide-react';
+import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Save, Trash2, History, ArrowLeft, Globe, Building, Home, ExternalLink, X, ChevronDown, LogOut } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import SA2BoxPlot from '../../components/sa2/SA2BoxPlot';
@@ -98,6 +98,8 @@ interface DataLoadingStatus {
 export default function SA2AnalyticsPage() {
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [selectedSA2, setSelectedSA2] = useState<SA2Data | null>(null);
@@ -129,6 +131,33 @@ export default function SA2AnalyticsPage() {
   const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(true);
   
   const router = useRouter();
+
+  // Handle sign out
+  const handleSignOut = async () => {
+    try {
+      setSigningOut(true);
+      const result = await signOut();
+      
+      if (result.success) {
+        router.push('/auth/signin');
+      } else {
+        console.error('Sign out failed:', result.error);
+        setSigningOut(false);
+      }
+    } catch (error) {
+      console.error('Sign out error:', error);
+      setSigningOut(false);
+    }
+  };
+
+  // Get user initials for avatar
+  const getInitials = (name: string): string => {
+    if (!name) return 'U';
+    const names = name.trim().split(' ');
+    if (names.length === 1) return names[0].charAt(0).toUpperCase();
+    return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+  };
+
   const dataLoadingRef = useRef(false);
   const dataLoadedRef = useRef(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -1293,17 +1322,22 @@ export default function SA2AnalyticsPage() {
       try {
         setCurrentUserLoading(true);
         const currentUser = await getCurrentUser();
-        if (currentUser) {
-          setUser({
-            email: currentUser.email || '',
-            name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User',
-            id: currentUser.id
-          });
+        
+        if (!currentUser) {
+          router.push('/auth/signin');
+          return;
         }
+
+        setUser({
+          email: currentUser.email || '',
+          name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User',
+          id: currentUser.id
+        });
+        
         await loadSA2Data();
       } catch (error) {
         console.error('Error initializing SA2 analytics page:', error);
-        router.push('/auth/login');
+        router.push('/auth/signin');
       } finally {
         setIsLoading(false);
         setCurrentUserLoading(false);
@@ -2254,6 +2288,59 @@ export default function SA2AnalyticsPage() {
           )}
         </div>
       </div>
+      
+      {/* Username Display - Bottom Left */}
+      {user && (
+        <div className="fixed bottom-4 left-4 z-50">
+          <div className="relative">
+            <button
+              onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+              className="flex items-center gap-3 p-2 bg-white rounded-lg shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              disabled={signingOut}
+            >
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <span className="text-sm font-medium text-white">
+                  {getInitials(user?.name || '')}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {user?.name || 'User'}
+                </p>
+              </div>
+              <ChevronDown 
+                className={`h-4 w-4 text-gray-500 transition-transform ${
+                  userDropdownOpen ? 'rotate-180' : ''
+                }`} 
+              />
+            </button>
+
+            {/* Dropdown Menu */}
+            {userDropdownOpen && (
+              <>
+                {/* Backdrop */}
+                <div 
+                  className="fixed inset-0 z-40"
+                  onClick={() => setUserDropdownOpen(false)}
+                />
+                {/* Sign-out Popup - Opens Above Button */}
+                <div className="absolute left-0 bottom-full mb-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="py-1">
+                    <button
+                      onClick={handleSignOut}
+                      disabled={signingOut}
+                      className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <LogOut className="h-4 w-4 text-red-500" />
+                      {signingOut ? 'Signing out...' : 'Sign out'}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
