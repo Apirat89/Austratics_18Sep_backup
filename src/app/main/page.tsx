@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Map,
-  BookOpen,
   BarChart3,
   Building,
   Home,
@@ -80,11 +79,6 @@ export default function MainPage() {
       title: "News",
       icon: Newspaper,
       route: "/news"
-    },
-    {
-      title: "Regulation (BETA)", 
-      icon: BookOpen,
-      route: "/regulation"
     },
     {
       title: "FAQ (Chatbot)",

@@ -16,7 +16,7 @@ export function createBrowserSupabaseClient() {
   return createBrowserClient(supabaseUrl, supabaseAnonKey);
 }
 
-// Server client for server components and API routes
+// Server client for API routes only (where cookies can be modified)
 export async function createServerSupabaseClient() {
   const { cookies } = await import('next/headers');
   const cookieStore = await cookies();
@@ -27,10 +27,42 @@ export async function createServerSupabaseClient() {
         return cookieStore.get(name)?.value;
       },
       set(name: string, value: string, options: any) {
-        cookieStore.set({ name, value, ...options });
+        try {
+          cookieStore.set({ name, value, ...options });
+        } catch {
+          // The `set` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing
+          // user sessions.
+        }
       },
       remove(name: string, options: any) {
-        cookieStore.set({ name, value: '', ...options });
+        try {
+          cookieStore.set({ name, value: '', ...options });
+        } catch {
+          // The `remove` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing
+          // user sessions.
+        }
+      },
+    },
+  });
+}
+
+// Read-only server client for Server Components
+export async function createReadOnlyServerSupabaseClient() {
+  const { cookies } = await import('next/headers');
+  const cookieStore = await cookies();
+  
+  return createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      get(name: string) {
+        return cookieStore.get(name)?.value;
+      },
+      set() {
+        // This is intentionally empty for read-only operations
+      },
+      remove() {
+        // This is intentionally empty for read-only operations
       },
     },
   });

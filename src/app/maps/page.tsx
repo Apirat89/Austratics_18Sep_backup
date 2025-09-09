@@ -17,6 +17,7 @@ import { RankedSA2Data } from '../../components/HeatmapDataService';
 import { getLocationByName } from '../../lib/mapSearchService';
 import { Map, Settings, User, Menu, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
 import MapLoadingCoordinator from '../../components/MapLoadingCoordinator';
+import { useTelemetry } from '../../lib/telemetry';
 
 interface UserData {
   email: string;
@@ -62,6 +63,9 @@ type GeoLayerType = 'sa2' | 'sa3' | 'sa4' | 'lga' | 'postcode' | 'locality' | 'a
 type MapStyleType = 'basic' | 'topo' | 'satellite' | 'terrain' | 'streets';
 
 export default function MapsPage() {
+  // Initialize telemetry tracking
+  const { trackFeatureOpen, trackClick, trackSearch } = useTelemetry();
+
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -206,6 +210,12 @@ export default function MapsPage() {
           email: currentUser.email || '',
           name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User',
           id: currentUser.id
+        });
+
+        // Track page open after user loads
+        trackFeatureOpen('map', {
+          user_email: currentUser.email,
+          initial_facility_types: JSON.stringify(facilityTypes)
         });
       } catch (error) {
         console.error('Error loading user:', error);
@@ -616,6 +626,9 @@ export default function MapsPage() {
       // Reset navigation state for general searches
       setMapNavigation(null);
     }
+
+    // Track search telemetry
+    trackSearch('map', searchTerm, navigation?.searchResult ? 1 : 0);
   };
 
   const handleClearHighlight = useCallback(() => {
@@ -1167,6 +1180,13 @@ export default function MapsPage() {
                                 setBulkSelectionTypes(prev => {
                                   const updated = { ...prev, residential: e.target.checked };
                                   console.log('🔄 CHECKBOX DEBUG: Updated bulkSelectionTypes:', updated);
+                                  
+                                  // Track facility layer toggle
+                                  trackClick('map', 'facility_toggle', {
+                                    facility_type: 'residential',
+                                    enabled: e.target.checked
+                                  });
+                                  
                                   return updated;
                                 });
                               }}
