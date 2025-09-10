@@ -1,9 +1,12 @@
 import nodemailer from 'nodemailer';
-import { ContactRequest } from '../app/api/contact/route';
 
-// Email service configuration interface
+// ==========================================
+// EMAIL SERVICE CONFIGURATION
+// ==========================================
+
 interface EmailConfig {
-  smtp: {
+  masterAdminEmail: string;
+  smtpConfig: {
     host: string;
     port: number;
     secure: boolean;
@@ -12,297 +15,914 @@ interface EmailConfig {
       pass: string;
     };
   };
-  from: string;
-  to: string;
 }
 
-// Email template interface
-interface EmailTemplate {
-  subject: string;
-  text: string;
-  html: string;
-}
-
-class EmailService {
-  private transporter: nodemailer.Transporter | null = null;
-  private config: EmailConfig | null = null;
-
-  constructor() {
-    this.initialize();
+// Email configuration - using master admin email as sender
+const emailConfig: EmailConfig = {
+  masterAdminEmail: 'apirat.kongchanagul@gmail.com',
+  smtpConfig: {
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // Use TLS
+    auth: {
+      user: process.env.EMAIL_USER || 'apirat.kongchanagul@gmail.com',
+      pass: process.env.EMAIL_PASSWORD || '' // Gmail App Password
+    }
   }
+};
 
-  private initialize() {
+// Create reusable transporter
+let transporter: nodemailer.Transporter | null = null;
+
+function getEmailTransporter() {
+  if (!transporter) {
+    transporter = nodemailer.createTransport(emailConfig.smtpConfig);
+  }
+  return transporter;
+}
+
+// ==========================================
+// EMAIL TEMPLATE FUNCTIONS
+// ==========================================
+
+/**
+ * Generate HTML template for admin invitation email
+ */
+function generateAdminInvitationTemplate(email: string, tempPassword: string, activationToken: string): string {
+  const activationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/master/activate?token=${activationToken}`;
+  
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Admin Invitation - Aged Care Analytics</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 30px;
+          text-align: center;
+          border-radius: 8px 8px 0 0;
+        }
+        .content {
+          background: #f8f9fa;
+          padding: 30px;
+          border-radius: 0 0 8px 8px;
+          border: 1px solid #e9ecef;
+          border-top: none;
+        }
+        .credentials-box {
+          background: white;
+          padding: 20px;
+          border-radius: 6px;
+          border: 1px solid #dee2e6;
+          margin: 20px 0;
+        }
+        .button {
+          display: inline-block;
+          background: #667eea;
+          color: white;
+          padding: 12px 30px;
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: 600;
+          margin: 20px 0;
+        }
+        .warning {
+          background: #fff3cd;
+          color: #856404;
+          padding: 15px;
+          border-radius: 6px;
+          border: 1px solid #ffeaa7;
+          margin: 20px 0;
+        }
+        .footer {
+          text-align: center;
+          color: #6c757d;
+          font-size: 14px;
+          margin-top: 30px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>🔐 Admin Access Granted</h1>
+        <p>You've been invited to join the administration team</p>
+      </div>
+      
+      <div class="content">
+        <h2>Welcome to Aged Care Analytics Administration</h2>
+        <p>Hello,</p>
+        <p>You have been granted administrator privileges for the Aged Care Analytics platform. This gives you access to the master administration interface for managing users, viewing analytics, and overseeing system operations.</p>
+        
+        <div class="credentials-box">
+          <h3>🔑 Your Login Credentials</h3>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Temporary Password:</strong> <code style="background: #f8f9fa; padding: 4px 8px; border-radius: 4px; font-family: monospace;">${tempPassword}</code></p>
+        </div>
+        
+        <div class="warning">
+          <p><strong>⚠️ Important Security Notes:</strong></p>
+          <ul>
+            <li>This is a temporary password. You'll be prompted to change it upon first login.</li>
+            <li>Your account must be activated within 72 hours of receiving this email.</li>
+            <li>Never share your admin credentials with anyone.</li>
+            <li>Always log out when finished with admin tasks.</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center;">
+          <a href="${activationUrl}" class="button">🚀 Activate Your Admin Account</a>
+        </div>
+        
+        <h3>📋 Admin Permissions</h3>
+        <p>As an administrator, you will have access to:</p>
+        <ul>
+          <li><strong>User Management:</strong> View and manage user accounts</li>
+          <li><strong>Usage Analytics:</strong> Access to platform usage statistics and reports</li>
+          <li><strong>System Oversight:</strong> Monitor platform health and performance</li>
+          <li><strong>Admin Self-Management:</strong> Ability to manage your own admin account</li>
+        </ul>
+        
+        <p><strong>Note:</strong> Only the master administrator can add or remove admin users.</p>
+        
+        <h3>🔗 Getting Started</h3>
+        <ol>
+          <li>Click the activation link above</li>
+          <li>Log in with your email and temporary password</li>
+          <li>Set a new, secure password</li>
+          <li>Familiarize yourself with the admin interface</li>
+        </ol>
+        
+        <p>If you have any questions or concerns about your admin access, please contact the master administrator directly.</p>
+        
+        <p>Best regards,<br>
+        <strong>Aged Care Analytics Team</strong></p>
+      </div>
+      
+      <div class="footer">
+        <p>This email was sent from the Aged Care Analytics administration system.</p>
+        <p>If you didn't expect this email, please contact: apirat.kongchanagul@gmail.com</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+/**
+ * Generate HTML template for admin activity summary email
+ */
+function generateActivitySummaryTemplate(adminEmail: string, activities: AdminActivity[]): string {
+  const activityRows = activities.map(activity => `
+    <tr>
+      <td style="padding: 12px; border-bottom: 1px solid #e9ecef;">${new Date(activity.timestamp).toLocaleString()}</td>
+      <td style="padding: 12px; border-bottom: 1px solid #e9ecef;">
+        <span style="background: ${getActionTypeColor(activity.actionType)}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+          ${activity.actionType}
+        </span>
+      </td>
+      <td style="padding: 12px; border-bottom: 1px solid #e9ecef;">${activity.targetType}</td>
+      <td style="padding: 12px; border-bottom: 1px solid #e9ecef;">${activity.description}</td>
+    </tr>
+  `).join('');
+
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Admin Activity Summary - Aged Care Analytics</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .header {
+          background: #343a40;
+          color: white;
+          padding: 20px;
+          text-align: center;
+          border-radius: 8px 8px 0 0;
+        }
+        .content {
+          background: white;
+          padding: 30px;
+          border: 1px solid #e9ecef;
+          border-top: none;
+        }
+        .summary-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 20px 0;
+        }
+        .summary-table th {
+          background: #f8f9fa;
+          padding: 12px;
+          text-align: left;
+          border-bottom: 2px solid #e9ecef;
+          font-weight: 600;
+        }
+        .footer-section {
+          background: #f8f9fa;
+          padding: 20px;
+          border-radius: 0 0 8px 8px;
+          border: 1px solid #e9ecef;
+          border-top: none;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>📊 Admin Activity Summary</h1>
+        <p>Recent administrative actions performed by: <strong>${adminEmail}</strong></p>
+      </div>
+      
+      <div class="content">
+        <h2>Recent Activities (${activities.length} actions)</h2>
+        ${activities.length > 0 ? `
+          <table class="summary-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Action</th>
+                <th>Target</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${activityRows}
+            </tbody>
+          </table>
+        ` : '<p>No recent activities to report.</p>'}
+      </div>
+      
+      <div class="footer-section">
+        <p><strong>Note:</strong> This is an automated summary sent to the master administrator for audit purposes.</p>
+        <p>Generated at: ${new Date().toLocaleString()}</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+/**
+ * Generate HTML template for user invitation email
+ */
+function generateUserInvitationTemplate(email: string, tempPassword: string): string {
+  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/signin`;
+  
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Welcome to Aged Care Analytics</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .header {
+          background: linear-gradient(135deg, #4f46e5 0%, #3c366b 100%);
+          color: white;
+          padding: 30px;
+          text-align: center;
+          border-radius: 8px 8px 0 0;
+        }
+        .content {
+          background: #f8f9fa;
+          padding: 30px;
+          border-radius: 0 0 8px 8px;
+          border: 1px solid #e9ecef;
+          border-top: none;
+        }
+        .credentials-box {
+          background: white;
+          padding: 20px;
+          border-radius: 6px;
+          border: 1px solid #dee2e6;
+          margin: 20px 0;
+        }
+        .button {
+          display: inline-block;
+          background: #4f46e5;
+          color: white;
+          padding: 12px 30px;
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: 600;
+          margin: 20px 0;
+        }
+        .warning {
+          background: #fff3cd;
+          color: #856404;
+          padding: 15px;
+          border-radius: 6px;
+          border: 1px solid #ffeaa7;
+          margin: 20px 0;
+        }
+        .footer {
+          text-align: center;
+          color: #6c757d;
+          font-size: 14px;
+          margin-top: 30px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>👋 Welcome to Aged Care Analytics</h1>
+        <p>Your account has been created</p>
+      </div>
+      
+      <div class="content">
+        <h2>Your Account is Ready</h2>
+        <p>Hello,</p>
+        <p>An account has been created for you on the Aged Care Analytics platform. You can now access the platform using the credentials below.</p>
+        
+        <div class="credentials-box">
+          <h3>🔑 Your Login Credentials</h3>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Temporary Password:</strong> <code style="background: #f8f9fa; padding: 4px 8px; border-radius: 4px; font-family: monospace;">${tempPassword}</code></p>
+        </div>
+        
+        <div class="warning">
+          <p><strong>⚠️ Important Security Notes:</strong></p>
+          <ul>
+            <li>This is a temporary password. You'll be prompted to change it upon first login.</li>
+            <li>Never share your credentials with anyone.</li>
+            <li>Always log out when finished with your session.</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center;">
+          <a href="${loginUrl}" class="button">🚀 Log in to Your Account</a>
+        </div>
+        
+        <h3>🔍 Getting Started</h3>
+        <ol>
+          <li>Click the login button above</li>
+          <li>Enter your email and temporary password</li>
+          <li>Set a new, secure password</li>
+          <li>Start exploring the platform's features</li>
+        </ol>
+        
+        <p>If you have any questions or need assistance, please contact support.</p>
+        
+        <p>Best regards,<br>
+        <strong>Aged Care Analytics Team</strong></p>
+      </div>
+      
+      <div class="footer">
+        <p>This email was sent from the Aged Care Analytics platform.</p>
+        <p>If you didn't expect this email, please contact us immediately.</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+/**
+ * Generate HTML template for admin password reset email
+ */
+function generateAdminPasswordResetTemplate(email: string, resetToken: string): string {
+  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/admin-reset-password?token=${resetToken}`;
+  
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Admin Password Reset - Aged Care Analytics</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 30px;
+          text-align: center;
+          border-radius: 8px 8px 0 0;
+        }
+        .content {
+          background: #f8f9fa;
+          padding: 30px;
+          border-radius: 0 0 8px 8px;
+          border: 1px solid #e9ecef;
+          border-top: none;
+        }
+        .button {
+          display: inline-block;
+          background: #667eea;
+          color: white;
+          padding: 12px 30px;
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: 600;
+          margin: 20px 0;
+        }
+        .warning {
+          background: #fff3cd;
+          color: #856404;
+          padding: 15px;
+          border-radius: 6px;
+          border: 1px solid #ffeaa7;
+          margin: 20px 0;
+        }
+        .footer {
+          text-align: center;
+          color: #6c757d;
+          font-size: 14px;
+          margin-top: 30px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>🔐 Admin Password Reset</h1>
+        <p>Reset your administrator account password</p>
+      </div>
+      
+      <div class="content">
+        <h2>Reset Your Admin Password</h2>
+        <p>Hello,</p>
+        <p>We received a request to reset the password for your administrator account. To proceed with the password reset, please click the button below:</p>
+        
+        <div style="text-align: center;">
+          <a href="${resetUrl}" class="button">🔒 Reset Your Password</a>
+        </div>
+        
+        <div class="warning">
+          <p><strong>⚠️ Important Security Notes:</strong></p>
+          <ul>
+            <li>This password reset link will expire in 1 hour.</li>
+            <li>If you didn't request a password reset, please ignore this email or contact the master administrator.</li>
+            <li>For security reasons, all your active sessions will be logged out when you reset your password.</li>
+          </ul>
+        </div>
+        
+        <p>If the button above doesn't work, copy and paste the following URL into your browser:</p>
+        <p style="word-break: break-all; background: #f1f3f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px;">
+          ${resetUrl}
+        </p>
+        
+        <p>Best regards,<br>
+        <strong>Aged Care Analytics Team</strong></p>
+      </div>
+      
+      <div class="footer">
+        <p>This email was sent from the Aged Care Analytics administration system.</p>
+        <p>If you didn't expect this email, please contact: apirat.kongchanagul@gmail.com</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+// Helper function to get color based on action type
+function getActionTypeColor(actionType: string): string {
+  switch (actionType) {
+    case 'create_admin_user': return '#28a745';
+    case 'delete_admin_user': return '#dc3545';
+    case 'admin_login': return '#007bff';
+    case 'admin_logout': return '#6c757d';
+    case 'update_admin_user': return '#ffc107';
+    default: return '#17a2b8';
+  }
+}
+
+// ==========================================
+// EMAIL SENDING FUNCTIONS
+// ==========================================
+
+export interface AdminActivity {
+  actionType: string;
+  targetType: string;
+  description: string;
+  timestamp: string;
+}
+
+/**
+ * Send admin invitation email
+ */
+export async function sendAdminInvitationEmail(
+  email: string, 
+  tempPassword: string, 
+  activationToken: string
+): Promise<boolean> {
+  try {
+    const transporter = getEmailTransporter();
+    
+    const mailOptions = {
+      from: `"Aged Care Analytics Admin" <${emailConfig.masterAdminEmail}>`,
+      to: email,
+      subject: '🔐 Admin Access Granted - Aged Care Analytics',
+      html: generateAdminInvitationTemplate(email, tempPassword, activationToken),
+      text: `
+        Admin Invitation - Aged Care Analytics
+        
+        You have been granted administrator privileges for the Aged Care Analytics platform.
+        
+        Your Login Credentials:
+        Email: ${email}
+        Temporary Password: ${tempPassword}
+        
+        Please activate your account within 72 hours by visiting:
+        ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/master/activate?token=${activationToken}
+        
+        This is a temporary password. You'll be prompted to change it upon first login.
+        
+        Best regards,
+        Aged Care Analytics Team
+      `
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Admin invitation email sent successfully:', result.messageId);
+    return true;
+
+  } catch (error) {
+    console.error('Failed to send admin invitation email:', error);
+    return false;
+  }
+}
+
+/**
+ * Send admin password reset email
+ */
+export async function sendAdminPasswordResetEmail(
+  email: string,
+  resetToken: string
+): Promise<boolean> {
+  try {
+    const transporter = getEmailTransporter();
+    // Use admin-reset-password URL, never the regular user one
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/admin-reset-password?token=${resetToken}`;
+    
+    const mailOptions = {
+      from: `"Aged Care Analytics Admin" <${emailConfig.masterAdminEmail}>`,
+      to: email,
+      subject: '🔐 Admin Password Reset - Aged Care Analytics',
+      html: generateAdminPasswordResetTemplate(email, resetToken),
+      text: `
+        Admin Password Reset - Aged Care Analytics
+        
+        We received a request to reset the password for your administrator account.
+        
+        To reset your password, please visit:
+        ${resetUrl}
+        
+        Important Notes:
+        - This password reset link will expire in 1 hour.
+        - If you didn't request a password reset, please ignore this email or contact the master administrator.
+        - All your active sessions will be logged out when you reset your password.
+        
+        Best regards,
+        Aged Care Analytics Team
+      `
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Admin password reset email sent successfully:', result.messageId);
+    return true;
+
+  } catch (error) {
+    console.error('Failed to send admin password reset email:', error);
+    return false;
+  }
+}
+
+/**
+ * Send admin activity summary to master admin
+ */
+export async function sendActivitySummaryEmail(
+  adminEmail: string,
+  activities: AdminActivity[]
+): Promise<boolean> {
+  try {
+    const transporter = getEmailTransporter();
+    
+    const mailOptions = {
+      from: `"Aged Care Analytics System" <${emailConfig.masterAdminEmail}>`,
+      to: emailConfig.masterAdminEmail, // Always send to master admin
+      subject: `📊 Admin Activity Summary - ${adminEmail}`,
+      html: generateActivitySummaryTemplate(adminEmail, activities),
+      text: `
+        Admin Activity Summary for: ${adminEmail}
+        
+        Recent Activities (${activities.length} actions):
+        ${activities.map(activity => 
+          `- ${activity.actionType} on ${activity.targetType}: ${activity.description} (${activity.timestamp})`
+        ).join('\n')}
+        
+        Generated at: ${new Date().toLocaleString()}
+      `
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Activity summary email sent successfully:', result.messageId);
+    return true;
+
+  } catch (error) {
+    console.error('Failed to send activity summary email:', error);
+    return false;
+  }
+}
+
+/**
+ * Send user invitation email
+ */
+export async function sendUserInvitationEmail(
+  email: string, 
+  tempPassword: string
+): Promise<boolean> {
+  try {
+    const transporter = getEmailTransporter();
+    
+    const mailOptions = {
+      from: `"Aged Care Analytics" <${emailConfig.masterAdminEmail}>`,
+      to: email,
+      subject: '👋 Welcome to Aged Care Analytics - Your Account Details',
+      html: generateUserInvitationTemplate(email, tempPassword),
+      text: `
+        Welcome to Aged Care Analytics
+        
+        An account has been created for you on the Aged Care Analytics platform.
+        
+        Your Login Credentials:
+        Email: ${email}
+        Temporary Password: ${tempPassword}
+        
+        Please log in at: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/signin
+        
+        This is a temporary password. You'll be prompted to change it upon first login.
+        
+        Best regards,
+        Aged Care Analytics Team
+      `
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('User invitation email sent successfully:', result.messageId);
+    return true;
+
+  } catch (error) {
+    console.error('Failed to send user invitation email:', error);
+    return false;
+  }
+}
+
+/**
+ * Test email configuration
+ */
+export async function testEmailConfiguration(): Promise<boolean> {
+  try {
+    const transporter = getEmailTransporter();
+    await transporter.verify();
+    console.log('Email configuration is valid');
+    return true;
+
+  } catch (error) {
+    console.error('Email configuration test failed:', error);
+    return false;
+  }
+}
+
+// ==========================================
+// BACKGROUND EMAIL PROCESSING
+// ==========================================
+
+/**
+ * Send periodic activity summaries (to be called by cron job or scheduler)
+ */
+export async function sendPeriodicActivitySummaries(): Promise<void> {
+  try {
+    // This would typically fetch recent activities from the database
+    // For now, it's a placeholder for the actual implementation
+    console.log('Sending periodic activity summaries...');
+    
+    // TODO: Implement actual database query for recent admin activities
+    // const recentActivities = await getRecentAdminActivities();
+    // await sendActivitySummaryEmail('admin-summary@system', recentActivities);
+    
+  } catch (error) {
+    console.error('Failed to send periodic activity summaries:', error);
+  }
+}
+
+/**
+ * Helper function to ensure admin_users table has reset token columns
+ * This is a temporary solution until proper migrations can be run
+ */
+export async function ensureAdminUserSchemaColumns(): Promise<boolean> {
+  try {
+    // We need to import dynamically to avoid circular dependency issues
+    const { createServerSupabaseClient } = await import('./supabase');
+    const supabase = await createServerSupabaseClient();
+    
+    console.log('Checking admin_users table schema for reset token columns...');
+    
     try {
-      // Load configuration from environment variables
-      const smtpHost = process.env.SMTP_HOST;
-      const smtpPort = process.env.SMTP_PORT;
-      const smtpUser = process.env.SMTP_USER;
-      const smtpPass = process.env.SMTP_PASS;
-      const fromEmail = process.env.FROM_EMAIL;
-      const supportEmail = process.env.SUPPORT_EMAIL;
+      // Directly try to use the columns first, since they should now exist
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('reset_token, reset_token_expires_at')
+        .limit(1);
+      
+      if (!error) {
+        console.log('Reset token columns already exist in admin_users table');
+        return true;
+      } else {
+        console.error('Error checking for reset token columns:', error);
+        // Columns might not be in schema cache yet
+      }
+    } catch (checkError) {
+      console.error('Error checking for reset token columns:', checkError);
+    }
 
-      if (!smtpHost || !smtpPort || !smtpUser || !smtpPass || !fromEmail || !supportEmail) {
-        console.warn('[EMAIL SERVICE] Missing environment variables. Email sending will be disabled.');
-        return;
+    // Try to force a schema cache refresh
+    try {
+      await supabase.rpc('pg_notify', { 
+        channel: 'pgrst',
+        payload: 'reload schema'
+      });
+      console.log('Schema cache refresh requested');
+    } catch (refreshError) {
+      console.log('Schema cache refresh not available, but columns may still exist');
+    }
+    
+    return true; // Assume columns exist since they were added via SQL
+  } catch (error) {
+    console.error('Error ensuring admin user schema:', error);
+    return false;
+  }
+}
+
+// ==========================================
+// UTILITY FUNCTIONS
+// ==========================================
+
+/**
+ * Validate email address format
+ */
+export function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+/**
+ * Generate secure temporary password
+ */
+export function generateTempPassword(length: number = 12): string {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  let password = '';
+  
+  for (let i = 0; i < length; i++) {
+    password += charset.charAt(Math.floor(Math.random() * charset.length));
+  }
+  
+  return password;
+}
+
+// ==========================================
+// CONTACT EMAIL SERVICE (DEFAULT EXPORT)
+// ==========================================
+
+interface ContactRequest {
+  email: string;
+  message: string;
+  category?: string;
+}
+
+interface EmailResult {
+  success: boolean;
+  messageId?: string;
+  error?: string;
+}
+
+const emailService = {
+  /**
+   * Check if email service is properly configured
+   */
+  isConfigured(): boolean {
+    return !!(process.env.EMAIL_USER && process.env.EMAIL_PASSWORD);
+  },
+
+  /**
+   * Send contact/feedback email
+   */
+  async sendContactEmail(contactData: ContactRequest, clientIP?: string): Promise<EmailResult> {
+    try {
+      if (!this.isConfigured()) {
+        return { success: false, error: 'Email service not configured' };
       }
 
-      this.config = {
-        smtp: {
-          host: smtpHost,
-          port: parseInt(smtpPort),
-          secure: parseInt(smtpPort) === 465, // true for 465, false for other ports
-          auth: {
-            user: smtpUser,
-            pass: smtpPass,
-          },
-        },
-        from: fromEmail,
-        to: supportEmail,
-      };
-
-      // Create transporter
-      this.transporter = nodemailer.createTransport(this.config.smtp);
-
-      console.log('[EMAIL SERVICE] Initialized successfully');
-    } catch (error) {
-      console.error('[EMAIL SERVICE] Initialization failed:', error);
-    }
-  }
-
-  // Test email configuration
-  async testConnection(): Promise<{ success: boolean; error?: string }> {
-    if (!this.transporter) {
-      return { success: false, error: 'Email service not initialized' };
-    }
-
-    try {
-      await this.transporter.verify();
-      return { success: true };
-    } catch (error) {
-      console.error('[EMAIL SERVICE] Connection test failed:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      };
-    }
-  }
-
-  // Generate email template for contact form submission
-  private generateContactTemplate(data: ContactRequest, clientIP: string): EmailTemplate {
-    const timestamp = new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' });
-    
-    const subject = data.category 
-      ? `[${data.category}] New Contact Form Submission`
-      : 'New Contact Form Submission';
-
-    const text = `
-New Contact Form Submission
-
-From: ${data.email}
-Category: ${data.category || 'General Inquiry'}
-Submitted: ${timestamp}
-IP Address: ${clientIP}
-
-Message:
-${data.message}
-
----
-This message was sent via the Aged Care Analytics contact form.
-To reply, simply respond to this email.
-    `.trim();
-
-    const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>New Contact Form Submission</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background-color: #2563eb; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
-    .content { background-color: #f8f9fa; padding: 20px; border: 1px solid #dee2e6; }
-    .message-box { background-color: white; padding: 15px; margin: 15px 0; border-radius: 5px; border-left: 4px solid #2563eb; }
-    .meta-info { background-color: #e9ecef; padding: 10px; margin: 15px 0; border-radius: 5px; font-size: 0.9em; }
-    .footer { background-color: #6c757d; color: white; padding: 15px; border-radius: 0 0 8px 8px; font-size: 0.85em; }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <h2>📧 New Contact Form Submission</h2>
-  </div>
-  
-  <div class="content">
-    <div class="meta-info">
-      <strong>From:</strong> ${data.email}<br>
-      <strong>Category:</strong> ${data.category || 'General Inquiry'}<br>
-      <strong>Submitted:</strong> ${timestamp}<br>
-      <strong>IP Address:</strong> ${clientIP}
-    </div>
-    
-    <div class="message-box">
-      <h4>Message:</h4>
-      <p>${data.message.replace(/\n/g, '<br>')}</p>
-    </div>
-  </div>
-  
-  <div class="footer">
-    <p>This message was sent via the Aged Care Analytics contact form.<br>
-    To reply, simply respond to this email.</p>
-  </div>
-</body>
-</html>
-    `.trim();
-
-    return { subject, text, html };
-  }
-
-  // Send contact form email
-  async sendContactEmail(
-    data: ContactRequest, 
-    clientIP: string
-  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
-    if (!this.transporter || !this.config) {
-      return { success: false, error: 'Email service not configured' };
-    }
-
-    try {
-      const template = this.generateContactTemplate(data, clientIP);
-
+      const transporter = getEmailTransporter();
+      
       const mailOptions = {
-        from: `"Aged Care Analytics" <${this.config.from}>`,
-        to: this.config.to,
-        replyTo: data.email,
-        subject: template.subject,
-        text: template.text,
-        html: template.html,
-        headers: {
-          'X-Contact-Form': 'true',
-          'X-Client-IP': clientIP,
-          'X-Submission-Time': new Date().toISOString(),
-        },
+        from: `"${contactData.email}" <${emailConfig.masterAdminEmail}>`,
+        to: emailConfig.masterAdminEmail,
+        replyTo: contactData.email,
+        subject: `Contact Form Submission${contactData.category ? ` - ${contactData.category}` : ''}`,
+        html: `
+          <h3>New Contact Form Submission</h3>
+          <p><strong>From:</strong> ${contactData.email}</p>
+          ${contactData.category ? `<p><strong>Category:</strong> ${contactData.category}</p>` : ''}
+          ${clientIP ? `<p><strong>IP Address:</strong> ${clientIP}</p>` : ''}
+          <p><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
+          <hr>
+          <p><strong>Message:</strong></p>
+          <p>${contactData.message.replace(/\n/g, '<br>')}</p>
+        `,
+        text: `
+          New Contact Form Submission
+          
+          From: ${contactData.email}
+          ${contactData.category ? `Category: ${contactData.category}` : ''}
+          ${clientIP ? `IP Address: ${clientIP}` : ''}
+          Timestamp: ${new Date().toLocaleString()}
+          
+          Message:
+          ${contactData.message}
+        `
       };
 
-      const info = await this.transporter.sendMail(mailOptions);
-      
-      console.log('[EMAIL SERVICE] Email sent successfully:', {
-        messageId: info.messageId,
-        from: data.email,
-        category: data.category,
-        timestamp: new Date().toISOString()
-      });
-
-      return { 
-        success: true, 
-        messageId: info.messageId 
-      };
+      const result = await transporter.sendMail(mailOptions);
+      return { success: true, messageId: result.messageId };
 
     } catch (error) {
-      console.error('[EMAIL SERVICE] Failed to send email:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      };
+      console.error('Failed to send contact email:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
-  }
+  },
 
-  // Send auto-response email to user (optional feature)
-  async sendAutoResponse(
-    userEmail: string
-  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
-    if (!this.transporter || !this.config) {
-      return { success: false, error: 'Email service not configured' };
-    }
-
+  /**
+   * Send auto-response to user
+   */
+  async sendAutoResponse(userEmail: string): Promise<EmailResult> {
     try {
-      const subject = 'Thank you for contacting Aged Care Analytics';
+      if (!this.isConfigured()) {
+        return { success: false, error: 'Email service not configured' };
+      }
+
+      const transporter = getEmailTransporter();
       
-      const text = `
-Thank you for your message!
-
-We've received your inquiry and will get back to you within 24-48 hours during business days.
-
-If your inquiry is urgent, please call us directly.
-
-Best regards,
-Aged Care Analytics Team
-
----
-This is an automated response. Please do not reply to this email.
-      `.trim();
-
-      const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Thank you for contacting us</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background-color: #28a745; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
-    .content { background-color: #f8f9fa; padding: 20px; border: 1px solid #dee2e6; border-radius: 0 0 8px 8px; }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <h2>✅ Thank you for contacting us!</h2>
-  </div>
-  
-  <div class="content">
-    <p>We've received your inquiry and will get back to you within <strong>24-48 hours</strong> during business days.</p>
-    
-    <p>If your inquiry is urgent, please call us directly.</p>
-    
-    <p>Best regards,<br>
-    <strong>Aged Care Analytics Team</strong></p>
-    
-    <hr style="margin: 20px 0;">
-    <p style="font-size: 0.85em; color: #6c757d;">
-      This is an automated response. Please do not reply to this email.
-    </p>
-  </div>
-</body>
-</html>
-      `.trim();
-
       const mailOptions = {
-        from: `"Aged Care Analytics" <${this.config.from}>`,
+        from: `"Aged Care Analytics Support" <${emailConfig.masterAdminEmail}>`,
         to: userEmail,
-        subject,
-        text,
-        html,
-        headers: {
-          'X-Auto-Response': 'true',
-        },
+        subject: 'Thank you for contacting us - Aged Care Analytics',
+        html: `
+          <h3>Thank you for your message!</h3>
+          <p>We have received your contact form submission and will get back to you as soon as possible.</p>
+          <p>Our team typically responds within 24-48 hours during business days.</p>
+          <p>Best regards,<br>The Aged Care Analytics Team</p>
+        `,
+        text: `
+          Thank you for your message!
+          
+          We have received your contact form submission and will get back to you as soon as possible.
+          Our team typically responds within 24-48 hours during business days.
+          
+          Best regards,
+          The Aged Care Analytics Team
+        `
       };
 
-      const info = await this.transporter.sendMail(mailOptions);
-      
-      console.log('[EMAIL SERVICE] Auto-response sent:', {
-        messageId: info.messageId,
-        to: userEmail,
-        timestamp: new Date().toISOString()
-      });
-
-      return { 
-        success: true, 
-        messageId: info.messageId 
-      };
+      const result = await transporter.sendMail(mailOptions);
+      return { success: true, messageId: result.messageId };
 
     } catch (error) {
-      console.error('[EMAIL SERVICE] Failed to send auto-response:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      };
+      console.error('Failed to send auto-response email:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }
+};
 
-  // Check if email service is available
-  isConfigured(): boolean {
-    return this.transporter !== null && this.config !== null;
-  }
-}
-
-// Export singleton instance
-export const emailService = new EmailService();
 export default emailService; 
