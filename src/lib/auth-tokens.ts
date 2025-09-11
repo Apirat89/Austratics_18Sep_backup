@@ -88,7 +88,7 @@ export function generateResetToken(): string {
   return crypto.randomBytes(32).toString('hex');
 }
 
-export async function createResetToken(email: string): Promise<{ success: boolean; token?: string; error?: string }> {
+export async function createResetToken(email: string): Promise<{ success: boolean; token?: string; error?: string; emailExists?: boolean }> {
   try {
     // Check if user exists in Supabase
     const { data: users, error: userError } = await supabase.auth.admin.listUsers();
@@ -100,14 +100,14 @@ export async function createResetToken(email: string): Promise<{ success: boolea
 
     const user = users.users.find(u => u.email === email);
     if (!user) {
-      // Don't reveal if user exists or not for security
-      return { success: true }; // Return success but don't actually create token
+      // Return email doesn't exist flag
+      return { success: false, emailExists: false, error: 'Email not registered' };
     }
 
     // Use Redis in production, file storage in development
     if (TokenManager && isProduction) {
       const token = await TokenManager.createToken(user.id, email);
-      return { success: true, token };
+      return { success: true, token, emailExists: true };
     } else {
       // Use file storage for development
       cleanupExpiredTokensFromFile(); // Clean up old tokens first
@@ -126,7 +126,7 @@ export async function createResetToken(email: string): Promise<{ success: boolea
       saveTokens(tokens);
       console.log(`✅ Token created and saved to file: ${token.substring(0, 16)}...`);
 
-      return { success: true, token };
+      return { success: true, token, emailExists: true };
     }
   } catch (error) {
     console.error('Error creating reset token:', error);

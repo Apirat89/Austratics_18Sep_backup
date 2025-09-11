@@ -82,11 +82,26 @@ export async function POST(request: NextRequest) {
     // Create reset token
     const tokenResult = await createResetToken(email);
     
-    if (!tokenResult.success || !tokenResult.token) {
-      // Even if user doesn't exist, we return success for security
+    if (!tokenResult.success) {
+      // Check if it's because email doesn't exist
+      if (tokenResult.emailExists === false) {
+        return NextResponse.json(
+          { error: 'Email not registered or activated. Please contact hello@austratrics.com for account activation.' },
+          { status: 400 }
+        );
+      }
+      
       return NextResponse.json(
-        { message: 'If an account with that email exists, we have sent password reset instructions.' },
-        { status: 200 }
+        { error: tokenResult.error || 'Something went wrong with your request' },
+        { status: 500 }
+      );
+    }
+
+    // Only proceed with email sending if token was successfully created
+    if (!tokenResult.token) {
+      return NextResponse.json(
+        { error: 'Failed to create reset token' },
+        { status: 500 }
       );
     }
 

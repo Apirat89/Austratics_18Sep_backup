@@ -324,12 +324,9 @@ export default function Home() {
               </button>
             </form>
 
-            {/* Sign Up Link */}
+            {/* Contact Info */}
             <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
-              Don't have an account?{' '}
-              <Link href="/auth/signup" style={{ color: '#2563eb', fontWeight: 600 }}>
-                Create Account
-              </Link>
+              Don't have an account? Reach out to hello@austratrics.com
             </p>
           </div>
 
