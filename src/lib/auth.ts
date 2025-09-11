@@ -12,6 +12,7 @@ export interface AuthResponse {
   error?: string;
   user?: any;
   profile?: any;
+  requiresVerification?: boolean;
 }
 
 export interface UserProfile {
@@ -45,6 +46,7 @@ export async function signUp({ email, password, name, companyId }: AuthCredentia
     }
 
     // If user was created, create/update their profile with company info
+    // This happens even if email is not yet verified
     if (data.user) {
       let assignedCompanyId = companyId;
       
@@ -83,11 +85,16 @@ export async function signUp({ email, password, name, companyId }: AuthCredentia
       return { 
         success: true, 
         user: data.user,
-        profile: profileData 
+        profile: profileData,
+        requiresVerification: !data.session
       };
     }
 
-    return { success: true, user: data.user };
+    return { 
+      success: true, 
+      user: data.user,
+      requiresVerification: !data.session
+    };
   } catch (error) {
     console.error('SignUp error:', error);
     return { success: false, error: 'An unexpected error occurred during sign up' };

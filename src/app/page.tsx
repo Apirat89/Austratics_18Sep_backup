@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import PasswordInput from '../components/PasswordInput';
+import { useSearchParams } from 'next/navigation';
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -12,10 +13,13 @@ export default function Home() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isVerificationError, setIsVerificationError] = useState(false);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [backgroundPhoto, setBackgroundPhoto] = useState('');
   const router = useRouter();
-
+  const searchParams = useSearchParams();
+  
   // Array of beautiful Australian photos (all optimized under 3MB)
   const backgroundPhotos = [
     'aerial-view-of-scarborough-beach-perth-western-a-2025-02-09-00-32-40-utc.jpg',
@@ -45,9 +49,22 @@ export default function Home() {
 
   // Set random background photo on client-side only
   useEffect(() => {
+    // Check if there's an error message in the URL params
+    const errorParam = searchParams?.get('error');
+    if (errorParam) {
+      setError(decodeURIComponent(errorParam));
+      
+      // Check if it's a verification error
+      if (errorParam.includes('verification') || 
+          errorParam.includes('email not confirmed') || 
+          errorParam.includes('not verified')) {
+        setIsVerificationError(true);
+      }
+    }
+
     const randomPhoto = backgroundPhotos[Math.floor(Math.random() * backgroundPhotos.length)];
     setBackgroundPhoto(randomPhoto);
-  }, []);
+  }, [searchParams]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -61,6 +78,7 @@ export default function Home() {
     e.preventDefault();
     setIsLoading(true);
     setError('');
+    setIsVerificationError(false);
 
     try {
       const response = await fetch('/api/auth/signin', {
@@ -77,6 +95,10 @@ export default function Home() {
       const data = await response.json();
 
       if (!response.ok) {
+        // Check if this is a verification error
+        if (data.code === 'email_not_verified') {
+          setIsVerificationError(true);
+        }
         setError(data.error || 'Something went wrong');
         return;
       }
@@ -88,6 +110,35 @@ export default function Home() {
       setError('Network error. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle resending verification email
+  const handleResendVerification = async () => {
+    if (!formData.email || isResendingVerification) return;
+    
+    setIsResendingVerification(true);
+    try {
+      const response = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setError('Verification email resent! Please check your inbox.');
+        setIsVerificationError(false);
+      } else {
+        setError(data.error || 'Failed to resend verification email.');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+    } finally {
+      setIsResendingVerification(false);
     }
   };
 
@@ -170,6 +221,28 @@ export default function Home() {
                 borderRadius: '0.5rem' 
               }}>
                 {error}
+                {isVerificationError && (
+                  <div style={{ marginTop: '0.75rem' }}>
+                    <button
+                      type="button"
+                      onClick={handleResendVerification}
+                      disabled={isResendingVerification}
+                      style={{
+                        backgroundColor: '#dc2626',
+                        color: 'white',
+                        border: 'none',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        cursor: isResendingVerification ? 'not-allowed' : 'pointer',
+                        opacity: isResendingVerification ? '0.7' : '1'
+                      }}
+                    >
+                      {isResendingVerification ? 'Sending...' : 'Resend Verification Email'}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 

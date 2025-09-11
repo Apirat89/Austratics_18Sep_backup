@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -18,12 +18,8 @@ interface UserManagementTabProps {
 
 interface User {
   id: string;
-  email: string;
-  company: string;
-  companyId?: string | null;
-  status: 'active' | 'suspended' | 'deleted';
-  role?: string;
-  lastLogin?: string;
+  email?: string | null;
+  user_metadata?: any;
 }
 
 export default function UserManagementTab({ currentAdmin }: UserManagementTabProps) {
@@ -31,213 +27,106 @@ export default function UserManagementTab({ currentAdmin }: UserManagementTabPro
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newUserEmail, setNewUserEmail] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [company, setCompany] = useState('');
   const [adding, setAdding] = useState(false);
-  const [editingCompany, setEditingCompany] = useState<{id: string, value: string} | null>(null);
-  const [processing, setProcessing] = useState<{ [key: string]: boolean }>({});
+  const [msg, setMsg] = useState<string | null>(null);
 
   // Load users on component mount
   useEffect(() => {
-    fetchUsers();
+    refresh();
   }, []);
 
-  const fetchUsers = async () => {
+  async function refresh() {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('/api/admin-auth/regular-users', {
+      console.log('Fetching users from /api/admin/auth-users/list');
+      const response = await fetch('/api/admin/auth-users/list', { 
+        cache: 'no-store',
         credentials: 'include'
       });
-
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch users');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('API Error:', errorData);
+        throw new Error(errorData.error || `Failed to fetch users: ${response.status}`);
       }
-
+      
       const data = await response.json();
+      console.log('Users fetched:', data);
       setUsers(data.users || []);
-      setLoading(false);
     } catch (error) {
       console.error('Failed to fetch users:', error);
-      setError('Failed to load users');
+      setError(error instanceof Error ? error.message : 'Failed to load users');
+    } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const handleAddUser = async (e: React.FormEvent) => {
+  async function handleAddUser(e: React.FormEvent) {
     e.preventDefault();
     
-    if (!newUserEmail) {
-      alert('Email is required');
+    if (!email || !name) {
+      alert('Name and email are required');
       return;
     }
 
     setAdding(true);
+    setMsg(null);
 
     try {
-      const response = await fetch('/api/admin-auth/regular-users', {
+      const response = await fetch('/api/admin/auth-users', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: newUserEmail
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, company }),
+        credentials: 'include'
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create user');
-      }
-
+      
       const data = await response.json();
       
-      // Refresh user list
-      fetchUsers();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create user');
+      }
       
-      setNewUserEmail('');
+      setName('');
+      setEmail('');
+      setCompany('');
       setShowAddForm(false);
-      alert('User created successfully! Login credentials have been sent.');
+      setMsg('Invite sent.');
+      
+      refresh();
     } catch (error) {
       console.error('Failed to add user:', error);
-      alert(error instanceof Error ? error.message : 'Failed to add user');
+      setMsg(error instanceof Error ? error.message : 'Failed to add user');
     } finally {
       setAdding(false);
     }
-  };
+  }
 
-  const handleCompanyChange = async (userId: string, companyName: string) => {
-    // Set processing state for this user
-    setProcessing(prev => ({ ...prev, [userId]: true }));
+  async function handleDeleteUser(uid: string, userEmail: string) {
+    if (!confirm(`Are you sure you want to delete user ${userEmail}?`)) return;
     
     try {
-      const response = await fetch(`/api/admin-auth/regular-users/${userId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          company: companyName
-        })
+      const response = await fetch(`/api/admin/auth-users?id=${uid}`, { 
+        method: 'DELETE',
+        credentials: 'include'
       });
-
+      
+      const data = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Company update error response:', errorData);
-        
-        // Show more specific error message if available
-        throw new Error(errorData.error || 'Failed to update company');
+        throw new Error(data.error || 'Failed to delete user');
       }
-
-      // Update user in local state
-      setUsers(users.map(user => 
-        user.id === userId ? { ...user, company: companyName } : user
-      ));
       
-      // Clear editing state
-      setEditingCompany(null);
+      refresh();
     } catch (error) {
-      console.error('Failed to update company:', error);
-      
-      // Show a more detailed error message if possible
-      let errorMessage = 'Failed to update company';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      
-      alert(`Error: ${errorMessage}`);
-      
-      // If error occurred, revert back to viewing mode with original value
-      const originalUser = users.find(user => user.id === userId);
-      if (originalUser) {
-        setEditingCompany(null);
-      }
-    } finally {
-      setProcessing(prev => ({ ...prev, [userId]: false }));
+      console.error('Failed to delete user:', error);
+      alert(error instanceof Error ? error.message : 'Failed to delete');
     }
-  };
-
-  const handleDeleteUser = async (userId: string, userEmail: string) => {
-    if (confirm(`Are you sure you want to delete user ${userEmail}?`)) {
-      // Set processing state for this user
-      setProcessing(prev => ({ ...prev, [userId]: true }));
-      
-      try {
-        const response = await fetch(`/api/admin-auth/regular-users/${userId}`, {
-          method: 'DELETE',
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to delete user');
-        }
-
-        // Remove user from local state
-        setUsers(users.filter(user => user.id !== userId));
-        alert('User deleted successfully');
-      } catch (error) {
-        console.error('Failed to delete user:', error);
-        alert(error instanceof Error ? error.message : 'Failed to delete user');
-      } finally {
-        setProcessing(prev => ({ ...prev, [userId]: false }));
-      }
-    }
-  };
-
-  const handleResetUser = async (userId: string, userEmail: string) => {
-    if (confirm(`Are you sure you want to reset all data for ${userEmail}? This will delete all saved searches, bookmarks, and conversation history.`)) {
-      // Set processing state for this user
-      setProcessing(prev => ({ ...prev, [userId]: true }));
-      
-      try {
-        const response = await fetch(`/api/admin-auth/regular-users/${userId}/reset`, {
-          method: 'POST',
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to reset user data');
-        }
-
-        alert('User data reset successfully');
-      } catch (error) {
-        console.error('Failed to reset user data:', error);
-        alert(error instanceof Error ? error.message : 'Failed to reset user data');
-      } finally {
-        setProcessing(prev => ({ ...prev, [userId]: false }));
-      }
-    }
-  };
-
-  const handleResetPassword = async (userId: string, userEmail: string) => {
-    if (confirm(`Are you sure you want to reset password for ${userEmail}? A new temporary password will be sent to their email.`)) {
-      // Set processing state for this user
-      setProcessing(prev => ({ ...prev, [userId]: true }));
-      
-      try {
-        const response = await fetch(`/api/admin-auth/regular-users/${userId}/reset-password`, {
-          method: 'POST',
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to reset password');
-        }
-
-        alert('Password reset successfully. A temporary password has been sent to the user.');
-      } catch (error) {
-        console.error('Failed to reset password:', error);
-        alert(error instanceof Error ? error.message : 'Failed to reset password');
-      } finally {
-        setProcessing(prev => ({ ...prev, [userId]: false }));
-      }
-    }
-  };
+  }
 
   if (loading) {
     return (
@@ -255,7 +144,7 @@ export default function UserManagementTab({ currentAdmin }: UserManagementTabPro
         <p className="text-red-600 font-medium mb-2">Error Loading Users</p>
         <p className="text-slate-600 text-sm mb-4">{error}</p>
         <button
-          onClick={fetchUsers}
+          onClick={refresh}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
         >
           Retry
@@ -290,21 +179,47 @@ export default function UserManagementTab({ currentAdmin }: UserManagementTabPro
           <CardContent className="pt-6">
             <form onSubmit={handleAddUser} className="space-y-4">
               <div>
+                <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Full name"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  required
+                />
+              </div>
+              
+              <div>
                 <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
                   Email Address
                 </label>
                 <input
                   type="email"
                   id="email"
-                  value={newUserEmail}
-                  onChange={(e) => setNewUserEmail(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="user@example.com"
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   required
                 />
-                <p className="mt-1 text-sm text-slate-500">
-                  An email with login credentials will be sent to this address
-                </p>
+              </div>
+              
+              <div>
+                <label htmlFor="company" className="block text-sm font-medium text-slate-700 mb-1">
+                  Company (optional)
+                </label>
+                <input
+                  type="text"
+                  id="company"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder="Company name"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
               </div>
               
               <div className="flex space-x-3">
@@ -316,12 +231,12 @@ export default function UserManagementTab({ currentAdmin }: UserManagementTabPro
                   {adding ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Creating...</span>
+                      <span>Sending...</span>
                     </>
                   ) : (
                     <>
                       <span>✉️</span>
-                      <span>Create & Send Credentials</span>
+                      <span>Create & Send Invite</span>
                     </>
                   )}
                 </button>
@@ -330,13 +245,21 @@ export default function UserManagementTab({ currentAdmin }: UserManagementTabPro
                   type="button"
                   onClick={() => {
                     setShowAddForm(false);
-                    setNewUserEmail('');
+                    setName('');
+                    setEmail('');
+                    setCompany('');
                   }}
                   className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium"
                 >
                   Cancel
                 </button>
               </div>
+              
+              {msg && (
+                <div className={`text-sm mt-2 ${msg.includes('sent') ? 'text-green-600' : 'text-red-600'}`}>
+                  {msg}
+                </div>
+              )}
             </form>
           </CardContent>
         </Card>
@@ -349,9 +272,8 @@ export default function UserManagementTab({ currentAdmin }: UserManagementTabPro
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="text-left px-6 py-3 text-sm font-semibold text-slate-900">Email</th>
+                <th className="text-left px-6 py-3 text-sm font-semibold text-slate-900">Name</th>
                 <th className="text-left px-6 py-3 text-sm font-semibold text-slate-900">Company</th>
-                <th className="text-left px-6 py-3 text-sm font-semibold text-slate-900">Status</th>
-                <th className="text-left px-6 py-3 text-sm font-semibold text-slate-900">Last Login</th>
                 <th className="text-left px-6 py-3 text-sm font-semibold text-slate-900">Actions</th>
               </tr>
             </thead>
@@ -359,66 +281,16 @@ export default function UserManagementTab({ currentAdmin }: UserManagementTabPro
               {users.map((user) => (
                 <tr key={user.id} className="hover:bg-slate-50">
                   <td className="px-6 py-4 font-medium text-slate-900">{user.email}</td>
-                  <td className="px-6 py-4 text-slate-600">
-                    {editingCompany && editingCompany.id === user.id ? (
-                      <input
-                        type="text"
-                        value={editingCompany.value}
-                        onChange={(e) => setEditingCompany({...editingCompany, value: e.target.value})}
-                        onBlur={() => handleCompanyChange(user.id, editingCompany.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleCompanyChange(user.id, editingCompany.value)}
-                        className="px-2 py-1 border border-slate-300 rounded w-full"
-                        autoFocus
-                        disabled={processing[user.id]}
-                      />
-                    ) : (
-                      <div 
-                        onClick={() => setEditingCompany({id: user.id, value: user.company || ''})}
-                        className="cursor-pointer hover:bg-slate-100 px-2 py-1 rounded -mx-2"
-                      >
-                        {user.company || <span className="text-slate-400 italic">Click to add</span>}
-                        {processing[user.id] && <span className="ml-2 inline-block w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></span>}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <Badge 
-                      variant={
-                        user.status === 'active' ? 'default' : 
-                        user.status === 'suspended' ? 'secondary' : 'outline'
-                      }
-                    >
-                      {user.status}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">
-                    {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never'}
-                  </td>
+                  <td className="px-6 py-4 text-slate-600">{user.user_metadata?.full_name ?? '—'}</td>
+                  <td className="px-6 py-4 text-slate-600">{user.user_metadata?.company ?? '—'}</td>
                   <td className="px-6 py-4">
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleDeleteUser(user.id, user.email)}
+                        onClick={() => handleDeleteUser(user.id, user.email || '')}
                         className="text-red-600 hover:text-red-800 text-sm font-medium"
                         title="Delete user"
-                        disabled={processing[user.id]}
                       >
                         Delete
-                      </button>
-                      <button
-                        onClick={() => handleResetUser(user.id, user.email)}
-                        className="text-amber-600 hover:text-amber-800 text-sm font-medium"
-                        title="Reset user data (clear saved searches, bookmarks, conversation history)"
-                        disabled={processing[user.id]}
-                      >
-                        Reset
-                      </button>
-                      <button
-                        onClick={() => handleResetPassword(user.id, user.email)}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                        title="Reset password and send temporary password to user"
-                        disabled={processing[user.id]}
-                      >
-                        Reset Password
                       </button>
                     </div>
                   </td>

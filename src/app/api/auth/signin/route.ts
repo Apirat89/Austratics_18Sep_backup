@@ -42,13 +42,56 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createServerSupabaseClient();
 
+    // Attempt to sign in
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.toLowerCase().trim(),
       password,
     });
 
     if (error) {
-      // Generic error message for security (don't reveal if email exists)
+      console.error('Sign-in error detail:', error);
+      
+      // Check if this is an email verification error
+      if (error.message.includes('Email not confirmed') || 
+          error.message.includes('is not confirmed') || 
+          error.message.includes('not verified') ||
+          error.message.includes('not been confirmed')) {
+        
+        // Log detailed error for debugging
+        console.log('Verification error detected:', { 
+          message: error.message,
+          email,
+          errorCode: error.status
+        });
+        
+        // Resend verification email and provide a helpful message
+        const { error: resendError } = await supabase.auth.resend({
+          type: 'signup',
+          email: email.toLowerCase().trim(),
+          options: {
+            emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/confirm?next=/`,
+          }
+        });
+        
+        if (resendError) {
+          console.error('Error resending verification email:', resendError);
+        } else {
+          console.log('Verification email resent successfully');
+        }
+        
+        return NextResponse.json(
+          { 
+            error: 'Email not verified. Please check your inbox for a verification link. We\'ve sent a new verification email to your address.',
+            code: 'email_not_verified',
+            resendSuccess: !resendError,
+            originalError: error.message,
+            status: error.status
+          },
+          { status: 401 }
+        );
+      }
+      
+      // Generic error message for other login failures (don't reveal if email exists)
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }

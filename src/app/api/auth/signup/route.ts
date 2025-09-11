@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '../../../../lib/supabase';
 import { validatePassword, validateEmail, checkRateLimit } from '../../../../lib/passwordValidation';
+import { sendWelcomeEmail } from '../../../../lib/emailService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -66,6 +67,11 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createServerSupabaseClient();
 
+    // Create a site URL for verification redirect
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+    // Sign up with Supabase and let it handle the verification email
+    // enable_confirmations = true is set in supabase/config.toml
     const { data, error } = await supabase.auth.signUp({
       email: email.toLowerCase().trim(),
       password,
@@ -73,6 +79,8 @@ export async function POST(request: NextRequest) {
         data: {
           full_name: sanitizedName,
         },
+        // Proper format for the redirect URL with next parameter
+        emailRedirectTo: `${siteUrl}/auth/confirm?next=/`,
       },
     });
 
@@ -90,6 +98,15 @@ export async function POST(request: NextRequest) {
         { error: error.message },
         { status: 400 }
       );
+    }
+
+    // Send our custom welcome email (separate from the verification email)
+    try {
+      await sendWelcomeEmail(email.toLowerCase().trim(), sanitizedName);
+      console.log('Welcome email sent successfully');
+    } catch (emailError) {
+      console.error('Error sending welcome email:', emailError);
+      // Continue even if welcome email fails - verification email is what matters
     }
 
     return NextResponse.json({

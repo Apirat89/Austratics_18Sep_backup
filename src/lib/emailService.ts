@@ -715,6 +715,444 @@ export async function testEmailConfiguration(): Promise<boolean> {
   }
 }
 
+/**
+ * Send email verification for new user signup
+ */
+export async function sendEmailVerification(
+  email: string,
+  verificationLink: string
+): Promise<boolean> {
+  try {
+    const transporter = getEmailTransporter();
+    
+    const mailOptions = {
+      from: `"Aged Care Analytics" <${emailConfig.masterAdminEmail}>`,
+      to: email,
+      subject: '✅ Verify Your Email - Aged Care Analytics',
+      html: generateEmailVerificationTemplate(email, verificationLink),
+      text: `
+        Email Verification - Aged Care Analytics
+        
+        Thank you for signing up for Aged Care Analytics! To complete your registration, please verify your email address.
+        
+        Please verify your email by clicking this link:
+        ${verificationLink}
+        
+        This verification link will expire in 24 hours.
+        
+        If you did not create an account with Aged Care Analytics, please ignore this email.
+        
+        Best regards,
+        Aged Care Analytics Team
+      `
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Email verification sent successfully:', result.messageId);
+    return true;
+
+  } catch (error) {
+    console.error('Failed to send verification email:', error);
+    return false;
+  }
+}
+
+/**
+ * Generate HTML template for email verification
+ */
+function generateEmailVerificationTemplate(email: string, verificationLink: string): string {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Verify Your Email - Aged Care Analytics</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .header {
+          background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+          color: white;
+          padding: 30px;
+          text-align: center;
+          border-radius: 8px 8px 0 0;
+        }
+        .content {
+          background: #f8f9fa;
+          padding: 30px;
+          border-radius: 0 0 8px 8px;
+          border: 1px solid #e9ecef;
+          border-top: none;
+        }
+        .button {
+          display: inline-block;
+          background: #3B82F6;
+          color: white;
+          padding: 12px 30px;
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: 600;
+          margin: 20px 0;
+        }
+        .button:hover {
+          background: #2563EB;
+        }
+        .notice {
+          background: #e6f7ff;
+          color: #0c5460;
+          padding: 15px;
+          border-radius: 6px;
+          border: 1px solid #bee5eb;
+          margin: 20px 0;
+        }
+        .footer {
+          text-align: center;
+          color: #6c757d;
+          font-size: 14px;
+          margin-top: 30px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>✅ Verify Your Email</h1>
+        <p>Complete your Aged Care Analytics registration</p>
+      </div>
+      
+      <div class="content">
+        <h2>Welcome to Aged Care Analytics!</h2>
+        <p>Hello,</p>
+        <p>Thank you for creating an account with Aged Care Analytics. To complete your registration and access all features, please verify your email address.</p>
+        
+        <div style="text-align: center;">
+          <a href="${verificationLink}" class="button">Verify Email Address</a>
+        </div>
+        
+        <div class="notice">
+          <p><strong>Note:</strong> This verification link will expire in 24 hours.</p>
+          <p>If you did not create an account with us, you can safely ignore this email.</p>
+        </div>
+        
+        <p>If the button above doesn't work, copy and paste this URL into your browser:</p>
+        <p style="word-break: break-all; background: #f1f3f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px;">
+          ${verificationLink}
+        </p>
+        
+        <p>Best regards,<br>
+        <strong>Aged Care Analytics Team</strong></p>
+      </div>
+      
+      <div class="footer">
+        <p>This email was sent to ${email}.</p>
+        <p>If you have any questions, please contact our support team.</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+/**
+ * Send welcome email for new user signup
+ */
+export async function sendWelcomeEmail(
+  email: string,
+  name?: string
+): Promise<boolean> {
+  try {
+    const transporter = getEmailTransporter();
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    
+    const mailOptions = {
+      from: `"Aged Care Analytics" <${emailConfig.masterAdminEmail}>`,
+      to: email,
+      subject: '👋 Welcome to Aged Care Analytics',
+      html: generateWelcomeEmailTemplate(email, name, siteUrl),
+      text: `
+        Welcome to Aged Care Analytics!
+        
+        Thank you for signing up! We're excited to have you join us. Please check your inbox for a separate email to verify your email address.
+        
+        After verifying your email, you'll have access to all features of Aged Care Analytics, including:
+        - Access to analytics and insights
+        - Personalized reporting and recommendations
+        - Industry-leading aged care data
+        
+        If you have any questions or need assistance, please don't hesitate to contact our support team.
+        
+        Best regards,
+        Aged Care Analytics Team
+      `
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Welcome email sent successfully:', result.messageId);
+    return true;
+
+  } catch (error) {
+    console.error('Failed to send welcome email:', error);
+    return false;
+  }
+}
+
+/**
+ * Generate HTML template for welcome email
+ */
+function generateWelcomeEmailTemplate(email: string, name?: string, siteUrl?: string): string {
+  const displayName = name || email.split('@')[0];
+  const loginUrl = `${siteUrl}/auth/signin`;
+  
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Welcome to Aged Care Analytics</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .header {
+          background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+          color: white;
+          padding: 30px;
+          text-align: center;
+          border-radius: 8px 8px 0 0;
+        }
+        .content {
+          background: #f8f9fa;
+          padding: 30px;
+          border-radius: 0 0 8px 8px;
+          border: 1px solid #e9ecef;
+          border-top: none;
+        }
+        .button {
+          display: inline-block;
+          background: #3B82F6;
+          color: white;
+          padding: 12px 30px;
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: 600;
+          margin: 20px 0;
+        }
+        .button:hover {
+          background: #2563EB;
+        }
+        .feature-box {
+          background: white;
+          border-radius: 8px;
+          padding: 20px;
+          margin: 20px 0;
+          border: 1px solid #e9ecef;
+        }
+        .feature-item {
+          display: flex;
+          align-items: flex-start;
+          margin-bottom: 15px;
+        }
+        .feature-icon {
+          min-width: 24px;
+          text-align: center;
+          margin-right: 10px;
+        }
+        .footer {
+          text-align: center;
+          color: #6c757d;
+          font-size: 14px;
+          margin-top: 30px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>👋 Welcome to Aged Care Analytics!</h1>
+        <p>We're excited to have you join us</p>
+      </div>
+      
+      <div class="content">
+        <h2>Thank You for Signing Up</h2>
+        <p>Hello ${displayName},</p>
+        <p>Thank you for creating an account with Aged Care Analytics! Please check your inbox for a separate email with a verification link to complete your registration.</p>
+        
+        <div class="feature-box">
+          <h3>What's Next?</h3>
+          
+          <div class="feature-item">
+            <div class="feature-icon">✅</div>
+            <div>
+              <strong>Verify Your Email</strong>
+              <p>Please verify your email address using the verification link sent in a separate email.</p>
+            </div>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">🔍</div>
+            <div>
+              <strong>Explore Our Features</strong>
+              <p>After verification, you'll have access to our comprehensive aged care analytics platform.</p>
+            </div>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">📊</div>
+            <div>
+              <strong>Access Insights</strong>
+              <p>Gain valuable insights and make data-driven decisions for better aged care outcomes.</p>
+            </div>
+          </div>
+        </div>
+        
+        <p>Once your email is verified, you can sign in to your account:</p>
+        <div style="text-align: center;">
+          <a href="${loginUrl}" class="button">Sign In to Your Account</a>
+        </div>
+        
+        <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+        
+        <p>Best regards,<br>
+        <strong>The Aged Care Analytics Team</strong></p>
+      </div>
+      
+      <div class="footer">
+        <p>This email was sent to ${email}.</p>
+        <p>© ${new Date().getFullYear()} Aged Care Analytics. All rights reserved.</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+/**
+ * Send invite link email for new user signup
+ */
+export async function sendInviteLinkEmail(
+  email: string, 
+  inviteLink: string,
+  userName?: string
+): Promise<boolean> {
+  try {
+    const transporter = getEmailTransporter();
+    
+    const mailOptions = {
+      from: `"Aged Care Analytics" <${emailConfig.masterAdminEmail}>`,
+      to: email,
+      subject: '👋 Welcome to Aged Care Analytics - Account Invitation',
+      html: `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Welcome to Aged Care Analytics</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            .header {
+              background: linear-gradient(135deg, #4f46e5 0%, #3c366b 100%);
+              color: white;
+              padding: 30px;
+              text-align: center;
+              border-radius: 8px 8px 0 0;
+            }
+            .content {
+              background: #f8f9fa;
+              padding: 30px;
+              border-radius: 0 0 8px 8px;
+              border: 1px solid #e9ecef;
+              border-top: none;
+            }
+            .button {
+              display: inline-block;
+              background: #4f46e5;
+              color: white !important;
+              padding: 12px 30px;
+              text-decoration: none;
+              border-radius: 6px;
+              font-weight: 600;
+              margin: 20px 0;
+            }
+            .footer {
+              text-align: center;
+              color: #6c757d;
+              font-size: 14px;
+              margin-top: 30px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>👋 Welcome to Aged Care Analytics</h1>
+            <p>Your account has been created</p>
+          </div>
+          
+          <div class="content">
+            <h2>Your Account is Ready</h2>
+            <p>Hello ${userName || 'there'},</p>
+            <p>An account has been created for you on the Aged Care Analytics platform. You can now access the platform using the link below.</p>
+            
+            <div style="text-align: center;">
+              <a href="${inviteLink}" class="button">🚀 Activate Your Account</a>
+            </div>
+            
+            <p>After clicking the link, you'll be able to set your own secure password and access all features of the platform.</p>
+            
+            <p>If you have any questions or need assistance, please contact support.</p>
+            
+            <p>Best regards,<br>
+            <strong>Aged Care Analytics Team</strong></p>
+          </div>
+          
+          <div class="footer">
+            <p>This email was sent from the Aged Care Analytics platform.</p>
+            <p>If you didn't expect this email, please contact us immediately.</p>
+          </div>
+        </body>
+        </html>
+      `,
+      text: `
+        Welcome to Aged Care Analytics
+        
+        An account has been created for you on the Aged Care Analytics platform.
+        
+        Click here to activate your account: ${inviteLink}
+        
+        After clicking the link, you'll be able to set your own secure password and access all features of the platform.
+        
+        If you have any questions or need assistance, please contact support.
+        
+        Best regards,
+        Aged Care Analytics Team
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`Invite email sent successfully to: ${email}`);
+    return true;
+  } catch (error) {
+    console.error(`Failed to send invite email to ${email}:`, error);
+    return false;
+  }
+}
+
 // ==========================================
 // BACKGROUND EMAIL PROCESSING
 // ==========================================
