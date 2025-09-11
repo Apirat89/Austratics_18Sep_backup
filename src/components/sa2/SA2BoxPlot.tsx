@@ -50,6 +50,9 @@ const SA2BoxPlot: React.FC<SA2BoxPlotProps> = ({
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
   const [performanceLevel, setPerformanceLevel] = useState<'low' | 'medium' | 'high'>('medium');
+  
+  // Extract category and subcategory from metric name
+  const [category, subcategory] = metricName.split(' | ');
 
   // Get the appropriate statistics based on comparison level
   const getActiveStatistics = (): SA2Statistics => {
@@ -99,21 +102,36 @@ const SA2BoxPlot: React.FC<SA2BoxPlotProps> = ({
     const boxData = [activeStats.min, activeStats.q1, activeStats.median, activeStats.q3, activeStats.max];
 
     const option: echarts.EChartsOption = {
-      title: {
-        text: metricName,
-        left: 'center',
-        textStyle: {
-          fontSize: 12,
-          fontWeight: 'normal'
+      title: [
+        {
+          // Use only subcategory as the main title if available, otherwise use the full metricName
+          text: subcategory || metricName,
+          left: 'center',
+          top: '5%',
+          textStyle: {
+            fontSize: 12, // Reduced from 14
+            fontWeight: 'bold'
+          }
+        },
+        {
+          // Add a smaller subtitle showing the full "Category - Subcategory" format when both are available
+          text: category && subcategory ? `${category} - ${subcategory}` : '',
+          left: 'center',
+          top: '15%',
+          textStyle: {
+            fontSize: 9, // Reduced from 10
+            fontWeight: 'normal',
+            color: '#666'
+          }
         }
-      },
+      ],
       tooltip: {
         trigger: 'item',
         formatter: (params: any) => {
           if (params.seriesType === 'boxplot') {
             return `
               <div style="font-size: 12px;">
-                <strong>${metricName}</strong><br/>
+                <strong>${category && subcategory ? `${category} - ${subcategory}` : metricName}</strong><br/>
                 <div style="color: #666; font-size: 11px; margin-bottom: 8px;">Compared to: ${comparisonName}</div>
                 <div style="margin: 8px 0;">
                   <div>Min: <strong>${activeStats.min.toLocaleString()}</strong></div>
@@ -136,11 +154,12 @@ const SA2BoxPlot: React.FC<SA2BoxPlotProps> = ({
             return `
               <div style="font-size: 12px;">
                 <strong>This SA2 Region</strong><br/>
-                Value: <strong style="color: ${
+                <strong>${category && subcategory ? `${category} - ${subcategory}` : metricName}</strong>
+                <div>Value: <strong style="color: ${
                   performanceLevel === 'high' ? '#10b981' : 
                   performanceLevel === 'low' ? '#ef4444' : '#f59e0b'
-                }">${currentValue.toLocaleString()}</strong><br/>
-                Performance: <strong>${performanceLevel.toUpperCase()}</strong>
+                }">${currentValue.toLocaleString()}</strong></div>
+                <div>Performance: <strong>${performanceLevel.toUpperCase()}</strong></div>
               </div>
             `;
           }
@@ -150,7 +169,7 @@ const SA2BoxPlot: React.FC<SA2BoxPlotProps> = ({
       grid: {
         left: '10%',
         right: '10%',
-        top: '20%',
+        top: '28%', // Increased from 25% to make more space for titles
         bottom: '15%'
       },
       xAxis: {
@@ -224,7 +243,7 @@ const SA2BoxPlot: React.FC<SA2BoxPlotProps> = ({
       window.removeEventListener('resize', handleResize);
       chartInstance.current?.dispose();
     };
-  }, [metricName, currentValue, activeStats, performanceLevel, comparisonName]);
+  }, [metricName, currentValue, activeStats, performanceLevel, comparisonName, subcategory, category]);
 
   const getPerformanceColor = () => {
     switch (performanceLevel) {

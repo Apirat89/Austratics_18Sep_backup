@@ -139,7 +139,14 @@ export default function InsightsLandingRankings({
 
   // Filter metrics for display (clean up names)
   const getDisplayName = (metric: string) => {
-    return metric.replace(/^[^|]*\|\s*/, ''); // Remove category prefix
+    // For program types that use a pipe separator (e.g. "Home Care | Number of Participants")
+    if (metric.includes(' | ')) {
+      const [category, subcategory] = metric.split(' | ');
+      return `${category} - ${subcategory}`;
+    }
+    
+    // Otherwise, remove the prefix and return the metric name
+    return metric.replace(/^[^|]*\|\s*/, '');
   };
 
   const getCategoryIcon = (metric: string) => {

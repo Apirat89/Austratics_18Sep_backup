@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser, signOut } from '../../lib/auth';
 import BackToMainButton from '../../components/BackToMainButton';
-import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Save, Trash2, History, ArrowLeft, Globe, Building, Home, ExternalLink, X, ChevronDown, LogOut } from 'lucide-react';
+import { Search, MapPin, BarChart3, TrendingUp, Users, DollarSign, Heart, Activity, AlertTriangle, CheckCircle, Loader2, Target, Radar, Award, Grid3X3, Cross, Save, Trash2, History, ArrowLeft, Globe, Building, Home, ExternalLink, X, ChevronDown, LogOut, Database } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import SA2BoxPlot from '../../components/sa2/SA2BoxPlot';
@@ -31,6 +31,13 @@ import {
   deleteInsightsSearchHistoryItem,
   clearInsightsSearchHistory
 } from '../../lib/insightsHistory';
+import { 
+  PROGRAM_TYPES, 
+  DEMOGRAPHICS_TYPES, 
+  ECONOMIC_TYPES, 
+  HEALTH_TYPES 
+} from '../../components/HeatmapDataService';
+import SA2DataCategoriesSelector from '../../components/sa2/SA2DataCategoriesSelector';
 
 interface UserData {
   email: string;
@@ -130,6 +137,9 @@ export default function SA2AnalyticsPage() {
   // Insights search history state
   const [insightsSearchHistory, setInsightsSearchHistory] = useState<InsightsSearchHistoryItem[]>([]);
   const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(true);
+  
+  // State for selected metrics
+  const [selectedMetrics, setSelectedMetrics] = useState<string[]>([]);
   
   const router = useRouter();
 
@@ -300,6 +310,12 @@ export default function SA2AnalyticsPage() {
     // If we have a short name, use it
     if (shortNames[metric]) {
       return shortNames[metric];
+    }
+    
+    // For program types that use a pipe separator (e.g. "Home Care | Number of Participants")
+    if (metric.includes(' | ')) {
+      const [category, subcategory] = metric.split(' | ');
+      return `${category} - ${subcategory}`;
     }
     
     // Otherwise, remove the prefix and return the metric name
@@ -1430,6 +1446,24 @@ export default function SA2AnalyticsPage() {
     };
   }, [searchResults.length, handleClickOutside]);
 
+  // Handle metric selection/deselection
+  const handleMetricToggle = (metricKey: string, selected: boolean) => {
+    if (selected) {
+      setSelectedMetrics(prev => [...prev, metricKey]);
+    } else {
+      setSelectedMetrics(prev => prev.filter(m => m !== metricKey));
+    }
+  };
+  
+  // Helper function to create combined label for metrics
+  const createCombinedLabel = (metricKey: string): string => {
+    if (metricKey.includes(' | ')) {
+      const [category, subcategory] = metricKey.split(' | ');
+      return `${category} - ${subcategory}`;
+    }
+    return metricKey;
+  };
+
   if (isLoading || !user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -2043,8 +2077,7 @@ export default function SA2AnalyticsPage() {
                       </TabsTrigger>
                     </TabsList>
                     
-
-                    {/* 🟢 Economics Tab */}
+                    {/* �� Economics Tab */}
                     <TabsContent value="economics" className="mt-6">
                       <div className="space-y-6">
                         <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
