@@ -217,8 +217,8 @@ export default function AdminManagementTab({ currentAdmin }: AdminManagementTabP
                     </>
                   ) : (
                     <>
-                      <span>✉️</span>
-                      <span>Create & Send Invitation</span>
+                      <span>🔑</span>
+                      <span>Activate and Reset Password</span>
                     </>
                   )}
                 </button>

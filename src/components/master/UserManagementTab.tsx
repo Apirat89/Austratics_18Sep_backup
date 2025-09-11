@@ -95,7 +95,7 @@ export default function UserManagementTab({ currentAdmin }: UserManagementTabPro
       setEmail('');
       setCompany('');
       setShowAddForm(false);
-      setMsg('Invite sent.');
+      setMsg('Activation email sent.');
       
       refresh();
     } catch (error) {
@@ -235,8 +235,8 @@ export default function UserManagementTab({ currentAdmin }: UserManagementTabPro
                     </>
                   ) : (
                     <>
-                      <span>✉️</span>
-                      <span>Create & Send Invite</span>
+                      <span>🔑</span>
+                      <span>Activate and Reset Password</span>
                     </>
                   )}
                 </button>

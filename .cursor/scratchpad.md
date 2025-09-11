@@ -1245,3 +1245,214 @@ curl -X POST http://localhost:3000/api/admin-auth/users \
 - **SMTP**: Gmail SMTP (smtp.gmail.com:587) with TLS
 
 **✅ Now admin invitation emails should be sent successfully to the requested email address!**
+
+---
+
+## 🔄 **USER ACTIVATION FLOW FIX**
+
+**USER ISSUE:** Master page user tab activation uses broken invite flow instead of working reset password flow
+
+**EXECUTOR MODE ACTIVE** ⚙️
+
+## Background and Motivation
+
+**Current Problem:**
+- ✅ **Admin user creation working** - API successfully creates users and sends emails
+- ❌ **Invite flow broken** - `/auth/invite` fails with "Missing token_hash or type" 
+- ✅ **Reset password flow working** - Successfully generates tokens and works at `/auth/reset-password?token=...`
+- 🎯 **User request** - Change activation to use reset password flow instead
+
+**Terminal Evidence:**
+- Invite link generated: `https://ejhmrjcvjrrsbopffhuo.supabase.co/auth/v1/verify?token=...&type=invite&redirect_to=...`
+- Invite flow fails: "Missing token_hash or type" when accessing `/auth/invite`
+- Reset password working: `POST /api/auth/reset-password` generates token successfully
+- Reset page works: `/auth/reset-password?token=7f4ecc1fe9ceb2ff...` loads and functions
+
+## Key Challenges and Analysis
+
+### **Challenge 1: Replace Invite Flow with Reset Password Flow**
+**Current State**: Admin user creation calls Supabase `inviteUserByEmail()` 
+**Target State**: Generate reset password token and send reset password email
+**Files Affected**: 
+- Admin user creation API (`/api/admin-auth/users` or `/api/admin/auth-users`)
+- Email template and sending logic
+**Risk Level**: ⭐⭐ MEDIUM - Need to identify and modify user creation flow
+
+### **Challenge 2: Update Activation Button Text**
+**Current State**: Button likely says "Invite" or "Activate"
+**Target State**: Button should say "Activate and Reset Password"
+**Implementation**: Update button text in admin interface
+**Risk Level**: ⭐ LOW - Simple text change
+
+## High-level Task Breakdown
+
+### **Phase A: Identify Current Flow** 🔍
+**Goal**: Find where admin user creation and email sending happens
+**Tasks**:
+A.1 Locate admin user creation API endpoint
+A.2 Find current invite email implementation
+A.3 Identify button text location in admin interface
+
+### **Phase B: Replace with Reset Password Flow** 🔄
+**Goal**: Change from invite flow to reset password token flow
+**Tasks**:
+B.1 Replace `inviteUserByEmail()` with reset password token generation
+B.2 Update email template to use reset password language
+B.3 Generate proper reset password link format
+B.4 Update button text to "Activate and Reset Password"
+
+### **Phase C: Testing & Verification** ✅
+**Goal**: Ensure new activation flow works end-to-end
+**Tasks**:
+C.1 Test admin user creation with new flow
+C.2 Verify email sent with reset password link
+C.3 Confirm reset password page loads with token
+C.4 Test complete password setting workflow
+
+## Project Status Board
+
+- **Phase A: Identify Current Flow** ✅ COMPLETE
+  - A.1 Located admin user creation API endpoint ✅ COMPLETE (`/api/admin/auth-users/route.ts` - lines 47-82)
+  - A.2 Found current invite email implementation ✅ COMPLETE (uses Supabase `generateLink` with `type: 'invite'`)
+  - A.3 Identified button text location ✅ COMPLETE (UserManagementTab.tsx line 221: "Create & Send Invitation")
+- **Phase B: Replace with Reset Password Flow** ✅ COMPLETE
+  - B.1 Replace `inviteUserByEmail()` with reset password token generation ✅ COMPLETE (replaced Supabase generateLink)
+  - B.2 Update email template to use reset password language ✅ COMPLETE (using sendPasswordResetEmail)
+  - B.3 Generate proper reset password link format ✅ COMPLETE (`/auth/reset-password?token=...`)
+  - B.4 Update button text to "Activate and Reset Password" ✅ COMPLETE (both AdminManagementTab and UserManagementTab)
+- **Phase C: Testing & Verification** ⏳ IN PROGRESS
+
+## Executor's Feedback or Assistance Requests
+
+**✅ IMPLEMENTATION COMPLETE:**
+
+**Changes Made:**
+
+**1. API Endpoint (`/api/admin/auth-users/route.ts`):**
+- ✅ **Replaced imports**: `sendInviteLinkEmail` → `sendPasswordResetEmail` + `createResetToken`
+- ✅ **Replaced invite flow**: Removed Supabase `generateLink({ type: 'invite' })` 
+- ✅ **Added reset token flow**: Using `createResetToken(email)` and `sendPasswordResetEmail()`
+- ✅ **Updated URL format**: `/auth/invite` → `/auth/reset-password?token=...`
+
+**2. Admin Interface - AdminManagementTab.tsx:**
+- ✅ **Button text**: "Create & Send Invitation" → "Activate and Reset Password"
+- ✅ **Button icon**: ✉️ → 🔑
+
+**3. Admin Interface - UserManagementTab.tsx:**
+- ✅ **Button text**: "Create & Send Invite" → "Activate and Reset Password"  
+- ✅ **Button icon**: ✉️ → 🔑
+- ✅ **Success message**: "Invite sent." → "Activation email sent."
+
+**CURRENT TASK**: Test the new activation flow end-to-end to verify it works correctly
+
+---
+
+## 🔧 **COMPILATION ERROR FIX & TOKEN CLARIFICATION**
+
+**EXECUTOR MODE ACTIVE** ⚙️
+
+### **🚨 ISSUES IDENTIFIED:**
+
+**1. Next.js Compilation Errors:**
+- **Error**: `ENOENT: no such file or directory, open '/.next/server/pages/_document.js'`
+- **Cause**: Corrupted `.next` build cache
+- **Solution**: ✅ Cleared `.next` directory and restarting dev server
+
+**2. Token Misunderstanding:**
+- **Your Concern**: "we shouldnt be fixing a particular token"
+- **You're Absolutely Right!** The `7f4ecc1fe9ceb2ff...` was just your example format
+- **Actual System**: Generates **NEW unique token** for each user activation
+
+### **🔧 IMPORTANT CLARIFICATIONS:**
+
+**Token System (DYNAMIC, not fixed):**
+- ✅ **Each activation generates a UNIQUE token** via `createResetToken(email)`
+- ✅ **Format**: `/auth/reset-password?token=<FRESH_GENERATED_TOKEN>`
+- ❌ **NOT using your example token** `7f4ecc1fe9ceb2ff...` (that was just to show the working format)
+- ✅ **Every user gets their own fresh token** that expires in 1 hour
+- 🎯 **Example flow**: User A gets `token=abc123...`, User B gets `token=xyz789...`, etc.
+
+**Server Details:**
+- 🌐 **Correct URL**: `http://localhost:3001` (port 3001, not 3000)
+- 🔧 **Cache Issue**: Next.js compilation errors being fixed by clearing `.next` directory
+
+### **⚡ CURRENT STATUS:**
+- **Cache**: ✅ Clearing corrupted `.next` directory
+- **Server**: 🔄 Restarting on port 3001
+- **Token System**: ✅ Generates unique tokens per user (not fixed)
+- **Ready for Testing**: ⏳ Once server restarts
+
+---
+
+## 🔄 **COMBINE EMAIL VERIFICATION + PASSWORD RESET INTO ONE EMAIL**
+
+**USER REQUEST:** "can we combine the 2 into 1 so the user only need to press once, and it will verify email and also lead the user to reset password page"
+
+**EXECUTOR MODE ACTIVE** ⚙️
+
+### **🔍 CURRENT PROBLEM IDENTIFIED:**
+
+**From Terminal Logs:**
+1. ✅ User created → Reset token generated → Reset password email sent
+2. ✅ User clicks link → Sets password successfully  
+3. ❌ User tries to login → **"Email not confirmed"** error (line 107-126)
+4. ❌ System sends **separate verification email** (line 125)
+
+**Root Cause**: `createUser()` creates unverified users → Reset password works but email still unconfirmed → Requires second verification email
+
+### **🎯 SOLUTION APPROACHES:**
+
+**Option 1: Auto-confirm during user creation**
+- Set `email_confirm: true` in `createUser()` call
+- User gets reset password email only
+- Email is pre-confirmed when they set password
+
+**Option 2: Confirm email during password reset**  
+- Keep current flow but add email confirmation to reset password API
+- When user sets password, also mark email as confirmed
+
+**Option 3: Custom activation flow**
+- Create custom activation endpoint that does both
+- Single click → confirm email + redirect to password setup
+
+**RECOMMENDED**: Option 1 (simplest and cleanest)
+
+### **✅ IMPLEMENTATION COMPLETE - OPTION 1:**
+
+**Fix Applied**: Added `email_confirm: true` to user creation in `/api/admin/auth-users/route.ts`
+
+**Before:**
+```javascript
+await supabaseAdmin.auth.admin.createUser({
+  email,
+  user_metadata: { full_name: name, company },
+})
+```
+
+**After:**
+```javascript  
+await supabaseAdmin.auth.admin.createUser({
+  email,
+  user_metadata: { full_name: name, company },
+  email_confirm: true  // Auto-confirm email to avoid separate verification email
+})
+```
+
+### **🎯 NEW SINGLE-EMAIL FLOW:**
+
+**Previous (Two Emails):**
+1. Admin creates user → Reset password email sent ✉️
+2. User sets password → Login fails "Email not confirmed" 
+3. System sends verification email ✉️ → User clicks verification
+4. User can finally login ✅
+
+**New (One Email Only):**
+1. Admin creates user (email auto-confirmed) → Reset password email sent ✉️  
+2. User clicks link → Sets password → Can login immediately ✅
+
+**🎉 RESULT**: **ONE email, ONE click, COMPLETE activation!**
+
+### **⚡ READY FOR TESTING:**
+- **Server**: `http://localhost:3001` (now on port 3002 based on latest logs)
+- **Test**: Create new user → Should only get ONE activation email → Click link → Set password → Login should work immediately
+- **Expected**: No more "Email not confirmed" errors!

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { sendInviteLinkEmail } from '@/lib/emailService'
+import { sendPasswordResetEmail } from '@/lib/email'
+import { createResetToken } from '@/lib/auth-tokens'
 import { requireAdminAuth } from '@/lib/adminAuth'
 
 export async function POST(req: NextRequest) {
@@ -31,10 +32,11 @@ export async function POST(req: NextRequest) {
 
     console.log('Creating user with email:', email, 'from origin:', origin)
 
-    // 1) Pre-create user with metadata
+    // 1) Pre-create user with metadata and auto-confirm email
     const { data: createData, error: createErr } = await supabaseAdmin.auth.admin.createUser({
       email,
       user_metadata: { full_name: name, company },
+      email_confirm: true  // Auto-confirm email to avoid separate verification email
     })
     
     if (createErr) {
@@ -44,38 +46,36 @@ export async function POST(req: NextRequest) {
 
     console.log('User created successfully:', createData.user?.id)
 
-    // 2) Generate an invite link with proper redirect to our invite handler
-    const redirectTo = `${origin}/auth/invite?next=${encodeURIComponent('/onboarding/set-password')}`
-    console.log('Generating invite link with redirectTo:', redirectTo)
+    // 2) Generate reset password token using working flow
+    console.log('Generating reset password token for activation')
+    const tokenResult = await createResetToken(email)
     
-    const { data: linkData, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'invite',
-      email,
-      options: {
-        redirectTo: redirectTo,
-      },
-    })
-    
-    if (linkErr) {
-      console.error('Supabase generate link error:', linkErr)
-      return NextResponse.json({ error: linkErr.message }, { status: 400 })
+    if (!tokenResult.success || !tokenResult.token) {
+      console.error('Failed to create reset token:', tokenResult.error)
+      return NextResponse.json({ error: 'Failed to generate activation token' }, { status: 500 })
     }
 
-    console.log('Invite link generated successfully')
-    console.log('Link data:', linkData)
+    console.log('Reset token generated successfully')
 
-    const actionLink = linkData.properties?.action_link
-    if (!actionLink) {
-      console.error('No action link in generated data:', linkData)
-      return NextResponse.json({ error: 'No invite link generated' }, { status: 500 })
-    }
+    // 3) Create reset password URL
+    const resetUrl = `${origin}/auth/reset-password?token=${tokenResult.token}`
+    console.log('Reset URL:', resetUrl)
 
-    console.log('Action link:', actionLink)
-
-    // 3) Send branded invite email using new email service function
+    // 4) Send reset password email for account activation
     try {
-      await sendInviteLinkEmail(email, actionLink, name);
-      console.log(`Invitation email sent successfully to: ${email} by admin: ${admin.email}`);
+      const emailResult = await sendPasswordResetEmail({
+        to: email,
+        resetToken: tokenResult.token,
+        resetUrl,
+        userEmail: email
+      })
+      
+      if (emailResult.success) {
+        console.log(`Activation email sent successfully to: ${email} by admin: ${admin.email}`);
+      } else {
+        console.error("Email error:", emailResult.error);
+        // We don't fail the request if email fails, just log it
+      }
     } catch (emailErr) {
       console.error("Email error:", emailErr);
       // We don't fail the request if email fails, just log it
