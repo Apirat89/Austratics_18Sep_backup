@@ -1148,11 +1148,17 @@ export default function ResidentialPage() {
     const scopeStats = getStatisticsForScope();
     const fieldStats = fieldName && scopeStats ? scopeStats.fields?.[fieldName] : null;
     
+    // Format value if it's a financial field
+    const formattedValue = isNumeric && fieldName && (
+      /(cost|finance|income|expenditure|rate|hourly|surplus|deficit|budget|payment|fee|price|dollar|pay|financial)/i.test(fieldName) ||
+      /(\$|aud|amount)/i.test(fieldName)
+    ) ? formatCurrency(value) : value;
+    
     return (
       <div className="mb-3">
         <dt className="text-sm font-medium text-gray-500">{label}</dt>
         <dd className="text-gray-900 flex items-center">
-          {value}
+          {formattedValue}
           {showBoxPlots && isNumeric && fieldName && !statsLoading && fieldStats && (
             <InlineBoxPlot
               fieldName={fieldName}
@@ -1192,9 +1198,17 @@ export default function ResidentialPage() {
 
   const formatCurrency = (amount?: number) => {
     if (amount === null || amount === undefined) return 'N/A';
+    
+    // Large amounts (over 1000) don't need decimal places
+    // Smaller amounts (under 1000) like daily rates need decimal places
+    const minimumFractionDigits = amount >= 1000 ? 0 : 2;
+    const maximumFractionDigits = amount >= 1000 ? 0 : 2;
+    
     return new Intl.NumberFormat('en-AU', {
       style: 'currency',
-      currency: 'AUD'
+      currency: 'AUD',
+      minimumFractionDigits,
+      maximumFractionDigits
     }).format(amount);
   };
 

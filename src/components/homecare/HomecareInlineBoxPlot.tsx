@@ -109,14 +109,38 @@ const HomecareInlineBoxPlot: React.FC<HomecareInlineBoxPlotProps> = ({
   }
 
   const formatValue = (value: number) => {
-    // Format as currency for cost fields
-    if (fieldName.includes('cost') || fieldName.includes('budget')) {
+    // Format as currency for financial fields
+    if (
+      fieldName.toLowerCase().includes('cost') || 
+      fieldName.toLowerCase().includes('budget') ||
+      fieldName.toLowerCase().includes('income') || 
+      fieldName.toLowerCase().includes('expenditure') ||
+      fieldName.toLowerCase().includes('surplus') ||
+      fieldName.toLowerCase().includes('deficit') ||
+      fieldName.toLowerCase().includes('financial') ||
+      fieldName.toLowerCase().includes('pay') ||
+      fieldName.toLowerCase().includes('rate') ||
+      fieldName.toLowerCase().includes('hourly')
+    ) {
+      // Large amounts (over 1000) don't need decimal places
+      // Smaller amounts (under 1000) like daily rates need decimal places
+      const minimumFractionDigits = value >= 1000 ? 0 : 2;
+      const maximumFractionDigits = value >= 1000 ? 0 : 2;
+      
       return new Intl.NumberFormat('en-AU', {
         style: 'currency',
         currency: 'AUD',
+        minimumFractionDigits,
+        maximumFractionDigits
       }).format(value);
     }
-    return value.toString();
+    
+    // Format percentages
+    if (fieldName.toLowerCase().includes('%') || fieldName.toLowerCase().includes('percent')) {
+      return `${value.toFixed(1)}%`;
+    }
+    
+    return value.toLocaleString();
   };
 
   const getScopeLabel = (scope: string) => {

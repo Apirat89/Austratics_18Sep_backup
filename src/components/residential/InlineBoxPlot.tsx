@@ -112,17 +112,37 @@ const InlineBoxPlot: React.FC<InlineBoxPlotProps> = ({
     if (fieldName.toLowerCase().includes('rating') || fieldName.toLowerCase().includes('star')) {
       return value.toFixed(1);
     }
-    if (fieldName.toLowerCase().includes('cost') || fieldName.toLowerCase().includes('income') || fieldName.toLowerCase().includes('expenditure')) {
+    
+    // Handle currency formatting with appropriate decimal places
+    if (
+      fieldName.toLowerCase().includes('cost') || 
+      fieldName.toLowerCase().includes('income') || 
+      fieldName.toLowerCase().includes('expenditure') ||
+      fieldName.toLowerCase().includes('budget') ||
+      fieldName.toLowerCase().includes('surplus') ||
+      fieldName.toLowerCase().includes('deficit') ||
+      fieldName.toLowerCase().includes('financial') ||
+      fieldName.toLowerCase().includes('pay') ||
+      fieldName.toLowerCase().includes('rate') ||
+      fieldName.toLowerCase().includes('hourly')
+    ) {
+      // Large amounts (over 1000) don't need decimal places
+      // Smaller amounts (under 1000) like daily rates need decimal places
+      const minimumFractionDigits = value >= 1000 ? 0 : 2;
+      const maximumFractionDigits = value >= 1000 ? 0 : 2;
+      
       return new Intl.NumberFormat('en-AU', {
         style: 'currency',
         currency: 'AUD',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
+        minimumFractionDigits,
+        maximumFractionDigits
       }).format(value);
     }
+    
     if (fieldName.toLowerCase().includes('%') || fieldName.toLowerCase().includes('percent')) {
       return `${value.toFixed(1)}%`;
     }
+    
     return value.toLocaleString();
   };
 

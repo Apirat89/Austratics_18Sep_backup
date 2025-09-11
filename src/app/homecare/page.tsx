@@ -1088,7 +1088,10 @@ export default function HomecarePage() {
       if (typeof value === 'object' && value !== null) {
         return JSON.stringify(value);
       }
-      if (typeof value === 'number' && fieldName && /(cost|finance|income|expenditure|rate|hourly|surplus|deficit)/.test(fieldName)) {
+      if (typeof value === 'number' && fieldName && (
+        /(cost|finance|income|expenditure|rate|hourly|surplus|deficit|budget|payment|fee|price|dollar|pay|financial)/i.test(fieldName) ||
+        /(\$|aud|amount)/i.test(fieldName)
+      )) {
         return formatCurrency(value);
       }
       return value;
@@ -1114,9 +1117,18 @@ export default function HomecarePage() {
 
   // Helper function to format currency - NEW
   const formatCurrency = (amount: number) => {
+    if (amount === null || amount === undefined) return 'N/A';
+    
+    // Large amounts (over 1000) don't need decimal places
+    // Smaller amounts (under 1000) like daily rates need decimal places
+    const minimumFractionDigits = amount >= 1000 ? 0 : 2;
+    const maximumFractionDigits = amount >= 1000 ? 0 : 2;
+    
     return new Intl.NumberFormat('en-AU', {
       style: 'currency',
       currency: 'AUD',
+      minimumFractionDigits,
+      maximumFractionDigits
     }).format(amount);
   };
 
