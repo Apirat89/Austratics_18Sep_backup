@@ -14,6 +14,7 @@ import SA2HeatmapChart from '../../components/sa2/SA2HeatmapChart';
 import InsightsLandingRankings from '../../components/insights/InsightsLandingRankings';
 import InsightsHistoryPanel from '../../components/insights/InsightsHistoryPanel';
 import { searchLocations } from '../../lib/mapSearchService';
+import { trackApiCall, trackedFetch } from '@/lib/usageTracking';
 import { 
   saveSA2Search, 
   getUserSavedSA2Searches, 
@@ -182,7 +183,11 @@ export default function SA2AnalyticsPage() {
       }));
 
       // Load data from SA2 API
-      const response = await fetch('/api/sa2');
+      const response = await (user?.id ? 
+        trackedFetch(user.id, 'sa2', '/api/sa2', { action: 'load_sa2_data' }) : 
+        fetch('/api/sa2')
+      );
+      
       if (!response.ok) {
         throw new Error(`API request failed: ${response.status}`);
       }
@@ -209,7 +214,10 @@ export default function SA2AnalyticsPage() {
       setAllSA2Data(transformedSA2Data);
 
       // Get available metrics
-      const metricsResponse = await fetch('/api/sa2?metrics=true');
+      const metricsResponse = await (user?.id ? 
+        trackedFetch(user.id, 'sa2', '/api/sa2?metrics=true', { action: 'load_sa2_metrics' }) : 
+        fetch('/api/sa2?metrics=true')
+      );
       const metricsData = await metricsResponse.json();
       setAvailableMetrics(metricsData.metrics || []);
 
@@ -247,7 +255,7 @@ export default function SA2AnalyticsPage() {
     } finally {
       dataLoadingRef.current = false;
     }
-  }, []);
+  }, [user]);
 
   // Helper function to get hierarchical statistics for a specific SA2 and metric
   const getHierarchicalStatsForSA2 = (sa2: SA2Data, metric: string): HierarchicalStatistics | undefined => {

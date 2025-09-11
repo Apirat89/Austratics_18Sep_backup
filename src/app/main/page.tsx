@@ -14,6 +14,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { getCurrentUser, signOut } from '../../lib/auth';
 import PromptArea from '../../components/PromptArea';
+import { trackApiCall } from '@/lib/usageTracking';
 
 interface UserData {
   email: string;
@@ -72,6 +73,15 @@ export default function MainPage() {
           email: currentUser.email || '',
           name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User',
           id: currentUser.id
+        });
+        
+        // Track page view
+        trackApiCall({
+          userId: currentUser.id,
+          page: '/',
+          service: 'internal',
+          action: 'page_view',
+          method: 'GET'
         });
       } catch (error) {
         console.error('Error loading user:', error);

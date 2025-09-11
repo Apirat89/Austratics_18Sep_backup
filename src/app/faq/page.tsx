@@ -6,6 +6,7 @@ import { HelpCircle, ArrowLeft, History, X, Bookmark, Plus, Copy, RotateCcw, Che
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import FAQHistoryPanel from '@/components/faq/FAQHistoryPanel';
+import { trackApiCall } from '@/lib/usageTracking';
 
 import { getCurrentUser, signOut } from '@/lib/auth';
 import { renderMarkdown } from '@/lib/markdownRenderer';
@@ -478,6 +479,26 @@ Ask me questions like "How do I search for homecare providers?" or "How do I use
         };
 
         setMessages(prev => prev.slice(0, -1).concat([assistantMessage]));
+
+        // Track Gemini API usage
+        if (currentUser) {
+          trackApiCall({
+            userId: currentUser.id,
+            page: '/faq',
+            service: 'gemini',
+            action: 'chat',
+            endpoint: '/api/faq/chat',
+            method: 'POST',
+            status: 200,
+            durationMs: chatResponse.processing_time,
+            tokensIn: chatResponse.context_used, 
+            meta: { 
+              conversation_id: chatResponse.conversation_id,
+              message_id: chatResponse.message_id,
+              citations_count: chatResponse.citations?.length || 0
+            }
+          });
+        }
 
         // Save to search history if user is logged in
         if (currentUser) {

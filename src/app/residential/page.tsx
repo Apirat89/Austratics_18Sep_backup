@@ -6,6 +6,7 @@ import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InlineBoxPlot from '@/components/residential/InlineBoxPlot';
+import { trackApiCall } from '@/lib/usageTracking';
 
 import HistoryPanel from '@/components/residential/HistoryPanel';
 import { getCurrentUser, signOut } from '../../lib/auth';
@@ -427,6 +428,17 @@ export default function ResidentialPage() {
           const result = await getUserSavedResidentialFacilities(currentUser.id);
           setSavedFacilities(result.facilities);
           
+          // Track Supabase read operation
+          trackApiCall({
+            userId: currentUser.id,
+            page: '/residential',
+            service: 'supabase',
+            action: 'select',
+            endpoint: 'savedResidentialFacilities',
+            method: 'select',
+            meta: { count: result.facilities.length }
+          });
+          
           // Load search history from Supabase
           const searches = await getResidentialSearchHistory(currentUser.id, 10);
           setSearchHistory(searches);
@@ -794,6 +806,20 @@ export default function ResidentialPage() {
         // Reload saved facilities to get the new one with proper ID
         const updatedResult = await getUserSavedResidentialFacilities(currentUser.id);
         setSavedFacilities(updatedResult.facilities);
+        
+        // Track Supabase write operation
+        trackApiCall({
+          userId: currentUser.id,
+          page: '/residential',
+          service: 'supabase',
+          action: 'insert',
+          endpoint: 'savedResidentialFacilities',
+          method: 'insert',
+          meta: { 
+            facility_id: facilityId,
+            facility_name: facility["Service Name"]
+          }
+        });
       } else {
         alert(`Failed to save facility: ${result.message}`);
       }

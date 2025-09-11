@@ -12,6 +12,9 @@ import LayerManager from './LayerManager';
 import HeatmapDataService, { SA2HeatmapData, RankedSA2Data } from './HeatmapDataService';
 import { globalLoadingCoordinator } from './MapLoadingCoordinator';
 
+// Import the tracking utility
+import { trackApiCall } from '@/lib/usageTracking';
+
 // Removed magic wand imports - replaced with bulk selection system
 
 // MapTiler API key - you'll need to add this to your environment variables
@@ -465,8 +468,18 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     map.current.on('load', () => {
       setIsLoaded(true);
       
+      // Track map load event if user ID is available
+      if (userId) {
+        trackApiCall({
+          userId,
+          page: '/maps',
+          service: 'maptiler',
+          action: 'map_load',
+          endpoint: 'MapTiler SDK',
+          method: 'SDK'
+        });
+      }
 
-      
       // Add click handler
       if (map.current) {
         map.current.on('click', handleMapClick);
@@ -3344,6 +3357,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
           facilityLoading={facilityLoading}
           onHeatmapMinMaxCalculated={onHeatmapMinMaxCalculated}
           onHeatmapRenderComplete={onHeatmapRenderComplete}
+          userId={userId}
         />
       )}
 

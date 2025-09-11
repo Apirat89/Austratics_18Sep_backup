@@ -6,6 +6,7 @@ import { Search, Home, Phone, Globe, MapPin, DollarSign, FileText, Activity, Hea
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import HomecareInlineBoxPlot from '@/components/homecare/HomecareInlineBoxPlot';
+import { trackApiCall } from '@/lib/usageTracking';
 
 import { getCurrentUser, signOut } from '../../lib/auth';
 import { 
@@ -203,6 +204,17 @@ export default function HomecarePage() {
           // Load saved providers
           const savedData = await getUserSavedHomecareProviders(currentUser.id);
           setSavedProviders(savedData);
+          
+          // Track Supabase read operation
+          trackApiCall({
+            userId: currentUser.id,
+            page: '/homecare',
+            service: 'supabase',
+            action: 'select',
+            endpoint: 'savedHomecareProviders',
+            method: 'select',
+            meta: { count: savedData.length }
+          });
           
           // Load search history
           const historyData = await getHomecareSearchHistory(currentUser.id);
@@ -703,6 +715,20 @@ export default function HomecarePage() {
         setFilteredProviders(prev => prev.map(p => 
           p.provider_id === provider.provider_id ? { ...p, isSaved: true } : p
         ));
+        
+        // Track Supabase write operation
+        trackApiCall({
+          userId: currentUser.id,
+          page: '/homecare',
+          service: 'supabase',
+          action: 'insert',
+          endpoint: 'savedHomecareProviders',
+          method: 'insert',
+          meta: { 
+            provider_id: provider.provider_id,
+            provider_name: provider.provider_info.provider_name
+          }
+        });
       }
     } catch (error) {
       console.error('Error toggling save status:', error);

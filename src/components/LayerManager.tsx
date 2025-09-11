@@ -5,6 +5,7 @@ import type { Map as MapLibreMap } from 'maplibre-gl';
 import { mapBusy } from '../lib/mapBusy';
 import { waitForStyleAndIdle, safeMapOperation } from '../lib/mapboxEvents';
 import { globalLoadingCoordinator } from './MapLoadingCoordinator';
+import { trackApiCall } from '@/lib/usageTracking';
 
 interface SA2HeatmapData {
   [sa2Id: string]: number;
@@ -23,6 +24,8 @@ interface LayerManagerProps {
   mapLoaded?: boolean;
   // ✅ NEW: Completion callback for real-time loading indicator
   onHeatmapRenderComplete?: () => void;
+  // User ID for tracking
+  userId?: string;
 }
 
 export default function LayerManager({
@@ -33,7 +36,8 @@ export default function LayerManager({
   onHeatmapMinMaxCalculated,
   facilityLoading = false,
   mapLoaded = false,
-  onHeatmapRenderComplete
+  onHeatmapRenderComplete,
+  userId
 }: LayerManagerProps) {
   // Layer management state
   const [boundaryLoaded, setBoundaryLoaded] = useState(false);
@@ -448,6 +452,19 @@ export default function LayerManager({
             
             // ✅ FIXED: Report completion even when no data
             onHeatmapRenderComplete?.();
+            
+            // Track heatmap render event if user ID is available
+            if (userId) {
+              trackApiCall({
+                userId,
+                page: '/maps',
+                service: 'maptiler',
+                action: 'heatmap_render',
+                endpoint: 'MapTiler heatmap',
+                method: 'SDK',
+                meta: { status: 'no_data' }
+              });
+            }
             return;
           }
 
@@ -487,6 +504,24 @@ export default function LayerManager({
           // ✅ FIXED: Report completion to DataLayers for real-time loading indicator
           onHeatmapRenderComplete?.();
           
+          // Track successful heatmap render
+          if (userId) {
+            trackApiCall({
+              userId,
+              page: '/maps',
+              service: 'maptiler',
+              action: 'heatmap_render',
+              endpoint: 'MapTiler heatmap',
+              method: 'SDK',
+              meta: { 
+                status: 'success',
+                dataPoints: dataEntries.length,
+                minValue,
+                maxValue 
+              }
+            });
+          }
+          
         } else {
           console.log('📊 LayerManager: Heatmap not visible or no data, hiding layer');
           onHeatmapMinMaxCalculated?.(undefined, undefined);
@@ -499,6 +534,18 @@ export default function LayerManager({
           
           // ✅ FIXED: Report completion even when hiding heatmap
           onHeatmapRenderComplete?.();
+          
+          // Track hide heatmap event
+          if (userId) {
+            trackApiCall({
+              userId,
+              page: '/maps',
+              service: 'maptiler',
+              action: 'heatmap_hide',
+              endpoint: 'MapTiler heatmap',
+              method: 'SDK'
+            });
+          }
         }
         
           const totalTime = performance.now() - performanceStart;
@@ -512,6 +559,19 @@ export default function LayerManager({
         // ✅ SAFETY: Report completion even on error to prevent stuck loading indicators
         onHeatmapRenderComplete?.();
         
+        // Track error event
+        if (userId) {
+          trackApiCall({
+            userId,
+            page: '/maps',
+            service: 'maptiler',
+            action: 'heatmap_error',
+            endpoint: 'MapTiler heatmap',
+            method: 'SDK',
+            meta: { error: error instanceof Error ? error.message : String(error) }
+          });
+        }
+        
         // Force reset mapBusy if we're in an error state
         if (mapBusy.isBusy) {
           console.warn('⚠️ LayerManager: Force resetting mapBusy due to heatmap update error');
@@ -519,7 +579,7 @@ export default function LayerManager({
         }
       }
     })();
-  }, [map, boundaryLoaded, heatmapDataReady, facilityLoading, onHeatmapMinMaxCalculated, onHeatmapRenderComplete, cleanupCache, consecutiveErrors]);
+  }, [map, boundaryLoaded, heatmapDataReady, facilityLoading, onHeatmapMinMaxCalculated, onHeatmapRenderComplete, cleanupCache, consecutiveErrors, userId]);
 
   // ✅ MEMORY MANAGEMENT: Cleanup caches when component unmounts
   useEffect(() => {

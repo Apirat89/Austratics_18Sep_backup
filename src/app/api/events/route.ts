@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '../../../lib/supabase';
+import { logUsage } from '@/lib/usageServer';
 
 // Rate limiting cache (in production, use Redis)
 const rateLimitCache = new Map<string, { count: number; resetTime: number }>();
@@ -55,60 +56,127 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { feature, action, attrs = {}, session_id } = body;
 
-    // Validate required fields
-    if (!feature || !action) {
-      return NextResponse.json(
-        { error: 'Feature and action are required' },
-        { status: 400 }
-      );
-    }
+    // Check if this is an API usage tracking event or a regular event
+    if (body.service) {
+      // This is a usage tracking event
+      const { user_id, page, service, action, endpoint, method, status, 
+              duration_ms, tokens_in, tokens_out, meta } = body;
 
-    // Validate feature exists
-    const { data: featureCheck } = await supabase
-      .from('feature_dim')
-      .select('feature')
-      .eq('feature', feature)
-      .eq('is_active', true)
-      .single();
+      // Validate required fields
+      if (!user_id || !service) {
+        return NextResponse.json(
+          { error: 'user_id and service are required for API usage tracking' },
+          { status: 400 }
+        );
+      }
 
-    if (!featureCheck) {
-      return NextResponse.json(
-        { error: 'Invalid feature' },
-        { status: 400 }
-      );
-    }
+      // Ensure the user can only log events for themselves unless they're an admin
+      if (user_id !== user.id) {
+        // Check if the user is an admin
+        const { data: adminCheck } = await supabase
+          .from('admin_users')
+          .select('status, is_master')
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .single();
 
-    // Get client info
-    const userAgent = request.headers.get('user-agent') || 'unknown';
-    const clientIP = request.headers.get('x-forwarded-for') || 
-                    request.headers.get('x-real-ip') || 
-                    null;
+        if (!adminCheck) {
+          return NextResponse.json(
+            { error: 'Unauthorized: Cannot log events for other users' },
+            { status: 403 }
+          );
+        }
+      }
 
-    // Insert event
-    const { error: insertError } = await supabase
-      .from('user_events')
-      .insert({
-        user_id: user.id,
-        feature,
+      // Get client info
+      const userAgent = request.headers.get('user-agent') || undefined;
+      const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                      request.headers.get('x-real-ip') || 
+                      undefined;
+
+      // Log the usage event
+      const { error: usageError } = await logUsage({
+        user_id,
+        page,
+        service,
         action,
-        attrs,
-        session_id: session_id || null,
-        user_agent: userAgent.substring(0, 500), // Limit length
-        ip_address: clientIP
+        endpoint,
+        method,
+        status,
+        duration_ms,
+        tokens_in,
+        tokens_out,
+        meta,
+        user_agent: userAgent,
+        client_ip: clientIP
       });
 
-    if (insertError) {
-      console.error('Error inserting event:', insertError);
-      return NextResponse.json(
-        { error: 'Failed to record event' },
-        { status: 500 }
-      );
+      if (usageError) {
+        console.error('Error logging usage:', usageError);
+        return NextResponse.json(
+          { error: 'Failed to record API usage' },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({ success: true });
+    } else {
+      // This is a regular event
+      const { feature, action, attrs = {}, session_id } = body;
+
+      // Validate required fields
+      if (!feature || !action) {
+        return NextResponse.json(
+          { error: 'Feature and action are required' },
+          { status: 400 }
+        );
+      }
+
+      // Validate feature exists
+      const { data: featureCheck } = await supabase
+        .from('feature_dim')
+        .select('feature')
+        .eq('feature', feature)
+        .eq('is_active', true)
+        .single();
+
+      if (!featureCheck) {
+        return NextResponse.json(
+          { error: 'Invalid feature' },
+          { status: 400 }
+        );
+      }
+
+      // Get client info
+      const userAgent = request.headers.get('user-agent') || 'unknown';
+      const clientIP = request.headers.get('x-forwarded-for') || 
+                      request.headers.get('x-real-ip') || 
+                      null;
+
+      // Insert event
+      const { error: insertError } = await supabase
+        .from('user_events')
+        .insert({
+          user_id: user.id,
+          feature,
+          action,
+          attrs,
+          session_id: session_id || null,
+          user_agent: userAgent.substring(0, 500), // Limit length
+          ip_address: clientIP
+        });
+
+      if (insertError) {
+        console.error('Error inserting event:', insertError);
+        return NextResponse.json(
+          { error: 'Failed to record event' },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({ success: true });
     }
-
-    return NextResponse.json({ success: true });
-
   } catch (error) {
     console.error('Events API error:', error);
     return NextResponse.json(
