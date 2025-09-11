@@ -29,6 +29,8 @@ export async function POST(req: NextRequest) {
       }, { status: 400 })
     }
 
+    console.log('Creating user with email:', email, 'from origin:', origin)
+
     // 1) Pre-create user with metadata
     const { data: createData, error: createErr } = await supabaseAdmin.auth.admin.createUser({
       email,
@@ -40,12 +42,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: createErr.message }, { status: 400 })
     }
 
-    // 2) Generate an invite link
+    console.log('User created successfully:', createData.user?.id)
+
+    // 2) Generate an invite link with proper redirect URL
+    const redirectTo = `${origin}/auth/confirm?next=${encodeURIComponent('/onboarding/set-password')}`
+    console.log('Generating invite link with redirectTo:', redirectTo)
+    
     const { data: linkData, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
       type: 'invite',
       email,
       options: {
-        redirectTo: `${origin}/auth/confirm?next=/onboarding/set-password`,
+        redirectTo: redirectTo,
       },
     })
     
@@ -54,10 +61,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: linkErr.message }, { status: 400 })
     }
 
+    console.log('Invite link generated successfully')
+    console.log('Link data:', linkData)
+
     const actionLink = linkData.properties?.action_link
     if (!actionLink) {
+      console.error('No action link in generated data:', linkData)
       return NextResponse.json({ error: 'No invite link generated' }, { status: 500 })
     }
+
+    console.log('Action link:', actionLink)
 
     // 3) Send branded invite email using new email service function
     try {

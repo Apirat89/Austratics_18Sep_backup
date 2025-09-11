@@ -1,180 +1,150 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { createBrowserSupabaseClient } from '../../../lib/supabase';
+import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { createBrowserSupabaseClient } from '../../../lib/supabase'
 
-export default function ConfirmEmail() {
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [message, setMessage] = useState('Verifying your email...');
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  
+export default function ConfirmPage() {
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
   useEffect(() => {
-    const confirmEmail = async () => {
+    const handleAuth = async () => {
       try {
-        // Get both token_hash and type from URL - this comes from Supabase's verification email
-        const token_hash = searchParams?.get('token_hash');
-        const type = searchParams?.get('type');
-        
-        // If there's no token_hash or type, it might be an incorrect link
-        if (!token_hash || !type) {
-          console.log('Missing token_hash or type in params:', { token_hash, type });
+        // Check for hash fragments (like #error=access_denied)
+        if (window.location.hash) {
+          const hashParams = new URLSearchParams(window.location.hash.substring(1))
+          const hashError = hashParams.get('error')
+          const errorDescription = hashParams.get('error_description')
           
-          // Try the legacy token param as fallback
-          const token = searchParams?.get('token');
-          if (token) {
-            console.log('Found legacy token param, attempting verification');
-            const supabase = createBrowserSupabaseClient();
-            const { error } = await supabase.auth.verifyOtp({
-              token_hash: token,
-              type: 'email',
-            });
-            
-            if (!error) {
-              setStatus('success');
-              setMessage('Your email has been verified successfully! You can now sign in to your account.');
-              return;
-            }
+          if (hashError) {
+            console.log('Hash error found:', hashError, errorDescription)
+            const errorMsg = errorDescription || hashError
+            setError(errorMsg.replace(/\+/g, ' '))
+            setLoading(false)
+            return
+          }
+        }
+
+        // Check query parameters
+        const code = searchParams?.get('code')
+        const token_hash = searchParams?.get('token_hash')
+        const type = searchParams?.get('type')
+        const next = searchParams?.get('next') || '/dashboard'
+        
+        console.log('Auth confirm page params:', { code, token_hash, type, next })
+
+        if (!code && !token_hash) {
+          setError('Missing authentication parameters. Please request a new invitation link.')
+          setLoading(false)
+          return
+        }
+
+        const supabase = createBrowserSupabaseClient()
+
+        // Handle code-based flow
+        if (code) {
+          console.log('Processing code-based auth flow on client')
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+          
+          if (exchangeError) {
+            console.error('Code exchange failed:', exchangeError)
+            setError(exchangeError.message)
+            setLoading(false)
+            return
           }
           
-          setStatus('error');
-          setMessage('Invalid verification link. The link might be expired or malformed.');
-          return;
+          console.log('Code exchange successful, redirecting to:', next)
+          router.replace(next.startsWith('/') ? next : '/dashboard')
+          return
         }
 
-        console.log('Verifying with token_hash and type:', { token_hash, type });
-        
-        // If we have token_hash and type, verify with Supabase
-        const supabase = createBrowserSupabaseClient();
-        const { error } = await supabase.auth.verifyOtp({
-          token_hash,
-          type: type as any,
-        });
-
-        if (error) {
-          console.error('Error verifying email:', error);
-          setStatus('error');
-          setMessage(
-            error.message === 'Token has expired or is invalid'
-              ? 'The verification link has expired or is invalid. Please request a new verification email.'
-              : error.message || 'Failed to verify email. Please try again or request a new verification link.'
-          );
-          return;
+        // Handle token_hash flow
+        if (token_hash && type) {
+          console.log('Processing token_hash auth flow on client')
+          const { error: verifyError } = await supabase.auth.verifyOtp({ 
+            token_hash, 
+            type: type as any 
+          })
+          
+          if (verifyError) {
+            console.error('Token verification failed:', verifyError)
+            setError(verifyError.message)
+            setLoading(false)
+            return
+          }
+          
+          console.log('Token verification successful, redirecting to:', next)
+          router.replace(next.startsWith('/') ? next : '/dashboard')
+          return
         }
 
-        // Email verified successfully
-        setStatus('success');
-        setMessage('Your email has been verified successfully! You can now sign in to your account.');
-      } catch (error) {
-        console.error('Unexpected error during email verification:', error);
-        setStatus('error');
-        setMessage('An unexpected error occurred during verification. Please try again later.');
+      } catch (err) {
+        console.error('Auth confirmation error:', err)
+        setError('An unexpected error occurred during authentication.')
+      } finally {
+        setLoading(false)
       }
-    };
-
-    confirmEmail();
-  }, [searchParams]);
-
-  const handleResendVerification = async () => {
-    try {
-      setStatus('loading');
-      setMessage('Sending a new verification email...');
-      
-      // Get email from URL (for custom links) or prompt user
-      let email = searchParams?.get('email');
-      
-      if (!email) {
-        const emailInput = prompt('Please enter your email address to resend verification:');
-        if (!emailInput) {
-          setStatus('error');
-          setMessage('Email is required to resend verification.');
-          return;
-        }
-        email = emailInput.trim();
-      }
-      
-      const supabase = createBrowserSupabaseClient();
-      const { error } = await supabase.auth.resend({
-        type: 'signup',  // This is correct for resending signup verification
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm`,
-        },
-      });
-      
-      if (error) {
-        console.error('Error resending verification email:', error);
-        setStatus('error');
-        setMessage(error.message || 'Failed to resend verification email. Please try again later.');
-        return;
-      }
-      
-      setStatus('success');
-      setMessage('A new verification email has been sent. Please check your inbox and click the verification link.');
-    } catch (error) {
-      console.error('Unexpected error resending verification:', error);
-      setStatus('error');
-      setMessage('An unexpected error occurred. Please try again later.');
     }
-  };
+
+    handleAuth()
+  }, [router, searchParams])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <h1 className="text-xl font-semibold text-gray-900">Confirming your account...</h1>
+          <p className="text-gray-600 mt-2">Please wait while we process your invitation.</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg text-center">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Authentication Error</h1>
+          
+          <p className="text-gray-600 mb-6">{error}</p>
+          
+          <div className="space-y-3">
+            <button
+              onClick={() => router.push('/')}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md transition-colors"
+            >
+              Go to Home
+            </button>
+            
+            <button
+              onClick={() => router.push('/auth/signin')}
+              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md transition-colors"
+            >
+              Sign In
+            </button>
+          </div>
+          
+          <div className="mt-6 text-sm text-gray-500">
+            <p>Need a new invitation? Contact your administrator.</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
-        {status === 'loading' && (
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold text-gray-700">Verifying your email...</h2>
-            <p className="mt-2 text-gray-500">Please wait while we confirm your email address.</p>
-          </div>
-        )}
-
-        {status === 'success' && (
-          <div className="text-center">
-            <div className="bg-green-100 text-green-700 p-4 rounded-full inline-block mb-4">
-              <svg className="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-            </div>
-            <h2 className="text-xl font-semibold text-gray-700">Email Verification</h2>
-            <p className="mt-3 text-gray-500">{message}</p>
-            <Link 
-              href="/auth/signin" 
-              className="mt-6 inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
-            >
-              Sign In
-            </Link>
-          </div>
-        )}
-
-        {status === 'error' && (
-          <div className="text-center">
-            <div className="bg-red-100 text-red-700 p-4 rounded-full inline-block mb-4">
-              <svg className="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </div>
-            <h2 className="text-xl font-semibold text-gray-700">Verification Failed</h2>
-            <p className="mt-3 text-gray-500">{message}</p>
-            <div className="mt-6 space-y-3">
-              <button
-                onClick={handleResendVerification}
-                className="block w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
-              >
-                Resend Verification Email
-              </button>
-              <Link 
-                href="/auth/signin" 
-                className="block px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-md transition-colors"
-              >
-                Back to Sign In
-              </Link>
-            </div>
-          </div>
-        )}
+      <div className="text-center">
+        <div className="text-green-500 text-6xl mb-4">✅</div>
+        <h1 className="text-xl font-semibold text-gray-900">Success!</h1>
+        <p className="text-gray-600 mt-2">Redirecting you now...</p>
       </div>
     </div>
-  );
+  )
 } 
