@@ -44,8 +44,8 @@ export async function POST(req: NextRequest) {
 
     console.log('User created successfully:', createData.user?.id)
 
-    // 2) Generate an invite link with proper redirect URL
-    const redirectTo = `${origin}/auth/confirm?next=${encodeURIComponent('/onboarding/set-password')}`
+    // 2) Generate an invite link with proper redirect to our invite handler
+    const redirectTo = `${origin}/auth/invite?next=${encodeURIComponent('/onboarding/set-password')}`
     console.log('Generating invite link with redirectTo:', redirectTo)
     
     const { data: linkData, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
