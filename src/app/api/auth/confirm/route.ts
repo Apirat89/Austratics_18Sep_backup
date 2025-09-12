@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { redirect } from 'next/navigation'
-import { createServerSupabaseClient } from '../../../lib/supabase'
+import { createServerSupabaseClient } from '../../../../lib/supabase'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
