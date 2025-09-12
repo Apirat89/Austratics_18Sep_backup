@@ -144,9 +144,28 @@ export async function summarizeAllUsersUsage(days: number = 30) {
       return { success: false, error: 'Failed to retrieve user list' };
     }
     
-    // Get unique user IDs
-    const uniqueUserIds = Array.from(new Set(users?.map(item => item.user_id) || []));
+    // Get unique user IDs with API usage
+    let uniqueUserIds = Array.from(new Set(users?.map(item => item.user_id) || []));
     console.log(`Found ${uniqueUserIds.length} unique users with API usage`);
+    
+    // Get all admin users (ensure admins are always included in results)
+    const { data: adminUsers, error: adminError } = await supabase
+      .from('admin_users')
+      .select('user_id')
+      .eq('status', 'active');
+      
+    if (!adminError && adminUsers) {
+      const adminUserIds = adminUsers.map(admin => admin.user_id);
+      console.log(`Found ${adminUserIds.length} admin users to include`);
+      
+      // Add any admin users that aren't already in the list
+      adminUserIds.forEach(adminId => {
+        if (!uniqueUserIds.includes(adminId)) {
+          console.log(`Adding admin user to API usage list: ${adminId}`);
+          uniqueUserIds.push(adminId);
+        }
+      });
+    }
     
     if (uniqueUserIds.length === 0) {
       return { success: true, users: [], generatedAt: now.toISOString() };

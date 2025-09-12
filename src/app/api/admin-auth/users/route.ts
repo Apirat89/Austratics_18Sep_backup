@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
 
     console.log(`Admin user list requested by: ${admin.email} (isMaster: ${admin.isMaster})`);
     
-    // Get admin users list
-    const adminUsers = await getAdminUsers();
+    // Get admin users list - pass the request to the updated function
+    const adminUsers = await getAdminUsers(request);
 
     console.log(`Returning ${adminUsers.length} admin users to ${admin.email}`);
 

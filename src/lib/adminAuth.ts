@@ -2,6 +2,7 @@ import { createBrowserSupabaseClient, createServerSupabaseClient } from './supab
 import { NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
+import { cookies } from 'next/headers';
 
 // ==========================================
 // TYPES AND INTERFACES
@@ -361,11 +362,11 @@ export async function deleteAdminUser(adminId: string): Promise<boolean> {
 /**
  * Get list of all admin users (with permission check)
  */
-export async function getAdminUsers(): Promise<AdminUser[]> {
+export async function getAdminUsers(request?: NextRequest): Promise<AdminUser[]> {
   try {
     const supabase = await createServerSupabaseClient();
     
-    const currentAdmin = await getCurrentAdmin();
+    const currentAdmin = await getCurrentAdmin(request);
     if (!currentAdmin) {
       return [];
     }
@@ -477,29 +478,56 @@ export async function isAdminUser(): Promise<boolean> {
 
 /**
  * Get current authenticated admin
+ * Note: This now requires a request parameter to access cookies
  */
-export async function getCurrentAdmin(): Promise<AdminUser | null> {
+export async function getCurrentAdmin(request?: NextRequest): Promise<AdminUser | null> {
   try {
     const supabase = await createServerSupabaseClient();
     
-    const { data: { user } } = await supabase.auth.getUser();
+    // This approach relies on auth.users which we want to avoid
+    // const { data: { user } } = await supabase.auth.getUser();
+    // 
+    // if (!user?.email) {
+    //   return null;
+    // }
+
+    // Get the session token from the request if provided
+    let sessionToken: string | undefined;
     
-    if (!user?.email) {
+    if (request) {
+      // Extract from request object if provided (API routes)
+      sessionToken = request.cookies.get('admin-session')?.value;
+    } else {
+      // If no request is provided, we can't get the session token
+      console.warn('getCurrentAdmin called without request object - cannot access cookies');
+      return null;
+    }
+    
+    if (!sessionToken) {
       return null;
     }
 
-    const { data: admin, error } = await supabase
-      .from('admin_users')
-      .select('*')
-      .eq('email', user.email)
-      .eq('status', 'active')
+    const { data: session, error: sessionError } = await supabase
+      .from('admin_sessions')
+      .select(`
+        *,
+        admin_users (*)
+      `)
+      .eq('session_token', sessionToken)
+      .eq('is_active', true)
+      .gte('expires_at', new Date().toISOString())
       .single();
 
-    if (error || !admin) {
+    if (sessionError || !session || !session.admin_users) {
       return null;
     }
 
-    return formatAdminUser(admin);
+    // Update session heartbeat
+    await supabase.rpc('update_admin_session_heartbeat', {
+      session_token: sessionToken
+    });
+
+    return formatAdminUser(session.admin_users);
 
   } catch (error) {
     console.error('Get current admin error:', error);

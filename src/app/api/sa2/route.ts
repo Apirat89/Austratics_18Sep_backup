@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMergedSA2Data, listAllMetrics, getSA2Row, searchSA2ByName, getMetricMedians } from '../../../../lib/mergeSA2Data';
+import { createServerSupabaseClient } from '@/lib/supabase';
+import { logUsage } from '@/lib/usageServer';
 
 /**
  * API Route: /api/sa2
@@ -14,6 +16,10 @@ import { getMergedSA2Data, listAllMetrics, getSA2Row, searchSA2ByName, getMetric
  */
 
 export async function GET(request: NextRequest) {
+  const startTime = Date.now();
+  const actionType = getActionType(request);
+  let userId = null;
+  
   try {
     console.log('🔍 SA2 API called:', request.url);
     const { searchParams } = new URL(request.url);
@@ -25,6 +31,18 @@ export async function GET(request: NextRequest) {
     
     console.log('📋 Query params:', { metrics, id, search, limit, refresh });
     
+    // Get authenticated user for tracking
+    try {
+      const supabase = await createServerSupabaseClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        userId = user.id;
+      }
+    } catch (authError) {
+      console.error('❌ Auth error in SA2 API:', authError);
+      // Continue without authentication - tracking will be skipped
+    }
+    
     // Clear cache if refresh parameter is provided
     if (refresh === 'true') {
       console.log('🗑️ Clearing SA2 data cache...');
@@ -35,39 +53,59 @@ export async function GET(request: NextRequest) {
     // Return list of all metrics
     if (metrics === 'true') {
       const allMetrics = await listAllMetrics();
-      return NextResponse.json({ 
+      const response = { 
         success: true,
         metrics: allMetrics,
         count: allMetrics.length
-      });
+      };
+      
+      // Track API usage
+      trackSA2Usage(userId, 'listMetrics', request.url, 200, startTime);
+      
+      return NextResponse.json(response);
     }
 
     // Return data for specific SA2 area
     if (id) {
       const sa2Data = await getSA2Row(id);
       if (!sa2Data) {
+        // Track failed lookup
+        trackSA2Usage(userId, 'getSA2ById', request.url, 404, startTime);
+        
         return NextResponse.json(
           { error: `SA2 area with ID ${id} not found` },
           { status: 404 }
         );
       }
-      return NextResponse.json({ 
+      
+      const response = { 
         success: true,
         sa2Id: id,
         data: sa2Data
-      });
+      };
+      
+      // Track API usage
+      trackSA2Usage(userId, 'getSA2ById', request.url, 200, startTime);
+      
+      return NextResponse.json(response);
     }
 
     // Search SA2 areas by name
     if (search) {
       const searchLimit = limit ? parseInt(limit) : 10;
       const results = await searchSA2ByName(search, searchLimit);
-      return NextResponse.json({ 
+      
+      const response = { 
         success: true,
         query: search,
         results,
         count: results.length
-      });
+      };
+      
+      // Track API usage
+      trackSA2Usage(userId, 'searchSA2', request.url, 200, startTime);
+      
+      return NextResponse.json(response);
     }
 
     // Return all merged data (default)
@@ -86,7 +124,7 @@ export async function GET(request: NextRequest) {
     const medians = await getMetricMedians();
     console.log('✅ All data processing complete');
 
-    return NextResponse.json({
+    const response = {
       success: true,
       data: mergedData,
       metadata: {
@@ -102,11 +140,19 @@ export async function GET(request: NextRequest) {
         ],
         lastUpdated: new Date().toISOString()
       }
-    });
+    };
+    
+    // Track API usage
+    trackSA2Usage(userId, 'getAllSA2Data', request.url, 200, startTime);
+    
+    return NextResponse.json(response);
 
   } catch (error) {
     console.error('❌ SA2 API error:', error);
     console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    
+    // Track error
+    trackSA2Usage(userId, 'error', request.url, 500, startTime);
     
     // Check if this is a specific type of error
     if (error instanceof Error) {
@@ -123,5 +169,56 @@ export async function GET(request: NextRequest) {
       },
       { status: 500 }
     );
+  }
+}
+
+/**
+ * Helper function to get action type based on request parameters
+ */
+function getActionType(request: NextRequest): string {
+  const { searchParams } = new URL(request.url);
+  
+  if (searchParams.get('metrics') === 'true') {
+    return 'listMetrics';
+  }
+  
+  if (searchParams.get('id')) {
+    return 'getSA2ById';
+  }
+  
+  if (searchParams.get('search')) {
+    return 'searchSA2';
+  }
+  
+  return 'getAllSA2Data';
+}
+
+/**
+ * Helper function to track SA2 API usage
+ */
+async function trackSA2Usage(userId: string | null, action: string, endpoint: string, status: number, startTime: number) {
+  // Skip tracking if no user ID
+  if (!userId) {
+    return;
+  }
+  
+  try {
+    const duration = Date.now() - startTime;
+    const userIdPrefix = userId.substring(0, 6); // For privacy in logs, just show prefix
+    console.log(`📊 Tracking SA2 API usage for user ${userIdPrefix}... (${action})`);
+    
+    await logUsage({
+      user_id: userId,
+      page: '/api/sa2',
+      service: 'sa2',
+      action,
+      endpoint,
+      method: 'GET',
+      status,
+      duration_ms: duration,
+    });
+  } catch (error) {
+    // Don't let tracking errors affect the main API functionality
+    console.error('❌ Failed to track SA2 API usage:', error);
   }
 } 

@@ -1526,3 +1526,161 @@ await supabaseAdmin.auth.admin.createUser({
 - **Contact**: ✅ Updated to hello@austratrics.com
 
 **Ready for Testing**: User should visit the landing page to verify the text change is working correctly
+
+## 🔍 **API USAGE TRACKING ISSUE INVESTIGATION**
+
+**USER ISSUE:** API usage for user "apirat.kongchanagul" not being tracked in the master page, despite user being listed in user tab.
+
+**PLANNER MODE ACTIVE** 🧠
+
+## Background and Motivation
+
+The system includes an API usage tracking functionality that records and reports user interactions with various services. While the API usage tracking infrastructure appears properly set up, a specific user ("apirat.kongchanagul") is not having their usage tracked in the admin dashboard. This investigation aims to identify why this user's activity isn't being recorded or displayed properly.
+
+**Terminal Errors Observed:**
+- "Events API error: SyntaxError: Unexpected end of JSON input" - Occurring at route.ts:58 in the `await request.json()` line
+- "Events API error: [Error: aborted] { code: 'ECONNRESET' }" - Connection reset errors
+
+These errors suggest issues with the tracking API endpoint that might explain the missing data.
+
+## Key Challenges and Analysis
+
+### **Challenge 1: JSON Parsing Errors in Events API**
+**Current State**: The `/api/events` endpoint is experiencing JSON parsing errors when processing certain requests
+**Symptoms**: SyntaxError showing "Unexpected end of JSON input" when trying to parse request body
+**Impact**: ⭐⭐⭐ HIGH - These failures would prevent API usage events from being stored
+**Possible Causes**: 
+- Empty request bodies being sent
+- Malformed JSON in the request
+- Network interruptions truncating the request body
+- Incorrect content-type headers
+
+### **Challenge 2: Connection Reset Issues**
+**Current State**: Some requests to the events API are being aborted with ECONNRESET errors
+**Symptoms**: "Events API error: [Error: aborted] { code: 'ECONNRESET' }" in logs
+**Impact**: ⭐⭐⭐ HIGH - Connection resets would prevent events from being recorded
+**Possible Causes**:
+- Network instability
+- Request timeout issues
+- Server load causing connection drops
+- Proxy or load balancer issues
+
+### **Challenge 3: RLS Policy Misalignment**
+**Current State**: Database RLS policies might be preventing access to records
+**Files Analyzed**: api_usage_events_setup.sql and api_usage_events_setup_alt.sql show different policy approaches
+**Impact**: ⭐⭐⭐ HIGH - Incorrectly configured policies could block data access
+**Possible Issues**:
+- Mismatch between admin authentication and RLS policies
+- Policy using incorrect field for admin check (`admin_users.id` vs `admin_users.user_id`)
+- Policy using incorrect JWT claim extraction method
+
+### **Challenge 4: Client-Side Tracking Implementation**
+**Current State**: Client-side tracking might not be properly integrated in all application areas
+**Impact**: ⭐⭐⭐ HIGH - Missing tracking calls would result in no data
+**Possible Issues**:
+- Missing `trackApiCall` calls in sections used by this specific user
+- User-specific errors in tracking implementation
+- Missing `userId` parameter in tracking calls
+
+## High-level Task Breakdown
+
+### **Phase 1: Data Existence Verification** 📊
+**Goal**: Determine if data for apirat.kongchanagul exists in the database at all
+**Tasks**:
+1.1 Check `api_usage_events` table for records with user_id matching apirat.kongchanagul
+1.2 Verify if any API usage events are being recorded for this user
+1.3 Compare record counts against other active users
+
+### **Phase 2: API Event Collection Debugging** 🔎
+**Goal**: Find out why events API might be failing for this user
+**Tasks**:
+2.1 Fix JSON parsing errors in events API endpoint
+2.2 Add more robust error handling and debugging to the events endpoint
+2.3 Add request body validation before parsing
+2.4 Check content-type headers on requests
+
+### **Phase 3: RLS Policy Analysis** 🔒
+**Goal**: Ensure RLS policies allow proper access to apirat.kongchanagul's data
+**Tasks**:
+3.1 Compare deployed RLS policies with different versions in codebase (standard vs alt)
+3.2 Fix potential mismatch in admin user identification in RLS policies
+3.3 Test policy effectiveness with direct database queries
+
+### **Phase 4: Client-Side Tracking Integration** 💻
+**Goal**: Verify tracking is properly implemented in all application areas
+**Tasks**:
+4.1 Ensure all API calls include proper tracking
+4.2 Add credentials to fetch requests ('credentials': 'include')
+4.3 Fix potential issues with tracking HTTP fetch requests
+
+## Project Status Board
+
+- **Phase 1: Data Existence Verification** ⏳ PENDING
+- **Phase 2: API Event Collection Debugging** ⏳ PENDING
+- **Phase 3: RLS Policy Analysis** ⏳ PENDING
+- **Phase 4: Client-Side Tracking Integration** ⏳ PENDING
+
+## Potential Solutions
+
+### **Immediate Fix for JSON Parsing Errors:**
+```javascript
+// Add try/catch around JSON parsing in events/route.ts
+let body;
+try {
+  body = await request.json();
+} catch (parseError) {
+  console.error('JSON parsing error:', parseError);
+  return NextResponse.json(
+    { error: 'Invalid JSON in request body' },
+    { status: 400 }
+  );
+}
+```
+
+### **Fix for Client-Side Fetch Credentials:**
+```javascript
+// In usageTracking.ts - Add credentials to the fetch call
+export async function trackApiCall(args: TrackArgs) {
+  if (!args.userId) return; // No tracking without a user ID
+  
+  try {
+    await fetch('/api/events', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      credentials: 'include', // Add this to ensure cookies are sent
+      body: JSON.stringify({
+        user_id: args.userId,
+        // ...other fields...
+      })
+    });
+  } catch (err) {
+    console.error('Failed to track API call:', err);
+  }
+}
+```
+
+### **RLS Policy Alignment Fix:**
+Ensure the RLS policy in the database matches the correct version:
+```sql
+CREATE POLICY "Admin users can view all usage events"
+  ON public.api_usage_events
+  FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.admin_users
+      WHERE admin_users.user_id = auth.uid() -- Use user_id instead of id
+      AND admin_users.status = 'active'      -- Check status is active
+    ) OR user_id = auth.uid()
+  );
+```
+
+## Next Steps
+
+1. **Verify data existence** - Check if any data for apirat.kongchanagul exists in the database
+2. **Fix event API robustness** - Implement stronger error handling around JSON parsing
+3. **Update fetch credentials** - Add credentials to trackApiCall fetch requests
+4. **Align RLS policies** - Ensure policies use correct field for admin user identification
+5. **Implement frontend instrumentation** - Add debug logging for tracking calls
+
+These steps should address both the data collection and data access issues potentially affecting the apirat.kongchanagul user's API usage tracking.

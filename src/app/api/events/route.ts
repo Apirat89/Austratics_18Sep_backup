@@ -27,14 +27,28 @@ function checkRateLimit(key: string, maxRequests: number, windowMs: number): { a
   return { allowed: true };
 }
 
+// AbortController timeout helper
+function timeoutSignal(ms: number): { signal: AbortSignal; clear: () => void } {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), ms);
+  return { 
+    signal: controller.signal, 
+    clear: () => clearTimeout(timeout) 
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Set up a timeout to avoid long-running operations causing ECONNRESET
+    const { signal, clear } = timeoutSignal(5000); // 5 second timeout
+    
     const supabase = await createServerSupabaseClient();
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
     if (authError || !user) {
+      clear(); // Clear the timeout
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -46,6 +60,7 @@ export async function POST(request: NextRequest) {
     const rateLimitResult = checkRateLimit(rateLimitKey, 100, 60 * 1000);
     
     if (!rateLimitResult.allowed) {
+      clear(); // Clear the timeout
       return NextResponse.json(
         { 
           error: 'Rate limit exceeded. Too many events.',
@@ -55,7 +70,52 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    // Add robust error handling around JSON parsing
+    let body;
+    try {
+      // Clone the request for safer parsing
+      const clonedRequest = request.clone();
+      body = await clonedRequest.json();
+    } catch (parseError) {
+      clear(); // Clear the timeout
+      console.error('Events API JSON parsing error:', parseError);
+      
+      // Handle malformed JSON errors gracefully for all users
+      try {
+        // Try to extract any usable info from the request
+        const contentType = request.headers.get('content-type');
+        const isJson = contentType?.includes('application/json');
+        const referrer = request.headers.get('referer');
+        
+        // If we can determine it was likely a tracking request, create a recovery event
+        if (isJson && user) {
+          console.log('Creating recovery event for failed tracking request');
+          
+          await logUsage({
+            user_id: user.id,
+            page: referrer || '/unknown',
+            service: 'recovery',
+            action: 'json_error_recovery',
+            endpoint: request.url,
+            method: request.method,
+            status: 400,
+            meta: {
+              recovery: true,
+              error: 'JSON parse error',
+              timestamp: new Date().toISOString()
+            }
+          });
+          console.log('Created recovery event for user', user.id);
+        }
+      } catch (recoveryError) {
+        console.error('Failed to create recovery event:', recoveryError);
+      }
+      
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
 
     // Check if this is an API usage tracking event or a regular event
     if (body.service) {
@@ -65,6 +125,7 @@ export async function POST(request: NextRequest) {
 
       // Validate required fields
       if (!user_id || !service) {
+        clear(); // Clear the timeout
         return NextResponse.json(
           { error: 'user_id and service are required for API usage tracking' },
           { status: 400 }
@@ -82,6 +143,7 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (!adminCheck) {
+          clear(); // Clear the timeout
           return NextResponse.json(
             { error: 'Unauthorized: Cannot log events for other users' },
             { status: 403 }
@@ -96,31 +158,42 @@ export async function POST(request: NextRequest) {
                       undefined;
 
       // Log the usage event
-      const { error: usageError } = await logUsage({
-        user_id,
-        page,
-        service,
-        action,
-        endpoint,
-        method,
-        status,
-        duration_ms,
-        tokens_in,
-        tokens_out,
-        meta,
-        user_agent: userAgent,
-        client_ip: clientIP
-      });
+      try {
+        const { error: usageError } = await logUsage({
+          user_id,
+          page,
+          service,
+          action,
+          endpoint,
+          method,
+          status,
+          duration_ms,
+          tokens_in,
+          tokens_out,
+          meta,
+          user_agent: userAgent,
+          client_ip: clientIP
+        });
 
-      if (usageError) {
-        console.error('Error logging usage:', usageError);
+        if (usageError) {
+          console.error('Error logging usage:', usageError);
+          clear(); // Clear the timeout
+          return NextResponse.json(
+            { error: 'Failed to record API usage', details: usageError.message },
+            { status: 500 }
+          );
+        }
+
+        clear(); // Clear the timeout on success
+        return NextResponse.json({ success: true });
+      } catch (logError) {
+        console.error('Unexpected error logging usage:', logError);
+        clear(); // Clear the timeout
         return NextResponse.json(
-          { error: 'Failed to record API usage' },
+          { error: 'Error processing API usage event', details: String(logError) },
           { status: 500 }
         );
       }
-
-      return NextResponse.json({ success: true });
     } else {
       // This is a regular event
       const { feature, action, attrs = {}, session_id } = body;
@@ -180,7 +253,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Events API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: String(error) },
       { status: 500 }
     );
   }
