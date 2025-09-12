@@ -131,8 +131,30 @@ export async function summarizeAllUsersUsage(days: number = 30) {
   startDate.setDate(startDate.getDate() - days);
   
   try {
+    // First get all users from auth system
+    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers({
+      page: 1,
+      perPage: 1000
+    });
+    
+    if (authError) {
+      console.error('Error fetching users from auth system:', authError);
+      return { success: false, error: 'Failed to retrieve user list' };
+    }
+
+    // Create a map of all users
+    const allUsersMap: Record<string, {id: string, email: string}> = {};
+    if (authUsers?.users) {
+      authUsers.users.forEach(user => {
+        allUsersMap[user.id] = {
+          id: user.id,
+          email: user.email || 'Unknown'
+        };
+      });
+    }
+    
     // Get all unique users who have API usage events in the time period
-    const { data: users, error: usersError } = await supabase
+    const { data: usageUsers, error: usersError } = await supabase
       .from('api_usage_events')
       .select('user_id')
       .gte('created_at', startDate.toISOString())
@@ -140,13 +162,20 @@ export async function summarizeAllUsersUsage(days: number = 30) {
       .limit(1000);
     
     if (usersError) {
-      console.error('Error getting unique users:', usersError);
-      return { success: false, error: 'Failed to retrieve user list' };
+      console.error('Error getting users with API usage:', usersError);
+      return { success: false, error: 'Failed to retrieve user API usage data' };
     }
     
     // Get unique user IDs with API usage
-    let uniqueUserIds = Array.from(new Set(users?.map(item => item.user_id) || []));
+    let uniqueUserIds = Array.from(new Set(usageUsers?.map(item => item.user_id) || []));
     console.log(`Found ${uniqueUserIds.length} unique users with API usage`);
+    
+    // Add any authenticated users that don't have usage data yet
+    Object.keys(allUsersMap).forEach(userId => {
+      if (!uniqueUserIds.includes(userId)) {
+        uniqueUserIds.push(userId);
+      }
+    });
     
     // Get all admin users (ensure admins are always included in results)
     const { data: adminUsers, error: adminError } = await supabase
@@ -171,26 +200,8 @@ export async function summarizeAllUsersUsage(days: number = 30) {
       return { success: true, users: [], generatedAt: now.toISOString() };
     }
     
-    // Get emails for these users
-    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers({
-      page: 1,
-      perPage: 1000
-    });
+    console.log(`Total users to include in report: ${uniqueUserIds.length}`);
     
-    if (authError) {
-      console.error('Error fetching user emails:', authError);
-      // Continue without emails
-    }
-    
-    // Create email lookup map
-    const emailMap: Record<string, string> = {};
-    if (authUsers?.users) {
-      authUsers.users.forEach(user => {
-        emailMap[user.id] = user.email || 'Unknown';
-      });
-    }
-    
-    // Get counts by service for each user
     const results: UserServiceUsage[] = [];
     
     await Promise.all(uniqueUserIds.map(async (userId) => {
@@ -232,9 +243,12 @@ export async function summarizeAllUsersUsage(days: number = 30) {
       
       const total = supabaseCount + maptilerCount + geminiCount + newsCount + otherCount;
       
+      // Get email from allUsersMap or fallback to "Unknown"
+      const email = allUsersMap[userId]?.email || 'Unknown';
+      
       results.push({
         user_id: userId,
-        email: emailMap[userId] || 'Unknown',
+        email: email,
         supabase: supabaseCount,
         maptiler: maptilerCount,
         gemini: geminiCount,

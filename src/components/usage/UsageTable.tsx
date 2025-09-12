@@ -23,13 +23,17 @@ export default function UsageTable({ adminId }: UsageTableProps) {
         setLoading(true);
         setError(null);
 
+        console.log(`Fetching usage data with period: ${selectedPeriod} days`);
         const response = await fetch(`/api/usage?summary=all_users&days=${selectedPeriod}`);
         
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`Failed to fetch data: ${response.status}`, errorText);
           throw new Error(`Failed to fetch data: ${response.status}`);
         }
         
         const result = await response.json();
+        console.log(`Received usage data: ${result.users?.length || 0} users`);
         
         if (!result.success) {
           throw new Error(result.error || 'Unknown error');
@@ -111,15 +115,18 @@ export default function UsageTable({ adminId }: UsageTableProps) {
   if (!data || data.length === 0) {
     return (
       <div className="p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <h3 className="text-lg font-medium text-yellow-800 mb-2">No Usage Data Available</h3>
+        <h3 className="text-lg font-medium text-yellow-800 mb-2">No Users Available</h3>
         <p className="text-yellow-600">
-          There is no API usage data recorded for any users in the selected time period.
-          Try selecting a different time window or check if the tracking system is working properly.
+          There are no users registered in the system. 
+          Please add users to start tracking API usage.
         </p>
       </div>
     );
   }
 
+  // Check if we have users but all have zero usage
+  const hasUsageData = data.some(user => user.total > 0);
+  
   return (
     <div className="space-y-4">
       {/* Time Period Selector */}
@@ -143,6 +150,15 @@ export default function UsageTable({ adminId }: UsageTableProps) {
           ))}
         </div>
       </div>
+
+      {!hasUsageData && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+          <p className="text-blue-600">
+            <span className="font-medium">Note:</span> All users have zero API usage in the selected time period. 
+            Their accounts exist but haven't generated any usage data yet.
+          </p>
+        </div>
+      )}
 
       {/* User API Usage Table */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
