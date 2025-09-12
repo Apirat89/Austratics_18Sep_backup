@@ -25,22 +25,20 @@
       ]
     }
   ],
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next",
-      "config": {
-        "eslint": {
-          "ignoreDuringBuilds": true
-        },
-        "typescript": {
-          "ignoreBuildErrors": true
-        }
-      }
-    }
-  ],
   "env": {
     "NEXT_PUBLIC_SENTRY_ENVIRONMENT": "production",
     "SENTRY_AUTH_TOKEN": "dummy-token-for-build"
+  },
+  "buildCommand": "next build",
+  "ignoreCommand": "echo 'Ignoring build step'",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "devCommand": "next dev",
+  "eslint": {
+    "ignoreDuringBuilds": true
+  },
+  "typescript": {
+    "ignoreBuildErrors": true
   }
 } 
