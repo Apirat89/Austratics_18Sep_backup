@@ -244,19 +244,26 @@ export async function isSearchSaved(userId: string, searchTerm: string): Promise
     
     // Check both search_term and search_display_name to handle cases where
     // the user might search with display names but we stored with different search terms
-    const { data, error } = await supabase
-      .from('saved_searches')
-      .select('id')
-      .eq('user_id', userId)
-      .or(`search_term.eq.${searchTerm},search_display_name.eq.${searchTerm}`)
-      .limit(1);
+    try {
+      // Use parameterized filters instead of string interpolation
+      const { data, error } = await supabase
+        .from('saved_searches')
+        .select('id')
+        .eq('user_id', userId)
+        .or('search_term.eq."' + searchTerm + '",search_display_name.eq."' + searchTerm + '"')
+        .limit(1);
 
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error checking if search is saved:', error);
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking if search is saved:', error);
+        return false;
+      }
+      
+      return !!(data && data.length > 0);
+    } catch (queryError) {
+      // This catch is specifically for the query building/execution errors
+      console.error('Error building query to check saved search:', queryError);
       return false;
     }
-
-    return !!(data && data.length > 0);
   } catch (error) {
     console.error('Error checking if search is saved:', error);
     return false;
