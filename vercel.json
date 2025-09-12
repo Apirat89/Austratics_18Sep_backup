@@ -10,26 +10,6 @@
       "schedule": "*/30 * * * *"
     }
   ],
-  "firewall": {
-    "rules": [
-      {
-        "rule": "block",
-        "action": {
-          "type": "rewrite",
-          "pathname": "/api/blocked"
-        },
-        "conditions": [
-          {
-            "type": "rate_limit",
-            "config": {
-              "requests": 60,
-              "window": "1m"
-            }
-          }
-        ]
-      }
-    ]
-  },
   "headers": [
     {
       "source": "/api/(.*)",
