@@ -162,7 +162,7 @@ export default function Home() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          backgroundColor: 'rgba(0, 0, 0, 0.35)', // Slightly darker overlay for consistency
           zIndex: 1
         }}
       ></div>
@@ -176,28 +176,38 @@ export default function Home() {
           minHeight: '100vh',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '2rem'
+          padding: '1.5rem 2rem' // Reduced padding from 3rem to 1.5rem
         }}
       >
         <div style={{ width: '100%', maxWidth: '28rem' }}>
           
           {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <h1 style={{ 
-              color: 'white', 
-              fontSize: '2.5rem', 
-              fontWeight: 'bold', 
-              marginBottom: '0.5rem',
-              textShadow: '0 1px 3px rgba(0,0,0,0.5)'
+          <div style={{ textAlign: 'center', marginBottom: '2rem', marginTop: '1rem' }}>
+            <div style={{
+              marginBottom: '0.75rem', // Reduced from 1.5rem
+              display: 'flex',
+              justifyContent: 'center',
+              padding: '0.5rem' // Reduced from 1.5rem
             }}>
-              Aged Care Analytics
-            </h1>
+              <img 
+                src="/Austratics Logo.png"
+                alt="Austratics Logo"
+                style={{
+                  height: '220px',
+                  maxWidth: '100%',
+                  objectFit: 'contain',
+                  filter: 'brightness(0) invert(1)' // Simple white filter
+                }}
+              />
+            </div>
             <p style={{ 
-              color: 'rgba(255,255,255,0.9)', 
-              fontSize: '1.125rem',
-              textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+              color: 'rgba(255,255,255,0.95)', 
+              fontSize: '1.25rem',
+              fontWeight: '500',
+              textShadow: '0 1px 2px rgba(0,0,0,0.7)',
+              letterSpacing: '0.5px'
             }}>
-              Your intelligent healthcare companion
+              Your intelligent aged care companion
             </p>
           </div>
 
@@ -207,13 +217,13 @@ export default function Home() {
             backdropFilter: 'blur(8px)',
             borderRadius: '1rem',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            padding: '2rem',
+            padding: '1.5rem', // Reduced from 2rem
             border: '1px solid rgba(255,255,255,0.2)'
           }}>
             {/* Error Message */}
             {error && (
               <div style={{ 
-                marginBottom: '1.5rem', 
+                marginBottom: '1rem', 
                 padding: '0.75rem', 
                 backgroundColor: '#fee2e2', 
                 border: '1px solid #fecaca', 
@@ -246,7 +256,7 @@ export default function Home() {
               </div>
             )}
 
-            <form style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} onSubmit={handleSubmit}>
+            <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }} onSubmit={handleSubmit}>
               {/* Email Input */}
               <div>
                 <label style={{ color: '#0d141c', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem', display: 'block' }}>
@@ -325,24 +335,25 @@ export default function Home() {
             </form>
 
             {/* Contact Info */}
-            <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
-              Don't have an account? Reach out to hello@austratrics.com
+            <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.875rem', color: '#6b7280' }}>
+              Don't have an account? Reach out to hello@austratics.com
             </p>
           </div>
 
           {/* Australia Analytics Info */}
-          <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+          <div style={{ marginTop: '2rem', textAlign: 'center', paddingBottom: '1.5rem' }}>
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
               fontSize: '0.875rem',
-              color: 'rgba(255,255,255,0.9)',
-              backgroundColor: 'rgba(255,255,255,0.1)',
+              color: 'rgba(255,255,255,0.95)',
+              backgroundColor: 'rgba(255,255,255,0.15)',
               backdropFilter: 'blur(8px)',
               borderRadius: '9999px',
-              padding: '0.5rem 1rem',
-              border: '1px solid rgba(255,255,255,0.2)'
+              padding: '0.75rem 1.5rem',
+              border: '1px solid rgba(255,255,255,0.25)',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
             }}>
               <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: '#60a5fa', borderRadius: '50%' }}></div>
               <span>Trusted by aged care providers nationwide</span>
