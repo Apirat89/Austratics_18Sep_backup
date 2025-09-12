@@ -34,11 +34,5 @@
   "installCommand": "npm install",
   "outputDirectory": ".next",
   "framework": "nextjs",
-  "devCommand": "next dev",
-  "eslint": {
-    "ignoreDuringBuilds": true
-  },
-  "typescript": {
-    "ignoreBuildErrors": true
-  }
+  "devCommand": "next dev"
 } 
