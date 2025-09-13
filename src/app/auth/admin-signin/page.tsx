@@ -1,11 +1,38 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import PasswordInput from '../../../components/PasswordInput';
 
-export default function AdminSignIn() {
+// Loading component for Suspense fallback
+function LoadingState() {
+  return (
+    <div className="min-h-screen flex items-center justify-center"
+      style={{
+        fontFamily: '"Inter", "Public Sans", "Noto Sans", sans-serif',
+        backgroundColor: '#3B82F6'
+      }}
+    >
+      <div style={{
+        backgroundColor: 'rgba(255,255,255,0.95)',
+        backdropFilter: 'blur(8px)',
+        borderRadius: '1rem',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        padding: '2rem',
+        border: '1px solid rgba(255,255,255,0.2)',
+        textAlign: 'center'
+      }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-4"></div>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Loading Admin Login</h2>
+        <p className="text-gray-600">Please wait...</p>
+      </div>
+    </div>
+  );
+}
+
+// Client component that uses search params
+function AdminSignInContent() {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -273,5 +300,14 @@ export default function AdminSignIn() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function AdminSignIn() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <AdminSignInContent />
+    </Suspense>
   );
 } 
