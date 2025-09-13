@@ -1,4 +1,3 @@
-// NO 'use client' here
 import { Suspense } from 'react';
 import ResetPasswordContent from './reset-password-content';
 
@@ -7,7 +6,7 @@ export const revalidate = 0;
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
       <ResetPasswordContent />
     </Suspense>
   );
