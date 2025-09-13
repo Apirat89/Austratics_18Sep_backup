@@ -3,6 +3,10 @@
 import React, { Suspense } from 'react';
 import ConfirmPageContent from './confirm-content';
 
+// Config exports to disable static generation for this page
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Simple loading fallback component
 function LoadingFallback() {
   return (

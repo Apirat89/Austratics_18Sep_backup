@@ -3,6 +3,10 @@
 import React, { Suspense } from 'react';
 import ResetPasswordContent from './reset-password-content';
 
+// Config exports to disable static generation for this page
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Simplified loading component
 function LoadingFallback() {
   return (
