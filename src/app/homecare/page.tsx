@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Home, Phone, Globe, MapPin, DollarSign, FileText, Activity, Heart, Award, BarChart3, BookmarkCheck, Trash2, ArrowLeft, Scale, X, Save, Building2, Building, Filter, ExternalLink, ChevronDown, LogOut } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -59,45 +59,21 @@ interface UserData {
   id: string;
 }
 
-// Utility functions (currently unused but kept for future use)
-const _isHomecareProviderSaved = (
-  provider: HomecareProvider,
-  savedProviders: any[]
-): boolean => {
-  return savedProviders.some(saved => saved.provider_name === provider.provider_info?.provider_name || saved.provider_id === provider.provider_info?.provider_id);
-};
-
-// ... existing code ...
-
-const _isHomecareProviderSelected = (
-  provider: HomecareProvider,
-  selectedProviders: string[]
-): boolean => {
-  return selectedProviders.includes(provider.provider_info?.provider_name || '');
-};
-
-// ... existing code ...
-
-// Calculate distance between two coordinates (Haversine formula) - currently unused but kept for future use
-const _calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-  const R = 6371; // Earth's radius in kilometers
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
-};
-
-// ... existing code ...
-
-interface _HomecareAPIResponse {
-  data: HomecareProvider[];
-  success: boolean;
+// Loading component for Suspense fallback
+function LoadingState() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-6"></div>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Homecare Providers</h2>
+        <p className="text-gray-600">Please wait while we load the homecare providers...</p>
+      </div>
+    </div>
+  );
 }
 
-export default function HomecarePage() {
+// Client component that uses search params
+function HomecarePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [providers, setProviders] = useState<HomecareProvider[]>([]);
@@ -153,6 +129,14 @@ export default function HomecarePage() {
   const [showSA2Dropdown, setShowSA2Dropdown] = useState(false);
   const [selectedSA2Filter, setSelectedSA2Filter] = useState<SavedSA2Search | null>(null);
   const [sa2LoadingError, setSA2LoadingError] = useState<string | null>(null);
+
+  // Utility functions (currently unused but kept for future use)
+  const _isHomecareProviderSaved = (
+    provider: HomecareProvider,
+    savedProviders: any[]
+  ): boolean => {
+    return savedProviders.some(saved => saved.provider_name === provider.provider_info?.provider_name || saved.provider_id === provider.provider_info?.provider_id);
+  };
 
   // Handle sign out
   const handleSignOut = async () => {
@@ -2272,6 +2256,15 @@ export default function HomecarePage() {
         </div>
       )}
     </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function HomecarePage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <HomecarePageContent />
+    </Suspense>
   );
 }
 
