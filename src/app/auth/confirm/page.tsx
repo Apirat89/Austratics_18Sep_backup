@@ -1,13 +1,26 @@
-import { Suspense } from 'react';
-import ConfirmContent from './confirm-content';
+import ConfirmClient from './confirm-content';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export default function ConfirmPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ConfirmContent />
-    </Suspense>
-  );
+export default function ConfirmPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  // Extract all search parameters to pass to the client component
+  const code = typeof searchParams.code === 'string' ? searchParams.code : undefined;
+  const token_hash = typeof searchParams.token_hash === 'string' ? searchParams.token_hash : undefined;
+  const type = typeof searchParams.type === 'string' ? searchParams.type : undefined;
+  const next = typeof searchParams.next === 'string' ? searchParams.next : '/dashboard';
+  const token = typeof searchParams.token === 'string' ? searchParams.token : undefined;
+  
+  // Pass all params to client component without using useSearchParams()
+  return <ConfirmClient 
+    code={code}
+    token_hash={token_hash}
+    type={type}
+    next={next}
+    token={token}
+  />;
 } 

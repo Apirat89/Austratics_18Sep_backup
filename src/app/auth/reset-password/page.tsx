@@ -1,13 +1,16 @@
-import { Suspense } from 'react';
-import ResetPasswordContent from './reset-password-content';
+import ResetPasswordClient from './reset-password-content';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export default function ResetPasswordPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ResetPasswordContent />
-    </Suspense>
-  );
+export default function ResetPasswordPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  // Extract token from search parameters to pass to client component
+  const token = typeof searchParams.token === 'string' ? searchParams.token : undefined;
+  
+  // Pass token to client component without using useSearchParams()
+  return <ResetPasswordClient token={token} />;
 } 

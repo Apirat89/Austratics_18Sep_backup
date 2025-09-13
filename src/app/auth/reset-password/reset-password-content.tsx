@@ -2,11 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import PasswordStrengthIndicator from '../../../components/PasswordStrengthIndicator';
 import PasswordInput from '../../../components/PasswordInput';
 
-export default function ResetPasswordContent() {
+interface ResetPasswordClientProps {
+  token?: string;
+}
+
+export default function ResetPasswordClient({ token }: ResetPasswordClientProps) {
   const [formData, setFormData] = useState({
     password: '',
     confirmPassword: ''
@@ -18,7 +22,6 @@ export default function ResetPasswordContent() {
   const [resetToken, setResetToken] = useState('');
   
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   // Array of beautiful Australian photos
   const backgroundPhotos = [
@@ -54,15 +57,13 @@ export default function ResetPasswordContent() {
   }, []);
 
   useEffect(() => {
-    // Get token from URL parameters
-    const token = searchParams?.get('token');
-    
+    // Use token from props instead of searchParams
     if (token) {
       setResetToken(token);
     } else {
       setError('Invalid or missing reset token. Please request a new password reset.');
     }
-  }, [searchParams]);
+  }, [token]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

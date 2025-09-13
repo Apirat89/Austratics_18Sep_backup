@@ -1,14 +1,27 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { createBrowserSupabaseClient } from '../../../lib/supabase';
 
-export default function ConfirmContent() {
+interface ConfirmClientProps {
+  code?: string;
+  token_hash?: string;
+  type?: string;
+  next?: string;
+  token?: string;
+}
+
+export default function ConfirmClient({
+  code,
+  token_hash,
+  type,
+  next = '/dashboard',
+  token
+}: ConfirmClientProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     const handleAuth = async () => {
@@ -27,14 +40,8 @@ export default function ConfirmContent() {
             return;
           }
         }
-
-        // Check query parameters
-        const code = searchParams?.get('code');
-        const token_hash = searchParams?.get('token_hash');
-        const type = searchParams?.get('type');
-        const next = searchParams?.get('next') || '/dashboard';
         
-        console.log('Auth confirm page params:', { code, token_hash, type, next });
+        console.log('Auth confirm page params:', { code, token_hash, type, next, token });
 
         if (!code && !token_hash) {
           setError('Missing authentication parameters. Please request a new invitation link.');
@@ -90,7 +97,7 @@ export default function ConfirmContent() {
     };
 
     handleAuth();
-  }, [router, searchParams]);
+  }, [router, code, token_hash, type, next, token]); // Updated dependencies to include props
 
   if (loading) {
     return (
