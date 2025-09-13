@@ -1,6 +1,3 @@
-import fs from 'fs/promises';
-import path from 'path';
-
 /**
  * SA2 Data Merging Utility
  * 
@@ -25,6 +22,9 @@ import path from 'path';
  * const region = getSA2Row('101021007');
  * const income = region?.['Economics | Median Income'] || 0;
  */
+
+import fs from 'fs/promises';
+import path from 'path';
 
 // Type definitions
 export interface SA2Row {
@@ -419,28 +419,45 @@ function getAllMetrics(data: SA2DataWide): string[] {
  * Helper function: Get all available metric keys
  */
 export async function listAllMetrics(): Promise<string[]> {
-  if (cachedMetrics) {
-    return cachedMetrics;
+  if (cachedData) { // Changed from cachedMetrics to cachedData
+    return getAllMetrics(cachedData); // Changed from cachedMetrics to cachedData
   }
   
   const data = await getMergedSA2Data();
-  cachedMetrics = getAllMetrics(data);
-  return cachedMetrics;
+  return getAllMetrics(data);
 }
 
 /**
  * Helper function: Get pre-calculated medians for all metrics
  */
 export async function getMetricMedians(): Promise<{ [key: string]: number }> {
-  if (cachedMedians && Object.keys(cachedMedians).length > 0) {
-    return cachedMedians;
+  if (cachedData) { // Changed from cachedMedians to cachedData
+    const allMetrics = getAllMetrics(cachedData);
+    const medians: { [key: string]: number } = {};
+    for (const metric of allMetrics) {
+      const values: number[] = [];
+      Object.values(cachedData!).forEach(region => {
+        const value = region[metric];
+        if (typeof value === 'number' && !isNaN(value)) {
+          values.push(value);
+        }
+      });
+      if (values.length > 0) {
+        values.sort((a, b) => a - b);
+        const mid = Math.floor(values.length / 2);
+        medians[metric] = values.length % 2 === 0 
+          ? (values[mid - 1] + values[mid]) / 2 
+          : values[mid];
+      }
+    }
+    return medians;
   }
   
   // Trigger loading of the merged data which will populate cachedMedians
   const mergedData = await getMergedSA2Data();
   
   // If cachedMedians is still empty (from merged file), calculate them on-the-fly
-  if (!cachedMedians || Object.keys(cachedMedians).length === 0) {
+  if (!cachedData || Object.keys(cachedData).length === 0) { // Changed from cachedMedians to cachedData
     console.log('📊 Calculating medians on-the-fly for all metrics...');
     const calculatedMedians: { [key: string]: number } = {};
     
@@ -469,11 +486,10 @@ export async function getMetricMedians(): Promise<{ [key: string]: number }> {
       }
     }
     
-    cachedMedians = calculatedMedians;
-    console.log(`✅ Calculated medians for ${Object.keys(calculatedMedians).length} metrics`);
+    return calculatedMedians;
   }
   
-  return cachedMedians || {};
+  return {};
 }
 
 /**
@@ -496,7 +512,7 @@ export async function listAllSA2Ids(): Promise<string[]> {
 /**
  * Helper function: Convert wide format to long format if needed
  */
-export function convertToLongFormat(wideData: SA2DataWide): SA2DataLong {
+export function convertToLongFormat(wideData: SA2DataWide): SA2DataLong { // Changed SA2DataLong to SA2DataLong
   const longData: SA2DataLong = [];
   
   Object.entries(wideData).forEach(([sa2Id, sa2Data]) => {
@@ -556,5 +572,4 @@ export async function searchSA2ByName(query: string, limit = 10): Promise<Array<
  */
 export function clearCache(): void {
   cachedData = null;
-  cachedMetrics = null;
 } 

@@ -36,37 +36,57 @@ function loadHomecareData(): HomecareProvider[] {
 
 function filterProviders(providers: HomecareProvider[], filters: HomecareFilters): HomecareProvider[] {
   let filtered = [...providers];
-
-  // Location and radius filtering
-  if (filters.location && filters.radiusKm) {
-    // This would need geocoding for the search location
-    // For now, we'll skip location filtering and implement it later
+  
+  // Apply filters if provided
+  if (filters.location) {
+    // Location-based filtering with radius
+    filtered = filtered.filter(provider => {
+      if (!provider.provider_info.coordinates) return false;
+      
+      // Calculate distance using provided lat/lng or geocoded coordinates
+      if (filters.userLat && filters.userLng && filters.radiusKm) {
+        const distance = calculateDistance(
+          filters.userLat,
+          filters.userLng,
+          provider.provider_info.coordinates.latitude,
+          provider.provider_info.coordinates.longitude
+        );
+        
+        // Add distance to provider for sorting
+        provider.distance = distance;
+        
+        // Filter by radius if specified
+        return distance <= filters.radiusKm;
+      }
+      
+      // If no user coordinates or radius, do text-based location search
+      return provider.provider_info.service_area.toLowerCase().includes(filters.location.toLowerCase()) ||
+             provider.provider_info.address.locality.toLowerCase().includes(filters.location.toLowerCase()) ||
+             provider.provider_info.address.state.toLowerCase().includes(filters.location.toLowerCase());
+    });
   }
-
-  // Package level filtering
+  
+  // Apply other filters
   if (filters.packageLevels && filters.packageLevels.length > 0) {
     filtered = filtered.filter(provider => {
-      const packages = provider.provider_info.home_care_packages;
       return filters.packageLevels!.some(level => {
         switch(level) {
-          case '1': return packages.level_1;
-          case '2': return packages.level_2;
-          case '3': return packages.level_3;
-          case '4': return packages.level_4;
-          default: return false;
+          case 'level_1': return provider.provider_info.home_care_packages.level_1;
+          case 'level_2': return provider.provider_info.home_care_packages.level_2;
+          case 'level_3': return provider.provider_info.home_care_packages.level_3;
+          case 'level_4': return provider.provider_info.home_care_packages.level_4;
+          default: return true;
         }
       });
     });
   }
-
-  // Organization type filtering
+  
   if (filters.organizationTypes && filters.organizationTypes.length > 0) {
     filtered = filtered.filter(provider => 
-      filters.organizationTypes!.includes(provider.provider_info.organization_type)
+      filters.organizationTypes!.includes(provider.provider_info.organization_type.toLowerCase())
     );
   }
-
-  // Service type filtering
+  
   if (filters.serviceTypes && filters.serviceTypes.length > 0) {
     filtered = filtered.filter(provider => 
       filters.serviceTypes!.some(service => 
@@ -76,15 +96,13 @@ function filterProviders(providers: HomecareProvider[], filters: HomecareFilters
       )
     );
   }
-
-  // Compliance status filtering
+  
   if (filters.complianceStatus && filters.complianceStatus.length > 0) {
     filtered = filtered.filter(provider => 
-      filters.complianceStatus!.includes(provider.provider_info.compliance_status)
+      filters.complianceStatus!.includes(provider.compliance_info.compliance_assessment.current_status.toLowerCase())
     );
   }
-
-  // Specialized care filtering
+  
   if (filters.specializedCare && filters.specializedCare.length > 0) {
     filtered = filtered.filter(provider => 
       filters.specializedCare!.some(care => 
@@ -94,80 +112,51 @@ function filterProviders(providers: HomecareProvider[], filters: HomecareFilters
       )
     );
   }
-
+  
   // Cost range filtering
-  if (filters.costRange && (filters.costRange.min || filters.costRange.max)) {
+  if (filters.costRange) {
     filtered = filtered.filter(provider => {
       let cost = 0;
       
-      // Extract cost based on type
-      switch(filters.costRange!.type) {
-        case 'management':
-          cost = provider.cost_info.management_costs.care_management.level_1_fortnightly;
-          break;
-        case 'personal_care':
-          cost = provider.cost_info.service_costs.personal_care.standard_hours;
-          break;
-        case 'nursing':
-          cost = provider.cost_info.service_costs.nursing.standard_hours;
-          break;
-        default:
-          cost = provider.cost_info.management_costs.care_management.level_1_fortnightly;
+      // Get the appropriate cost based on type
+      if (filters.costRange!.type === 'management') {
+        // Use package management level 2 as representative cost
+        cost = provider.cost_info.management_costs.package_management.level_2_fortnightly;
+      } else if (filters.costRange!.type === 'personal_care') {
+        // Use personal care standard hours as representative cost
+        cost = provider.cost_info.service_costs.personal_care.standard_hours;
+      } else if (filters.costRange!.type === 'nursing') {
+        // Use nursing standard hours as representative cost
+        cost = provider.cost_info.service_costs.nursing.standard_hours;
       }
-
-      if (filters.costRange!.min && cost < filters.costRange!.min) return false;
-      if (filters.costRange!.max && cost > filters.costRange!.max) return false;
+      
+      // Apply min and max filters
+      if (filters.costRange!.min !== undefined && cost < filters.costRange!.min) return false;
+      if (filters.costRange!.max !== undefined && cost > filters.costRange!.max) return false;
+      
       return true;
     });
   }
-
+  
   return filtered;
 }
 
-function searchProviders(providers: HomecareProvider[], searchTerm: string): HomecareProvider[] {
-  if (!searchTerm || searchTerm.trim() === '') {
-    return providers;
-  }
-
-  const term = searchTerm.toLowerCase();
+// Search providers by name, locality, or state
+function searchProviders(providers: HomecareProvider[], query: string): HomecareProvider[] {
+  if (!query) return providers;
   
-  return providers.filter(provider => {
-    const info = provider.provider_info;
-    
-    // Search in provider name (with null check)
-    if (info.provider_name && info.provider_name.toLowerCase().includes(term)) return true;
-    
-    // Search in service area (with null check)
-    if (info.service_area && info.service_area.toLowerCase().includes(term)) return true;
-    
-    // Search in locality (with null check)
-    if (info.address?.locality && info.address.locality.toLowerCase().includes(term)) return true;
-    
-    // Search in state (with null check)
-    if (info.address?.state && info.address.state.toLowerCase().includes(term)) return true;
-    
-    // Search in postcode (with null check)
-    if (info.address?.postcode && info.address.postcode.includes(term)) return true;
-    
-    // Search in services offered (with null checks)
-    if (info.services_offered && Array.isArray(info.services_offered) && 
-        info.services_offered.some(service => 
-          service && service.toLowerCase().includes(term)
-        )) return true;
-    
-    // Search in specialized care (with null checks)
-    if (info.specialized_care && Array.isArray(info.specialized_care) && 
-        info.specialized_care.some(care => 
-          care && care.toLowerCase().includes(term)
-        )) return true;
-    
-    // Search in summary (with null check)
-    if (info.summary && info.summary.toLowerCase().includes(term)) return true;
-    
-    return false;
-  });
+  const lowerQuery = query.toLowerCase();
+  
+  return providers.filter(provider => 
+    provider.provider_info.provider_name.toLowerCase().includes(lowerQuery) ||
+    provider.provider_info.address.locality.toLowerCase().includes(lowerQuery) ||
+    provider.provider_info.address.state.toLowerCase().includes(lowerQuery) ||
+    provider.provider_info.address.postcode.includes(lowerQuery) ||
+    provider.provider_info.service_area.toLowerCase().includes(lowerQuery)
+  );
 }
 
+// Paginate providers for API response
 function paginateResults(providers: HomecareProvider[], page: number, limit: number) {
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
@@ -176,22 +165,9 @@ function paginateResults(providers: HomecareProvider[], page: number, limit: num
     providers: providers.slice(startIndex, endIndex),
     total: providers.length,
     page,
-    limit,
-    totalPages: Math.ceil(providers.length / limit)
+    limit
   };
 }
-
-// Calculate distance between two coordinates (Haversine formula) - currently unused but kept for future use
-const _calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-  const R = 6371; // Earth's radius in kilometers
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
-};
 
 export async function GET(request: NextRequest) {
   try {
@@ -212,7 +188,7 @@ export async function GET(request: NextRequest) {
       complianceStatus: searchParams.get('complianceStatus')?.split(',') || undefined,
       specializedCare: searchParams.get('specializedCare')?.split(',') || undefined,
     };
-
+    
     // Parse cost range
     const costMin = searchParams.get('costMin');
     const costMax = searchParams.get('costMax');
@@ -225,7 +201,7 @@ export async function GET(request: NextRequest) {
         type: costType || 'management'
       };
     }
-
+    
     // Load data
     const allProviders = loadHomecareData();
     
@@ -245,7 +221,7 @@ export async function GET(request: NextRequest) {
       limit: paginatedResult.limit,
       filters_applied: filters
     };
-
+    
     return NextResponse.json(response);
 
   } catch (error) {

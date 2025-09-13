@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setup-storage": "node scripts/setup-supabase-storage.js",
+    "upload-data": "tsc && node scripts/upload-to-supabase-storage.js",
+    "make-executable": "chmod +x scripts/setup-supabase-storage.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -29,11 +32,13 @@
     "echarts-for-react": "^3.0.2",
     "fast-xml-parser": "^5.2.5",
     "flexsearch": "^0.8.205",
+    "form-data": "^4.0.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.511.0",
     "mammoth": "^1.10.0",
     "natural": "^8.1.0",
     "next": "^15.5.3",
+    "node-fetch": "^2.7.0",
     "nodemailer": "^7.0.6",
     "openai": "^5.8.3",
     "pdf-parse": "^1.1.1",

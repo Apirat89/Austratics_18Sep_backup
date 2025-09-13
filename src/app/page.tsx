@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import PasswordInput from '../components/PasswordInput';
 import { useSearchParams } from 'next/navigation';
+import { getImageUrl } from '../lib/storageHelpers';
 
 function HomeContent() {
   const [formData, setFormData] = useState({
@@ -147,30 +148,18 @@ function HomeContent() {
   };
 
   return (
-    <div 
-      className="min-h-screen"
-      style={{
-        fontFamily: '"Inter", "Public Sans", "Noto Sans", sans-serif',
-        backgroundColor: '#3B82F6',
-        backgroundImage: backgroundPhoto ? `url(/${backgroundPhoto})` : 'none',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
-      {/* 30% Grey Overlay */}
+    <div className="flex min-h-screen">
+      {/* Background Image */}
       <div 
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          zIndex: 1
+        className="fixed inset-0 bg-cover bg-center transition-opacity duration-500"
+        style={{ 
+          backgroundImage: `url('${getImageUrl(backgroundPhoto)}')`, 
+          opacity: backgroundPhoto ? 1 : 0 
         }}
-      ></div>
-      
+      >
+        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+      </div>
+
       {/* Centered Sign In Form */}
       <div 
         style={{
