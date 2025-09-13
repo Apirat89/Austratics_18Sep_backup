@@ -1,4 +1,5 @@
 import ConfirmClient from './confirm-content';
+import { headers } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -8,6 +9,9 @@ export default function ConfirmPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  // Force this to be a dynamic route by touching request headers
+  headers();
+  
   // Extract all search parameters to pass to the client component
   const code = typeof searchParams.code === 'string' ? searchParams.code : undefined;
   const token_hash = typeof searchParams.token_hash === 'string' ? searchParams.token_hash : undefined;

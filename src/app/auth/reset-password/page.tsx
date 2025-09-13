@@ -1,4 +1,5 @@
 import ResetPasswordClient from './reset-password-content';
+import { headers } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -8,6 +9,9 @@ export default function ResetPasswordPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  // Force this to be a dynamic route by touching request headers
+  headers();
+  
   // Extract token from search parameters to pass to client component
   const token = typeof searchParams.token === 'string' ? searchParams.token : undefined;
   
