@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MapPin, DollarSign, ArrowLeft, Scale, Shield, Phone, Mail, Heart, Building, Activity, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { HomecareProvider } from '@/types/homecare';
 
-export default function HomecareComparePage() {
+// Create a client component for the search params handling
+function HomecareCompareContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [providers, setProviders] = useState<HomecareProvider[]>([]);
@@ -60,7 +61,7 @@ export default function HomecareComparePage() {
       console.log('✅ Full dataset loaded directly from JSON file');
       console.log('📊 Total providers in full dataset:', allProviders.length);
       
-             // Sample a few provider names for debugging
+           // Sample a few provider names for debugging
        if (allProviders && allProviders.length > 0) {
          console.log('📋 Sample provider names from full dataset:');
          allProviders.slice(0, 5).forEach((provider: HomecareProvider, i: number) => {
@@ -1241,5 +1242,21 @@ export default function HomecareComparePage() {
 
       </div>
     </div>
+  );
+}
+
+// The main page component with Suspense boundary
+export default function HomecareComparePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading provider comparison...</p>
+        </div>
+      </div>
+    }>
+      <HomecareCompareContent />
+    </Suspense>
   );
 } 

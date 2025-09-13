@@ -1,12 +1,34 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import PasswordStrengthIndicator from '../../../components/PasswordStrengthIndicator';
 import PasswordInput from '../../../components/PasswordInput';
 
-export default function AdminResetPassword() {
+// Loading fallback component
+function LoadingState() {
+  return (
+    <div 
+      className="min-h-screen flex items-center justify-center"
+      style={{
+        fontFamily: '"Inter", "Public Sans", "Noto Sans", sans-serif',
+        backgroundColor: '#3B82F6'
+      }}
+    >
+      <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20 max-w-md mx-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h1 className="text-xl font-bold text-gray-900 mb-2">Loading Reset Page</h1>
+          <p className="text-gray-600">Please wait while we verify your reset token...</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Client component that uses search params
+function AdminResetPasswordContent() {
   const [formData, setFormData] = useState({
     password: '',
     confirmPassword: ''
@@ -299,5 +321,14 @@ export default function AdminResetPassword() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function AdminResetPassword() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <AdminResetPasswordContent />
+    </Suspense>
   );
 } 
