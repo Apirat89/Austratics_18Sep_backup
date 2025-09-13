@@ -33,38 +33,5 @@
   "installCommand": "npm install",
   "outputDirectory": ".next",
   "framework": "nextjs",
-  "devCommand": "next dev",
-  "ignoreCommand": "",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next",
-      "config": {
-        "eslint": {
-          "ignoreDuringBuilds": true
-        },
-        "typescript": {
-          "ignoreBuildErrors": true
-        },
-        "framework": "nextjs",
-        "buildCommand": "next build",
-        "commandOptions": [
-          "--no-lint",
-          "--no-typecheck"
-        ],
-        "skipBuildIdentifier": true,
-        "skipMiddlewareUrlNormalize": true
-      }
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/auth/confirm",
-      "destination": "/auth/confirm-client"
-    },
-    {
-      "source": "/auth/reset-password",
-      "destination": "/auth/reset-password-client"
-    }
-  ]
+  "devCommand": "next dev"
 } 

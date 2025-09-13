@@ -1,28 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Completely disable static generation which is causing issues with useSearchParams()
+  // Output standalone build for better performance
   output: 'standalone',
+  
+  // Allow longer build time for complex pages
   staticPageGenerationTimeout: 180,
   
-  // Force all pages to be server-side rendered
+  // Experimental features needed for the app
   experimental: {
-    serverActions: {
-      allowedOrigins: ["*"],
-    },
     clientTraceMetadata: ['baggage', 'sentry-trace'],
   },
   
-  // Explicitly set to Server-Side Rendering (not Static Generation)
+  // React settings
   reactStrictMode: true,
   swcMinify: true,
-  
-  // Disable static optimization
-  compiler: {
-    styledComponents: true,
-  },
-  
-  // Disable all static exports and generations
-  exportPathMap: undefined,
   
   // Bypass TypeScript and ESLint checks during build
   eslint: {
@@ -32,7 +23,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   
-  // Existing config from the original next.config.js
+  // Security headers (from original config)
   async headers() {
     return [
       {
@@ -53,16 +44,7 @@ const nextConfig = {
         ],
       },
     ];
-  },
-  
-  // Explicit flag to disable static generation
-  generateStaticParams: false,
-  
-  // Tell Next.js to ignore prerendering errors
-  onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
-  },
+  }
 }
 
 export default nextConfig; 
