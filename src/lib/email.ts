@@ -69,7 +69,7 @@ export async function sendPasswordResetEmail({ to, resetToken, resetUrl, userEma
                 </div>
                 
                 <p style="color: #64748B; font-size: 14px; margin-top: 30px;">
-                    If you have any questions or concerns, please contact our support team.
+                    If you have any questions or concerns, please contact us at hello@austratics.com.
                 </p>
             </div>
             
@@ -101,23 +101,29 @@ Security Information:
 - Never share this link with anyone
 - We recommend using a strong, unique password
 
-If you have any questions, please contact our support team.
+If you have any questions, please contact us at hello@austratics.com.
 
 Best regards,
 Aged Care Analytics Team
   `;
 
-  // Gmail SMTP Configuration
+  // SMTP Configuration
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: process.env.SMTP_HOST || 'mail.spacemail.com',
+    port: 465,
+    secure: true, // Use SSL instead of TLS
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
     },
+    tls: {
+      // Do not fail on invalid certs
+      rejectUnauthorized: false
+    }
   });
 
   const mailOptions = {
-    from: `"Aged Care Analytics" <${process.env.EMAIL_USER}>`,
+    from: `"Aged Care Analytics" <${process.env.EMAIL_USER || 'hello@austratics.com'}>`,
     to: to,
     subject: '🔒 Password Reset Request - Aged Care Analytics',
     html: emailHtml,

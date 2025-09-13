@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       // Check if it's because email doesn't exist
       if (tokenResult.emailExists === false) {
         return NextResponse.json(
-          { error: 'Email not registered or activated. Please contact hello@austratrics.com for account activation.' },
+          { error: 'Email not registered or activated. Please contact hello@austratics.com for account activation.' },
           { status: 400 }
         );
       }
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send custom email
+    // Send the reset link email
     const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-password?token=${tokenResult.token}`;
     
     const emailResult = await sendPasswordResetEmail({
@@ -114,17 +114,17 @@ export async function POST(request: NextRequest) {
       resetUrl,
       userEmail: email
     });
-
+    
     if (!emailResult.success) {
       console.error('Failed to send email:', emailResult.error);
       return NextResponse.json(
-        { error: 'Failed to send password reset email. Please try again.' },
+        { error: 'Failed to send password reset email. Please try again later or contact hello@austratics.com for assistance.' },
         { status: 500 }
       );
     }
 
     return NextResponse.json(
-      { message: 'Password reset instructions have been sent to your email.' },
+      { success: true, message: 'Password reset email sent successfully' },
       { status: 200 }
     );
 

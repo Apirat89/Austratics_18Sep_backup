@@ -14,19 +14,26 @@ interface EmailConfig {
       user: string;
       pass: string;
     };
+    tls?: {
+      rejectUnauthorized: boolean;
+    };
   };
 }
 
 // Email configuration - using master admin email as sender
 const emailConfig: EmailConfig = {
-  masterAdminEmail: 'apirat.kongchanagul@gmail.com',
+  masterAdminEmail: 'hello@austratics.com',
   smtpConfig: {
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // Use TLS
+    host: process.env.SMTP_HOST || 'mail.spacemail.com',
+    port: 465,
+    secure: true, // Use SSL instead of TLS
     auth: {
-      user: process.env.EMAIL_USER || 'apirat.kongchanagul@gmail.com',
-      pass: process.env.EMAIL_PASSWORD || '' // Gmail App Password
+      user: process.env.EMAIL_USER || 'hello@austratics.com',
+      pass: process.env.EMAIL_PASSWORD || ''
+    },
+    tls: {
+      // Do not fail on invalid certs
+      rejectUnauthorized: false
     }
   }
 };
@@ -172,7 +179,7 @@ function generateAdminInvitationTemplate(email: string, tempPassword: string, ac
       
       <div class="footer">
         <p>This email was sent from the Aged Care Analytics administration system.</p>
-        <p>If you didn't expect this email, please contact: apirat.kongchanagul@gmail.com</p>
+        <p>If you didn't expect this email, please contact: hello@austratics.com</p>
       </div>
     </body>
     </html>
@@ -387,7 +394,7 @@ function generateUserInvitationTemplate(email: string, tempPassword: string): st
           <li>Start exploring the platform's features</li>
         </ol>
         
-        <p>If you have any questions or need assistance, please contact support.</p>
+        <p>If you have any questions or need assistance, please contact us at hello@austratics.com.</p>
         
         <p>Best regards,<br>
         <strong>Aged Care Analytics Team</strong></p>
@@ -395,7 +402,7 @@ function generateUserInvitationTemplate(email: string, tempPassword: string): st
       
       <div class="footer">
         <p>This email was sent from the Aged Care Analytics platform.</p>
-        <p>If you didn't expect this email, please contact us immediately.</p>
+        <p>If you didn't expect this email, please contact us at hello@austratics.com.</p>
       </div>
     </body>
     </html>
@@ -499,7 +506,7 @@ function generateAdminPasswordResetTemplate(email: string, resetToken: string): 
       
       <div class="footer">
         <p>This email was sent from the Aged Care Analytics administration system.</p>
-        <p>If you didn't expect this email, please contact: apirat.kongchanagul@gmail.com</p>
+        <p>If you didn't expect this email, please contact: hello@austratics.com</p>
       </div>
     </body>
     </html>
@@ -851,7 +858,7 @@ function generateEmailVerificationTemplate(email: string, verificationLink: stri
       
       <div class="footer">
         <p>This email was sent to ${email}.</p>
-        <p>If you have any questions, please contact our support team.</p>
+        <p>If you have any questions, please contact us at hello@austratics.com.</p>
       </div>
     </body>
     </html>
@@ -884,7 +891,7 @@ export async function sendWelcomeEmail(
         - Personalized reporting and recommendations
         - Industry-leading aged care data
         
-        If you have any questions or need assistance, please don't hesitate to contact our support team.
+        If you have any questions or need assistance, please don't hesitate to contact us at hello@austratics.com.
         
         Best regards,
         Aged Care Analytics Team
@@ -1020,7 +1027,7 @@ function generateWelcomeEmailTemplate(email: string, name?: string, siteUrl?: st
           <a href="${loginUrl}" class="button">Sign In to Your Account</a>
         </div>
         
-        <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+        <p>If you have any questions or need assistance, please don't hesitate to contact us at hello@austratics.com.</p>
         
         <p>Best regards,<br>
         <strong>The Aged Care Analytics Team</strong></p>
@@ -1115,7 +1122,7 @@ export async function sendInviteLinkEmail(
             
             <p>After clicking the link, you'll be able to set your own secure password and access all features of the platform.</p>
             
-            <p>If you have any questions or need assistance, please contact support.</p>
+            <p>If you have any questions or need assistance, please contact us at hello@austratics.com.</p>
             
             <p>Best regards,<br>
             <strong>Aged Care Analytics Team</strong></p>
@@ -1123,7 +1130,7 @@ export async function sendInviteLinkEmail(
           
           <div class="footer">
             <p>This email was sent from the Aged Care Analytics platform.</p>
-            <p>If you didn't expect this email, please contact us immediately.</p>
+            <p>If you didn't expect this email, please contact us at hello@austratics.com.</p>
           </div>
         </body>
         </html>
@@ -1137,7 +1144,7 @@ export async function sendInviteLinkEmail(
         
         After clicking the link, you'll be able to set your own secure password and access all features of the platform.
         
-        If you have any questions or need assistance, please contact support.
+        If you have any questions or need assistance, please contact us at hello@austratics.com.
         
         Best regards,
         Aged Care Analytics Team

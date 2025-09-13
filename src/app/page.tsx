@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import PasswordInput from '../components/PasswordInput';
 import { useSearchParams } from 'next/navigation';
 
-export default function Home() {
+function HomeContent() {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -113,29 +113,33 @@ export default function Home() {
     }
   };
 
-  // Handle resending verification email
+  // Function to resend verification email
   const handleResendVerification = async () => {
-    if (!formData.email || isResendingVerification) return;
+    if (isResendingVerification || !formData.email) return;
     
     setIsResendingVerification(true);
+    
     try {
       const response = await fetch('/api/auth/resend-verification', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: formData.email }),
+        body: JSON.stringify({
+          email: formData.email,
+        }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        setError('Verification email resent! Please check your inbox.');
-        setIsVerificationError(false);
-      } else {
-        setError(data.error || 'Failed to resend verification email.');
+      if (!response.ok) {
+        setError(data.error || 'Failed to resend verification email');
+        return;
       }
-    } catch (err) {
+
+      // Show success message
+      setError('Verification email has been sent. Please check your inbox.');
+    } catch (error) {
       setError('Network error. Please try again.');
     } finally {
       setIsResendingVerification(false);
@@ -162,7 +166,7 @@ export default function Home() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.35)', // Slightly darker overlay for consistency
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
           zIndex: 1
         }}
       ></div>
@@ -176,38 +180,28 @@ export default function Home() {
           minHeight: '100vh',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '1.5rem 2rem' // Reduced padding from 3rem to 1.5rem
+          padding: '2rem'
         }}
       >
         <div style={{ width: '100%', maxWidth: '28rem' }}>
           
           {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem', marginTop: '1rem' }}>
-            <div style={{
-              marginBottom: '0.75rem', // Reduced from 1.5rem
-              display: 'flex',
-              justifyContent: 'center',
-              padding: '0.5rem' // Reduced from 1.5rem
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <h1 style={{ 
+              color: 'white', 
+              fontSize: '2.5rem', 
+              fontWeight: 'bold', 
+              marginBottom: '0.5rem',
+              textShadow: '0 1px 3px rgba(0,0,0,0.5)'
             }}>
-              <img 
-                src="/Austratics Logo.png"
-                alt="Austratics Logo"
-                style={{
-                  height: '220px',
-                  maxWidth: '100%',
-                  objectFit: 'contain',
-                  filter: 'brightness(0) invert(1)' // Simple white filter
-                }}
-              />
-            </div>
+              Austratics
+            </h1>
             <p style={{ 
-              color: 'rgba(255,255,255,0.95)', 
-              fontSize: '1.25rem',
-              fontWeight: '500',
-              textShadow: '0 1px 2px rgba(0,0,0,0.7)',
-              letterSpacing: '0.5px'
+              color: 'rgba(255,255,255,0.9)', 
+              fontSize: '1.125rem',
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)'
             }}>
-              Your intelligent aged care companion
+              Sign in to your account
             </p>
           </div>
 
@@ -217,46 +211,49 @@ export default function Home() {
             backdropFilter: 'blur(8px)',
             borderRadius: '1rem',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            padding: '1.5rem', // Reduced from 2rem
+            padding: '2rem',
             border: '1px solid rgba(255,255,255,0.2)'
           }}>
             {/* Error Message */}
             {error && (
               <div style={{ 
-                marginBottom: '1rem', 
+                marginBottom: '1.5rem', 
                 padding: '0.75rem', 
-                backgroundColor: '#fee2e2', 
-                border: '1px solid #fecaca', 
-                color: '#dc2626', 
+                backgroundColor: isVerificationError ? '#fef3c7' : '#fee2e2', 
+                border: `1px solid ${isVerificationError ? '#fde68a' : '#fecaca'}`, 
+                color: isVerificationError ? '#92400e' : '#dc2626', 
                 borderRadius: '0.5rem' 
               }}>
-                {error}
+                <p>{error}</p>
+                
                 {isVerificationError && (
-                  <div style={{ marginTop: '0.75rem' }}>
-                    <button
-                      type="button"
-                      onClick={handleResendVerification}
-                      disabled={isResendingVerification}
-                      style={{
-                        backgroundColor: '#dc2626',
-                        color: 'white',
-                        border: 'none',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '0.25rem',
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
-                        cursor: isResendingVerification ? 'not-allowed' : 'pointer',
-                        opacity: isResendingVerification ? '0.7' : '1'
-                      }}
-                    >
-                      {isResendingVerification ? 'Sending...' : 'Resend Verification Email'}
-                    </button>
-                  </div>
+                  <button 
+                    type="button"
+                    disabled={isResendingVerification || !formData.email}
+                    onClick={handleResendVerification}
+                    style={{
+                      marginTop: '0.75rem',
+                      backgroundColor: '#f59e0b',
+                      color: 'white',
+                      borderRadius: '0.375rem',
+                      padding: '0.5rem 1rem',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '100%',
+                      cursor: isResendingVerification ? 'not-allowed' : 'pointer',
+                      opacity: isResendingVerification ? 0.7 : 1
+                    }}
+                  >
+                    {isResendingVerification ? 'Sending...' : 'Resend Verification Email'}
+                  </button>
                 )}
               </div>
             )}
 
-            <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }} onSubmit={handleSubmit}>
+            <form style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} onSubmit={handleSubmit}>
               {/* Email Input */}
               <div>
                 <label style={{ color: '#0d141c', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem', display: 'block' }}>
@@ -274,7 +271,6 @@ export default function Home() {
                     padding: '1rem',
                     borderRadius: '0.75rem',
                     border: '1px solid #d1d5db',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     fontSize: '1rem',
                     transition: 'all 0.2s'
                   }}
@@ -290,24 +286,33 @@ export default function Home() {
                 placeholder="Enter your password"
                 label="Password"
                 required
-                className="w-full h-14 px-4 pr-12 rounded-xl border border-gray-300 text-base transition-all duration-200"
-                style={{
-                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                }}
               />
 
               {/* Remember Me & Forgot Password */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <label style={{ display: 'flex', alignItems: 'center' }}>
-                  <input 
-                    type="checkbox" 
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <input
+                    type="checkbox"
+                    id="remember-me"
                     checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    style={{ marginRight: '0.5rem' }} 
+                    onChange={() => setRememberMe(!rememberMe)}
+                    style={{ 
+                      width: '1.125rem', 
+                      height: '1.125rem',
+                      borderRadius: '0.25rem',
+                      accentColor: '#3B82F6',
+                      marginRight: '0.5rem'
+                    }}
                   />
-                  <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Remember me</span>
-                </label>
-                <Link href="/auth/forgot-password" style={{ fontSize: '0.875rem', color: '#2563eb', fontWeight: 500 }}>
+                  <label htmlFor="remember-me" style={{ fontSize: '0.875rem', color: '#1f2937' }}>
+                    Remember me
+                  </label>
+                </div>
+                <Link href="/auth/forgot-password" style={{ fontSize: '0.875rem', color: '#3B82F6', fontWeight: 500 }}>
                   Forgot password?
                 </Link>
               </div>
@@ -318,50 +323,64 @@ export default function Home() {
                 disabled={isLoading}
                 style={{
                   width: '100%',
-                  height: '3rem',
-                  backgroundColor: isLoading ? '#9ca3af' : '#2563eb',
+                  height: '3.5rem',
+                  backgroundColor: isLoading ? '#93c5fd' : '#3B82F6',
                   color: 'white',
                   borderRadius: '0.75rem',
                   fontSize: '1rem',
                   fontWeight: 'bold',
                   border: 'none',
                   cursor: isLoading ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  transition: 'all 0.2s'
                 }}
               >
-                {isLoading ? 'Signing In...' : 'Sign In'}
+                {isLoading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
 
-            {/* Contact Info */}
-            <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.875rem', color: '#6b7280' }}>
-              Don't have an account? Reach out to hello@austratics.com
+            {/* Create Account Link */}
+            <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
+              Don't have an account? Reach out to hello@austratrics.com
             </p>
           </div>
 
-          {/* Australia Analytics Info */}
-          <div style={{ marginTop: '2rem', textAlign: 'center', paddingBottom: '1.5rem' }}>
+          {/* Security Info */}
+          <div style={{ marginTop: '2rem', textAlign: 'center' }}>
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
               fontSize: '0.875rem',
-              color: 'rgba(255,255,255,0.95)',
-              backgroundColor: 'rgba(255,255,255,0.15)',
+              color: 'rgba(255,255,255,0.9)',
+              backgroundColor: 'rgba(255,255,255,0.1)',
               backdropFilter: 'blur(8px)',
               borderRadius: '9999px',
-              padding: '0.75rem 1.5rem',
-              border: '1px solid rgba(255,255,255,0.25)',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+              padding: '0.5rem 1rem',
+              border: '1px solid rgba(255,255,255,0.2)'
             }}>
               <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: '#60a5fa', borderRadius: '50%' }}></div>
-              <span>Trusted by aged care providers nationwide</span>
+              <span>Secure sign-in • Powered by Austratics</span>
             </div>
           </div>
 
         </div>
       </div>
     </div>
-  )
+  );
+}
+
+// Main component with Suspense boundary
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-blue-500">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-white mx-auto mb-4"></div>
+          <h1 className="text-xl font-semibold text-white">Loading...</h1>
+        </div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
+  );
 }

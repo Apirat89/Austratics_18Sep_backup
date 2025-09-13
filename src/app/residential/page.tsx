@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Building, Star, Phone, Mail, Globe, MapPin, Users, DollarSign, FileText, Activity, Heart, Award, BarChart3, Home, Bookmark, BookmarkCheck, Trash2, History, ArrowLeft, Scale, CheckSquare, Square, Eye, X, Filter, ExternalLink, Save, ChevronDown, LogOut } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -321,7 +321,20 @@ interface UserData {
   id: string;
 }
 
-export default function ResidentialPage() {
+// Loading component for Suspense fallback
+function LoadingResidentialPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mx-auto mb-4"></div>
+        <h1 className="text-xl font-semibold text-gray-900">Loading residential data...</h1>
+      </div>
+    </div>
+  );
+}
+
+// Main content component that uses useSearchParams
+function ResidentialPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [facilities, setFacilities] = useState<ResidentialFacility[]>([]);
@@ -3061,5 +3074,14 @@ export default function ResidentialPage() {
       
       {/* End Main Flex Container */}
     </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function ResidentialPage() {
+  return (
+    <Suspense fallback={<LoadingResidentialPage />}>
+      <ResidentialPageContent />
+    </Suspense>
   );
 } 

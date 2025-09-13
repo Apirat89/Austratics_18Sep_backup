@@ -136,13 +136,13 @@ export default function ForgotPassword() {
             {error && (
               <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
                 {error}
-                {error.includes('contact hello@austratrics.com') && (
+                {error.includes('contact hello@austratics.com') && (
                   <div className="mt-2 text-sm">
                     <a 
-                      href={`mailto:hello@austratrics.com?subject=Account%20Activation%20Request&body=I%20tried%20to%20reset%20my%20password%20for%20email:%20${encodeURIComponent(email)}`}
+                      href={`mailto:hello@austratics.com?subject=Account%20Activation%20Request&body=I%20tried%20to%20reset%20my%20password%20for%20email:%20${encodeURIComponent(email)}`}
                       className="text-blue-600 font-medium hover:underline"
                     >
-                      Email hello@austratrics.com →
+                      Email hello@austratics.com →
                     </a>
                   </div>
                 )}

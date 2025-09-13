@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Star, MapPin, DollarSign, Users, Activity, Heart, ArrowLeft, Scale, Building, Shield, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -199,7 +199,20 @@ interface ResidentialFacility {
   care_staff_spending_last_quarter?: number;
 }
 
-export default function ResidentialComparePage() {
+// Loading component for Suspense fallback
+function LoadingResidentialCompare() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mx-auto mb-4"></div>
+        <h1 className="text-xl font-semibold text-gray-900">Loading comparison data...</h1>
+      </div>
+    </div>
+  );
+}
+
+// Main content component that uses useSearchParams
+function ResidentialCompareContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [facilities, setFacilities] = useState<ResidentialFacility[]>([]);
@@ -986,5 +999,14 @@ export default function ResidentialComparePage() {
         </Tabs>
       </div>
     </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function ResidentialCompare() {
+  return (
+    <Suspense fallback={<LoadingResidentialCompare />}>
+      <ResidentialCompareContent />
+    </Suspense>
   );
 } 
