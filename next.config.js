@@ -12,9 +12,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Disable static generation for specific auth routes that use useSearchParams
-  // This helps prevent issues with client-side navigation hooks during build
-  generateStaticParams: false,
+  // Longer timeout for static page generation and standalone output
   staticPageGenerationTimeout: 120,
   output: 'standalone',
   async headers() {
