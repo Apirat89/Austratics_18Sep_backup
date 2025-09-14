@@ -106,7 +106,31 @@ export async function uploadFileToStorage(
 }
 
 /**
+ * Get a signed URL for a file in a private bucket
+ * @param bucket The bucket name
+ * @param path The file path within the bucket
+ * @param expiresIn Expiration time in seconds (default: 1 hour)
+ * @returns The signed URL or null if error
+ */
+export async function getSignedUrl(bucket: string, path: string, expiresIn: number = 3600): Promise<string | null> {
+  const supabase = createStorageClient();
+  
+  const { data, error } = await supabase
+    .storage
+    .from(bucket)
+    .createSignedUrl(path, expiresIn);
+  
+  if (error) {
+    console.error(`Error creating signed URL for ${path} from ${bucket}:`, error);
+    return null;
+  }
+  
+  return data.signedUrl;
+}
+
+/**
  * Get a publicly accessible URL for a file
+ * This is for backward compatibility - use getSignedUrl for private buckets
  * @param bucket The bucket name
  * @param path The file path within the bucket
  * @returns The public URL

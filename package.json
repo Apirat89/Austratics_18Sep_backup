@@ -9,7 +9,8 @@
     "lint": "next lint",
     "setup-storage": "node scripts/setup-supabase-storage.js",
     "upload-data": "tsc && node scripts/upload-to-supabase-storage.js",
-    "make-executable": "chmod +x scripts/setup-supabase-storage.js"
+    "make-executable": "chmod +x scripts/setup-supabase-storage.js",
+    "apply-storage-rls": "node scripts/apply-storage-rls.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

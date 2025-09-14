@@ -1,13 +1,16 @@
-import { getPublicUrl } from './supabase-storage';
+import { getPublicUrl, getSignedUrl } from './supabase-storage';
+
+// List of buckets that are set to private
+const PRIVATE_BUCKETS = ['images', 'json_data', 'documents', 'faq'];
 
 /**
  * Converts a local image path to a Supabase Storage URL.
  * If the image is not found in Supabase Storage, falls back to the original path.
  *
  * @param imagePath - The local image path (e.g. '/my-image.jpg')
- * @returns The Supabase Storage URL or the original path as a fallback
+ * @returns Promise resolving to the Supabase Storage URL or the original path as a fallback
  */
-export function getImageUrl(imagePath: string): string {
+export async function getImageUrl(imagePath: string): Promise<string> {
   if (!imagePath) return '';
   
   // Extract filename from path
@@ -15,7 +18,13 @@ export function getImageUrl(imagePath: string): string {
   
   if (!filename) return imagePath;
   
-  // Return Supabase Storage URL
+  // Use signed URL for private buckets
+  if (PRIVATE_BUCKETS.includes('images')) {
+    const signedUrl = await getSignedUrl('images', filename);
+    return signedUrl || imagePath;
+  }
+  
+  // Return public URL for public buckets
   return getPublicUrl('images', filename);
 }
 
@@ -23,17 +32,44 @@ export function getImageUrl(imagePath: string): string {
  * Updates all image sources in a document to use Supabase Storage URLs
  * 
  * @param html - HTML content with image tags
- * @returns HTML content with updated image sources
+ * @returns Promise resolving to HTML content with updated image sources
  */
-export function updateImageSources(html: string): string {
-  // Replace image sources with Supabase Storage URLs
-  return html.replace(/src="([^"]+\.(jpg|jpeg|png|gif|svg|webp))"/gi, (match, src) => {
+export async function updateImageSources(html: string): Promise<string> {
+  // Extract all image sources
+  const regex = /src="([^"]+\.(jpg|jpeg|png|gif|svg|webp))"/gi;
+  let match;
+  const imageSources = [];
+  
+  while ((match = regex.exec(html)) !== null) {
+    imageSources.push(match[1]);
+  }
+  
+  // Generate signed URLs for all images
+  const imageUrlMap = new Map();
+  for (const src of imageSources) {
     const filename = src.split('/').pop();
-    if (!filename) return match;
+    if (!filename) continue;
     
-    const storageUrl = getPublicUrl('images', filename);
-    return `src="${storageUrl}"`;
-  });
+    // Use signed URL for private buckets
+    if (PRIVATE_BUCKETS.includes('images')) {
+      const signedUrl = await getSignedUrl('images', filename);
+      if (signedUrl) imageUrlMap.set(src, signedUrl);
+    } else {
+      const publicUrl = getPublicUrl('images', filename);
+      imageUrlMap.set(src, publicUrl);
+    }
+  }
+  
+  // Replace all image sources with the signed or public URLs
+  let updatedHtml = html;
+  for (const [original, newUrl] of imageUrlMap.entries()) {
+    updatedHtml = updatedHtml.replace(
+      new RegExp(`src="${original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`, 'g'), 
+      `src="${newUrl}"`
+    );
+  }
+  
+  return updatedHtml;
 }
 
 /**
@@ -64,9 +100,9 @@ export function getBucketForPath(filePath: string): string {
  * Converts a document path to a Supabase Storage URL
  * 
  * @param docPath - The document path
- * @returns The Supabase Storage URL
+ * @returns Promise resolving to the Supabase Storage URL
  */
-export function getDocumentUrl(docPath: string): string {
+export async function getDocumentUrl(docPath: string): Promise<string> {
   if (!docPath) return '';
   
   const bucket = getBucketForPath(docPath);
@@ -78,5 +114,12 @@ export function getDocumentUrl(docPath: string): string {
     ? `${docPath.split('/').slice(0, -1).join('/')}/${filename}` 
     : filename;
   
+  // Use signed URL for private buckets
+  if (PRIVATE_BUCKETS.includes(bucket)) {
+    const signedUrl = await getSignedUrl(bucket, storagePath);
+    return signedUrl || docPath;
+  }
+  
+  // Return public URL for public buckets
   return getPublicUrl(bucket, storagePath);
 } 

@@ -7,7 +7,17 @@ import PasswordInput from '../components/PasswordInput';
 import { useSearchParams } from 'next/navigation';
 import { getImageUrl } from '../lib/storageHelpers';
 
+// Background images
+const BACKGROUND_IMAGES = [
+  '/australian-koala-in-its-natural-habitat-of-gumtree-2024-11-27-16-51-33-utc.jpg',
+  '/australian-aerial-photography-2024-09-18-02-10-16-utc.jpg',
+  '/aerial-view-of-scarborough-beach-perth-western-a-2025-02-09-00-32-40-utc.jpg'
+];
+
 function HomeContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -17,37 +27,8 @@ function HomeContent() {
   const [isVerificationError, setIsVerificationError] = useState(false);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [backgroundPhoto, setBackgroundPhoto] = useState('');
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const [backgroundImage, setBackgroundImage] = useState('');
   
-  // Array of beautiful Australian photos (all optimized under 3MB)
-  const backgroundPhotos = [
-    'aerial-view-of-scarborough-beach-perth-western-a-2025-02-09-00-32-40-utc.jpg',
-    'australian-aerial-photography-2024-09-18-02-10-16-utc.jpg',
-    'sydney-opera-house-and-harbour-bridge-2025-02-10-07-07-15-utc.jpg',
-    'scenic-view-of-uluru-a-large-sandstone-formation-2025-02-08-19-46-10-utc.jpeg',
-    'beautiful-view-of-12-apostles-great-ocean-road-du-2025-02-02-21-18-40-utc.jpg',
-    'famous-st-xaviers-cathedral-in-adelaide-australia-2025-02-11-19-33-18-utc.jpeg',
-    'high-angle-view-of-turquoise-great-barrier-reef-in-2025-04-03-04-20-53-utc.jpg',
-    'hobart-cbd-and-waterfront-in-tasmania-australia-2025-03-09-14-14-33-utc.jpg',
-    'parliament-of-australia-2025-03-05-16-19-04-utc.jpg',
-    'story-bridge-and-brisbane-skyline-in-australia-2025-03-05-23-43-11-utc.jpg',
-    // New photos added from Photos_signon folder
-    'australian-koala-in-its-natural-habitat-of-gumtree-2024-11-27-16-51-33-utc.jpg',
-    'bangkok-thailand-january-20-2022-australia-co-2025-02-24-12-30-26-utc.jpg',
-    'deep-creek-kangaroo-8-2024-11-25-23-26-06-utc.jpg',
-    'little-boy-with-australian-flag-near-the-ocean-au-2025-01-08-23-36-51-utc.jpg',
-    'melbourne-city-2024-11-27-16-50-23-utc.jpg',
-    'view-from-jubilee-point-in-sorrento-australia-2025-03-08-18-18-33-utc.jpg',
-    'wildlife-of-australia-2025-02-12-00-09-47-utc.jpg',
-    // Latest photos added
-    'caring-interaction-in-a-geriatric-nursing-home-2025-03-08-13-28-06-utc.jpg',
-    'grazing-cows-in-the-australian-outback-2025-03-05-14-33-00-utc.jpg',
-    'happy-diverse-male-doctor-discussing-with-senior-m-2025-04-03-16-05-34-utc.jpg',
-    'senior-people-looking-at-camera-in-retirement-home-2025-03-06-01-04-29-utc.jpg'
-  ];
-
   // Set random background photo on client-side only
   useEffect(() => {
     // Check if there's an error message in the URL params
@@ -62,9 +43,24 @@ function HomeContent() {
         setIsVerificationError(true);
       }
     }
-
-    const randomPhoto = backgroundPhotos[Math.floor(Math.random() * backgroundPhotos.length)];
-    setBackgroundPhoto(randomPhoto);
+    
+    // Set random background image with Supabase Storage URL
+    const randomIndex = Math.floor(Math.random() * BACKGROUND_IMAGES.length);
+    const randomImage = BACKGROUND_IMAGES[randomIndex];
+    
+    // Load image URL asynchronously
+    async function loadBackgroundImage() {
+      try {
+        const imageUrl = await getImageUrl(randomImage);
+        setBackgroundImage(imageUrl);
+      } catch (error) {
+        console.error('Failed to load background image:', error);
+        // Fallback to local path
+        setBackgroundImage(randomImage);
+      }
+    }
+    
+    loadBackgroundImage();
   }, [searchParams]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,14 +143,22 @@ function HomeContent() {
     }
   };
 
+  // Apply background image as a style when available
+  const backgroundStyle = backgroundImage 
+    ? { backgroundImage: `url('${backgroundImage}')` }
+    : {}; // Empty object for fallback
+
   return (
-    <div className="flex min-h-screen">
+    <div 
+      className="min-h-screen flex flex-col items-center justify-center bg-cover bg-center p-4"
+      style={backgroundStyle}
+    >
       {/* Background Image */}
       <div 
         className="fixed inset-0 bg-cover bg-center transition-opacity duration-500"
         style={{ 
-          backgroundImage: `url('${getImageUrl(backgroundPhoto)}')`, 
-          opacity: backgroundPhoto ? 1 : 0 
+          backgroundImage: backgroundImage ? `url('${backgroundImage}')` : 'none', 
+          opacity: backgroundImage ? 1 : 0 
         }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
