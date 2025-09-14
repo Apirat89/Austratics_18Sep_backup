@@ -22,6 +22,23 @@ FOR SELECT
 TO authenticated
 USING (true);
 
+-- PUBLIC ACCESS POLICY FOR LOGIN PAGE BACKGROUND IMAGES:
+-- This allows anyone (even unauthenticated users) to access login page images
+CREATE POLICY "Allow public access to login page background images"
+ON storage.objects
+FOR SELECT
+TO anon
+USING (
+  bucket_id = 'images' AND 
+  (
+    name LIKE '%koala%' OR 
+    name LIKE '%aerial%' OR 
+    name LIKE '%scarborough%' OR
+    name LIKE '%australian%' OR
+    name LIKE '%aerial-view%'
+  )
+);
+
 -- DOWNLOAD POLICY FOR AUTHENTICATED USERS ONLY:
 CREATE POLICY "Allow authenticated users to download objects"
 ON storage.objects
@@ -62,13 +79,30 @@ FOR SELECT
 TO authenticated
 USING (true);
 
+-- Allow public access to list login page images
+CREATE POLICY "Allow public to list login page images"
+ON storage.objects
+FOR SELECT
+TO anon
+USING (
+  bucket_id = 'images' AND 
+  (
+    name LIKE '%koala%' OR 
+    name LIKE '%aerial%' OR 
+    name LIKE '%scarborough%' OR
+    name LIKE '%australian%' OR
+    name LIKE '%aerial-view%'
+  )
+);
+
 -- -----------------------------------------------------------------------------
 -- NOTES
 -- -----------------------------------------------------------------------------
 -- These policies enforce that:
 -- 1. Only authenticated users can download files from all buckets
 -- 2. Only the service role can upload/modify files
--- 3. Unauthenticated users cannot access any files
+-- 3. Unauthenticated users cannot access any files EXCEPT login page images
+-- 4. Login page background images have special public access
 --
 -- To test these policies, use the SQL Editor in Supabase Dashboard:
 --
@@ -78,4 +112,4 @@ USING (true);
 --
 -- For an unauthenticated session:
 -- SELECT auth.uid() IS NOT NULL AS is_authenticated;
--- SELECT * FROM storage.objects LIMIT 10;  -- Should return no records 
+-- SELECT * FROM storage.objects WHERE bucket_id = 'images' AND name LIKE '%koala%';  -- Should return specific login images 

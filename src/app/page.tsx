@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import PasswordInput from '../components/PasswordInput';
 import { useSearchParams } from 'next/navigation';
-import { getImageUrl } from '../lib/storageHelpers';
+import { getPublicUrl } from '../lib/supabase-storage';
 
 // Background images
 const BACKGROUND_IMAGES = [
@@ -44,23 +44,18 @@ function HomeContent() {
       }
     }
     
-    // Set random background image with Supabase Storage URL
+    // Set random background image - use public URL directly for login page
     const randomIndex = Math.floor(Math.random() * BACKGROUND_IMAGES.length);
     const randomImage = BACKGROUND_IMAGES[randomIndex];
     
-    // Load image URL asynchronously
-    async function loadBackgroundImage() {
-      try {
-        const imageUrl = await getImageUrl(randomImage);
-        setBackgroundImage(imageUrl);
-      } catch (error) {
-        console.error('Failed to load background image:', error);
-        // Fallback to local path
-        setBackgroundImage(randomImage);
-      }
-    }
+    // Extract just the filename
+    const filename = randomImage.split('/').pop();
     
-    loadBackgroundImage();
+    if (filename) {
+      // Use direct public URL for login page - bypassing authentication
+      const imageUrl = getPublicUrl('images', filename);
+      setBackgroundImage(imageUrl);
+    }
   }, [searchParams]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
