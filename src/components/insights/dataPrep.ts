@@ -1,6 +1,8 @@
 // dataPrep.ts - Comprehensive data preparation for ECharts dashboard
 // Handles loading and transformation of 4 JSON files with SA2 ID normalization
 
+import { getMapDataUrl } from '../../lib/supabaseStorage';
+
 export interface SA2Record {
   "SA2 ID": string;
   "SA2 Name": string;
@@ -163,7 +165,8 @@ class DataPrepService {
   
   private async loadDemographicsData(): Promise<any[]> {
     console.log('📥 Loading demographics data...');
-    const response = await fetch('/Maps_ABS_CSV/Demographics_2023.json');
+    const supabaseUrl = getMapDataUrl('Demographics_2023.json');
+    const response = await fetch(supabaseUrl);
     if (!response.ok) throw new Error(`Demographics data: ${response.statusText}`);
     const data = await response.json();
     console.log(`✅ Demographics: ${data.length} records`);
@@ -172,7 +175,8 @@ class DataPrepService {
   
   private async loadEconomicsData(): Promise<any[]> {
     console.log('📥 Loading economics data...');
-    const response = await fetch('/Maps_ABS_CSV/econ_stats.json');
+    const supabaseUrl = getMapDataUrl('econ_stats.json');
+    const response = await fetch(supabaseUrl);
     if (!response.ok) throw new Error(`Economics data: ${response.statusText}`);
     const data = await response.json();
     console.log(`✅ Economics: ${data.length} records`);
@@ -181,7 +185,8 @@ class DataPrepService {
   
   private async loadHealthStatsData(): Promise<any[]> {
     console.log('📥 Loading health statistics data...');
-    const response = await fetch('/Maps_ABS_CSV/health_stats.json');
+    const supabaseUrl = getMapDataUrl('health_stats.json');
+    const response = await fetch(supabaseUrl);
     if (!response.ok) throw new Error(`Health stats data: ${response.statusText}`);
     const data = await response.json();
     console.log(`✅ Health Stats: ${data.length} records`);

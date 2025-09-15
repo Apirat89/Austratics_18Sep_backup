@@ -15,6 +15,8 @@ import {
   getFlattenedHealthStatsOptions
 } from '../HeatmapDataService';
 
+import { getMapDataUrl } from '../../lib/supabaseStorage';
+
 // Define chart data interfaces
 export interface ChartDataPoint {
   sa2Id: string;
@@ -499,7 +501,8 @@ export class InsightsDataService {
       
       // Load demographics data
       console.log('👥 Loading demographics data...');
-      const demographicsResponse = await fetch('/Maps_ABS_CSV/Demographics_2023.json');
+      const demographicsUrl = getMapDataUrl('Demographics_2023.json');
+      const demographicsResponse = await fetch(demographicsUrl);
       if (demographicsResponse.ok) {
         this.demographicsData = await demographicsResponse.json();
         console.log(`✅ Demographics: ${this.demographicsData.length} records`);
@@ -510,7 +513,8 @@ export class InsightsDataService {
       
       // Load economics data
       console.log('💰 Loading economics data...');
-      const economicsResponse = await fetch('/Maps_ABS_CSV/econ_stats.json');
+      const economicsUrl = getMapDataUrl('econ_stats.json');
+      const economicsResponse = await fetch(economicsUrl);
       if (economicsResponse.ok) {
         this.economicsData = await economicsResponse.json();
         console.log(`✅ Economics: ${this.economicsData.length} records`);
@@ -521,7 +525,8 @@ export class InsightsDataService {
       
       // Load health statistics data
       console.log('🏥 Loading health statistics data...');
-      const healthStatsResponse = await fetch('/Maps_ABS_CSV/health_stats.json');
+      const healthStatsUrl = getMapDataUrl('health_stats.json');
+      const healthStatsResponse = await fetch(healthStatsUrl);
       if (healthStatsResponse.ok) {
         this.healthStatsData = await healthStatsResponse.json();
         console.log(`✅ Health stats: ${this.healthStatsData.length} records`);
@@ -542,7 +547,8 @@ export class InsightsDataService {
   
   private async loadBoundaryNames(): Promise<void> {
     try {
-      const response = await fetch('/maps/SA2.geojson');
+      const boundaryUrl = getMapDataUrl('SA2.geojson');
+      const response = await fetch(boundaryUrl);
       if (response.ok) {
         const geojson = await response.json();
         

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { globalLoadingCoordinator } from './MapLoadingCoordinator';
+// Import helper functions for Supabase Storage URLs
+import { getMapDataUrl, getSupabaseUrl, mapFetchPath } from '../lib/supabaseStorage';
 
 // Define the structure of our DSS data (healthcare)
 interface DSSData {
@@ -316,10 +318,12 @@ export default function HeatmapDataService({
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 HeatmapDataService: Loading demographics data from /Maps_ABS_CSV/Demographics_2023.json');
+      // Use Supabase URL instead of local path
+      const supabaseUrl = getMapDataUrl('Demographics_2023.json');
+      console.log('🔍 HeatmapDataService: Loading demographics data from', supabaseUrl);
       if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('demographics', 10);
       
-      const response = await fetch('/Maps_ABS_CSV/Demographics_2023.json');
+      const response = await fetch(supabaseUrl);
       console.log('📡 HeatmapDataService: Response status:', response.status);
       if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('demographics', 60);
       
@@ -348,10 +352,12 @@ export default function HeatmapDataService({
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 HeatmapDataService: Loading economic statistics data from /Maps_ABS_CSV/econ_stats.json');
+      // Use Supabase URL instead of local path
+      const supabaseUrl = getMapDataUrl('econ_stats.json');
+      console.log('🔍 HeatmapDataService: Loading economic statistics data from', supabaseUrl);
       if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('economics', 10);
       
-      const response = await fetch('/Maps_ABS_CSV/econ_stats.json');
+      const response = await fetch(supabaseUrl);
       console.log('📡 HeatmapDataService: Response status:', response.status);
       if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('economics', 60);
       
@@ -380,10 +386,12 @@ export default function HeatmapDataService({
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 HeatmapDataService: Loading health statistics data from /Maps_ABS_CSV/health_stats.json');
+      // Use Supabase URL instead of local path
+      const supabaseUrl = getMapDataUrl('health_stats.json');
+      console.log('🔍 HeatmapDataService: Loading health statistics data from', supabaseUrl);
       if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('health-stats', 10);
       
-      const response = await fetch('/Maps_ABS_CSV/health_stats.json');
+      const response = await fetch(supabaseUrl);
       console.log('📡 HeatmapDataService: Response status:', response.status);
       if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('health-stats', 60);
       
@@ -667,7 +675,10 @@ export default function HeatmapDataService({
         console.log('📡 HeatmapDataService: Fetching SA2.geojson for name lookup...');
         const startTime = Date.now();
         
-        const response = await fetch('/maps/SA2.geojson');
+        // Use Supabase URL instead of local path
+        const supabaseUrl = getMapDataUrl('SA2.geojson');
+        const response = await fetch(supabaseUrl);
+        
         if (!response.ok) {
           throw new Error(`Failed to load SA2 boundaries: ${response.status} ${response.statusText}`);
         }

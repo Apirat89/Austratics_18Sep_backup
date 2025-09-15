@@ -4,6 +4,7 @@
 // Professional document titles for FAQ user guide files
 
 import { FAQ_DOCUMENT_TITLES } from '../types/faq';
+import { getFAQDocumentUrl } from './supabaseStorage';
 
 interface FAQDocumentTitleMapping {
   [filename: string]: string;
@@ -27,6 +28,13 @@ class FAQDocumentTitleService {
 
   private initializeTitleMappings(): void {
     console.log('🔧 FAQDocumentTitleService: Initializing FAQ title mappings...');
+    
+    // Get Supabase URLs for each document
+    const homecareUrl = getFAQDocumentUrl('homecare_userguide.docx');
+    const residentialUrl = getFAQDocumentUrl('residential_userguide.docx');
+    const mapsUrl = getFAQDocumentUrl('maps_Userguide.docx');
+    const newsUrl = getFAQDocumentUrl('news_userguide.docx');
+    const sa2Url = getFAQDocumentUrl('SA2_userguide.docx');
     
     // Core FAQ user guide mappings
     this.titleMappings = {
@@ -64,6 +72,13 @@ class FAQDocumentTitleService {
       'data/FAQ/maps_Userguide.docx': 'Maps Feature User Guide',
       'data/FAQ/news_userguide.docx': 'News Feature User Guide',
       'data/FAQ/SA2_userguide.docx': 'SA2 Analysis User Guide',
+      
+      // Supabase URL variations
+      [homecareUrl]: 'Home Care User Guide',
+      [residentialUrl]: 'Residential Care User Guide',
+      [mapsUrl]: 'Maps Feature User Guide',
+      [newsUrl]: 'News Feature User Guide',
+      [sa2Url]: 'SA2 Analysis User Guide',
     };
 
     const mappingCount = Object.keys(this.titleMappings).length;

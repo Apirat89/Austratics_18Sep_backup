@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Globe, Building, MapPin, Home } from 'lucide-react';
+import { getMapDataUrl } from '../../lib/supabaseStorage';
 
 interface StatisticalData {
   count: number;
@@ -81,7 +82,9 @@ export default function TabBoxPlots({ selectedFacility, fields, title, className
   useEffect(() => {
     const loadStatistics = async () => {
       try {
-        const response = await fetch('/maps/abs_csv/Residential_Statistics_Analysis.json');
+        // Use Supabase URL for statistics data
+        const supabaseUrl = getMapDataUrl('Residential_Statistics_Analysis.json');
+        const response = await fetch(supabaseUrl);
         if (!response.ok) {
           throw new Error('Failed to load statistics data');
         }

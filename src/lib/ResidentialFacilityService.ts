@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { StateCreator } from 'zustand';
+import { getMapDataUrl } from './supabaseStorage';
 
 // Types for the new residential facility data
 export interface ResidentialFacility {
@@ -79,8 +80,9 @@ export const useResidentialFacilityStore = create<ResidentialFacilityStore>((set
     loadFacilities: async () => {
       set({ isLoading: true, error: null });
       try {
-        // Load the new residential facility data
-        const response = await fetch('/Maps_ABS_CSV/Residential_May2025_ExcludeMPS.json');
+        // Load the residential facility data from Supabase
+        const supabaseUrl = getMapDataUrl('Residential_May2025_ExcludeMPS.json');
+        const response = await fetch(supabaseUrl);
         if (!response.ok) {
           throw new Error(`Failed to load facilities: ${response.statusText}`);
         }

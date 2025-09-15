@@ -47,6 +47,7 @@ import {
   addDistanceToFacilities,
   calculateDistance 
 } from '../../lib/spatialUtils';
+import { getMapDataUrl } from '../../lib/supabaseStorage';
 
 interface ResidentialFacility {
   // Enhanced Provider Information
@@ -491,7 +492,9 @@ function ResidentialPageContent() {
   useEffect(() => {
     const loadFacilities = async () => {
       try {
-        const response = await fetch('/maps/abs_csv/Residential_May2025_ExcludeMPS_updated_with_finance.json');
+        // Use Supabase URL for facilities data
+        const supabaseUrl = getMapDataUrl('Residential_May2025_ExcludeMPS_updated_with_finance.json');
+        const response = await fetch(supabaseUrl);
         const data = await response.json();
         setFacilities(data);
         setFilteredFacilities([]); // Start with empty list
@@ -504,7 +507,9 @@ function ResidentialPageContent() {
 
     const loadStatistics = async () => {
       try {
-        const response = await fetch('/maps/abs_csv/Residential_Statistics_Analysis.json');
+        // Use Supabase URL for statistics data
+        const supabaseUrl = getMapDataUrl('Residential_Statistics_Analysis.json');
+        const response = await fetch(supabaseUrl);
         const data = await response.json();
         setStatisticsData(data);
       } catch (error) {

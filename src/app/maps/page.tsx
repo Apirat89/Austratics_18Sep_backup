@@ -18,6 +18,7 @@ import { getLocationByName } from '../../lib/mapSearchService';
 import { Map, Settings, User, Menu, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
 import MapLoadingCoordinator from '../../components/MapLoadingCoordinator';
 import { useTelemetry } from '../../lib/telemetry';
+import { getMapDataUrl } from '../../lib/supabaseStorage';
 
 interface UserData {
   email: string;
@@ -388,7 +389,30 @@ export default function MapsPage() {
   // Function to load facility by ID and open modal
   const loadFacilityById = async (facilityId: string) => {
     try {
-      const response = await fetch('/maps/healthcare.geojson');
+      console.log('🔍 Facility fetch beginning for ID:', facilityId);
+      console.log('🔍 Current path:', window.location.pathname);
+      console.log('🔍 Current origin:', window.location.origin);
+      
+      // Use Supabase URL for healthcare.geojson
+      const supabaseUrl = getMapDataUrl('healthcare.geojson');
+      console.log('🔍 Attempting to fetch facility data from Supabase:', supabaseUrl);
+      let response = await fetch(supabaseUrl);
+      console.log('🔍 Facility fetch response status:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        console.log('⚠️ Supabase fetch failed. Trying local fallback path: /maps/healthcare.geojson');
+        response = await fetch('/maps/healthcare.geojson');
+        
+        if (!response.ok) {
+          console.log('⚠️ Local fallback failed. Trying public path: /public/maps/healthcare.geojson');
+          response = await fetch('/public/maps/healthcare.geojson');
+          
+          if (!response.ok) {
+            throw new Error(`Failed to load facility data: ${response.status} ${response.statusText}`);
+          }
+        }
+      }
+      
       if (!response.ok) throw new Error('Failed to load facility data');
       
       const data = await response.json();

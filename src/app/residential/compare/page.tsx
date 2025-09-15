@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Star, MapPin, DollarSign, Users, Activity, Heart, ArrowLeft, Scale, Building, Shield, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getMapDataUrl } from '../../../lib/supabaseStorage';
 
 interface ResidentialFacility {
   // Enhanced Provider Information
@@ -234,8 +235,9 @@ function ResidentialCompareContent() {
     try {
       setLoading(true);
       
-      // Load the residential data
-      const response = await fetch('/maps/abs_csv/Residential_May2025_ExcludeMPS_updated_with_finance.json');
+      // Use Supabase URL for residential data
+      const supabaseUrl = getMapDataUrl('Residential_May2025_ExcludeMPS_updated_with_finance.json');
+      const response = await fetch(supabaseUrl);
       const data = await response.json();
       
       // Find facilities by name

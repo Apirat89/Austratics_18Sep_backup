@@ -1,13 +1,11 @@
 /**
  * Supabase Storage Server Utilities
  * 
- * SERVER-ONLY functions for interacting with Supabase Storage and local filesystem.
- * This file uses Node.js-only modules like 'fs/promises' and should only be imported
+ * SERVER-ONLY functions for interacting with Supabase Storage.
+ * This file uses Node.js-only modules and should only be imported
  * in server components or API routes.
  */
 
-import fs from 'fs/promises';
-import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 import { SA2DataMap, SA2Record } from './supabaseStorage';
 
@@ -53,7 +51,7 @@ let homecareProvidersCache: any[] | null = null;
 let residentialProvidersCache: any[] | null = null;
 
 /**
- * Load SA2 data from Supabase Storage or local file
+ * Load SA2 data from Supabase Storage
  */
 export async function loadSA2Data(): Promise<SA2DataMap> {
   // Return cached data if available
@@ -62,43 +60,21 @@ export async function loadSA2Data(): Promise<SA2DataMap> {
   }
 
   try {
-    console.log('📥 Loading SA2 data...');
+    console.log('📥 Loading SA2 data from Supabase Storage...');
     
-    // Try loading from Supabase Storage first
+    // Load from Supabase Storage
     const data = await getJsonFromStorage<any>('json_data', 'sa2/merged_sa2_data_with_postcodes.json');
     
-    if (data && data.regions) {
-      console.log('✅ Loaded SA2 data from Supabase Storage');
-      
-      // Process the data into the expected format
-      const processedData: SA2DataMap = {};
-      
-      data.regions.forEach((region: any) => {
-        const sa2Id = region.id.replace(/^0+/, ''); // Remove leading zeros
-        
-        processedData[sa2Id] = {
-          sa2_name: region.name,
-          ...region.metrics,
-          sa2_median: region.medians || {},
-          postcodes: region.postcodes || []
-        };
-      });
-      
-      // Cache and return
-      sa2DataCache = processedData;
-      return processedData;
+    if (!data || !data.regions) {
+      throw new Error('Failed to load SA2 data from Supabase Storage');
     }
     
-    // Fall back to local file
-    console.log('⚠️ Falling back to local file for SA2 data');
-    const filePath = path.join(process.cwd(), 'data', 'sa2', 'merged_sa2_data_with_postcodes.json');
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    const localData = JSON.parse(fileContent);
+    console.log('✅ Loaded SA2 data from Supabase Storage');
     
     // Process the data into the expected format
     const processedData: SA2DataMap = {};
     
-    localData.regions.forEach((region: any) => {
+    data.regions.forEach((region: any) => {
       const sa2Id = region.id.replace(/^0+/, ''); // Remove leading zeros
       
       processedData[sa2Id] = {
@@ -114,12 +90,12 @@ export async function loadSA2Data(): Promise<SA2DataMap> {
     return processedData;
   } catch (error) {
     console.error('❌ Error loading SA2 data:', error);
-    throw new Error('Failed to load SA2 data');
+    throw new Error('Failed to load SA2 data from Supabase Storage');
   }
 }
 
 /**
- * Load homecare providers data from Supabase Storage or local file
+ * Load homecare providers data from Supabase Storage
  */
 export async function loadHomecareProviders(): Promise<any[]> {
   // Return cached data if available
@@ -128,33 +104,26 @@ export async function loadHomecareProviders(): Promise<any[]> {
   }
 
   try {
-    console.log('📥 Loading homecare providers data...');
+    console.log('📥 Loading homecare providers data from Supabase Storage...');
     
-    // Try loading from Supabase Storage first
+    // Load from Supabase Storage
     const data = await getJsonFromStorage<any[]>('json_data', 'maps/merged_homecare_providers.json');
     
-    if (data) {
-      console.log('✅ Loaded homecare providers from Supabase Storage');
-      homecareProvidersCache = data;
-      return data;
+    if (!data) {
+      throw new Error('Failed to load homecare providers data from Supabase Storage');
     }
     
-    // Fall back to local file
-    console.log('⚠️ Falling back to local file for homecare providers');
-    const filePath = path.join(process.cwd(), 'Maps_ABS_CSV', 'merged_homecare_providers.json');
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    const localData = JSON.parse(fileContent);
-    
-    homecareProvidersCache = localData;
-    return localData;
+    console.log('✅ Loaded homecare providers from Supabase Storage');
+    homecareProvidersCache = data;
+    return data;
   } catch (error) {
     console.error('❌ Error loading homecare providers:', error);
-    throw new Error('Failed to load homecare providers data');
+    throw new Error('Failed to load homecare providers data from Supabase Storage');
   }
 }
 
 /**
- * Load residential providers data from Supabase Storage or local file
+ * Load residential providers data from Supabase Storage
  */
 export async function loadResidentialProviders(): Promise<any[]> {
   // Return cached data if available
@@ -163,28 +132,21 @@ export async function loadResidentialProviders(): Promise<any[]> {
   }
 
   try {
-    console.log('📥 Loading residential providers data...');
+    console.log('📥 Loading residential providers data from Supabase Storage...');
     
-    // Try loading from Supabase Storage first
+    // Load from Supabase Storage
     const data = await getJsonFromStorage<any[]>('json_data', 'maps/Residential_May2025_ExcludeMPS_updated_with_finance.json');
     
-    if (data) {
-      console.log('✅ Loaded residential providers from Supabase Storage');
-      residentialProvidersCache = data;
-      return data;
+    if (!data) {
+      throw new Error('Failed to load residential providers data from Supabase Storage');
     }
     
-    // Fall back to local file
-    console.log('⚠️ Falling back to local file for residential providers');
-    const filePath = path.join(process.cwd(), 'public', 'maps', 'abs_csv', 'Residential_May2025_ExcludeMPS_updated_with_finance.json');
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    const localData = JSON.parse(fileContent);
-    
-    residentialProvidersCache = localData;
-    return localData;
+    console.log('✅ Loaded residential providers from Supabase Storage');
+    residentialProvidersCache = data;
+    return data;
   } catch (error) {
     console.error('❌ Error loading residential providers:', error);
-    throw new Error('Failed to load residential providers data');
+    throw new Error('Failed to load residential providers data from Supabase Storage');
   }
 }
 

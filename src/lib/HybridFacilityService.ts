@@ -52,6 +52,8 @@ interface EnhancedFacilityData {
   detailedData?: ResidentialDetailedData;
 }
 
+import { getMapDataUrl } from './supabaseStorage';
+
 class HybridFacilityService {
   private static instance: HybridFacilityService;
   private cachedData: EnhancedFacilityData[] | null = null;
@@ -90,25 +92,38 @@ class HybridFacilityService {
     console.log('🔄 Loading hybrid facility data...');
     
     try {
-      // Load both data sources in parallel
+      // Add extra debugging information
+      console.log('🔍 Current path:', typeof window !== 'undefined' ? window.location.pathname : 'SSR');
+      console.log('🔍 Current origin:', typeof window !== 'undefined' ? window.location.origin : 'SSR');
+      
+      // Get Supabase URLs for healthcare and residential data
+      const healthcareUrl = getMapDataUrl('healthcare.geojson');
+      const residentialUrl = getMapDataUrl('Residential_May2025_ExcludeMPS_updated_with_finance.json');
+      
+      console.log('📡 Fetching healthcare data from:', healthcareUrl);
+      console.log('📡 Fetching residential data from:', residentialUrl);
+      
+      // Load data from Supabase Storage
       const [healthcareResponse, residentialResponse] = await Promise.all([
-        fetch('/maps/healthcare.geojson'),
-        fetch('/maps/abs_csv/Residential_May2025_ExcludeMPS_updated_with_finance.json')
+        fetch(healthcareUrl),
+        fetch(residentialUrl)
       ]);
-
+      
+      // Check responses
       if (!healthcareResponse.ok) {
-        throw new Error(`Failed to load healthcare data: ${healthcareResponse.status}`);
+        throw new Error(`Failed to load healthcare data from Supabase: ${healthcareResponse.status} ${healthcareResponse.statusText}`);
       }
-
       if (!residentialResponse.ok) {
-        throw new Error(`Failed to load residential data: ${residentialResponse.status}`);
+        throw new Error(`Failed to load residential data from Supabase: ${residentialResponse.status} ${residentialResponse.statusText}`);
       }
-
+      
+      // Parse JSON data
       const [healthcareData, residentialData] = await Promise.all([
         healthcareResponse.json(),
         residentialResponse.json()
       ]);
-
+      
+      console.log('✅ Successfully loaded data from Supabase Storage');
       console.log('📊 Healthcare facilities loaded:', healthcareData.features?.length || 0);
       console.log('🏠 Residential facilities loaded:', residentialData?.length || 0);
 

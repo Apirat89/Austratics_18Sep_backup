@@ -6,6 +6,7 @@ import { MapPin, DollarSign, ArrowLeft, Scale, Shield, Phone, Mail, Heart, Build
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { HomecareProvider } from '@/types/homecare';
+import { getMapDataUrl } from '../../../lib/supabaseStorage';
 
 // Create a client component for the search params handling
 function HomecareCompareContent() {
@@ -49,9 +50,10 @@ function HomecareCompareContent() {
     try {
       setLoading(true);
       
-      // Load the full homecare dataset directly (like main page) - NOT via API to avoid pagination
-      console.log('📡 Fetching FULL dataset from /Maps_ABS_CSV/merged_homecare_providers.json...');
-      const response = await fetch('/Maps_ABS_CSV/merged_homecare_providers.json');
+      // Use Supabase URL instead of local path
+      const supabaseUrl = getMapDataUrl('merged_homecare_providers.json');
+      console.log('📡 Fetching FULL dataset from', supabaseUrl);
+      const response = await fetch(supabaseUrl);
       
       if (!response.ok) {
         throw new Error(`Failed to load homecare data: ${response.status}`);

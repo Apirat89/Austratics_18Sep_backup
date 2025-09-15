@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import * as echarts from 'echarts';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getSA2DataUrl } from '../../lib/supabaseStorage';
 
 interface SA2Statistics {
   min: number;

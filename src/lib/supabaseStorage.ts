@@ -1,119 +1,128 @@
 /**
- * Supabase Storage Client Utilities
+ * Supabase Storage URL utilities
  * 
- * Client-safe functions for interacting with Supabase Storage.
- * This file does NOT use any Node.js-only modules like 'fs/promises'.
+ * This file provides helper functions to generate URLs for files stored in Supabase Storage.
+ * It implements mapping from local file paths to Supabase Storage URLs to facilitate
+ * the migration from local file system to cloud storage.
  */
-import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client for browser-side operations
-export function createBrowserClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase environment variables');
-  }
-  
-  return createClient(supabaseUrl, supabaseAnonKey);
-}
-
-// Get a publicly accessible URL for a file (for public buckets)
-export function getPublicUrl(bucket: string, path: string): string {
-  const supabase = createBrowserClient();
-  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
-  return data.publicUrl;
-}
-
-// Download JSON data directly (for private buckets)
-export async function downloadJson<T = any>(bucket: string, path: string): Promise<T> {
-  const supabase = createBrowserClient();
-  
-  try {
-    const { data, error } = await supabase.storage.from(bucket).download(path);
-    
-    if (error) {
-      console.error(`Error downloading file ${path} from ${bucket}:`, error);
-      throw error;
-    }
-    
-    if (!data) {
-      throw new Error(`No data returned from ${bucket}/${path}`);
-    }
-    
-    const text = await data.text();
-    return JSON.parse(text);
-  } catch (error) {
-    console.error(`Error processing JSON file ${path} from ${bucket}:`, error);
-    throw error;
-  }
-}
-
-// Get a signed URL for private files (time-limited access)
-export async function getSignedUrl(bucket: string, path: string, expiresIn = 3600): Promise<string> {
-  const supabase = createBrowserClient();
-  
-  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, expiresIn);
-  
-  if (error) {
-    console.error(`Error creating signed URL for ${path} from ${bucket}:`, error);
-    throw error;
-  }
-  
-  return data.signedUrl;
-}
-
-// Multi-location file finder - tries several paths to find a file
-// Useful when you're not sure of the exact path structure
-export async function findAndDownloadJson<T = any>(bucket: string, filename: string, possiblePaths?: string[]): Promise<T> {
-  const supabase = createBrowserClient();
-  
-  // Default paths to try
-  const paths = possiblePaths || [
-    `${filename}`,
-    `maps/${filename}`,
-    `public-maps/${filename}`,
-    `sa2/${filename}`
-  ];
-  
-  // Try each path until we find the file
-  for (const path of paths) {
-    try {
-      const { data, error } = await supabase.storage.from(bucket).download(path);
-      
-      if (!error && data) {
-        const text = await data.text();
-        return JSON.parse(text);
-      }
-    } catch (e) {
-      console.log(`File not found at ${bucket}/${path}, trying next path...`);
-    }
-  }
-  
-  // If all paths fail, throw an error
-  throw new Error(`Failed to find file ${filename} in ${bucket} bucket at any of the tried paths`);
-}
-
-// List files in a bucket/folder
-export async function listFiles(bucket: string, folder = ''): Promise<string[]> {
-  const supabase = createBrowserClient();
-  
-  const { data, error } = await supabase.storage.from(bucket).list(folder);
-  
-  if (error) {
-    console.error(`Error listing files in ${bucket}/${folder}:`, error);
-    throw error;
-  }
-  
-  return data.map(item => item.name);
-}
-
-// SA2 Data Types (used by server-side code but safe to include here)
+/**
+ * SA2Record represents a single SA2 region's data
+ */
 export interface SA2Record {
   sa2_name: string;
-  [metricKey: string]: any;
+  sa2_median?: Record<string, number>;
+  postcodes?: string[];
+  [key: string]: any;  // Other metrics and properties
 }
 
-export interface SA2DataMap {
+/**
+ * SA2DataMap is a map of SA2 IDs to their data records
+ */
+export type SA2DataMap = {
   [sa2Id: string]: SA2Record;
+};
+
+export const SUPABASE_STORAGE_URL = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public';
+
+/**
+ * Generates a complete URL for a file in Supabase Storage
+ * @param bucket - The storage bucket name (e.g., 'json_data', 'images', 'faq')
+ * @param path - The path within the bucket (e.g., 'maps/Demographics_2023.json')
+ * @returns Full URL to the file in Supabase Storage
+ */
+export function getSupabaseFileUrl(bucket: string, path: string): string {
+  return `${SUPABASE_STORAGE_URL}/${bucket}/${path}`;
+}
+
+/**
+ * Maps a local file path to its corresponding Supabase Storage URL
+ * 
+ * @param localPath - The local path to the file
+ * @returns The Supabase Storage URL for the file
+ */
+export function getSupabaseUrl(localPath: string): string {
+  // Clean up the path by removing leading slashes or 'public/'
+  const cleanPath = localPath.replace(/^\/+|^public\/+/, '');
+  
+  // Map Maps_ABS_CSV files to json_data/maps bucket
+  if (cleanPath.includes('Maps_ABS_CSV/') || cleanPath.includes('maps_abs_csv/') || cleanPath.includes('maps/abs_csv/')) {
+    const filename = cleanPath.split('/').pop();
+    return getSupabaseFileUrl('json_data', `maps/${filename}`);
+  }
+  
+  // Map data/sa2 files to json_data/sa2 bucket
+  if (cleanPath.includes('data/sa2/')) {
+    const filename = cleanPath.split('/').pop();
+    return getSupabaseFileUrl('json_data', `sa2/${filename}`);
+  }
+  
+  // Map FAQ document files to faq/guides bucket
+  if (cleanPath.includes('data/FAQ/')) {
+    const filename = cleanPath.split('/').pop();
+    return getSupabaseFileUrl('faq', `guides/${filename}`);
+  }
+  
+  // Map image files to images bucket
+  if (cleanPath.startsWith('images/') || 
+      (cleanPath.endsWith('.jpg') || cleanPath.endsWith('.jpeg') || cleanPath.endsWith('.png'))) {
+    const filename = cleanPath.split('/').pop();
+    return getSupabaseFileUrl('images', filename || '');
+  }
+  
+  // If no specific mapping found, return original path
+  // This should not happen in practice as all files should be mapped
+  console.warn(`⚠️ No Supabase mapping found for path: ${localPath}`);
+  return localPath;
+}
+
+/**
+ * Maps a file path used in a fetch() call to its Supabase Storage URL
+ * Handles common fetch path patterns like '/Maps_ABS_CSV/file.json'
+ * 
+ * @param fetchPath - The path used in fetch() calls
+ * @returns The corresponding Supabase Storage URL
+ */
+export function mapFetchPath(fetchPath: string): string {
+  return getSupabaseUrl(fetchPath);
+}
+
+/**
+ * Gets a URL for a specific SA2 data file in Supabase Storage
+ * 
+ * @param filename - The name of the SA2 data file
+ * @returns Full Supabase URL for the SA2 data file
+ */
+export function getSA2DataUrl(filename: string): string {
+  return getSupabaseFileUrl('json_data', `sa2/${filename}`);
+}
+
+/**
+ * Gets a URL for a specific map data file in Supabase Storage
+ * 
+ * @param filename - The name of the map data file
+ * @returns Full Supabase URL for the map data file
+ */
+export function getMapDataUrl(filename: string): string {
+  return getSupabaseFileUrl('json_data', `maps/${filename}`);
+}
+
+/**
+ * Gets a URL for a specific FAQ document in Supabase Storage
+ * 
+ * @param filename - The name of the FAQ document file
+ * @returns Full Supabase URL for the FAQ document
+ */
+export function getFAQDocumentUrl(filename: string): string {
+  return getSupabaseFileUrl('faq', `guides/${filename}`);
+}
+
+/**
+ * Gets a URL for a specific image in Supabase Storage
+ * 
+ * @param filename - The name of the image file
+ * @returns Full Supabase URL for the image
+ */
+export function getImageUrl(filename: string): string {
+  return getSupabaseFileUrl('images', filename);
 } 
