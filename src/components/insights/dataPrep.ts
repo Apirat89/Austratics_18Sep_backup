@@ -1,7 +1,7 @@
 // dataPrep.ts - Comprehensive data preparation for ECharts dashboard
 // Handles loading and transformation of 4 JSON files with SA2 ID normalization
 
-import { getMapDataUrl } from '../../lib/supabaseStorage';
+// Direct Supabase URLs used - no helper functions needed
 
 export interface SA2Record {
   "SA2 ID": string;
@@ -156,7 +156,7 @@ class DataPrepService {
   
   private async loadHealthcareData(): Promise<any[]> {
     console.log('📥 Loading healthcare data...');
-    const response = await fetch('/DSS_Cleaned_2024.json');
+    const response = await fetch('https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/DSS_Cleaned_2024.json');
     if (!response.ok) throw new Error(`Healthcare data: ${response.statusText}`);
     const data = await response.json();
     console.log(`✅ Healthcare: ${data.length} records`);
@@ -165,7 +165,7 @@ class DataPrepService {
   
   private async loadDemographicsData(): Promise<any[]> {
     console.log('📥 Loading demographics data...');
-    const supabaseUrl = getMapDataUrl('Demographics_2023.json');
+    const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Demographics_2023.json';
     const response = await fetch(supabaseUrl);
     if (!response.ok) throw new Error(`Demographics data: ${response.statusText}`);
     const data = await response.json();
@@ -175,7 +175,7 @@ class DataPrepService {
   
   private async loadEconomicsData(): Promise<any[]> {
     console.log('📥 Loading economics data...');
-    const supabaseUrl = getMapDataUrl('econ_stats.json');
+    const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/econ_stats.json';
     const response = await fetch(supabaseUrl);
     if (!response.ok) throw new Error(`Economics data: ${response.statusText}`);
     const data = await response.json();
@@ -185,7 +185,7 @@ class DataPrepService {
   
   private async loadHealthStatsData(): Promise<any[]> {
     console.log('📥 Loading health statistics data...');
-    const supabaseUrl = getMapDataUrl('health_stats.json');
+    const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/health_stats.json';
     const response = await fetch(supabaseUrl);
     if (!response.ok) throw new Error(`Health stats data: ${response.statusText}`);
     const data = await response.json();

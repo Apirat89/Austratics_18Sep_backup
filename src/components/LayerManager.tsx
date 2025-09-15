@@ -6,7 +6,7 @@ import { mapBusy } from '../lib/mapBusy';
 import { waitForStyleAndIdle, safeMapOperation } from '../lib/mapboxEvents';
 import { globalLoadingCoordinator } from './MapLoadingCoordinator';
 import { trackApiCall } from '@/lib/usageTracking';
-import { getMapDataUrl } from '../lib/supabaseStorage';
+// Direct Supabase URLs used - no helper functions needed
 import { createBrowserClient } from '@supabase/ssr';
 
 interface SA2HeatmapData {
@@ -229,7 +229,7 @@ export default function LayerManager({
           
           // Fallback to direct fetch as last resort
           try {
-            const supabaseUrl = getMapDataUrl('SA2.geojson');
+            const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2.geojson';
             console.log('🔍 LayerManager: Fallback to direct fetch from:', supabaseUrl);
             
             const response = await fetch(supabaseUrl);

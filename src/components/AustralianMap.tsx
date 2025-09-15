@@ -2560,7 +2560,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         };
 
         const fileName = fileMap[layerType];
-        console.log(`Fetching boundary file: /maps/${fileName}`);
+        const supabaseUrl = `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/${fileName}`;
+        console.log(`Fetching boundary file: ${supabaseUrl}`);
         
         // Special handling for large files
         if (layerType === 'sa2') {
@@ -2568,7 +2569,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         }
         
         const startTime = Date.now();
-        const response = await fetch(`/maps/${fileName}`, {
+        const response = await fetch(supabaseUrl, {
           signal: abortController.signal
         });
         const fetchTime = Date.now() - startTime;
@@ -2720,7 +2721,8 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         setPreloadProgress({ current: i + 1, total: orderedTypes.length });
         
         const startTime = Date.now();
-        const response = await fetch(`/maps/${fileName}`);
+        const supabaseUrl = `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/${fileName}`;
+        const response = await fetch(supabaseUrl);
         
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);

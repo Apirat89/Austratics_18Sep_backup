@@ -47,7 +47,7 @@ import {
   addDistanceToFacilities,
   calculateDistance 
 } from '../../lib/spatialUtils';
-import { getMapDataUrl } from '../../lib/supabaseStorage';
+// Direct Supabase URLs used - no helper functions needed
 
 interface ResidentialFacility {
   // Enhanced Provider Information
@@ -493,7 +493,7 @@ function ResidentialPageContent() {
     const loadFacilities = async () => {
       try {
         // Use Supabase URL for facilities data
-        const supabaseUrl = getMapDataUrl('Residential_May2025_ExcludeMPS_updated_with_finance.json');
+        const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Residential_May2025_ExcludeMPS_updated_with_finance.json';
         const response = await fetch(supabaseUrl);
         const data = await response.json();
         setFacilities(data);
@@ -508,7 +508,7 @@ function ResidentialPageContent() {
     const loadStatistics = async () => {
       try {
         // Use Supabase URL for statistics data
-        const supabaseUrl = getMapDataUrl('Residential_Statistics_Analysis.json');
+        const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Residential_Statistics_Analysis.json';
         const response = await fetch(supabaseUrl);
         const data = await response.json();
         setStatisticsData(data);

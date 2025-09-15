@@ -2296,3 +2296,216 @@ export function mapJSONPath(localPath: string): string {
 ---
 
 **READY FOR IMPLEMENTATION** - All migration requirements have been analyzed and a detailed plan has been created 🚀
+
+---
+
+## 🔄 **COMPLETE SUPABASE STORAGE MIGRATION - NO FALLBACKS**
+
+**USER REQUEST:** Remove all fallbacks and migrate all local file references to use Supabase Storage URLs exclusively. Website must work even when local computer is offline.
+
+**PLANNER MODE ACTIVE** 🧠
+
+## Background and Motivation
+
+**Current Hybrid System Issues:**
+- ✅ **Supabase files uploaded**: All files available in public Supabase buckets
+- ❌ **Hybrid fallback logic**: Code attempts Supabase first, falls back to local files
+- ❌ **Local dependencies**: Website fails when computer is offline
+- 🎯 **User Goal**: Complete independence from local file system
+
+**Migration Objectives:**
+- **Complete Migration**: Replace ALL local file paths with direct Supabase URLs
+- **Remove Hybrid Logic**: Delete all fallback mechanisms
+- **Production Ready**: Website works from any deployment without local files
+- **Performance**: Direct CDN access, no local file system dependencies
+
+**Files Available in Supabase:**
+- **Maps Bucket**: 17 JSON/GeoJSON files (`json_data/maps/`)
+- **SA2 Bucket**: 21 demographic/statistics files (`json_data/sa2/`)
+- **Images Bucket**: 21 background/UI images (`images/`)
+- **FAQ Bucket**: 5 user guide documents (`faq/guides/`)
+
+## Key Challenges and Analysis
+
+### **Challenge 1: Comprehensive File Reference Audit**
+**Current State**: Mixed references across ~50+ components/services
+**Target State**: Complete inventory and systematic replacement
+**Risk Level**: ⭐⭐⭐ HIGH - Missing any reference breaks functionality
+**Critical Files Identified**:
+- `src/lib/supabaseStorage.ts` - Contains hybrid mapping logic
+- `src/lib/HybridFacilityService.ts` - Uses fallback patterns
+- `src/components/HeatmapDataService.tsx` - Mixed approach
+- All components importing from `/Maps_ABS_CSV/`, `/data/sa2/`
+
+### **Challenge 2: Remove Fallback Logic**
+**Current State**: Code tries Supabase first, falls back to local
+**Target State**: Direct Supabase URL usage only
+**Risk Level**: ⭐⭐ MEDIUM - Need to identify and remove all try/catch fallbacks
+**Key Areas**:
+- Remove `getSupabaseUrl()` mapping functions
+- Replace hybrid services with direct URL services  
+- Update all `fetch()` calls to use direct Supabase URLs
+- Remove filesystem access (`fs.readFile`, local path imports)
+
+### **Challenge 3: Path Pattern Standardization**
+**Current State**: Inconsistent local path patterns across codebase
+**Target State**: Standardized direct Supabase URLs everywhere
+**Risk Level**: ⭐⭐⭐ HIGH - Incorrect mapping breaks file access
+**Pattern Examples**:
+- **OLD**: `/Maps_ABS_CSV/Demographics_2023.json`
+- **NEW**: `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Demographics_2023.json`
+
+### **Challenge 4: Component Loading Method Updates**
+**Current State**: Various loading approaches (fetch, import, fs)
+**Target State**: Consistent HTTP fetch from Supabase URLs
+**Risk Level**: ⭐⭐ MEDIUM - Need to standardize loading patterns
+**Changes Required**:
+- Replace direct imports with fetch calls
+- Remove filesystem access in API routes
+- Update all hard-coded local paths
+
+## High-level Task Breakdown
+
+### **Phase 1: Complete Reference Audit** 📋
+**Goal**: Identify every file reference that needs updating
+**Tasks**:
+1.1 Search for all local path patterns (`/Maps_ABS_CSV/`, `/data/sa2/`, `/public/`, etc.)
+1.2 Create comprehensive mapping table (Local Path → Supabase URL)
+1.3 Identify all components/services that load data files
+1.4 Document current loading methods (fetch, import, fs) per reference
+1.5 Prioritize critical paths (maps, SA2 data, images)
+
+### **Phase 2: Remove Hybrid Infrastructure** 🔧
+**Goal**: Eliminate all fallback logic and mapping utilities
+**Tasks**:
+2.1 Remove `getSupabaseUrl()`, `mapFetchPath()` functions from `supabaseStorage.ts`
+2.2 Replace `HybridFacilityService.ts` with direct URL service
+2.3 Remove try/catch fallback patterns in data loading
+2.4 Delete filesystem imports (`fs.readFile`) in API routes
+2.5 Clean up unused hybrid helper functions
+
+### **Phase 3: Direct URL Implementation - Maps** 🗺️
+**Goal**: Convert all map-related file loading to direct Supabase URLs
+**Critical Files**:
+- `src/components/AustralianMap.tsx`
+- `src/components/LayerManager.tsx`
+- `src/app/maps/page.tsx`
+- `src/lib/mapSearchService.ts`
+**Tasks**:
+3.1 Replace `/Maps_ABS_CSV/Demographics_2023.json` → `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Demographics_2023.json`
+3.2 Update GeoJSON loading (healthcare.geojson, LGA.geojson, etc.)
+3.3 Replace all residential data file paths
+3.4 Test map functionality with each change
+
+### **Phase 4: Direct URL Implementation - SA2 Data** 📊
+**Goal**: Convert all SA2 demographic/statistics loading to direct URLs
+**Critical Files**:
+- `src/components/insights/InsightsDataService.tsx`
+- `src/components/SA2DataLayer.tsx`
+- `src/components/sa2/SA2BoxPlot.tsx`
+**Tasks**:
+4.1 Replace `/data/sa2/Demographics_2023.json` → `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/Demographics_2023.json`
+4.2 Update all comprehensive/expanded SA2 data references
+4.3 Replace DSS_Cleaned_2024 file references
+4.4 Test SA2 visualizations and analytics
+
+### **Phase 5: Direct URL Implementation - Images** 🖼️
+**Goal**: Convert all image references to direct Supabase URLs
+**Critical Files**:
+- `src/app/page.tsx` (landing page backgrounds)
+- Various components with image imports
+**Tasks**:
+5.1 Replace background images: `/public/australian-koala...jpg` → `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/images/australian-koala-in-its-natural-habitat-of-gumtree-2024-11-27-16-51-33-utc.jpg`
+5.2 Update all other image references
+5.3 Test image loading across all pages
+
+### **Phase 6: Direct URL Implementation - Documents** 📄
+**Goal**: Convert FAQ and guide document access to direct URLs
+**Critical Files**:
+- FAQ-related components
+- Document processing services
+**Tasks**:
+6.1 Replace `/data/FAQ/homecare_userguide.docx` → `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/faq/guides/homecare_userguide.docx`
+6.2 Update all user guide references
+6.3 Test document access and downloads
+
+### **Phase 7: Cleanup & Testing** ✅
+**Goal**: Remove unused code and verify complete migration
+**Tasks**:
+7.1 Delete unused local files from `/public/`, `/data/` directories
+7.2 Remove unused hybrid helper functions
+7.3 Comprehensive testing of all features
+7.4 Verify no console errors for missing files
+7.5 Test with network throttling to ensure proper loading states
+
+## Complete Path Mapping Reference
+
+### **Maps Data Files (json_data/maps/)**
+| Current Local Path | Direct Supabase URL |
+|-------------------|---------------------|
+| `/Maps_ABS_CSV/Demographics_2023.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Demographics_2023.json` |
+| `/Maps_ABS_CSV/DOH_simplified.geojson` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/DOH_simplified.geojson` |
+| `/Maps_ABS_CSV/healthcare.geojson` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/healthcare.geojson` |
+| `/Maps_ABS_CSV/Residential_May2025_ExcludeMPS_updated_with_finance.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Residential_May2025_ExcludeMPS_updated_with_finance.json` |
+| All 17 maps files | See complete list in user's provided URLs |
+
+### **SA2 Data Files (json_data/sa2/)**
+| Current Local Path | Direct Supabase URL |
+|-------------------|---------------------|
+| `/data/sa2/Demographics_2023.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/Demographics_2023.json` |
+| `/data/sa2/DSS_Cleaned_2024.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/DSS_Cleaned_2024.json` |
+| `/data/sa2/econ_stats.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/econ_stats.json` |
+| All 21 SA2 files | See complete list in user's provided URLs |
+
+### **Image Files (images/)**
+| Current Local Path | Direct Supabase URL |
+|-------------------|---------------------|
+| `/public/australian-koala-in-its-natural-habitat...jpg` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/images/australian-koala-in-its-natural-habitat-of-gumtree-2024-11-27-16-51-33-utc.jpg` |
+| All 21 image files | See complete list in user's provided URLs |
+
+### **FAQ Documents (faq/guides/)**
+| Current Local Path | Direct Supabase URL |
+|-------------------|---------------------|
+| `/data/FAQ/homecare_userguide.docx` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/faq/guides/homecare_userguide.docx` |
+| All 5 user guides | See complete list in user's provided URLs |
+
+## Project Status Board
+
+- **Phase 1: Complete Reference Audit** ⏳ PENDING
+- **Phase 2: Remove Hybrid Infrastructure** ⏳ PENDING  
+- **Phase 3: Direct URL Implementation - Maps** ⏳ PENDING
+- **Phase 4: Direct URL Implementation - SA2 Data** ⏳ PENDING
+- **Phase 5: Direct URL Implementation - Images** ⏳ PENDING
+- **Phase 6: Direct URL Implementation - Documents** ⏳ PENDING
+- **Phase 7: Cleanup & Testing** ⏳ PENDING
+
+## Critical Success Factors
+
+**✅ Must Have:**
+1. **Zero Local Dependencies**: Website works from any hosting without local files
+2. **No Fallback Logic**: Direct Supabase URL access only
+3. **Comprehensive Coverage**: Every file reference updated
+4. **Feature Preservation**: All existing functionality maintained
+
+**⚠️ Risk Mitigation:**
+1. **Incremental Testing**: Test after each major component update
+2. **Backup Strategy**: Keep local files until migration verified complete
+3. **Rollback Plan**: Maintain git branches for quick reversion
+4. **Monitoring**: Watch for any 404 errors or loading failures
+
+## Expected Benefits
+
+**🚀 Post-Migration Advantages:**
+- **Deployment Independence**: Works on any hosting platform
+- **CDN Performance**: Faster global file access
+- **Scalability**: No local storage limitations
+- **Reliability**: No dependency on local computer availability
+- **Maintenance**: Easier quarterly file updates via Supabase
+
+**🎯 Final Goal**: Website fully operational from Supabase storage with zero local file dependencies
+
+## Lessons
+
+*Complete migration requires systematic audit, careful path mapping, and incremental testing to ensure no functionality breaks during the transition from hybrid to direct storage access.*
+
+---

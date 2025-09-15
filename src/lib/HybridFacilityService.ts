@@ -52,7 +52,7 @@ interface EnhancedFacilityData {
   detailedData?: ResidentialDetailedData;
 }
 
-import { getMapDataUrl } from './supabaseStorage';
+// Direct Supabase URLs used - no helper functions needed
 
 class HybridFacilityService {
   private static instance: HybridFacilityService;
@@ -97,8 +97,8 @@ class HybridFacilityService {
       console.log('🔍 Current origin:', typeof window !== 'undefined' ? window.location.origin : 'SSR');
       
       // Get Supabase URLs for healthcare and residential data
-      const healthcareUrl = getMapDataUrl('healthcare.geojson');
-      const residentialUrl = getMapDataUrl('Residential_May2025_ExcludeMPS_updated_with_finance.json');
+          const healthcareUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/healthcare.geojson';
+    const residentialUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Residential_May2025_ExcludeMPS_updated_with_finance.json';
       
       console.log('📡 Fetching healthcare data from:', healthcareUrl);
       console.log('📡 Fetching residential data from:', residentialUrl);

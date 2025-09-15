@@ -133,7 +133,7 @@ export default function ResetPasswordClient({ token }: ResetPasswordClientProps)
         style={{
           fontFamily: '"Inter", "Public Sans", "Noto Sans", sans-serif',
           backgroundColor: '#3B82F6',
-          backgroundImage: backgroundPhoto ? `url(/${backgroundPhoto})` : 'none',
+          backgroundImage: backgroundPhoto ? `url(https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/images/${backgroundPhoto})` : 'none',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
@@ -173,7 +173,7 @@ export default function ResetPasswordClient({ token }: ResetPasswordClientProps)
       style={{
         fontFamily: '"Inter", "Public Sans", "Noto Sans", sans-serif',
         backgroundColor: '#3B82F6',
-        backgroundImage: backgroundPhoto ? `url(/${backgroundPhoto})` : 'none',
+        backgroundImage: backgroundPhoto ? `url(https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/images/${backgroundPhoto})` : 'none',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'

@@ -126,7 +126,8 @@ async function loadGeoJSONData(type: 'lga' | 'sa2' | 'sa3' | 'sa4' | 'postcode' 
     };
 
     const fileName = fileMap[type];
-    const response = await fetch(`/maps/${fileName}`);
+    const supabaseUrl = `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/${fileName}`;
+    const response = await fetch(supabaseUrl);
     
     if (!response.ok) {
       console.error(`Failed to load ${fileName}: ${response.status}`);
@@ -262,7 +263,7 @@ async function buildHealthcareFacilityIndex(): Promise<SearchResult[]> {
   console.log('Building search index for healthcare facilities...'); // Debug log
 
   try {
-    const response = await fetch('/maps/healthcare.geojson');
+    const response = await fetch('https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/healthcare.geojson');
     
     if (!response.ok) {
       console.error(`Failed to load healthcare data: ${response.status}`);

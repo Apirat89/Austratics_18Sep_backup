@@ -15,7 +15,7 @@ import {
   getFlattenedHealthStatsOptions
 } from '../HeatmapDataService';
 
-import { getMapDataUrl } from '../../lib/supabaseStorage';
+// Direct Supabase URLs used - no helper functions needed
 
 // Define chart data interfaces
 export interface ChartDataPoint {
@@ -490,7 +490,7 @@ export class InsightsDataService {
     try {
       // Load healthcare data
       console.log('📊 Loading healthcare data...');
-      const healthcareResponse = await fetch('/DSS_Cleaned_2024_Compressed.json');
+      const healthcareResponse = await fetch('https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/DSS_Cleaned_2024.json');
       if (healthcareResponse.ok) {
         this.healthcareData = await healthcareResponse.json();
         console.log(`✅ Healthcare: ${this.healthcareData.length} records`);
@@ -501,7 +501,7 @@ export class InsightsDataService {
       
       // Load demographics data
       console.log('👥 Loading demographics data...');
-      const demographicsUrl = getMapDataUrl('Demographics_2023.json');
+      const demographicsUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Demographics_2023.json';
       const demographicsResponse = await fetch(demographicsUrl);
       if (demographicsResponse.ok) {
         this.demographicsData = await demographicsResponse.json();
@@ -513,7 +513,7 @@ export class InsightsDataService {
       
       // Load economics data
       console.log('💰 Loading economics data...');
-      const economicsUrl = getMapDataUrl('econ_stats.json');
+      const economicsUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/econ_stats.json';
       const economicsResponse = await fetch(economicsUrl);
       if (economicsResponse.ok) {
         this.economicsData = await economicsResponse.json();
@@ -525,7 +525,7 @@ export class InsightsDataService {
       
       // Load health statistics data
       console.log('🏥 Loading health statistics data...');
-      const healthStatsUrl = getMapDataUrl('health_stats.json');
+      const healthStatsUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/health_stats.json';
       const healthStatsResponse = await fetch(healthStatsUrl);
       if (healthStatsResponse.ok) {
         this.healthStatsData = await healthStatsResponse.json();
@@ -547,7 +547,7 @@ export class InsightsDataService {
   
   private async loadBoundaryNames(): Promise<void> {
     try {
-      const boundaryUrl = getMapDataUrl('SA2.geojson');
+      const boundaryUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2.geojson';
       const response = await fetch(boundaryUrl);
       if (response.ok) {
         const geojson = await response.json();

@@ -52,7 +52,7 @@ import type {
   HomecareAPIResponse, 
   HomecareFilters 
 } from '@/types/homecare';
-import { getMapDataUrl } from '../../lib/supabaseStorage';
+// Direct Supabase URLs used - no helper functions needed
 
 interface UserData {
   email: string;
@@ -314,7 +314,7 @@ function HomecarePageContent() {
         setLoading(true);
         
         // Use Supabase URL instead of local path
-        const supabaseUrl = getMapDataUrl('merged_homecare_providers.json');
+        const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/merged_homecare_providers.json';
         const response = await fetch(supabaseUrl);
         if (!response.ok) {
           throw new Error(`Failed to load homecare data: ${response.status}`);
@@ -338,7 +338,7 @@ function HomecarePageContent() {
     const loadStatistics = async () => {
       try {
         // Use Supabase URL instead of local path
-        const supabaseUrl = getMapDataUrl('homecare_statistics_analysis.json');
+        const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/homecare_statistics_analysis.json';
         const response = await fetch(supabaseUrl);
         if (!response.ok) {
           throw new Error(`Failed to load statistics: ${response.status}`);

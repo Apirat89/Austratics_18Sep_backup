@@ -99,7 +99,7 @@ export default function SimpleHeatmapMap({
         console.log('📡 Fetching SA2.geojson (170MB file)...');
         const startTime = Date.now();
         
-        const response = await fetch('/maps/SA2.geojson');
+        const response = await fetch('https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2.geojson');
         if (!response.ok) {
           throw new Error(`Failed to load SA2 boundaries: ${response.status} ${response.statusText}`);
         }

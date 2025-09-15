@@ -18,7 +18,7 @@ import { getLocationByName } from '../../lib/mapSearchService';
 import { Map, Settings, User, Menu, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
 import MapLoadingCoordinator from '../../components/MapLoadingCoordinator';
 import { useTelemetry } from '../../lib/telemetry';
-import { getMapDataUrl } from '../../lib/supabaseStorage';
+// Direct Supabase URLs used - no helper functions needed
 
 interface UserData {
   email: string;
@@ -393,24 +393,12 @@ export default function MapsPage() {
       console.log('🔍 Current path:', window.location.pathname);
       console.log('🔍 Current origin:', window.location.origin);
       
-      // Use Supabase URL for healthcare.geojson
-      const supabaseUrl = getMapDataUrl('healthcare.geojson');
-      console.log('🔍 Attempting to fetch facility data from Supabase:', supabaseUrl);
-      let response = await fetch(supabaseUrl);
-      console.log('🔍 Facility fetch response status:', response.status, response.statusText);
+      // Load healthcare data directly from Supabase Storage
+      const response = await fetch('https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/healthcare.geojson');
+      console.log('🔍 Healthcare data fetch response status:', response.status, response.statusText);
       
       if (!response.ok) {
-        console.log('⚠️ Supabase fetch failed. Trying local fallback path: /maps/healthcare.geojson');
-        response = await fetch('/maps/healthcare.geojson');
-        
-        if (!response.ok) {
-          console.log('⚠️ Local fallback failed. Trying public path: /public/maps/healthcare.geojson');
-          response = await fetch('/public/maps/healthcare.geojson');
-          
-          if (!response.ok) {
-            throw new Error(`Failed to load facility data: ${response.status} ${response.statusText}`);
-          }
-        }
+        throw new Error(`Failed to load healthcare data: ${response.status} ${response.statusText}`);
       }
       
       if (!response.ok) throw new Error('Failed to load facility data');

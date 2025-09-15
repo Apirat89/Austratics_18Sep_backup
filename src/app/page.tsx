@@ -68,10 +68,7 @@ function HomeContent() {
       }
     } catch (error) {
       console.error('Failed to generate image URL:', error);
-      // Fallback to local path as a last resort
-      const fallbackUrl = `/${filename}`;
-      console.log('Using local fallback URL:', fallbackUrl);
-      setBackgroundImage(fallbackUrl);
+      // No fallback - all images should be in Supabase storage
     }
   }, [searchParams]);
 

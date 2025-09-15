@@ -9,7 +9,7 @@ let homecareDataCache: HomecareProvider[] | null = null;
 let cacheTimestamp: number = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-function loadHomecareData(): HomecareProvider[] {
+async function loadHomecareData(): Promise<HomecareProvider[]> {
   const now = Date.now();
   
   // Return cached data if still valid
@@ -18,9 +18,11 @@ function loadHomecareData(): HomecareProvider[] {
   }
 
   try {
-    const filePath = path.join(process.cwd(), 'Maps_ABS_CSV', 'merged_homecare_providers.json');
-    const fileContent = fs.readFileSync(filePath, 'utf8');
-    const data: HomecareProvider[] = JSON.parse(fileContent);
+    const response = await fetch('https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/merged_homecare_providers.json');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch homecare data: ${response.status} ${response.statusText}`);
+    }
+    const data: HomecareProvider[] = await response.json();
     
     // Cache the data
     homecareDataCache = data;
@@ -203,7 +205,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Load data
-    const allProviders = loadHomecareData();
+    const allProviders = await loadHomecareData();
     
     // Apply search
     let filteredProviders = searchProviders(allProviders, search);
@@ -246,7 +248,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const allProviders = loadHomecareData();
+    const allProviders = await loadHomecareData();
     const provider = allProviders.find(p => p.provider_id === provider_id);
 
     if (!provider) {

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { StateCreator } from 'zustand';
-import { getMapDataUrl } from './supabaseStorage';
+// Direct Supabase URLs used - no helper functions needed
 
 // Types for the new residential facility data
 export interface ResidentialFacility {
@@ -81,7 +81,7 @@ export const useResidentialFacilityStore = create<ResidentialFacilityStore>((set
       set({ isLoading: true, error: null });
       try {
         // Load the residential facility data from Supabase
-        const supabaseUrl = getMapDataUrl('Residential_May2025_ExcludeMPS.json');
+        const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Residential_May2025_ExcludeMPS.json';
         const response = await fetch(supabaseUrl);
         if (!response.ok) {
           throw new Error(`Failed to load facilities: ${response.statusText}`);

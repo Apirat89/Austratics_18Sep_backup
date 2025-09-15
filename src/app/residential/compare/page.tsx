@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Star, MapPin, DollarSign, Users, Activity, Heart, ArrowLeft, Scale, Building, Shield, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getMapDataUrl } from '../../../lib/supabaseStorage';
+// Direct Supabase URLs used - no helper functions needed
 
 interface ResidentialFacility {
   // Enhanced Provider Information
@@ -236,7 +236,7 @@ function ResidentialCompareContent() {
       setLoading(true);
       
       // Use Supabase URL for residential data
-      const supabaseUrl = getMapDataUrl('Residential_May2025_ExcludeMPS_updated_with_finance.json');
+      const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Residential_May2025_ExcludeMPS_updated_with_finance.json';
       const response = await fetch(supabaseUrl);
       const data = await response.json();
       

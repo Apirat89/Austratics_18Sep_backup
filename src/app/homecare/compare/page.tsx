@@ -6,7 +6,7 @@ import { MapPin, DollarSign, ArrowLeft, Scale, Shield, Phone, Mail, Heart, Build
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { HomecareProvider } from '@/types/homecare';
-import { getMapDataUrl } from '../../../lib/supabaseStorage';
+// Direct Supabase URLs used - no helper functions needed
 
 // Create a client component for the search params handling
 function HomecareCompareContent() {
@@ -51,7 +51,7 @@ function HomecareCompareContent() {
       setLoading(true);
       
       // Use Supabase URL instead of local path
-      const supabaseUrl = getMapDataUrl('merged_homecare_providers.json');
+      const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/merged_homecare_providers.json';
       console.log('📡 Fetching FULL dataset from', supabaseUrl);
       const response = await fetch(supabaseUrl);
       

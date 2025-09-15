@@ -88,9 +88,9 @@ export default function HeatmapDataSelector({ onDataChange }: HeatmapDataSelecto
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 HeatmapDataSelector: Loading DSS data from /DSS_Cleaned_2024_Compressed.json');
+      console.log('🔍 HeatmapDataSelector: Loading DSS data from Supabase Storage');
       
-      const response = await fetch('/DSS_Cleaned_2024_Compressed.json');
+      const response = await fetch('https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/DSS_Cleaned_2024.json');
       console.log('📡 Response status:', response.status);
       
       if (!response.ok) {
