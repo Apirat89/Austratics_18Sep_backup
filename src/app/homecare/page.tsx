@@ -855,7 +855,23 @@ function HomecarePageContent() {
     if (searchTerm.trim().length > 0 && currentUser) {
       await addToSearchHistory(searchTerm);
     }
-    setSelectedProvider(providerData);
+
+    // Check if this is a SavedHomecareProvider (has flat structure) or full HomecareProvider (has provider_info)
+    if (providerData.provider_info) {
+      // This is already a full HomecareProvider, use it directly
+      setSelectedProvider(providerData);
+    } else {
+      // This is a SavedHomecareProvider, find the full provider data by provider_id
+      const fullProvider = providers.find(p => p.provider_id === providerData.provider_id);
+      if (fullProvider) {
+        setSelectedProvider(fullProvider);
+      } else {
+        // If provider not found in current providers array, show an error
+        console.error('Provider not found in current dataset:', providerData.provider_id);
+        // You could show a toast notification or error message here
+        alert('Unable to load provider details. The provider may no longer be available.');
+      }
+    }
   };
 
   // Comparison functionality with 5-provider limit and persistence
@@ -1628,8 +1644,11 @@ function HomecarePageContent() {
                     {savedProviders.map((savedProvider) => (
                       <div key={savedProvider.provider_id} className="bg-white rounded-lg border border-gray-200 p-4">
                         <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-medium text-gray-900">
+                          <div 
+                            className="flex-1 cursor-pointer" 
+                            onClick={() => handleViewDetails(savedProvider)}
+                          >
+                            <h3 className="text-lg font-medium text-gray-900 hover:text-blue-600 transition-colors">
                               {savedProvider.provider_name}
                             </h3>
                             <div className="text-sm text-gray-600 mt-1">
