@@ -1,5 +1,4 @@
-import fs from 'fs';
-import path from 'path';
+// Now uses Supabase Storage instead of filesystem
 
 interface FeeData {
   amount: number;
@@ -61,15 +60,17 @@ export class FeeSearchService {
 
   public async initialize(): Promise<void> {
     try {
-      const dataPath = path.join(process.cwd(), 'data', 'normalized-fee-data.json');
+      // Fetch normalized-fee-data.json from Supabase Storage
+      const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/fees/normalized-fee-data.json';
       
-      if (!fs.existsSync(dataPath)) {
-        console.warn('⚠️ FeeSearchService: Normalized fee data not found, service will be disabled');
+      const response = await fetch(supabaseUrl);
+      
+      if (!response.ok) {
+        console.warn(`⚠️ FeeSearchService: Normalized fee data not found in Supabase (${response.status}), service will be disabled`);
         return;
       }
 
-      const rawData = fs.readFileSync(dataPath, 'utf8');
-      this.feeData = JSON.parse(rawData);
+      this.feeData = await response.json();
       this.isInitialized = true;
 
             console.log('✅ FeeSearchService: Initialized with structured fee data');

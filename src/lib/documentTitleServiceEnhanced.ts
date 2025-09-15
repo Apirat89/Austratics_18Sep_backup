@@ -1,5 +1,4 @@
-import fs from 'fs';
-import path from 'path';
+// Now uses Supabase Storage instead of filesystem
 
 interface DocumentMapping {
   'File Name': string;
@@ -44,16 +43,18 @@ export class DocumentTitleServiceEnhanced {
     if (this.isInitialized) return;
 
     try {
-      const fileTitlesPath = path.join(process.cwd(), 'data', 'Regulation Docs', 'file_titles.json');
+      // Fetch file_titles.json from Supabase Storage
+      const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/regulation/file_titles.json';
       
-      if (!fs.existsSync(fileTitlesPath)) {
-        console.warn('file_titles.json not found. Service will use fallback formatting only.');
+      const response = await fetch(supabaseUrl);
+      
+      if (!response.ok) {
+        console.warn(`file_titles.json not found in Supabase (${response.status}). Service will use fallback formatting only.`);
         this.isInitialized = true;
         return;
       }
 
-      const fileContent = fs.readFileSync(fileTitlesPath, 'utf-8');
-      this.mappings = JSON.parse(fileContent);
+      this.mappings = await response.json();
 
       // Create multiple index maps for efficient lookups
       this.createIndexMaps();

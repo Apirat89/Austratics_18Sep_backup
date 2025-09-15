@@ -2200,10 +2200,10 @@ The surgical approach will get the application deployed quickly while minimizing
 
 ## Project Status Board
 
-- **Phase 1: Critical Sign-In Background & Logo Fix** ✅ COMPLETE - **URGENT**
-- **Phase 2: Complete File Reference Inventory** ⏳ PENDING
-- **Phase 3: Map Data Migration** ⏳ PENDING  
-- **Phase 4: SA2 Data Migration** ⏳ PENDING
+- **Phase 1: Critical Sign-In Background & Logo Fix** ✅ **COMPLETE & PUSHED TO GITHUB** - **URGENT**
+- **Phase 2: Complete File Reference Inventory** ✅ **COMPLETE**
+- **Phase 3: Critical Local Files Migration** ✅ **CODES UPDATED** - 3 services migrated, need file uploads
+- **Phase 4: Document Processing Migration** ⏳ PENDING
 - **Phase 5: Image Asset Migration** ⏳ PENDING
 - **Phase 6: FAQ Documentation Migration** ⏳ PENDING
 - **Phase 7: Comprehensive Testing** ⏳ PENDING
@@ -2414,7 +2414,62 @@ The user mentioned the sign-in page background image isn't displaying, which ind
 5. ✅ **FIXED ENVIRONMENT PRECEDENCE** - Local dev now uses .env instead of conflicting .env.local
 6. ✅ **ENHANCED STABILITY** - Background images now persist without flashing or disappearing
 
-**READY FOR PHASE 2:** File reference inventory and systematic migration
+## 🔍 **PHASE 2: FILE REFERENCE INVENTORY - COMPLETE**
+
+### **✅ MIGRATION STATUS: ~90% COMPLETE**
+
+**ALREADY MIGRATED** ✅:
+- **Map Data**: All GeoJSON/map files use direct Supabase URLs
+- **SA2 Data**: All demographic/healthcare data uses Supabase URLs  
+- **Background Images**: Sign-in page uses Supabase with proper encoding
+- **API Proxies**: `/api/maps/data/` route handles Supabase storage
+- **Core Services**: `HybridFacilityService`, `mapSearchService` all use direct URLs
+
+**REMAINING LOCAL FILESYSTEM USAGE** ❌:
+
+### **Critical Files Needing Migration**:
+
+| File | Local Path | Supabase Target | Priority |
+|------|------------|-----------------|----------|
+| `documentTitleService.ts` | `data/Regulation Docs/file_titles.json` | `json_data/regulation/file_titles.json` | 🔥 HIGH |
+| `documentTitleServiceEnhanced.ts` | `data/Regulation Docs/file_titles.json` | `json_data/regulation/file_titles.json` | 🔥 HIGH |
+| `feeSearchService.ts` | `data/normalized-fee-data.json` | `json_data/fees/normalized-fee-data.json` | 🔥 HIGH |
+| `faqDocumentProcessor.ts` | Local DOCX processing | Supabase DOCX processing | ⭐ MEDIUM |
+| `pdfProcessor.ts` | Local PDF processing | Supabase PDF processing | ⭐ MEDIUM |
+| `auth-tokens.ts` | `.tmp-reset-tokens.json` | Database storage | ⭐ LOW |
+
+## 🔧 **PHASE 3: CRITICAL FILES MIGRATION - IN PROGRESS**
+
+### **✅ CODE UPDATED (READY FOR UPLOAD)**
+
+**Successfully migrated 3 critical services from filesystem to Supabase URLs:**
+
+| **Service** | **Status** | **Local Path** | **New Supabase URL** |
+|-------------|------------|----------------|----------------------|
+| `documentTitleService.ts` | ✅ **CODE UPDATED** | `data/Regulation Docs/file_titles.json` | `json_data/regulation/file_titles.json` |
+| `documentTitleServiceEnhanced.ts` | ✅ **CODE UPDATED** | `data/Regulation Docs/file_titles.json` | `json_data/regulation/file_titles.json` |
+| `feeSearchService.ts` | ✅ **CODE UPDATED** | `data/normalized-fee-data.json` | `json_data/fees/normalized-fee-data.json` |
+
+### **⚠️ FILES NEED TO BE UPLOADED TO SUPABASE**
+
+**Required uploads for services to work:**
+
+1. **📄 `file_titles.json`** 
+   - **From**: `data/Regulation Docs/file_titles.json` (11KB, 274 lines)
+   - **To**: `json_data/regulation/file_titles.json`
+   - **Impact**: Regulation page document titles
+
+2. **💰 `normalized-fee-data.json`**
+   - **From**: `data/normalized-fee-data.json` (37KB, 1458 lines)  
+   - **To**: `json_data/fees/normalized-fee-data.json`
+   - **Impact**: Fee search functionality
+
+### **🚀 READY TO COMMIT & TEST**
+
+**Next Steps:**
+1. **Upload files to Supabase** using the paths specified above
+2. **Test updated services** to verify they fetch data correctly
+3. **Deploy** - Services now serverless-compatible!
 
 ## Lessons
 

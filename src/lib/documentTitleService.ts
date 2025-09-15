@@ -1,5 +1,4 @@
-import fs from 'fs';
-import path from 'path';
+// Now uses Supabase Storage instead of filesystem
 
 export interface FileTitle {
   "File Name": string;
@@ -29,21 +28,21 @@ export class DocumentTitleService {
     }
 
     try {
-      console.log('🔧 DocumentTitleService: Initializing title mappings...');
+      console.log('🔧 DocumentTitleService: Initializing title mappings from Supabase...');
       
-      // Get the absolute path to the file_titles.json
-      const filePath = path.join(process.cwd(), 'data', 'Regulation Docs', 'file_titles.json');
+      // Fetch file_titles.json from Supabase Storage
+      const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/regulation/file_titles.json';
       
-      // Check if file exists
-      if (!fs.existsSync(filePath)) {
-        console.warn('⚠️ DocumentTitleService: file_titles.json not found, using fallback to file names');
+      const response = await fetch(supabaseUrl);
+      
+      if (!response.ok) {
+        console.warn(`⚠️ DocumentTitleService: file_titles.json not found in Supabase (${response.status}), using fallback to file names`);
         this.isInitialized = true;
         return;
       }
 
-      // Read and parse the JSON file
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
-      const fileTitles: FileTitle[] = JSON.parse(fileContent);
+      // Parse the JSON response
+      const fileTitles: FileTitle[] = await response.json();
 
       // Build the title mapping
       let mappingCount = 0;
