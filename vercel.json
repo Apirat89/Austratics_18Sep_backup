@@ -6,8 +6,8 @@
   },
   "crons": [
     {
-      "path": "/api/news/refresh",
-      "schedule": "*/30 * * * *"
+      "path": "/api/cron/refresh-news-cache",
+      "schedule": "0 * * * *"
     }
   ],
   "headers": [

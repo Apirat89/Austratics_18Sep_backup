@@ -35,6 +35,7 @@
     "fast-xml-parser": "^5.2.5",
     "flexsearch": "^0.8.205",
     "form-data": "^4.0.0",
+    "glob": "^11.0.3",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.511.0",
     "mammoth": "^1.10.0",

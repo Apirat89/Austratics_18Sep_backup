@@ -2067,3 +2067,232 @@ The surgical approach will get the application deployed quickly while minimizing
 ## Lessons
 
 *Deployment preparation should include running production build checks locally before attempting deployment to catch these issues early.*
+
+## 🔄 **SUPABASE STORAGE MIGRATION PLAN**
+
+**USER REQUEST:** Migrate all local file references to Supabase Storage URLs
+
+**PLANNER MODE ACTIVE** 🧠
+
+## Background and Motivation
+
+The application currently serves various data files (JSON, GeoJSON, images, docx) locally from the filesystem. These files have been uploaded to Supabase Storage buckets and are now available via public URLs. We need to systematically update all code references to use these cloud-hosted files instead of local files.
+
+**Key Advantages:**
+- **Scalability**: Storage scales independently of application
+- **Performance**: CDN delivery for faster global access
+- **Reliability**: Reduced dependency on local file system
+- **Deployment Simplicity**: No need to package data files with application code
+
+**Migration Scope:**
+- JSON data files (maps, statistics, demographics)
+- GeoJSON files (boundaries, regions)
+- Image files (backgrounds, thumbnails)
+- Documentation files (user guides, FAQs)
+
+## Key Challenges and Analysis
+
+### **Challenge 1: Identifying All File References**
+**Current State**: Files referenced across multiple components, services, and API handlers
+**Target State**: Complete inventory of all file references that need updating
+**Risk Level**: ⭐⭐⭐ HIGH - Missing references would cause runtime errors
+**Strategy**: Use systematic code search to find all file path patterns
+
+### **Challenge 2: Path Pattern Mapping**
+**Current State**: Various local path patterns:
+- `/public/Maps_ABS_CSV/` 
+- `/Maps_ABS_CSV/`
+- `/data/sa2/`
+- `/public/maps/abs_csv/`
+- Public images at `/public/`
+- FAQ docs at `/data/FAQ/`
+
+**Target State**: Standardized Supabase URLs:
+- JSON bucket: `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/...`
+- Images bucket: `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/images/...`
+- FAQ bucket: `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/faq/...`
+
+**Risk Level**: ⭐⭐ MEDIUM - Need precise path mapping
+**Strategy**: Create explicit mapping table for each file
+
+### **Challenge 3: Service and Component Updates**
+**Current State**: Files loaded via various methods (fetch, direct import, fs)
+**Target State**: All files loaded via HTTP fetch or import from Supabase URLs
+**Risk Level**: ⭐⭐ MEDIUM - Need to adapt loading methods
+**Strategy**: Update fetch calls and imports, potentially create helper function
+
+### **Challenge 4: Testing Without Breaking Functionality**
+**Current State**: Working application with local file access
+**Target State**: Working application with Supabase storage access
+**Risk Level**: ⭐⭐⭐ HIGH - Changes could break critical features
+**Strategy**: Incremental changes with testing after each batch
+
+## High-level Task Breakdown
+
+### **Phase 1: File Reference Inventory** 📋
+**Goal**: Create complete inventory of files and their references
+**Tasks**:
+1.1 Search for patterns like `Maps_ABS_CSV`, `data/sa2`, `/public/`, etc.
+1.2 Document all components/files that reference data files
+1.3 Create mapping table between local paths and Supabase URLs
+1.4 Identify different loading methods used (direct import, fetch, fs)
+
+### **Phase 2: Create Helper Functions (if needed)** 🛠️
+**Goal**: Standardize file loading approach
+**Tasks**:
+2.1 Evaluate if helper function would simplify migration
+2.2 Create utility for converting paths or loading Supabase files
+2.3 Test helper functions with different file types
+
+### **Phase 3: Update Map Data References** 🗺️
+**Goal**: Migrate map-related JSON and GeoJSON files
+**Tasks**:
+3.1 Update components that load map demographics data
+3.2 Update components that load GeoJSON boundaries
+3.3 Update services that fetch map statistics
+3.4 Test map functionality with each change
+
+### **Phase 4: Update SA2 Data References** 📊
+**Goal**: Migrate SA2 demographic and statistics files
+**Tasks**:
+4.1 Update components that load SA2 demographics
+4.2 Update components that load SA2 statistics
+4.3 Update any API routes that serve SA2 data
+4.4 Test SA2 visualization and filtering features
+
+### **Phase 5: Update Image References** 🖼️
+**Goal**: Migrate all image references to Supabase URLs
+**Tasks**:
+5.1 Update background images on public pages
+5.2 Update any dynamic image loading components
+5.3 Test image loading and appearance
+
+### **Phase 6: Update Documentation References** 📄
+**Goal**: Migrate FAQ and user guide references
+**Tasks**:
+6.1 Update FAQ document loading
+6.2 Update user guide references
+6.3 Test document access and download
+
+### **Phase 7: Final Testing and Verification** ✅
+**Goal**: Ensure complete migration without issues
+**Tasks**:
+7.1 Comprehensive testing of all features
+7.2 Verify console has no file loading errors
+7.3 Check network tab for proper Supabase URL requests
+7.4 Test with slow connection to verify loading states
+
+## Project Status Board
+
+- **Phase 1: File Reference Inventory** ⏳ PENDING
+- **Phase 2: Create Helper Functions** ⏳ PENDING
+- **Phase 3: Update Map Data References** ⏳ PENDING
+- **Phase 4: Update SA2 Data References** ⏳ PENDING
+- **Phase 5: Update Image References** ⏳ PENDING
+- **Phase 6: Update Documentation References** ⏳ PENDING
+- **Phase 7: Final Testing and Verification** ⏳ PENDING
+
+## Path Mapping Reference
+
+### Map JSON Files
+| Local Path | Supabase URL |
+|------------|--------------|
+| `/public/Maps_ABS_CSV/Demographics_2023.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Demographics_2023.json` |
+| `/public/Maps_ABS_CSV/econ_stats.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/econ_stats.json` |
+| `/public/Maps_ABS_CSV/health_stats.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/health_stats.json` |
+| `/Maps_ABS_CSV/Residential_May2025_ExcludeMPS_updated_with_finance.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Residential_May2025_ExcludeMPS_updated_with_finance.json` |
+| `/Maps_ABS_CSV/Residential_Statistics_Analysis.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/Residential_Statistics_Analysis.json` |
+
+### Map GeoJSON Files
+| Local Path | Supabase URL |
+|------------|--------------|
+| `/public/Maps_ABS_CSV/DOH_simplified.geojson` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/DOH_simplified.geojson` |
+| `/public/Maps_ABS_CSV/healthcare_simplified_backup.geojson` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/healthcare_simplified_backup.geojson` |
+| `/public/Maps_ABS_CSV/healthcare.geojson` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/healthcare.geojson` |
+| `/public/Maps_ABS_CSV/LGA.geojson` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/LGA.geojson` |
+| `/public/Maps_ABS_CSV/MMM_simplified.geojson` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/MMM_simplified.geojson` |
+| `/public/Maps_ABS_CSV/POA.geojson` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/POA.geojson` |
+| `/public/Maps_ABS_CSV/SA3.geojson` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA3.geojson` |
+| `/public/Maps_ABS_CSV/SA4.geojson` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA4.geojson` |
+| `/public/Maps_ABS_CSV/SAL.geojson` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SAL.geojson` |
+
+### SA2 Data Files
+| Local Path | Supabase URL |
+|------------|--------------|
+| `/data/sa2/Demographics_2023_comprehensive.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/Demographics_2023_comprehensive.json` |
+| `/data/sa2/Demographics_2023_expanded.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/Demographics_2023_expanded.json` |
+| `/data/sa2/Demographics_2023.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/Demographics_2023.json` |
+| `/data/sa2/DSS_Cleaned_2024_comprehensive.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/DSS_Cleaned_2024_comprehensive.json` |
+| `/data/sa2/DSS_Cleaned_2024_expanded.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/DSS_Cleaned_2024_expanded.json` |
+| `/data/sa2/DSS_Cleaned_2024.json` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/DSS_Cleaned_2024.json` |
+
+### FAQ Documents
+| Local Path | Supabase URL |
+|------------|--------------|
+| `/data/FAQ/homecare_userguide.docx` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/faq/guides/homecare_userguide.docx` |
+| `/data/FAQ/maps_Userguide.docx` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/faq/guides/maps_Userguide.docx` |
+| `/data/FAQ/news_userguide.docx` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/faq/guides/news_userguide.docx` |
+| `/data/FAQ/residential_userguide.docx` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/faq/guides/residential_userguide.docx` |
+| `/data/FAQ/SA2_userguide.docx` | `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/faq/guides/SA2_userguide.docx` |
+
+## Implementation Notes
+
+### Code Patterns to Look For
+1. **Direct imports**:
+   ```typescript
+   import Demographics from '../../public/Maps_ABS_CSV/Demographics_2023.json';
+   ```
+
+2. **Fetch API calls**:
+   ```typescript
+   fetch('/Maps_ABS_CSV/Demographics_2023.json')
+     .then(res => res.json())
+   ```
+
+3. **Next.js public folder references**:
+   ```tsx
+   <Image src="/images/aerial-view-of-scarborough-beach-perth-western-a-2025-02-09-00-32-40-utc.jpg" />
+   ```
+
+4. **Backend file system reads**:
+   ```typescript
+   import fs from 'fs';
+   import path from 'path';
+   const data = fs.readFileSync(path.join(process.cwd(), 'data', 'sa2', 'Demographics_2023.json'));
+   ```
+
+### Update Patterns
+1. **For direct imports**: Update the import path to use remote URL (may require webpack config updates)
+2. **For fetch API calls**: Replace local path with full Supabase URL
+3. **For Next.js Image components**: Replace local path with Supabase URL
+4. **For backend fs reads**: Switch to fetch or axios to load from Supabase
+
+### Potential Helper Function
+```typescript
+// src/lib/supabaseStorage.ts
+
+export const SUPABASE_STORAGE_URL = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public';
+
+export function getSupabaseFileUrl(bucket: string, path: string): string {
+  return `${SUPABASE_STORAGE_URL}/${bucket}/${path}`;
+}
+
+export function mapJSONPath(localPath: string): string {
+  // Map from local path to Supabase storage URL
+  if (localPath.includes('Maps_ABS_CSV')) {
+    return getSupabaseFileUrl('json_data', `maps/${localPath.split('/').pop()}`);
+  } else if (localPath.includes('data/sa2')) {
+    return getSupabaseFileUrl('json_data', `sa2/${localPath.split('/').pop()}`);
+  }
+  // Add more mappings as needed
+  return localPath; // Return original if no mapping found
+}
+```
+
+## Lessons
+
+*Storage migration requires careful path mapping and thorough testing to ensure all file references are updated. Having a complete inventory of file paths and their new locations is essential for a successful migration.*
+
+---
+
+**READY FOR IMPLEMENTATION** - All migration requirements have been analyzed and a detailed plan has been created 🚀

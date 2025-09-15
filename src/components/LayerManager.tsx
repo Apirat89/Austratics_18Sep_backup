@@ -7,6 +7,7 @@ import { waitForStyleAndIdle, safeMapOperation } from '../lib/mapboxEvents';
 import { globalLoadingCoordinator } from './MapLoadingCoordinator';
 import { trackApiCall } from '@/lib/usageTracking';
 import { getMapDataUrl } from '../lib/supabaseStorage';
+import { createBrowserClient } from '@supabase/ssr';
 
 interface SA2HeatmapData {
   [sa2Id: string]: number;
@@ -174,7 +175,7 @@ export default function LayerManager({
       console.warn('⚠️ LayerManager: SA2 boundary loading timeout, forcing release');
       mapBusy.release();
       setBoundaryLoading(false);
-    }, 30000); // 30 second timeout
+    }, 60000); // Increased to 60 seconds for large file
 
     try {
       await waitForStyleAndIdle(map);
@@ -186,31 +187,64 @@ export default function LayerManager({
         console.log('📦 LayerManager: Using cached SA2 boundary data');
         globalLoadingCoordinator.reportBoundaryLoading(100);
       } else {
-        console.log('🔄 LayerManager: Loading SA2 boundary data...');
+        console.log('🔄 LayerManager: Loading SA2 boundary data from Supabase Storage...');
         
-        // Load from Supabase Storage
         try {
-          console.log('🔍 LayerManager: Loading SA2.geojson from Supabase Storage bucket');
-          const supabaseUrl = getMapDataUrl('SA2.geojson');
-          console.log('🔍 Using URL:', supabaseUrl);
+          // Use Supabase Storage API directly to bypass REST API limits
+          console.log('🔍 LayerManager: Loading large SA2.geojson via Storage API');
+          
+          const supabase = createBrowserClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+          );
           
           globalLoadingCoordinator.reportBoundaryLoading(10);
           
-          const response = await fetch(supabaseUrl);
+          // Download file directly from storage bucket
+          const { data: fileData, error: downloadError } = await supabase.storage
+            .from('json_data')
+            .download('maps/SA2.geojson');
           
-          if (!response.ok) {
-            throw new Error(`Failed to load SA2.geojson from Supabase: ${response.status} ${response.statusText}`);
+          if (downloadError) {
+            throw new Error(`Storage download failed: ${downloadError.message}`);
           }
           
-          geojsonData = await response.json();
+          if (!fileData) {
+            throw new Error('No file data received from storage');
+          }
+          
+          globalLoadingCoordinator.reportBoundaryLoading(60);
+          console.log('✅ LayerManager: File downloaded, parsing JSON...');
+          
+          // Convert blob to text and parse JSON
+          const textContent = await fileData.text();
+          geojsonData = JSON.parse(textContent);
           
           globalLoadingCoordinator.reportBoundaryLoading(100);
-          console.log('✅ LayerManager: Successfully loaded SA2 boundary data from Supabase Storage');
+          console.log('✅ LayerManager: Successfully loaded SA2 boundary data via Storage API');
           console.log(`📊 LayerManager: Features loaded: ${geojsonData.features?.length || 0}`);
-        } catch (error) {
-          console.error('❌ LayerManager: Error loading SA2.geojson:', error);
-          setBoundaryError(`Failed to load map boundaries. ${error instanceof Error ? error.message : 'Unknown error'}`);
-          throw error; // Propagate error to outer try-catch
+          
+        } catch (storageError) {
+          console.error('❌ LayerManager: Storage API failed, trying direct URL:', storageError);
+          
+          // Fallback to direct fetch as last resort
+          try {
+            const supabaseUrl = getMapDataUrl('SA2.geojson');
+            console.log('🔍 LayerManager: Fallback to direct fetch from:', supabaseUrl);
+            
+            const response = await fetch(supabaseUrl);
+            
+            if (!response.ok) {
+              throw new Error(`Direct fetch failed: ${response.status} ${response.statusText}`);
+            }
+            
+            geojsonData = await response.json();
+            console.log('✅ LayerManager: Fallback direct fetch succeeded');
+          } catch (fallbackError) {
+            console.error('❌ LayerManager: All loading methods failed:', fallbackError);
+            setBoundaryError(`Failed to load SA2 boundaries. Both Storage API and direct fetch failed.`);
+            throw fallbackError;
+          }
         }
 
         // Cache the data
