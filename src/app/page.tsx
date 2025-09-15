@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import PasswordInput from '../components/PasswordInput';
 import { useSearchParams } from 'next/navigation';
-import { getPublicUrl } from '../lib/supabase-storage';
+import { getImageUrl } from '../lib/publicUrl';
 
 // Background images - filenames must match what's in Supabase
 const BACKGROUND_IMAGES = [
@@ -28,9 +28,16 @@ function HomeContent() {
   const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
+  const [logoLoaded, setLogoLoaded] = useState(false);
+  const didInit = React.useRef(false);
   
   // Set random background photo on client-side only
   useEffect(() => {
+    // Prevent React Strict Mode double-mounting in development
+    if (didInit.current) return;
+    didInit.current = true;
+    
     // Check if there's an error message in the URL params
     const errorParam = searchParams?.get('error');
     if (errorParam) {
@@ -44,6 +51,24 @@ function HomeContent() {
       }
     }
     
+    // Load the logo first
+    const logoImageUrl = getImageUrl('Austratics Logo.png');
+    if (logoImageUrl) {
+             const img = new Image();
+       img.onload = () => {
+         console.log('✅ Logo loaded successfully:', logoImageUrl);
+         setLogoUrl(logoImageUrl);
+         setLogoLoaded(true);
+       };
+       img.onerror = (e) => {
+         console.error('❌ Logo failed to load:', logoImageUrl, e);
+         setLogoLoaded(true); // Allow text to show as fallback
+       };
+      img.src = logoImageUrl;
+    } else {
+      setLogoLoaded(true); // Allow text to show as fallback
+    }
+    
     // Choose a random background image from the list
     const randomIndex = Math.floor(Math.random() * BACKGROUND_IMAGES.length);
     const filename = BACKGROUND_IMAGES[randomIndex];
@@ -52,19 +77,29 @@ function HomeContent() {
     try {
       console.log('Attempting to load background image:', filename);
       
-      // Method 1: Use the helper function (preferred if bucket is public)
-      const imageUrl = getPublicUrl('images', filename);
-      console.log('Generated image URL:', imageUrl);
-      setBackgroundImage(imageUrl);
+      // Use the new client-safe helper function
+      const imageUrl = getImageUrl(filename);
+      console.log('Generated background image URL:', imageUrl);
       
-      // Method 2: Construct URL directly (backup method)
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      if (!imageUrl && supabaseUrl) {
-        // Extract the project reference from the Supabase URL
-        const projectRef = supabaseUrl.split('//')[1]?.split('.')[0];
-        const directUrl = `https://${projectRef}.supabase.co/storage/v1/object/public/images/${filename}`;
-        console.log('Fallback to direct URL:', directUrl);
-        setBackgroundImage(directUrl);
+      if (imageUrl) {
+        // Pre-load the background image to ensure it works
+        const bgImg = new Image();
+        bgImg.onload = () => {
+          console.log('✅ Background image loaded successfully:', imageUrl);
+          setBackgroundImage(imageUrl);
+        };
+        bgImg.onerror = (e) => {
+          console.error('❌ Background image failed to load:', imageUrl, e);
+          // Try direct fallback
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+          if (supabaseUrl) {
+            const projectRef = supabaseUrl.split('//')[1]?.split('.')[0];
+            const directUrl = `https://${projectRef}.supabase.co/storage/v1/object/public/images/${encodeURIComponent(filename)}`;
+            console.log('🔄 Trying direct fallback URL:', directUrl);
+            setBackgroundImage(directUrl);
+          }
+        };
+        bgImg.src = imageUrl;
       }
     } catch (error) {
       console.error('Failed to generate image URL:', error);
@@ -152,25 +187,18 @@ function HomeContent() {
     }
   };
 
-  // Apply background image as a style when available
-  const backgroundStyle = backgroundImage 
-    ? { backgroundImage: `url('${backgroundImage}')` }
-    : {}; // Empty object for fallback
-
   return (
-    <div 
-      className="min-h-screen flex flex-col items-center justify-center bg-cover bg-center p-4"
-      style={backgroundStyle}
-    >
-      {/* Background Image */}
-      <div 
-        className="fixed inset-0 bg-cover bg-center transition-opacity duration-500"
-        style={{ 
-          backgroundImage: backgroundImage ? `url('${backgroundImage}')` : 'none', 
-          opacity: backgroundImage ? 1 : 0 
-        }}
-      >
-        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div className="relative min-h-screen flex flex-col items-center justify-center p-4">
+      {/* Background layer behind everything */}
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div
+          className="h-full w-full bg-cover bg-center transition-opacity duration-500"
+          style={{
+            backgroundImage: backgroundImage ? `url('${backgroundImage}')` : undefined,
+            opacity: backgroundImage ? 1 : 0
+          }}
+        />
+        <div className="absolute inset-0 bg-black/50" />
       </div>
 
       {/* Centered Sign In Form */}
@@ -189,15 +217,41 @@ function HomeContent() {
           
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <h1 style={{ 
-              color: 'white', 
-              fontSize: '2.5rem', 
-              fontWeight: 'bold', 
-              marginBottom: '0.5rem',
-              textShadow: '0 1px 3px rgba(0,0,0,0.5)'
-            }}>
-              Austratics
-            </h1>
+            {/* Show logo if loaded, otherwise show text only after logo loading is complete */}
+            {logoUrl ? (
+              <div style={{ marginBottom: '1rem' }}>
+                <img 
+                  src={logoUrl} 
+                  alt="Austratics Logo" 
+                  style={{
+                    height: '7rem', // Bigger as requested
+                    maxWidth: '18rem', // Increased proportionally
+                    objectFit: 'contain',
+                    filter: 'brightness(0) invert(1) drop-shadow(0 2px 8px rgba(0,0,0,0.7))', // Enhanced shadow
+                    margin: '0 auto',
+                    display: 'block'
+                  }}
+                  onError={(e) => {
+                    console.error('Logo failed to display:', logoUrl);
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            ) : logoLoaded ? (
+              <h1 style={{ 
+                color: 'white', 
+                fontSize: '2.5rem', 
+                fontWeight: 'bold', 
+                marginBottom: '0.5rem',
+                textShadow: '0 1px 3px rgba(0,0,0,0.5)'
+              }}>
+                Austratics
+              </h1>
+            ) : (
+              // Reserve space while loading (prevents flash)
+              <div style={{ height: '7rem', marginBottom: '1rem' }}></div>
+            )}
+            
             <p style={{ 
               color: 'rgba(255,255,255,0.9)', 
               fontSize: '1.125rem',
