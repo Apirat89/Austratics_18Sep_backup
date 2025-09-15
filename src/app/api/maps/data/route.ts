@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSignedUrl, downloadJson } from '@/lib/supabaseStorage';
+import { getJsonFromStorage, createServerClient } from '@/lib/serverStorage';
 
 // API route to proxy map data from Supabase
 export async function GET(request: NextRequest) {
@@ -29,10 +29,12 @@ export async function GET(request: NextRequest) {
     // Try each path until we find the file
     for (const path of possiblePaths) {
       try {
-        data = await downloadJson(bucket, path);
-        foundPath = path;
-        console.log(`Found file at ${bucket}/${path}`);
-        break;
+        data = await getJsonFromStorage(bucket, path);
+        if (data) {
+          foundPath = path;
+          console.log(`Found file at ${bucket}/${path}`);
+          break;
+        }
       } catch (err) {
         console.log(`File not found at ${bucket}/${path}, trying next path...`);
       }
@@ -56,10 +58,17 @@ export async function GET(request: NextRequest) {
     // If direct download failed, try signed URL approach
     try {
       // Get a signed URL for the file
-      const signedUrl = await getSignedUrl(bucket, possiblePaths[0], 3600);
+      const supabase = createServerClient();
+      const { data: urlData, error } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(possiblePaths[0], 3600);
+      
+      if (error || !urlData?.signedUrl) {
+        throw error || new Error('Failed to generate signed URL');
+      }
       
       // Redirect to the signed URL
-      return NextResponse.redirect(signedUrl);
+      return NextResponse.redirect(urlData.signedUrl);
     } catch (err) {
       console.error(`Error getting signed URL for ${bucket}/${filename}:`, err);
       return NextResponse.json({ error: 'File not found' }, { status: 404 });

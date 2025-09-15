@@ -21,7 +21,7 @@ export default function MapsPage() {
     'POA.geojson'
   ];
 
-  return (
+        return (
     <main className="flex flex-col min-h-screen">
       <div className="flex-grow p-4">
         <h1 className="text-2xl font-bold mb-4">Maps</h1>
@@ -35,13 +35,13 @@ export default function MapsPage() {
             center={[133.7751, -25.2744]} 
             zoom={4}
           />
-        </div>
-        
+                        </div>
+
         {/* Map legend or additional controls could go here */}
         <div className="mt-4 text-sm text-gray-600">
           <p>Data sources: Australian Bureau of Statistics, Department of Health</p>
-        </div>
-      </div>
-    </main>
+                          </div>
+          </div>
+        </main>
   );
 } 
