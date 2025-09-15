@@ -28,10 +28,13 @@ export default function MapDisplay({
   useEffect(() => {
     if (!mapContainer.current) return;
     
-    // MapTiler key must be available as NEXT_PUBLIC_MAPTILER_KEY
-    const mapTilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY;
+    // Try all possible MapTiler key environment variable names
+    const mapTilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY || 
+                       process.env.NEXT_PUBLIC_MAPTILER_API_KEY || 
+                       process.env.MAPTILER_API_KEY;
+                       
     if (!mapTilerKey) {
-      setError('MapTiler API key is missing. Add NEXT_PUBLIC_MAPTILER_KEY to your environment variables.');
+      setError('MapTiler API key is missing. Please add one of these environment variables: NEXT_PUBLIC_MAPTILER_KEY, NEXT_PUBLIC_MAPTILER_API_KEY, or MAPTILER_API_KEY');
       return;
     }
     
@@ -146,8 +149,8 @@ export default function MapDisplay({
                     // Try to load marker icon
                     const markerUrl = getPublicUrl('images', 'markers/residential.svg');
                     
-                    // Load marker image with correct typing
-                    map.current.loadImage(markerUrl, (err: Error | undefined, image: ImageBitmap | undefined) => {
+                    // Load marker image with correct typing for MapLibre GL
+                    map.current.loadImage(markerUrl, function(err, image) {
                       if (err || !image) {
                         console.error('Error loading marker image:', err);
                         // Fallback to circle layer

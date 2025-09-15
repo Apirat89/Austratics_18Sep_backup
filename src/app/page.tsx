@@ -50,22 +50,28 @@ function HomeContent() {
     
     // Generate direct Supabase CDN URL using the public bucket
     try {
+      console.log('Attempting to load background image:', filename);
+      
       // Method 1: Use the helper function (preferred if bucket is public)
       const imageUrl = getPublicUrl('images', filename);
+      console.log('Generated image URL:', imageUrl);
       setBackgroundImage(imageUrl);
       
       // Method 2: Construct URL directly (backup method)
-      // const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      // if (supabaseUrl) {
-      //   // Extract the project reference from the Supabase URL
-      //   const projectRef = supabaseUrl.split('//')[1]?.split('.')[0];
-      //   const directUrl = `https://${projectRef}.supabase.co/storage/v1/object/public/images/${filename}`;
-      //   setBackgroundImage(directUrl);
-      // }
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      if (!imageUrl && supabaseUrl) {
+        // Extract the project reference from the Supabase URL
+        const projectRef = supabaseUrl.split('//')[1]?.split('.')[0];
+        const directUrl = `https://${projectRef}.supabase.co/storage/v1/object/public/images/${filename}`;
+        console.log('Fallback to direct URL:', directUrl);
+        setBackgroundImage(directUrl);
+      }
     } catch (error) {
       console.error('Failed to generate image URL:', error);
       // Fallback to local path as a last resort
-      setBackgroundImage(`/${filename}`);
+      const fallbackUrl = `/${filename}`;
+      console.log('Using local fallback URL:', fallbackUrl);
+      setBackgroundImage(fallbackUrl);
     }
   }, [searchParams]);
 
