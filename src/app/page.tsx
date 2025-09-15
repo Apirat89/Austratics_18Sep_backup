@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import PasswordInput from '../components/PasswordInput';
 import { useSearchParams } from 'next/navigation';
-import { getPublicUrl } from '../lib/supabase-storage';
+import { getPublicUrl } from '../lib/supabaseStorage';
 
-// Background images
+// Background images - filenames must match what's in Supabase
 const BACKGROUND_IMAGES = [
-  '/australian-koala-in-its-natural-habitat-of-gumtree-2024-11-27-16-51-33-utc.jpg',
-  '/australian-aerial-photography-2024-09-18-02-10-16-utc.jpg',
-  '/aerial-view-of-scarborough-beach-perth-western-a-2025-02-09-00-32-40-utc.jpg'
+  'australian-koala-in-its-natural-habitat-of-gumtree-2024-11-27-16-51-33-utc.jpg',
+  'australian-aerial-photography-2024-09-18-02-10-16-utc.jpg',
+  'aerial-view-of-scarborough-beach-perth-western-a-2025-02-09-00-32-40-utc.jpg'
 ];
 
 function HomeContent() {
@@ -44,17 +44,28 @@ function HomeContent() {
       }
     }
     
-    // Set random background image - use public URL directly for login page
+    // Choose a random background image from the list
     const randomIndex = Math.floor(Math.random() * BACKGROUND_IMAGES.length);
-    const randomImage = BACKGROUND_IMAGES[randomIndex];
+    const filename = BACKGROUND_IMAGES[randomIndex];
     
-    // Extract just the filename
-    const filename = randomImage.split('/').pop();
-    
-    if (filename) {
-      // Use direct public URL for login page - bypassing authentication
+    // Generate direct Supabase CDN URL using the public bucket
+    try {
+      // Method 1: Use the helper function (preferred if bucket is public)
       const imageUrl = getPublicUrl('images', filename);
       setBackgroundImage(imageUrl);
+      
+      // Method 2: Construct URL directly (backup method)
+      // const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      // if (supabaseUrl) {
+      //   // Extract the project reference from the Supabase URL
+      //   const projectRef = supabaseUrl.split('//')[1]?.split('.')[0];
+      //   const directUrl = `https://${projectRef}.supabase.co/storage/v1/object/public/images/${filename}`;
+      //   setBackgroundImage(directUrl);
+      // }
+    } catch (error) {
+      console.error('Failed to generate image URL:', error);
+      // Fallback to local path as a last resort
+      setBackgroundImage(`/${filename}`);
     }
   }, [searchParams]);
 
