@@ -188,74 +188,32 @@ export default function LayerManager({
       } else {
         console.log('🔄 LayerManager: Loading SA2 boundary data...');
         
-        // First try to load from Supabase Storage buckets
+        // Load from Supabase Storage
         try {
-          console.log('🔍 LayerManager: Attempting to load SA2.geojson from Supabase Storage bucket');
+          console.log('🔍 LayerManager: Loading SA2.geojson from Supabase Storage bucket');
           const supabaseUrl = getMapDataUrl('SA2.geojson');
+          console.log('🔍 Using URL:', supabaseUrl);
           
           globalLoadingCoordinator.reportBoundaryLoading(10);
           
-          // Try loading from Supabase Storage
           const response = await fetch(supabaseUrl);
           
           if (!response.ok) {
-            throw new Error(`Failed to load from Supabase: ${response.status} ${response.statusText}`);
+            throw new Error(`Failed to load SA2.geojson from Supabase: ${response.status} ${response.statusText}`);
           }
           
           geojsonData = await response.json();
           
           globalLoadingCoordinator.reportBoundaryLoading(100);
           console.log('✅ LayerManager: Successfully loaded SA2 boundary data from Supabase Storage');
-          console.log(`📊 LayerManager: Features from Supabase: ${geojsonData.features?.length || 0}`);
-        } catch (storageError) {
-          console.log('⚠️ LayerManager: Could not load from Supabase Storage, falling back to static files:', storageError);
-          
-          // Fallback to fetch from static files
-          console.log('📡 LayerManager: Fetching SA2.geojson (170MB file)...');
-          globalLoadingCoordinator.reportBoundaryLoading(10);
-          const startTime = Date.now();
-          
-          // Use Supabase URL for SA2.geojson
-          const supabaseUrl = getMapDataUrl('SA2.geojson');
-          console.log('🔍 Boundary fetch URL:', supabaseUrl);
-          console.log('🔍 Current path:', window.location.pathname);
-          console.log('🔍 Current origin:', window.location.origin);
-          
-          let response = await fetch(supabaseUrl);
-          console.log('🔍 Boundary fetch response status:', response.status, response.statusText);
-          
-          if (!response.ok) {
-            // Try with alternative path as fallback
-            console.log('⚠️ First attempt failed. Trying local fallback: /maps/SA2.geojson');
-            const localResponse = await fetch('/maps/SA2.geojson');
-            
-            if (!localResponse.ok) {
-              // Try with public path as another fallback
-              console.log('⚠️ Local fallback failed. Trying public path: /public/maps/SA2.geojson');
-              const publicResponse = await fetch('/public/maps/SA2.geojson');
-              
-              if (!publicResponse.ok) {
-                throw new Error(`Failed to load SA2 boundaries from Supabase (${supabaseUrl}) and local paths. Status: ${response.status} ${response.statusText}`);
-              } else {
-                console.log('✅ Public path fallback succeeded');
-                response = publicResponse;
-              }
-            } else {
-              console.log('✅ Local fallback succeeded');
-              response = localResponse;
-            }
-          }
-          globalLoadingCoordinator.reportBoundaryLoading(60);
-          
-          geojsonData = await response.json();
-          globalLoadingCoordinator.reportBoundaryLoading(100);
-          
-          const loadTime = (Date.now() - startTime) / 1000;
-          console.log(`✅ LayerManager: SA2 boundaries loaded from static files in ${loadTime.toFixed(1)}s`);
-          console.log(`📊 LayerManager: Features from static files: ${geojsonData.features?.length || 0}`);
+          console.log(`📊 LayerManager: Features loaded: ${geojsonData.features?.length || 0}`);
+        } catch (error) {
+          console.error('❌ LayerManager: Error loading SA2.geojson:', error);
+          setBoundaryError(`Failed to load map boundaries. ${error instanceof Error ? error.message : 'Unknown error'}`);
+          throw error; // Propagate error to outer try-catch
         }
 
-        // Cache the data regardless of source
+        // Cache the data
         boundaryDataCache.current.set('sa2-heatmap', geojsonData);
       }
 

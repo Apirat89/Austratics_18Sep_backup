@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import PasswordInput from '../components/PasswordInput';
 import { useSearchParams } from 'next/navigation';
-import { getPublicUrl } from '../lib/supabaseStorage';
+import { getPublicUrl } from '../lib/supabase-storage';
 
 // Background images - filenames must match what's in Supabase
 const BACKGROUND_IMAGES = [
