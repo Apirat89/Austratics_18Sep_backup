@@ -23,8 +23,7 @@
  * const income = region?.['Economics | Median Income'] || 0;
  */
 
-import fs from 'fs/promises';
-import path from 'path';
+// Now uses Supabase Storage instead of filesystem
 
 // Type definitions
 export interface SA2Row {
@@ -161,10 +160,33 @@ function getDSSMetricKey(row: RawDSSRow): string {
 /**
  * Reads and parses a JSON file from the data directory
  */
+// Supabase URL mapping for SA2 data files
+const SA2_FILE_URLS: Record<string, string> = {
+  'Demographics_2023_comprehensive.json': 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/Demographics_2023_comprehensive.json',
+  'econ_stats_comprehensive.json': 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/econ_stats_comprehensive.json',
+  'health_stats_comprehensive.json': 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/health_stats_comprehensive.json',
+  'DSS_Cleaned_2024_comprehensive.json': 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/DSS_Cleaned_2024_comprehensive.json'
+};
+
 async function readDataFile<T>(filename: string): Promise<T[]> {
   try {
-    const filePath = path.join(process.cwd(), 'data', 'sa2', filename);
-    const fileContent = await fs.readFile(filePath, 'utf-8');
+    const supabaseUrl = SA2_FILE_URLS[filename];
+    if (!supabaseUrl) {
+      console.warn(`⚠️ No Supabase URL mapping found for ${filename}`);
+      return [];
+    }
+    
+    console.log(`📥 Fetching ${filename} from Supabase...`);
+    const response = await fetch(supabaseUrl);
+    
+    if (!response.ok) {
+      console.warn(`⚠️ Failed to fetch ${filename} from Supabase (${response.status})`);
+      return [];
+    }
+    
+    const fileContent = await response.text();
+    console.log(`✅ ${filename} fetched successfully, size: ${(fileContent.length / 1024 / 1024).toFixed(2)} MB`);
+    
     return JSON.parse(fileContent);
   } catch (error) {
     console.warn(`⚠️ Failed to read ${filename}:`, error);
@@ -197,11 +219,16 @@ export async function getMergedSA2Data(): Promise<SA2DataWide> {
   console.log('📥 Loading pre-merged SA2 comprehensive dataset...');
   
   try {
-    // Load the single merged file
-    const filePath = path.join(process.cwd(), 'data', 'sa2', 'merged_sa2_data_with_postcodes.json');
-    console.log('📁 Reading file from:', filePath);
+    // Load the single merged file from Supabase
+    const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/merged_sa2_data_with_postcodes.json';
+    console.log('📁 Fetching merged SA2 data from Supabase:', supabaseUrl);
     
-    const fileContent = await fs.readFile(filePath, 'utf-8');
+    const response = await fetch(supabaseUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch merged SA2 data from Supabase (${response.status})`);
+    }
+    
+    const fileContent = await response.text();
     console.log('📄 File read successfully, size:', (fileContent.length / 1024 / 1024).toFixed(2), 'MB');
     
     console.log('🔍 Parsing JSON...');
@@ -374,21 +401,8 @@ async function getMergedSA2DataLegacy(): Promise<SA2DataWide> {
     
     console.log(`✅ SA2 data merged successfully: ${Object.keys(mergedData).length} regions, ${getAllMetrics(mergedData).length} unique metrics`);
     
-    // Production optimization: write to cache file
-    if (process.env.NODE_ENV === 'production') {
-      try {
-        const cacheDir = path.join(process.cwd(), 'public', 'cache');
-        await fs.mkdir(cacheDir, { recursive: true });
-        await fs.writeFile(
-          path.join(cacheDir, 'sa2_merged.json'),
-          JSON.stringify(mergedData),
-          'utf-8'
-        );
-        console.log('📁 Cached merged data to /public/cache/sa2_merged.json');
-      } catch (error) {
-        console.warn('⚠️ Failed to write cache file:', error);
-      }
-    }
+    // Note: Local filesystem caching removed since we're now using Supabase Storage
+    // Data is cached in memory via cachedData variable above
     
     return mergedData;
     
