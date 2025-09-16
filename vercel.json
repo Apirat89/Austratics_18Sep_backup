@@ -1,12 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "_crons_disabled": [
-    {
-      "path": "/api/cron/refresh-news-cache",
-      "schedule": "0 * * * *",
-      "note": "Disabled - using direct RSS fetching instead of caching"
-    }
-  ],
   "functions": {
     "src/app/api/news/route.ts": {
       "maxDuration": 15,
