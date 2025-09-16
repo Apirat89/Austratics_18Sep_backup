@@ -42,30 +42,12 @@ async function handleCronRequest(request: NextRequest) {
     
     const fetchDuration = Date.now() - startTime;
     
-    // Store in cache with 2-hour TTL (for redundancy)
+    // ✅ EXPERT PATTERN: Store in simplified cache
     await NewsCacheService.setCache({
       items: result.items,
-      errors: result.errors,
       lastUpdated: new Date().toISOString(),
-      sources: uniqueSources,
-      fetchDuration
-    }, 7200); // 2 hours TTL
-    
-    // Cache by source for more efficient filtering
-    const sourceGroups = new Map<string, any[]>();
-    result.items.forEach(item => {
-      if (!sourceGroups.has(item.source.id)) {
-        sourceGroups.set(item.source.id, []);
-      }
-      sourceGroups.get(item.source.id)?.push(item);
+      errors: result.errors,
     });
-    
-    // Store source-specific caches in parallel
-    const sourcePromises = Array.from(sourceGroups.entries()).map(
-      ([sourceId, items]) => NewsCacheService.setCacheBySource(sourceId, items, 7200)
-    );
-    
-    await Promise.all(sourcePromises);
     
     console.log(`✅ Vercel Cron: News cache refreshed successfully in ${fetchDuration}ms`);
     
