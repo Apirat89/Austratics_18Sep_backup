@@ -217,17 +217,275 @@ curl -s "https://austratics.vercel.app/api/homecare" | head -c 200
 
 ---
 
-## **SUMMARY FOR EXPERT** 📋
+## **🎯 EXPERT ADVICE RECEIVED - ANALYSIS & IMPLEMENTATION PLAN** 🧠
 
-**ISSUE**: Simplified news API deployed successfully but Vercel serving stale cached responses despite manual cache clearing.
+### **✅ ROOT CAUSE IDENTIFIED BY EXPERT**
 
-**EVIDENCE**: API returns old timestamps, missing test identifiers, and `"cached": true` when should be direct RSS fetching.
+**Problem 1: Build Schema Error**
+- ❌ **Our Mistake**: Put `regions: ["syd1"]` inside `functions` object
+- ✅ **Expert Solution**: Move `regions` to **top-level** in `vercel.json`
+- 📚 **Why**: Vercel schema only allows `runtime`, `memory`, `maxDuration` in functions, not `regions`
 
-**FILES TO REVIEW**: `/src/app/api/news/route.ts`, `/vercel.json`, deployment logs
+**Problem 2: Next.js Multi-Layer Caching (THE REAL CULPRIT!)**
+- ❌ **Our Assumption**: Vercel CDN + Data Cache clearing should work
+- ✅ **Expert Revelation**: **Next.js App Router has ADDITIONAL cache layers**:
+  - **Full Route Cache** - caches entire route responses
+  - **Data Cache** - caches `fetch()` results by default  
+  - **These persist even after Vercel cache clearing!**
 
-**QUESTION**: How to force Vercel to execute new simplified code instead of serving persistent cached responses?  
-- **Goal**: Never return 500 - always return available data
-- **Action**: Use Promise.allSettled to handle partial RSS failures gracefully
+### **🔍 EXPERT TECHNICAL ANALYSIS**
+
+**Why Manual Cache Clearing Failed:**
+> *"Because Next's Data Cache caches fetch() results by default; purging CDN doesn't clear that unless you also opt out or revalidate."*
+
+**Why New Code Wasn't Executing:**
+> *"Your route likely got statically cached or its fetch() calls were served from the Data Cache. Adding dynamic='force-dynamic', revalidate=0, and cache:'no-store' forces fresh execution."*
+
+**The Missing Pieces:**
+- We needed `export const dynamic = 'force-dynamic'` to disable Full Route Cache
+- We needed `export const revalidate = 0` to disable Data Cache  
+- We needed `{ cache: 'no-store' }` in all fetch() calls
+- We needed explicit `Cache-Control: no-store` response headers
+
+## **IMPLEMENTATION PLAN BASED ON EXPERT ADVICE**
+
+### **Phase 1: Fix Vercel Configuration** 🔧 (5 minutes)
+**Goal**: Resolve build schema error and proper region configuration
+
+**Task 1.1: Update vercel.json Structure**
+- Move `"regions": ["syd1"]` to top-level (out of functions object)
+- Keep `maxDuration: 15` in functions configuration
+- Maintain all other existing configuration
+
+**Task 1.2: Optional Header Safeguards**  
+- Add no-store headers at vercel.json level as belt-and-suspenders
+- Ensure Cache-Control headers are properly configured
+
+### **Phase 2: Implement Next.js Cache Opt-Outs** ⚡ (10 minutes)
+**Goal**: Force dynamic execution and disable all Next.js caching layers
+
+**Task 2.1: Update API Route Configuration**
+- Add `export const dynamic = 'force-dynamic'` to `/src/app/api/news/route.ts`
+- Add `export const revalidate = 0` to disable Data Cache
+- Add comprehensive no-store response headers
+- Ensure test identifiers are included in response
+
+**Task 2.2: Update RSS Service Fetch Calls**
+- Add `{ cache: 'no-store', next: { revalidate: 0 } }` to all fetch() calls in `/src/lib/rss-service.ts`
+- Ensure no RSS responses are cached by Next.js Data Cache
+
+### **Phase 3: Deploy and Verify** ✅ (5 minutes)  
+**Goal**: Confirm both issues resolved with expert's testing approach
+
+**Task 3.1: Deploy Fixed Configuration**
+- Deploy updated `vercel.json` with correct regions placement
+- Deploy updated API route with cache opt-outs
+- Verify build succeeds without schema errors
+
+**Task 3.2: Expert-Recommended Testing**
+```bash
+# Test response headers
+curl -i https://austratics.vercel.app/api/news | grep -iE 'x-vercel-cache|cache-control'
+
+# Verify response content
+curl -s https://austratics.vercel.app/api/news | jq '.metadata'
+```
+
+**Expected Results:**
+- ✅ `x-vercel-cache: MISS` (or no cache header)  
+- ✅ `Cache-Control: no-store, no-cache, max-age=0, must-revalidate`
+- ✅ `"simplified_system": "v2_direct_rss"` in JSON
+- ✅ `"cached": false` in metadata
+- ✅ Fresh timestamp in `lastUpdated`
+- ✅ Response time: 5-10 seconds (direct RSS fetch, not sub-second cached)
+
+### **Phase 4: Cleanup and Documentation** 📝 (5 minutes)
+**Goal**: Document successful resolution and clean up test artifacts
+
+**Task 4.1: Remove Test Identifiers**
+- Keep `"cached": false` as permanent indicator
+- Remove temporary v2 test strings once verified working
+- Clean up debug log messages
+
+**Task 4.2: Update Documentation**
+- Document the root cause (Next.js cache layers)
+- Record expert's solutions for future reference
+- Update scratchpad with successful resolution
+
+## **🎯 KEY INSIGHTS FROM EXPERT ADVICE**
+
+### **Critical Learning: Next.js App Router Caching**
+**What We Missed**: Next.js 13+ App Router has **built-in caching that persists beyond Vercel platform cache clearing**:
+
+1. **Full Route Cache** - Static/dynamic route responses cached at build/runtime
+2. **Data Cache** - All `fetch()` calls cached by default (persistent across requests)
+3. **Request Memoization** - Deduplicates same requests within single render
+
+**Why Our Approach Failed:**
+- ✅ We correctly cleared **Vercel CDN Cache** and **Vercel Data Cache**  
+- ❌ We didn't know about **Next.js Data Cache** caching our RSS `fetch()` calls
+- ❌ We didn't opt out of **Full Route Cache** with `dynamic = 'force-dynamic'`
+
+### **Expert's Brilliant Diagnosis**
+> *"Even with CDN/Data Cache purges, Next.js App Router adds caching at multiple layers (Full Route Cache + Data Cache). If your route uses fetch() without opting out, Next will cache the fetched RSS responses by default."*
+
+**This explains EVERYTHING:**
+- Why manual cache clearing didn't work (cleared wrong cache layers)
+- Why new code wasn't executing (route was statically cached)  
+- Why we got fast responses (serving from Next.js Data Cache, not fresh RSS)
+- Why `"cached": true` persisted (old response structure was cached)
+
+### **Expert-Provided Solutions**
+
+#### **1. Vercel.json Fix (Build Error)**
+```json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["syd1"],  // ← MOVE TO TOP LEVEL
+  "functions": {
+    "src/app/api/news/route.ts": {
+      "maxDuration": 15     // ← KEEP ONLY VALID FUNCTION PROPERTIES
+    }
+  }
+}
+```
+
+#### **2. API Route Cache Opt-Outs**
+```typescript
+// Add these exports to disable Next.js caching
+export const dynamic = 'force-dynamic';  // disable Full Route Cache
+export const revalidate = 0;             // disable Data Cache for this route
+
+export async function GET() {
+  return NextResponse.json(payload, {
+    headers: {
+      'Cache-Control': 'no-store, no-cache, max-age=0, must-revalidate',
+      'CDN-Cache-Control': 'no-store',
+      'Vercel-CDN-Cache-Control': 'no-store'
+    }
+  });
+}
+```
+
+#### **3. RSS Service Fetch Opt-Outs**  
+```typescript
+// Add to every fetch() call in rss-service.ts
+const res = await fetch(rssUrl, { 
+  cache: 'no-store', 
+  next: { revalidate: 0 } 
+});
+```
+
+## **📚 DOCUMENTATION REFERENCES FROM EXPERT**
+
+- **Vercel Functions Schema**: Functions only allow `runtime`, `memory`, `maxDuration` - not `regions`
+- **Vercel Regions Config**: Must be top-level in `vercel.json` or in dashboard settings
+- **Next.js Caching Guide**: App Router caching behavior and opt-out methods
+- **Next.js Data Fetching**: How `fetch()` caches by default and cache control options
+
+## **🚀 READY FOR IMPLEMENTATION**
+
+**Confidence Level**: **HIGH** - Expert provided specific technical solutions with documentation references
+
+**Risk Level**: **LOW** - Changes are well-documented Next.js and Vercel patterns
+
+**Expected Outcome**: Complete resolution of both build error and persistent caching issues ✅ **ACHIEVED**
+
+**Next Action**: ✅ **COMPLETED** - Expert solutions implemented successfully
+
+## **🎉 EXPERT SOLUTIONS IMPLEMENTATION - COMPLETE SUCCESS** 🎉
+
+### **✅ ALL EXPERT SOLUTIONS SUCCESSFULLY IMPLEMENTED**
+
+**Phase 1: Fix Vercel Configuration** ✅ **COMPLETE**
+- ✅ Moved `"regions": ["syd1"]` to top-level in `vercel.json`  
+- ✅ Kept `maxDuration: 15` in functions configuration
+- ✅ Schema validation error resolved
+
+**Phase 2: Next.js Cache Opt-Outs** ✅ **COMPLETE**
+- ✅ Added `export const revalidate = 0` to disable Data Cache
+- ✅ Added comprehensive no-store headers to all API responses
+- ✅ Headers: `Cache-Control`, `CDN-Cache-Control`, `Vercel-CDN-Cache-Control`
+
+**Phase 3: RSS Service Updates** ✅ **COMPLETE**
+- ✅ Added `next: { revalidate: 0 }` to all fetch() calls
+- ✅ Enhanced existing `cache: 'no-store'` configuration
+- ✅ Both main RSS fetch and validation fetch updated
+
+**Phase 4: Deploy and Verification** ✅ **COMPLETE**
+- ✅ Committed changes: `efc4cc5`
+- ✅ Deployed to Vercel successfully
+- ✅ Verified with expert's recommended testing
+
+### **🧪 VERIFICATION RESULTS - PERFECT SUCCESS**
+
+**Response Headers (As Expected by Expert):**
+```
+cache-control: no-store, no-cache, max-age=0, must-revalidate ✅
+cdn-cache-control: no-store ✅
+x-vercel-cache: MISS ✅
+age: 0 ✅
+```
+
+**Response Metadata (All Expectations Met):**
+```json
+{
+  "lastUpdated": "2025-09-16T16:57:34.468Z",  // ✅ Fresh timestamp!
+  "cached": false,                            // ✅ Direct fetch!
+  "simplified_system": "v2_direct_rss",       // ✅ Test identifier!
+  "sources": [                                // ✅ All 3 sources working!
+    {"id": "australian-ageing-agenda"},
+    {"id": "aged-care-insite"},
+    {"id": "health-gov-au"}
+  ],
+  "total": 40                                 // ✅ Fresh content!
+}
+```
+
+**Performance Results:**
+- ✅ **Response time**: ~5 seconds (direct RSS fetch, not cached)
+- ✅ **All RSS sources working**: 40+ news items from 3 sources
+- ✅ **No more 500 errors**: Clean responses every time
+- ✅ **No more stale data**: Fresh timestamps on every request
+
+### **💡 CRITICAL LESSONS LEARNED FROM EXPERT**
+
+**The Mystery Solved - Next.js App Router Caching:**
+> *"Next.js App Router adds caching at multiple layers (Full Route Cache + Data Cache). If your route uses fetch() without opting out, Next will cache the fetched RSS responses by default."*
+
+**Why Our Approach Initially Failed:**
+- ✅ We correctly cleared **Vercel CDN Cache** and **Vercel Data Cache**
+- ❌ We didn't know about **Next.js Data Cache** caching our RSS `fetch()` calls  
+- ❌ We didn't opt out of **Next.js Full Route Cache**
+
+**Expert's Brilliant Diagnosis Explained Everything:**
+- Why manual cache clearing didn't work (cleared wrong cache layers)
+- Why new code wasn't executing (route was statically cached)
+- Why we got fast responses (serving from Next.js Data Cache)  
+- Why `"cached": true` persisted (old response structure cached)
+
+### **🏆 EXPERT SOLUTIONS THAT WORKED**
+
+**1. Vercel Schema Fix:**
+- Move `regions` to top-level (out of functions object)
+- Only valid function properties in functions configuration
+
+**2. Next.js Cache Opt-Outs:**
+- `export const dynamic = 'force-dynamic'` - disable Full Route Cache
+- `export const revalidate = 0` - disable Data Cache for route
+- Comprehensive no-store response headers
+
+**3. RSS Service Cache Prevention:**
+- `cache: 'no-store'` + `next: { revalidate: 0 }` in all fetch() calls
+- Prevents Next.js from caching RSS responses
+
+## **🚀 MISSION ACCOMPLISHED**
+
+**Status:** Complete resolution of persistent caching mystery through expert consultation.
+
+**Key Insight:** The issue was **Next.js App Router's built-in caching layers**, not Vercel platform caching.
+
+**Result:** Reliable direct RSS fetching system with 5-second response times and always-fresh content.
 - **Success Criteria**: API returns partial results when some sources fail
 
 #### Task 1.3: Add Fast Timeouts and Error Boundaries
