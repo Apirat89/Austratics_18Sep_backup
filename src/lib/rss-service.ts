@@ -22,32 +22,58 @@ export class RSSService {
 
   /**
    * Fetch RSS feeds from all configured sources
+   * 🇦🇺 EXPERT FIX: Sequential fetching for government sources to avoid rate limiting
    */
   async fetchAllFeeds(): Promise<{ 
     items: NewsItem[], 
     errors: NewsServiceError[] 
   }> {
-    const fetchPromises = this.config.sources.map(source => 
-      this.fetchSingleFeed(source)
-    );
-
-    const results = await Promise.allSettled(fetchPromises);
+    // Separate government and non-government sources
+    const govSources = this.config.sources.filter(s => s.category === 'government');
+    const nonGovSources = this.config.sources.filter(s => s.category !== 'government');
     
     const allItems: NewsItem[] = [];
     const errors: NewsServiceError[] = [];
-
-    results.forEach((result, index) => {
-      if (result.status === 'fulfilled') {
-        allItems.push(...result.value);
-      } else {
+    
+    // Fetch non-government sources in parallel (faster)
+    if (nonGovSources.length > 0) {
+      const nonGovPromises = nonGovSources.map(source => this.fetchSingleFeed(source));
+      const nonGovResults = await Promise.allSettled(nonGovPromises);
+      
+      nonGovResults.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          allItems.push(...result.value);
+        } else {
+          errors.push({
+            message: result.reason?.message || 'Unknown error',
+            code: 'FEED_FETCH_ERROR',
+            source: nonGovSources[index]?.id,
+            details: { error: result.reason }
+          });
+        }
+      });
+    }
+    
+    // Fetch government sources sequentially (rate-limit friendly) 
+    for (const govSource of govSources) {
+      try {
+        console.log(`🇦🇺 Fetching government RSS sequentially: ${govSource.name}`);
+        const items = await this.fetchSingleFeed(govSource);
+        allItems.push(...items);
+        
+        // Add small delay between government requests
+        if (govSources.indexOf(govSource) < govSources.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
+        }
+      } catch (error) {
         errors.push({
-          message: result.reason?.message || 'Unknown error',
+          message: error instanceof Error ? error.message : 'Unknown error',
           code: 'FEED_FETCH_ERROR',
-          source: this.config.sources[index]?.id,
-          details: { error: result.reason }
+          source: govSource.id,
+          details: { error }
         });
       }
-    });
+    }
 
     // Sort by publication date (newest first)
     allItems.sort((a, b) => 
@@ -68,12 +94,12 @@ export class RSSService {
   async fetchSingleFeed(source: NewsSource): Promise<NewsItem[]> {
     console.log(`Fetching RSS feed from ${source.name} (${source.feedUrl})`);
     
-    // Different user agents to try if first one fails
+    // 🇦🇺 EXPERT FIX: Australian-friendly user agents for gov sites (Sydney region + human headers)
     const userAgents = [
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
-      'feedparser-python/6.0.8 +https://github.com/kurtmckee/feedparser/',
+      'AustraticsBot/1.0 (+https://austratics.vercel.app; contact: admin@austratics.vercel.app)',
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     ];
 
     let lastError: Error | null = null;
@@ -89,15 +115,20 @@ export class RSSService {
         const response = await fetch(source.feedUrl, {
           headers: {
             'User-Agent': userAgent,
-            'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-            'Accept-Language': 'en-US,en;q=0.9',
+            // 🇦🇺 EXPERT FIX: Australian government-friendly headers
+            'Accept': 'application/rss+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7',
+            'Accept-Language': 'en-AU,en;q=0.8',
             'Accept-Encoding': 'gzip, deflate, br',
             'Connection': 'keep-alive',
             'Upgrade-Insecure-Requests': '1',
-            'Referer': source.websiteUrl,
+            // Use appropriate referer for gov sites
+            'Referer': source.category === 'government' ? 'https://www.health.gov.au/news' : source.websiteUrl,
           },
+          cache: 'no-store',
+          redirect: 'follow',
           signal: AbortSignal.timeout(
-            source.category === 'government' ? this.config.timeout * 2 : this.config.timeout
+            // 🇦🇺 EXPERT FIX: Longer timeout for gov sites (25s) as they can be slow
+            source.category === 'government' ? 25000 : this.config.timeout
           ),
         });
 

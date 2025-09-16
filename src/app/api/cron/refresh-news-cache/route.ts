@@ -5,6 +5,8 @@ import { NEWS_SOURCES } from '../../../../types/news';
 // ✅ EXPERT PATTERN: Runtime configuration for proper Vercel function optimization
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// 🇦🇺 CRITICAL: Run from Sydney for Australian IP to access health.gov.au RSS
+export const preferredRegion = ["syd1"];
 
 export async function GET(req: Request) {
   // ✅ EXPERT PATTERN: Accept BOTH Vercel cron header AND bearer token
