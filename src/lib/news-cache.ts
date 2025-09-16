@@ -21,8 +21,13 @@ function getRedisFromEnv() {
 // If creds are missing, caching is disabled but API still works
 const redis = getRedisFromEnv();
 
-// Default TTL aligned with Edge cache (60 minutes)
-const DEFAULT_TTL_SECONDS = 60 * 60;
+// ✅ ADVISOR PATTERN: Unified cache configuration (single source of truth)
+export const CACHE_VERSION = 'v1';           // Use ONE value for both cron & API
+export const NEWS_CACHE_KEY = `news-cache:${CACHE_VERSION}`;
+export const CACHE_TTL_SECONDS = 60 * 60;    // 1h (keep existing value)
+
+// Default TTL aligned with Edge cache (60 minutes) - DEPRECATED, use CACHE_TTL_SECONDS
+const DEFAULT_TTL_SECONDS = CACHE_TTL_SECONDS;
 
 // ✅ EXPERT PATTERN: Simplified interface
 export interface NewsCacheData {
@@ -42,7 +47,7 @@ export class NewsCacheService {
     offset?: number;
   } = {}): string {
     const { source, limit = 20, offset = 0 } = params;
-    const parts = ['news-cache:v2']; // v2 for new key format
+    const parts = [NEWS_CACHE_KEY]; // ✅ ADVISOR FIX: Use unified cache key
     
     if (source) parts.push(`source:${source}`);
     if (limit !== 20) parts.push(`limit:${limit}`);
@@ -56,7 +61,7 @@ export class NewsCacheService {
    */
   static async getCache(key?: string): Promise<NewsCacheData | null> {
     if (!redis) return null;
-    const cacheKey = key || 'news-cache:v1'; // backward compatibility
+    const cacheKey = key || NEWS_CACHE_KEY; // ✅ ADVISOR FIX: Use unified cache key
     try {
       const data = await redis.get<NewsCacheData>(cacheKey);
       return data ?? null;
@@ -74,7 +79,7 @@ export class NewsCacheService {
     key?: string
   ): Promise<void> {
     if (!redis) return; // no-op when Redis is not configured
-    const cacheKey = key || 'news-cache:v1'; // backward compatibility
+    const cacheKey = key || NEWS_CACHE_KEY; // ✅ ADVISOR FIX: Use unified cache key
     try {
       await redis.set(cacheKey, data, { ex: ttlSeconds });
       console.log(`✅ News data cached in Redis (${cacheKey}): ${data.items.length} items, TTL: ${ttlSeconds}s`);

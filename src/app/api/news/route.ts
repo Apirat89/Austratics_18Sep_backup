@@ -1,6 +1,6 @@
 import { fetchAllNews } from '../../../lib/rss-service';
 import { NewsResponse, NewsItem, NewsServiceError } from '../../../types/news';
-import { NewsCacheService } from '../../../lib/news-cache';
+import { NewsCacheService, NEWS_CACHE_KEY } from '../../../lib/news-cache';
 
 // ✅ EXPERT PATTERN: Runtime configuration for proper Vercel function optimization
 export const runtime = 'nodejs';
@@ -54,7 +54,7 @@ async function withTimeout<T>(
 async function tryGetStaleCacheSafely() {
   try {
     console.log('🔄 Attempting stale cache fallback...');
-    const staleData = await NewsCacheService.getCache('news-cache:v1');
+    const staleData = await NewsCacheService.getCache(NEWS_CACHE_KEY); // ✅ ADVISOR FIX: Use unified cache key
     if (staleData && staleData.items?.length) {
       console.log(`✅ Stale cache fallback: ${staleData.items.length} items`);
       return {
