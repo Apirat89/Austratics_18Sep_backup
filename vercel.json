@@ -1,16 +1,27 @@
 {
-  "functions": {
-    "app/api/**/*.ts": {
-      "maxDuration": 10
-    }
-  },
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
       "path": "/api/cron/refresh-news-cache",
       "schedule": "0 * * * *"
     }
   ],
+  "functions": {
+    "src/app/api/cron/refresh-news-cache/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/**/route.ts": {
+      "maxDuration": 10
+    }
+  },
   "headers": [
+    {
+      "source": "/api/news",
+      "headers": [
+        { "key": "CDN-Cache-Control", "value": "public, s-maxage=3600, stale-while-revalidate=300, stale-if-error=86400" },
+        { "key": "Cache-Control", "value": "public, max-age=60" }
+      ]
+    },
     {
       "source": "/api/(.*)",
       "headers": [
