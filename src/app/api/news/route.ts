@@ -3,12 +3,34 @@ import { fetchAllNews } from '../../../lib/rss-service';
 import { NewsResponse, NewsItem, NewsServiceError } from '../../../types/news';
 import { NewsCacheService } from '../../../lib/news-cache';
 
+// ✅ EXPERT PATTERN: Edge runtime for global performance
+export const runtime = 'edge';
+export const preferredRegion = 'auto';
+
 /**
  * API Route: /api/news
  * 
- * Serves cached news from Redis - no direct RSS fetching
- * Background refresh is handled by Vercel Cron Jobs
+ * Multi-layered caching: Vercel Edge Cache → Redis → RSS fallback
+ * Background refresh + pre-warming via Vercel Cron Jobs
  */
+
+/**
+ * Generate CDN cache headers for Edge caching
+ */
+function generateCacheHeaders() {
+  // 1 hour edge cache; serve stale for 5 minutes while revalidating; keep stale on error for a day
+  const cdnCacheControl = 'public, s-maxage=3600, stale-while-revalidate=300, stale-if-error=86400';
+  
+  return {
+    // Vercel respects CDN-Cache-Control for edge caching
+    'CDN-Cache-Control': cdnCacheControl,
+    // Browsers see normal Cache-Control; conservative for user browsers
+    'Cache-Control': 'public, max-age=60',
+    'Vary': 'Accept-Encoding',
+    // Help with debugging
+    'X-Cache-Strategy': 'edge-redis-rss',
+  };
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -19,44 +41,87 @@ export async function GET(req: NextRequest) {
     const offset = Math.max(0, Number(searchParams.get('offset')) || 0);
     const sourceFilter = searchParams.get('source') || null;
 
-    // ✅ EXPERT PATTERN: 1) Try cache first
-    const cached = await NewsCacheService.getCache();
+    // Generate cache key for this specific query
+    const cacheKey = NewsCacheService.generateCacheKey({
+      source: sourceFilter || undefined,
+      limit,
+      offset
+    });
 
-    // ✅ EXPERT PATTERN: 2) Fallback to fetching if cache miss
-    const useCache = !!(cached && cached.items?.length);
-    const itemsRaw = useCache ? cached!.items : (await fetchAllNews()).items;
+    console.log(`🔍 Cache key: ${cacheKey}`);
 
-    // ✅ EXPERT PATTERN: 3) Optional source filter + pagination
+    // ✅ EXPERT PATTERN: 1) Try Redis cache first
+    const cached = await NewsCacheService.getCache(cacheKey);
+
+    if (cached && cached.items?.length) {
+      console.log(`⚡ Redis cache HIT: ${cached.items.length} items`);
+      
+      // Apply pagination if needed (cache might have full dataset)
+      const page = cached.items.slice(offset, offset + limit);
+      
+      // Build metadata
+      const sources = Array.from(
+        new Set(cached.items.map(i => i.source?.id).filter(Boolean))
+      ).map(s => ({ id: String(s), name: String(s) }));
+
+      return NextResponse.json({
+        success: true,
+        items: page,
+        metadata: {
+          total: cached.items.length,
+          limit,
+          offset,
+          lastUpdated: cached.lastUpdated || new Date().toISOString(),
+          sources,
+          cached: true,
+        },
+      }, { 
+        headers: generateCacheHeaders()
+      });
+    }
+
+    // ✅ EXPERT PATTERN: 2) Cache miss - fetch from RSS sources
+    console.log('❌ Redis cache MISS - fetching from RSS sources');
+    const fetchResult = await fetchAllNews();
+    
+    // Apply source filter if specified
     const filtered = sourceFilter
-      ? itemsRaw.filter(i => i.source?.id?.toLowerCase() === sourceFilter.toLowerCase())
-      : itemsRaw;
+      ? fetchResult.items.filter(i => i.source?.id?.toLowerCase() === sourceFilter.toLowerCase())
+      : fetchResult.items;
 
-    const total = filtered.length;
+    // Prepare cache data
+    const cacheData = {
+      items: filtered,
+      lastUpdated: new Date().toISOString(),
+      errors: fetchResult.errors,
+    };
+
+    // Store in Redis for future requests
+    await NewsCacheService.setCache(cacheData, 3600, cacheKey); // 1 hour TTL
+
+    // Apply pagination
     const page = filtered.slice(offset, offset + limit);
 
-    // Build metadata the UI expects
+    // Build metadata
     const sources = Array.from(
-      new Set(
-        (itemsRaw || []).map(i => i.source?.id).filter(Boolean)
-      )
+      new Set(filtered.map(i => i.source?.id).filter(Boolean))
     ).map(s => ({ id: String(s), name: String(s) }));
-
-    const lastUpdated = useCache
-      ? cached!.lastUpdated
-      : new Date().toISOString();
 
     return NextResponse.json({
       success: true,
       items: page,
       metadata: {
-        total,
+        total: filtered.length,
         limit,
         offset,
-        lastUpdated,
+        lastUpdated: cacheData.lastUpdated,
         sources,
-        cached: useCache,
+        cached: false,
       },
-        });
+    }, { 
+      headers: generateCacheHeaders()
+    });
+
   } catch (err: any) {
     console.error('❌ News API error:', err);
     
@@ -67,7 +132,13 @@ export async function GET(req: NextRequest) {
         items: [], 
         metadata: null 
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          // Even errors get some caching to avoid hammering failing services
+          'Cache-Control': 'public, max-age=60',
+        }
+      }
     );
   }
 }

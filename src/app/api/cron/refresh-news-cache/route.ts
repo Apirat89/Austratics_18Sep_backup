@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchAllNews } from '../../../../lib/rss-service';
 import { NewsCacheService } from '../../../../lib/news-cache';
+import { NEWS_SOURCES } from '../../../../types/news';
 
 // Verify this is a legitimate Vercel cron request
 const validateCronRequest = (req: NextRequest): boolean => {
@@ -51,6 +52,55 @@ async function handleCronRequest(request: NextRequest) {
     
     console.log(`✅ Vercel Cron: News cache refreshed successfully in ${fetchDuration}ms`);
     
+    // ✅ EXPERT PATTERN: Pre-warm Edge cache with common queries
+    const prewarmStartTime = Date.now();
+    console.log('🔥 Starting Edge cache pre-warming...');
+    
+    // Determine base URL for pre-warming requests
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : new URL(request.url).origin;
+    
+    // Define common query patterns to pre-warm
+    const prewarmPaths = [
+      '/api/news?limit=20&offset=0', // Default query
+    ];
+    
+    // Add per-source queries for available sources
+    uniqueSources.forEach(source => {
+      prewarmPaths.push(`/api/news?source=${source.id}&limit=20&offset=0`);
+    });
+    
+    // Execute pre-warming requests in parallel
+    const prewarmResults = await Promise.allSettled(
+      prewarmPaths.map(async (path) => {
+        try {
+          const response = await fetch(`${baseUrl}${path}`, {
+            headers: { 
+              'x-prewarm': '1',
+              'User-Agent': 'Taskmaster-Cron-Prewarm/1.0'
+            },
+          });
+          
+          if (response.ok) {
+            console.log(`✅ Pre-warmed: ${path} (${response.status})`);
+            return { path, success: true, status: response.status };
+          } else {
+            console.warn(`⚠️ Pre-warm failed: ${path} (${response.status})`);
+            return { path, success: false, status: response.status };
+          }
+        } catch (error) {
+          console.error(`❌ Pre-warm error: ${path}:`, error);
+          return { path, success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+        }
+      })
+    );
+    
+    const prewarmDuration = Date.now() - prewarmStartTime;
+    const successfulPrewarms = prewarmResults.filter(r => r.status === 'fulfilled' && r.value.success).length;
+    
+    console.log(`🔥 Edge cache pre-warming completed: ${successfulPrewarms}/${prewarmPaths.length} paths in ${prewarmDuration}ms`);
+    
     return NextResponse.json({
       success: true,
       timestamp: new Date().toISOString(),
@@ -58,7 +108,10 @@ async function handleCronRequest(request: NextRequest) {
         itemCount: result.items.length,
         sourceCount: uniqueSources.length,
         errorCount: result.errors.length,
-        duration: fetchDuration
+        duration: fetchDuration,
+        prewarmDuration,
+        prewarmPaths: prewarmPaths.length,
+        prewarmSuccessful: successfulPrewarms,
       },
       errors: result.errors.length > 0 ? result.errors : undefined
     });

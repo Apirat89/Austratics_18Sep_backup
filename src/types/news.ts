@@ -177,7 +177,7 @@ export const NEWS_SOURCES: NewsSource[] = [
 
 export const DEFAULT_NEWS_CONFIG: NewsServiceConfig = {
   sources: NEWS_SOURCES,
-  cacheDuration: 30, // 30 minutes
+  cacheDuration: 60, // 60 minutes - unified with Edge cache TTL
   maxItemsPerSource: 50,
   timeout: 10000, // 10 seconds
   userAgent: 'Aged Care Analytics News Aggregator 1.0',
