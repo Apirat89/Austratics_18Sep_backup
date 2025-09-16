@@ -4,6 +4,10 @@
     "src/app/api/news/route.ts": {
       "maxDuration": 15,
       "regions": ["syd1"]
+    },
+    "src/app/api/news-v2/route.ts": {
+      "maxDuration": 15,
+      "regions": ["syd1"]
     }
   },
   "headers": [

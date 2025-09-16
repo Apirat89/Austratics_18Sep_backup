@@ -141,23 +141,78 @@ After multiple attempts to implement a sophisticated caching system with Redis, 
 
 ## **Project Status Board**
 
-### **🗑️ IMMEDIATE PRIORITY: REMOVE CACHING COMPLEXITY**
+### **🗑️ PHASE 1: REMOVE CACHING COMPLEXITY** 
 
 | Task | Status | Notes |
 |------|---------|--------|
-| **1.1 Simplify News API Route** | ⏳ **TO DO** | Strip out Redis/caching logic from `/api/news` |
-| **1.2 Promise.allSettled Pattern** | ⏳ **TO DO** | Handle partial RSS failures gracefully |
-| **1.3 Fast Timeouts & Boundaries** | ⏳ **TO DO** | 5-8 second timeouts, comprehensive try/catch |
-| **1.4 Remove Complex Error Handling** | ⏳ **TO DO** | Simplify to basic error messages |
+| **1.1 Simplify News API Route** | ✅ **DONE** | Stripped out all Redis/caching logic from `/api/news` |
+| **1.2 Promise.allSettled Pattern** | ✅ **DONE** | Already in RSS service for partial failures |
+| **1.3 Fast Timeouts & Boundaries** | ✅ **DONE** | 8-second timeout, comprehensive try/catch |
+| **1.4 Remove Complex Error Handling** | ✅ **DONE** | Simplified to basic error responses |
 
-### **⏸️ SECONDARY: DISABLE CRON JOBS**
+### **⏸️ PHASE 2: DISABLE CRON JOBS**
 
 | Task | Status | Notes |
 |------|---------|--------|
-| **2.1 Disable Vercel CRON Config** | ⏳ **TO DO** | Comment out cron in `vercel.json` |
-| **2.2 Remove CRON Route Dependencies** | ⏳ **TO DO** | Delete/disable `/api/cron/refresh-news-cache` |
+| **2.1 Disable Vercel CRON Config** | ✅ **DONE** | Disabled cron in `vercel.json`, removed cache headers |
+| **2.2 Remove CRON Route Dependencies** | ✅ **DONE** | Deleted `/api/cron/refresh-news-cache` and diagnostic routes |
 
-### **🎯 OPTIONAL: OPTIMIZE DIRECT RSS**
+### **🔄 CURRENT: DEPLOYMENT & TESTING**
+
+| Task | Status | Notes |
+|------|---------|--------|
+| **Deploy Simplified System** | ✅ **DEPLOYED** | Commits `9574cb9` + `38e0cb6` deployed |
+| **Test Direct RSS Fetching** | ⚠️ **ISSUE** | Still getting 500 + 50s response (not 8s timeout) |
+
+### **🚨 DEPLOYMENT ISSUE IDENTIFIED**
+
+| Problem | Status | Investigation |
+|---------|--------|---------------|
+| **Vercel.json schema fixed** | ✅ **FIXED** | Removed invalid `_crons_disabled` property |
+| **API returns cached data** | ❌ **CONFIRMED** | Still serving old cached responses with `"cached": true, "stale": true` |
+| **New code not running** | ❌ **CONFIRMED** | v2 test identifiers don't appear in responses |
+| **Timestamp unchanged** | ❌ **CONFIRMED** | `lastUpdated: "2025-09-16T16:02:18.761Z"` (old timestamp) |
+
+### **🔍 ROOT CAUSE ANALYSIS**
+
+| Issue | Evidence | Conclusion |
+|-------|----------|------------|
+| **Old Cache Persisting** | Response shows `"cached": true, "stale": true` | Old caching system still active |
+| **Deployment Not Effective** | No v2 identifiers in response | Simplified code not running |
+| **CDN/Edge Caching** | Same timestamp across requests | Vercel serving cached responses |
+
+### **🔧 POTENTIAL SOLUTIONS**
+
+| Solution | Approach | Status |
+|----------|----------|---------|
+| **Manual Cache Clear** | Vercel Dashboard → Functions → Clear Cache | ⏳ **RECOMMENDED** |
+| **Change Route Path** | Rename `/api/news` to `/api/news-v2` | 🔄 **ALTERNATIVE** |
+| **Force Function Rebuild** | Delete/recreate function via Vercel UI | 🔄 **LAST RESORT** |
+
+### **📊 CURRENT STATUS**
+
+**✅ WHAT'S WORKING:**
+- Code simplification is complete and correct
+- Vercel.json schema validation fixed
+- All Redis/caching dependencies removed
+- Direct RSS fetching system ready
+
+**❌ WHAT'S BLOCKED:**
+- Old cached responses still being served  
+- New simplified code not executing
+- v2 test identifiers not appearing in responses
+- Stale cache preventing verification of fixes
+
+**🎯 NEXT STEPS:**
+1. **Manual Vercel cache invalidation** (user action required)
+2. **OR** rename route to bypass cache entirely  
+3. **Verify** simplified system with direct RSS fetching
+
+**EXPECTED RESULTS (once cache cleared):**
+- ✅ Response time: 5-10 seconds (direct RSS fetch)
+- ✅ `"cached": false` and `"simplified_system": "v2_direct_rss"` 
+- ✅ Fresh timestamp in `lastUpdated`
+- ✅ 2-3 RSS sources working (graceful partial results)
 
 | Task | Status | Notes |
 |------|---------|--------|
