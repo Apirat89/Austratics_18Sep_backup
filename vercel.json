@@ -1,27 +1,19 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
+  "_crons_disabled": [
     {
       "path": "/api/cron/refresh-news-cache",
-      "schedule": "0 * * * *"
+      "schedule": "0 * * * *",
+      "note": "Disabled - using direct RSS fetching instead of caching"
     }
   ],
   "functions": {
-    "src/app/api/cron/refresh-news-cache/route.ts": {
-      "maxDuration": 300
-    },
     "src/app/api/news/route.ts": {
-      "maxDuration": 60
+      "maxDuration": 15,
+      "regions": ["syd1"]
     }
   },
   "headers": [
-    {
-      "source": "/api/news",
-      "headers": [
-        { "key": "CDN-Cache-Control", "value": "public, s-maxage=3600, stale-while-revalidate=300, stale-if-error=86400" },
-        { "key": "Cache-Control", "value": "public, max-age=60" }
-      ]
-    },
     {
       "source": "/api/(.*)",
       "headers": [

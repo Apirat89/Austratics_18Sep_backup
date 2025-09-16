@@ -1,40 +1,24 @@
 import { fetchAllNews } from '../../../lib/rss-service';
 import { NewsResponse, NewsItem, NewsServiceError } from '../../../types/news';
-import { NewsCacheService, NEWS_CACHE_KEY } from '../../../lib/news-cache';
 
-// ✅ EXPERT PATTERN: Runtime configuration for proper Vercel function optimization
+// ✅ SIMPLIFIED PATTERN: Direct RSS fetching without caching complexity
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-// 🇦🇺 CRITICAL: Run from Sydney for Australian IP to access health.gov.au RSS
+// 🇦🇺 Keep Sydney region for better Australian government RSS access
 export const preferredRegion = ["syd1"];
 
 /**
  * API Route: /api/news
  * 
- * Multi-layered caching: Vercel Edge Cache → Redis → RSS fallback
- * Background refresh + pre-warming via Vercel Cron Jobs
+ * SIMPLIFIED ARCHITECTURE: Direct RSS fetching on every request
+ * - No Redis dependency
+ * - No CRON jobs  
+ * - Promise.allSettled for partial results
+ * - Fast timeouts for reliability
  */
 
 /**
- * Generate CDN cache headers for Edge caching
- */
-function generateCacheHeaders() {
-  // 1 hour edge cache; serve stale for 5 minutes while revalidating; keep stale on error for a day
-  const cdnCacheControl = 'public, s-maxage=3600, stale-while-revalidate=300, stale-if-error=86400';
-  
-  return {
-    // Vercel respects CDN-Cache-Control for edge caching
-    'CDN-Cache-Control': cdnCacheControl,
-    // Browsers see normal Cache-Control; conservative for user browsers
-    'Cache-Control': 'public, max-age=60',
-    'Vary': 'Accept-Encoding',
-    // Help with debugging
-    'X-Cache-Strategy': 'serverless-redis-rss',
-  };
-}
-
-/**
- * Timeout wrapper to prevent 504 Gateway Timeout errors on Vercel
+ * Fast timeout wrapper - 8 seconds max per request
  */
 async function withTimeout<T>(
   promise: Promise<T>, 
@@ -48,119 +32,37 @@ async function withTimeout<T>(
   return Promise.race([promise, timeout]);
 }
 
-/**
- * ✅ EXPERT PATTERN: Try to get stale cache data as fallback when main logic fails
- */
-async function tryGetStaleCacheSafely() {
-  try {
-    console.log('🔄 Attempting stale cache fallback...');
-    const staleData = await NewsCacheService.getCache(NEWS_CACHE_KEY); // ✅ ADVISOR FIX: Use unified cache key
-    if (staleData && staleData.items?.length) {
-      console.log(`✅ Stale cache fallback: ${staleData.items.length} items`);
-      return {
-        ...staleData,
-        metadata: {
-          total: staleData.items.length,
-          limit: 20,
-          offset: 0,
-          lastUpdated: staleData.lastUpdated || new Date().toISOString(),
-          sources: Array.from(new Set(staleData.items.map(i => i.source?.id).filter(Boolean))).map(s => ({ id: String(s), name: String(s) })),
-          cached: true,
-          stale: true
-        }
-      };
-    }
-  } catch (staleError) {
-    console.warn('⚠️ Stale cache fallback also failed:', staleError);
-  }
-  return null;
-}
-
 export async function GET(req: Request) {
-  // ✅ EXPERT PATTERN: Comprehensive error handling wrapper
   try {
-    console.log('📰 News API called:', req.url);
+    console.log('📰 News API called (DIRECT FETCH MODE):', req.url);
     const { searchParams } = new URL(req.url);
     
     const limit = Math.max(1, Math.min(100, Number(searchParams.get('limit')) || 20));
     const offset = Math.max(0, Number(searchParams.get('offset')) || 0);
     const sourceFilter = searchParams.get('source') || null;
 
-    // 1) Try hot cache (Redis/Upstash) first - with resilient error handling  
-    const cacheKey = NewsCacheService.generateCacheKey({
-      source: sourceFilter || undefined,
-      limit,
-      offset
-    });
-
-    console.log(`🔍 Cache key: ${cacheKey}`);
-    
-    // ✅ FRIEND'S FIX: Wrap Redis read in try/catch for resilience
-    let cached = null;
-    try {
-      cached = await NewsCacheService.getCache(cacheKey);
-      if (cached && cached.items?.length) {
-        console.log(`⚡ Redis cache HIT: ${cached.items.length} items`);
-        
-        const page = cached.items.slice(offset, offset + limit);
-        const sources = Array.from(
-          new Set(cached.items.map(i => i.source?.id).filter(Boolean))
-        ).map(s => ({ id: String(s), name: String(s) }));
-
-        return Response.json({
-          success: true,
-          items: page,
-          metadata: {
-            total: cached.items.length,
-            limit,
-            offset,
-            lastUpdated: cached.lastUpdated || new Date().toISOString(),
-            sources,
-            cached: true,
-          },
-        });
-      }
-    } catch (redisError) {
-      console.warn('⚠️ Redis cache read failed, proceeding without cache:', 
-        redisError instanceof Error ? redisError.message : String(redisError));
-      // Continue execution - don't let Redis failures break the API
-    }
-
-    // 2) If miss, fetch sources with short per-source timeout
-    console.log('❌ Redis cache MISS - fetching from RSS sources');
+    // Direct RSS fetch with fast timeout (8 seconds)
+    console.log('🔄 Fetching directly from RSS sources...');
     const fetchResult = await withTimeout(
       fetchAllNews(),
-      50000, // 50 seconds (within Vercel serverless 60s limit)
-      'RSS fetch timeout - taking too long to fetch news sources'
+      8000, // 8 seconds - fast failure for better UX
+      'RSS fetch timeout - sources taking too long to respond'
     );
     
+    // Filter by source if requested
     const filtered = sourceFilter
       ? fetchResult.items.filter(i => i.source?.id?.toLowerCase() === sourceFilter.toLowerCase())
       : fetchResult.items;
 
-    // Store in Redis for future requests - with resilient error handling
-    const cacheData = {
-      items: filtered,
-      lastUpdated: new Date().toISOString(),
-      errors: fetchResult.errors,
-    };
-    
-    // ✅ FRIEND'S FIX: Wrap Redis write in try/catch for resilience  
-    try {
-      await NewsCacheService.setCache(cacheData, 3600, cacheKey);
-      console.log('✅ Redis cache write successful');
-    } catch (redisWriteError) {
-      console.warn('⚠️ Redis cache write failed, continuing without caching:',
-        redisWriteError instanceof Error ? redisWriteError.message : String(redisWriteError));
-      // Continue execution - don't let Redis failures break the API
-    }
-
+    // Paginate results
     const page = filtered.slice(offset, offset + limit);
+    
+    // Get available sources from results
     const sources = Array.from(
       new Set(filtered.map(i => i.source?.id).filter(Boolean))
     ).map(s => ({ id: String(s), name: String(s) }));
 
-    // 3) Always catch and return partials instead of throwing
+    // Simple success response
     return Response.json({
       success: true,
       items: page,
@@ -168,76 +70,32 @@ export async function GET(req: Request) {
         total: filtered.length,
         limit,
         offset,
-        lastUpdated: cacheData.lastUpdated,
+        lastUpdated: new Date().toISOString(),
         sources,
-        cached: false,
+        cached: false, // Always false - direct fetch
+        errors: fetchResult.errors?.length ? fetchResult.errors : undefined
       }
     });
 
   } catch (err) {
-    console.error('NEWS_API_FATAL', err);
+    console.error('NEWS_API_ERROR', err);
     
-    // Try returning stale cache if available to avoid a blank screen
-    const stale = await tryGetStaleCacheSafely();
-    if (stale) {
-      return Response.json({
-        success: true,
-        ...stale,
-        metadata: { ...stale.metadata, cached: true, stale: true }
-      }, { status: 200 });
-    }
-    
+    // Simple error response - no complex fallback
     return Response.json({
       success: false,
-      message: 'Internal error fetching news.'
+      message: 'Failed to fetch news from RSS sources',
+      error: err instanceof Error ? err.message : 'Unknown error',
+      items: [],
+      metadata: {
+        total: 0,
+        limit: Number(new URL(req.url).searchParams.get('limit')) || 20,
+        offset: Number(new URL(req.url).searchParams.get('offset')) || 0,
+        lastUpdated: new Date().toISOString(),
+        sources: [],
+        cached: false
+      }
     }, { status: 500 });
   }
 }
 
-/**
- * Manual cache refresh endpoint (for debugging)
- */
-export async function POST(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action');
-    
-    if (action === 'refresh-cache') {
-      console.log('🔄 Manual cache refresh requested');
-      
-      // Direct cache refresh (bypass cron)
-      const result = await fetchAllNews();
-      
-      const uniqueSources = Array.from(
-        new Map(result.items.map(item => [item.source.id, item.source])).values()
-      );
-      
-      await NewsCacheService.setCache({
-        items: result.items,
-        lastUpdated: new Date().toISOString(),
-        errors: result.errors,
-      });
-      
-      return Response.json({
-        success: true,
-        message: 'Cache refreshed manually',
-        itemCount: result.items.length,
-        errorCount: result.errors.length
-      });
-    }
-    
-    return Response.json(
-      { error: 'Invalid action' },
-      { status: 400 }
-    );
-    
-  } catch (error) {
-    console.error('❌ Manual refresh error:', error);
-    return Response.json(
-      { error: 'Refresh failed' },
-      { status: 500 }
-    );
-  }
-}
-
-// ✅ EXPERT PATTERN: Simplified API - additional methods removed for clean implementation 
+// Remove POST method - no cache refresh needed in direct mode 
