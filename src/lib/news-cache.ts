@@ -6,12 +6,20 @@
 import { Redis } from '@upstash/redis';
 import { NewsItem, NewsServiceError, NewsSource } from '../types/news';
 
-// ✅ EXPERT PATTERN: Graceful degradation when Redis credentials missing
-const url = process.env.UPSTASH_REDIS_REST_URL;
-const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+// ✅ EXPERT PATTERN: Redis client hardening with quote/whitespace normalization
+function getRedisFromEnv() {
+  const url = (process.env.UPSTASH_REDIS_REST_URL || "").replace(/^"|"$/g, "").trim();
+  const token = (process.env.UPSTASH_REDIS_REST_TOKEN || "").replace(/^"|"$/g, "").trim();
+  if (!url || !token) {
+    console.log('ℹ️ Redis credentials missing - falling back to file cache and degraded performance');
+    return null;
+  }
+  console.log(`✅ Redis client initialized for: ${new URL(url).host}`);
+  return new Redis({ url, token });
+}
 
 // If creds are missing, caching is disabled but API still works
-const redis = url && token ? new Redis({ url, token }) : null;
+const redis = getRedisFromEnv();
 
 // Default TTL aligned with Edge cache (60 minutes)
 const DEFAULT_TTL_SECONDS = 60 * 60;
