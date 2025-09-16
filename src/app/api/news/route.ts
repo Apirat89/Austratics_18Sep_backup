@@ -1,12 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { fetchAllNews } from '../../../lib/rss-service';
 import { NewsResponse, NewsItem, NewsServiceError } from '../../../types/news';
 import { NewsCacheService } from '../../../lib/news-cache';
 
-// ✅ EXPERT PATTERN: Serverless runtime for RSS operations (60s timeout vs Edge 30s)
-// Edge runtime causes 504 timeouts on RSS fetching - using serverless for reliability
-// export const runtime = 'edge';
-// export const preferredRegion = 'auto';
+// ✅ EXPERT PATTERN: Runtime configuration for proper Vercel function optimization
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 /**
  * API Route: /api/news
@@ -48,7 +46,36 @@ async function withTimeout<T>(
   return Promise.race([promise, timeout]);
 }
 
-export async function GET(req: NextRequest) {
+/**
+ * ✅ EXPERT PATTERN: Try to get stale cache data as fallback when main logic fails
+ */
+async function tryGetStaleCacheSafely() {
+  try {
+    console.log('🔄 Attempting stale cache fallback...');
+    const staleData = await NewsCacheService.getCache('news-cache:v1');
+    if (staleData && staleData.items?.length) {
+      console.log(`✅ Stale cache fallback: ${staleData.items.length} items`);
+      return {
+        ...staleData,
+        metadata: {
+          total: staleData.items.length,
+          limit: 20,
+          offset: 0,
+          lastUpdated: staleData.lastUpdated || new Date().toISOString(),
+          sources: Array.from(new Set(staleData.items.map(i => i.source?.id).filter(Boolean))).map(s => ({ id: String(s), name: String(s) })),
+          cached: true,
+          stale: true
+        }
+      };
+    }
+  } catch (staleError) {
+    console.warn('⚠️ Stale cache fallback also failed:', staleError);
+  }
+  return null;
+}
+
+export async function GET(req: Request) {
+  // ✅ EXPERT PATTERN: Comprehensive error handling wrapper
   try {
     console.log('📰 News API called:', req.url);
     const { searchParams } = new URL(req.url);
@@ -57,7 +84,7 @@ export async function GET(req: NextRequest) {
     const offset = Math.max(0, Number(searchParams.get('offset')) || 0);
     const sourceFilter = searchParams.get('source') || null;
 
-    // Generate cache key for this specific query
+    // 1) Try hot cache (Redis/Upstash) first
     const cacheKey = NewsCacheService.generateCacheKey({
       source: sourceFilter || undefined,
       limit,
@@ -65,22 +92,17 @@ export async function GET(req: NextRequest) {
     });
 
     console.log(`🔍 Cache key: ${cacheKey}`);
-
-    // ✅ EXPERT PATTERN: 1) Try Redis cache first
     const cached = await NewsCacheService.getCache(cacheKey);
 
     if (cached && cached.items?.length) {
       console.log(`⚡ Redis cache HIT: ${cached.items.length} items`);
       
-      // Apply pagination if needed (cache might have full dataset)
       const page = cached.items.slice(offset, offset + limit);
-      
-      // Build metadata
       const sources = Array.from(
         new Set(cached.items.map(i => i.source?.id).filter(Boolean))
       ).map(s => ({ id: String(s), name: String(s) }));
 
-      return NextResponse.json({
+      return Response.json({
         success: true,
         items: page,
         metadata: {
@@ -91,12 +113,10 @@ export async function GET(req: NextRequest) {
           sources,
           cached: true,
         },
-      }, { 
-        headers: generateCacheHeaders()
       });
     }
 
-    // ✅ EXPERT PATTERN: 2) Cache miss - fetch from RSS sources with timeout protection
+    // 2) If miss, fetch sources with short per-source timeout
     console.log('❌ Redis cache MISS - fetching from RSS sources');
     const fetchResult = await withTimeout(
       fetchAllNews(),
@@ -104,30 +124,25 @@ export async function GET(req: NextRequest) {
       'RSS fetch timeout - taking too long to fetch news sources'
     );
     
-    // Apply source filter if specified
     const filtered = sourceFilter
       ? fetchResult.items.filter(i => i.source?.id?.toLowerCase() === sourceFilter.toLowerCase())
       : fetchResult.items;
 
-    // Prepare cache data
+    // Store in Redis for future requests
     const cacheData = {
       items: filtered,
       lastUpdated: new Date().toISOString(),
       errors: fetchResult.errors,
     };
+    await NewsCacheService.setCache(cacheData, 3600, cacheKey);
 
-    // Store in Redis for future requests
-    await NewsCacheService.setCache(cacheData, 3600, cacheKey); // 1 hour TTL
-
-    // Apply pagination
     const page = filtered.slice(offset, offset + limit);
-
-    // Build metadata
     const sources = Array.from(
       new Set(filtered.map(i => i.source?.id).filter(Boolean))
     ).map(s => ({ id: String(s), name: String(s) }));
 
-    return NextResponse.json({
+    // 3) Always catch and return partials instead of throwing
+    return Response.json({
       success: true,
       items: page,
       metadata: {
@@ -137,36 +152,33 @@ export async function GET(req: NextRequest) {
         lastUpdated: cacheData.lastUpdated,
         sources,
         cached: false,
-      },
-    }, { 
-      headers: generateCacheHeaders()
+      }
     });
 
-  } catch (err: any) {
-    console.error('❌ News API error:', err);
+  } catch (err) {
+    console.error('NEWS_API_FATAL', err);
     
-    return NextResponse.json(
-      { 
-        success: false, 
-        message: err?.message ?? 'Unexpected error', 
-        items: [], 
-        metadata: null 
-      },
-      { 
-        status: 500,
-        headers: {
-          // Even errors get some caching to avoid hammering failing services
-          'Cache-Control': 'public, max-age=60',
-        }
-      }
-    );
+    // Try returning stale cache if available to avoid a blank screen
+    const stale = await tryGetStaleCacheSafely();
+    if (stale) {
+      return Response.json({
+        success: true,
+        ...stale,
+        metadata: { ...stale.metadata, cached: true, stale: true }
+      }, { status: 200 });
+    }
+    
+    return Response.json({
+      success: false,
+      message: 'Internal error fetching news.'
+    }, { status: 500 });
   }
 }
 
 /**
  * Manual cache refresh endpoint (for debugging)
  */
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const action = searchParams.get('action');
@@ -187,7 +199,7 @@ export async function POST(request: NextRequest) {
         errors: result.errors,
       });
       
-      return NextResponse.json({
+      return Response.json({
         success: true,
         message: 'Cache refreshed manually',
         itemCount: result.items.length,
@@ -195,14 +207,14 @@ export async function POST(request: NextRequest) {
       });
     }
     
-    return NextResponse.json(
+    return Response.json(
       { error: 'Invalid action' },
       { status: 400 }
     );
     
   } catch (error) {
     console.error('❌ Manual refresh error:', error);
-    return NextResponse.json(
+    return Response.json(
       { error: 'Refresh failed' },
       { status: 500 }
     );

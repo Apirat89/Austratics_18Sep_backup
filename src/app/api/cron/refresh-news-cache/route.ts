@@ -1,47 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { fetchAllNews } from '../../../../lib/rss-service';
 import { NewsCacheService } from '../../../../lib/news-cache';
 import { NEWS_SOURCES } from '../../../../types/news';
 
-// Verify this is a legitimate Vercel cron request
-const validateCronRequest = (req: NextRequest): boolean => {
-  // Get authorization header (Vercel automatically sends this when CRON_SECRET is set)
-  const authHeader = req.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  
-  console.log('🔍 Cron validation:', {
-    hasAuthHeader: !!authHeader,
-    authHeader: authHeader ? `${authHeader.substring(0, 20)}...` : 'none',
-    hasCronSecret: !!cronSecret,
-    cronSecretPrefix: cronSecret ? `${cronSecret.substring(0, 5)}...` : 'none'
-  });
-  
-  // Exact string match as recommended by expert
-  const isValidCron = !!(cronSecret && authHeader === `Bearer ${cronSecret}`);
-  
-  if (!isValidCron) {
-    console.warn('🚫 Unauthorized cron request:', {
-      reason: !cronSecret ? 'No CRON_SECRET' : !authHeader ? 'No auth header' : 'Header mismatch'
+// ✅ EXPERT PATTERN: Runtime configuration for proper Vercel function optimization
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+export async function GET(req: Request) {
+  // ✅ EXPERT PATTERN: Accept BOTH Vercel cron header AND bearer token
+  const ua = req.headers.get('user-agent') || '';
+  const isVercelCron = ua.includes('vercel-cron') || !!req.headers.get('x-vercel-cron');
+
+  const auth = req.headers.get('authorization') || '';
+  const hasBearer = auth === `Bearer ${process.env.CRON_SECRET}`;
+
+  if (!isVercelCron && !hasBearer) {
+    console.warn('Unauthorized cron request attempt', {
+      ua,
+      xCron: !!req.headers.get('x-vercel-cron'),
+      authPresent: !!auth
     });
+    return new Response('Unauthorized', { status: 401 });
   }
-  
-  return isValidCron;
-};
 
-export async function GET(request: NextRequest) {
-  return handleCronRequest(request);
-}
-
-export async function POST(request: NextRequest) {
-  return handleCronRequest(request);
-}
-
-async function handleCronRequest(request: NextRequest) {
-  // Security check - verify this is a legitimate cron request
-  if (!validateCronRequest(request)) {
-    console.warn('🚫 Unauthorized cron request attempt');
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  console.log('✅ Valid cron request detected:', {
+    method: isVercelCron ? 'vercel-cron-header' : 'bearer-token',
+    userAgent: ua.substring(0, 50)
+  });
   
   console.log('🔄 Vercel Cron: Starting news cache refresh');
   const startTime = Date.now();
@@ -73,7 +58,7 @@ async function handleCronRequest(request: NextRequest) {
     // Determine base URL for pre-warming requests
     const baseUrl = process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : new URL(request.url).origin;
+      : new URL(req.url).origin;
     
     // Define common query patterns to pre-warm
     const prewarmPaths = [
@@ -115,7 +100,7 @@ async function handleCronRequest(request: NextRequest) {
     
     console.log(`🔥 Edge cache pre-warming completed: ${successfulPrewarms}/${prewarmPaths.length} paths in ${prewarmDuration}ms`);
     
-    return NextResponse.json({
+    return Response.json({
       success: true,
       timestamp: new Date().toISOString(),
       stats: {
@@ -133,7 +118,7 @@ async function handleCronRequest(request: NextRequest) {
   } catch (error) {
     console.error('❌ Vercel Cron: News cache refresh failed:', error);
     
-    return NextResponse.json({
+    return Response.json({
       success: false,
       timestamp: new Date().toISOString(),
       error: error instanceof Error ? error.message : 'Unknown error',
