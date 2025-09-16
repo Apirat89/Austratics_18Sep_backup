@@ -42,6 +42,33 @@ export async function POST(request: NextRequest) {
     // Set up a timeout to avoid long-running operations causing ECONNRESET
     const { signal, clear } = timeoutSignal(5000); // 5 second timeout
     
+    // Origin validation for browser requests (as recommended by expert)
+    const origin = request.headers.get('origin');
+    const referer = request.headers.get('referer');
+    const userAgent = request.headers.get('user-agent');
+    
+    // Allow requests from same origin or valid domains  
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3007', 
+      'https://austratics.vercel.app',
+      process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
+    ].filter(Boolean);
+    
+    const isValidOrigin = (origin && allowedOrigins.some(allowed => allowed && origin.includes(allowed))) ||
+                         (referer && allowedOrigins.some(allowed => allowed && referer.includes(allowed)));
+    
+    if (!isValidOrigin) {
+      console.warn('🚫 Invalid origin for events API:', { origin, referer, userAgent: userAgent?.substring(0, 50) });
+      clear(); // Clear the timeout
+      return NextResponse.json(
+        { error: 'Forbidden - Invalid origin' },
+        { status: 403 }
+      );
+    }
+    
+    console.log('✅ Valid origin for events API:', { origin });
+    
     const supabase = await createServerSupabaseClient();
     
     // Check authentication

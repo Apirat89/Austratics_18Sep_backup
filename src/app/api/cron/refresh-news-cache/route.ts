@@ -5,13 +5,27 @@ import { NEWS_SOURCES } from '../../../../types/news';
 
 // Verify this is a legitimate Vercel cron request
 const validateCronRequest = (req: NextRequest): boolean => {
-  // Vercel adds this header to cron requests
-  const vercelCron = req.headers.get('x-vercel-cron');
+  // Get authorization header (Vercel automatically sends this when CRON_SECRET is set)
   const authHeader = req.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
   
-  // Accept either Vercel's cron header or our custom auth
-  return vercelCron === '1' || authHeader === `Bearer ${cronSecret}`;
+  console.log('🔍 Cron validation:', {
+    hasAuthHeader: !!authHeader,
+    authHeader: authHeader ? `${authHeader.substring(0, 20)}...` : 'none',
+    hasCronSecret: !!cronSecret,
+    cronSecretPrefix: cronSecret ? `${cronSecret.substring(0, 5)}...` : 'none'
+  });
+  
+  // Exact string match as recommended by expert
+  const isValidCron = !!(cronSecret && authHeader === `Bearer ${cronSecret}`);
+  
+  if (!isValidCron) {
+    console.warn('🚫 Unauthorized cron request:', {
+      reason: !cronSecret ? 'No CRON_SECRET' : !authHeader ? 'No auth header' : 'Header mismatch'
+    });
+  }
+  
+  return isValidCron;
 };
 
 export async function GET(request: NextRequest) {

@@ -10,8 +10,8 @@
     "src/app/api/cron/refresh-news-cache/route.ts": {
       "maxDuration": 300
     },
-    "src/app/api/**/route.ts": {
-      "maxDuration": 10
+    "src/app/api/news/route.ts": {
+      "maxDuration": 60
     }
   },
   "headers": [
