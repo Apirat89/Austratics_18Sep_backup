@@ -3,9 +3,10 @@ import { fetchAllNews } from '../../../lib/rss-service';
 import { NewsResponse, NewsItem, NewsServiceError } from '../../../types/news';
 import { NewsCacheService } from '../../../lib/news-cache';
 
-// ✅ EXPERT PATTERN: Edge runtime for global performance
-export const runtime = 'edge';
-export const preferredRegion = 'auto';
+// ✅ EXPERT PATTERN: Serverless runtime for RSS operations (60s timeout vs Edge 30s)
+// Edge runtime causes 504 timeouts on RSS fetching - using serverless for reliability
+// export const runtime = 'edge';
+// export const preferredRegion = 'auto';
 
 /**
  * API Route: /api/news
@@ -28,8 +29,23 @@ function generateCacheHeaders() {
     'Cache-Control': 'public, max-age=60',
     'Vary': 'Accept-Encoding',
     // Help with debugging
-    'X-Cache-Strategy': 'edge-redis-rss',
+    'X-Cache-Strategy': 'serverless-redis-rss',
   };
+}
+
+/**
+ * Timeout wrapper to prevent 504 Gateway Timeout errors on Vercel
+ */
+async function withTimeout<T>(
+  promise: Promise<T>, 
+  timeoutMs: number, 
+  errorMessage: string
+): Promise<T> {
+  const timeout = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
+  });
+  
+  return Promise.race([promise, timeout]);
 }
 
 export async function GET(req: NextRequest) {
@@ -80,9 +96,13 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // ✅ EXPERT PATTERN: 2) Cache miss - fetch from RSS sources
+    // ✅ EXPERT PATTERN: 2) Cache miss - fetch from RSS sources with timeout protection
     console.log('❌ Redis cache MISS - fetching from RSS sources');
-    const fetchResult = await fetchAllNews();
+    const fetchResult = await withTimeout(
+      fetchAllNews(),
+      50000, // 50 seconds (within Vercel serverless 60s limit)
+      'RSS fetch timeout - taking too long to fetch news sources'
+    );
     
     // Apply source filter if specified
     const filtered = sourceFilter

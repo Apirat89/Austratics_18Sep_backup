@@ -179,7 +179,7 @@ export const DEFAULT_NEWS_CONFIG: NewsServiceConfig = {
   sources: NEWS_SOURCES,
   cacheDuration: 60, // 60 minutes - unified with Edge cache TTL
   maxItemsPerSource: 50,
-  timeout: 10000, // 10 seconds
+  timeout: 8000, // 8 seconds (optimized for Vercel serverless limits)
   userAgent: 'Aged Care Analytics News Aggregator 1.0',
   enableDeduplication: true,
 }; 
