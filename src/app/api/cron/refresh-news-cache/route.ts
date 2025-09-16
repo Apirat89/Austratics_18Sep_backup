@@ -77,7 +77,9 @@ export async function GET(req: Request) {
           const response = await fetch(`${baseUrl}${path}`, {
             headers: { 
               'x-prewarm': '1',
-              'User-Agent': 'Taskmaster-Cron-Prewarm/1.0'
+              'User-Agent': 'Taskmaster-Cron-Prewarm/1.0',
+              // ✅ FIX: Include CRON_SECRET for authorized pre-warming
+              'Authorization': `Bearer ${process.env.CRON_SECRET}`
             },
           });
           

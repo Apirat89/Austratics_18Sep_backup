@@ -1,20 +1,21 @@
 # Project Scratchpad
 
-## 🎯 **FRIEND'S EXPERT ANALYSIS: REDIS CONFIGURATION ISSUE IDENTIFIED** 🎯
+## 🎯 **FOLLOW-UP: CRON WORKING, 2 FINAL ISSUES TO RESOLVE** 🎯
 
-**EXECUTOR MODE: IMPLEMENTING FRIEND'S CORRECTIVE MEASURES** 🔧
+**EXECUTOR MODE: FIXING REMAINING REDIS + PRE-WARM ISSUES** 🔧
 
 ### **🎉 FRIEND'S EXPERT ANALYSIS - PROGRESS CONFIRMED!**
 
 **✅ WHAT'S ALREADY FIXED (EXPERT CORRECTIONS WORKED):**
 1. ✅ **CRON Job: NOW 200 SUCCESS!** - `Valid cron request detected … userAgent: vercel-cron/1.0`
-2. ✅ **Auth validation working** - No more 401 Unauthorized errors
+2. ✅ **Auth validation working** - No more 401 Unauthorized cron request errors
+3. ✅ **Redis resilience** - API never crashes on Redis failures (graceful degradation)
+4. ✅ **Tracking 403s eliminated** - Disabled trackedFetch, clean browser console
 
-**🚨 REMAINING ISSUES IDENTIFIED:**
-1. 🚨 **Redis Configuration: ENOTFOUND** - `getaddrinfo ENOTFOUND engaged-macaw-15465.upstash.io`
-2. 🚨 **News API: 500 from Redis failures** - Can't read/write cache, causes crashes  
-3. ⚠️ **Tracking Events: 403 from browser** - `trackedFetch` wrapper posting to `/api/events`
-4. ℹ️ **RSS Feed issues** - Some 403s/timeouts but non-blocking (working as intended)
+**🚨 FINAL 2 ISSUES IDENTIFIED:**
+1. 🚨 **Old Redis DB still being used** - `ENOTFOUND engaged-macaw-15465.upstash.io` (old deleted DB)
+2. 🚨 **Pre-warm 401 errors** - Edge cache warming failing, needs auth headers
+3. ℹ️ **RSS Feed issues** - Some 403s/timeouts but non-blocking (working as intended, can optimize later)
 
 **ROOT CAUSE OF MY FAILED FIXES:**
 - ❌ **CRON**: Only checked bearer token, didn't accept `x-vercel-cron` header as fallback
@@ -32,28 +33,36 @@
 
 ### **🛠️ FRIEND'S IMPLEMENTATION PLAN (IN ORDER)**
 
-**A) FIX REDIS ENV VARS (USER ACTION NEEDED)** 🔑 ✅ **COMPLETED**
-- ✅ **User Completed**: Set UPSTASH_REDIS_REST_URL = "https://helpful-cricket-12990.upstash.io"
-- ✅ **User Completed**: Set UPSTASH_REDIS_REST_TOKEN = "ATK-AAIncDE0NWY3ZjFlZmYzZjU0NTQyOGE0M2U4MzIwMmJlOWUxY3AxMTI5OTA"
-- ✅ **User Completed**: Updated both .env file and Vercel Production Environment Variables
-- 🔧 **Next**: Trigger redeploy and verify connection works
-- 🔧 **Expected**: No more `ENOTFOUND engaged-macaw-15465.upstash.io` errors
+**ISSUE #1: CLEAN UP OLD REDIS ENV VARS (USER ACTION NEEDED)** 🔑 ⚡ **URGENT**
+- ❌ **Problem**: Still seeing `ENOTFOUND engaged-macaw-15465.upstash.io` (deleted DB)
+- 🔧 **User Action**: Go to Vercel → Project → Settings → Environment Variables
+- 🔧 **User Action**: Filter by "UPSTASH" - DELETE any old/duplicate keys pointing to `engaged-macaw-15465`
+- 🔧 **User Action**: Ensure Production has EXACTLY these (no quotes/spaces):
+  ```
+  UPSTASH_REDIS_REST_URL=https://helpful-cricket-12990.upstash.io
+  UPSTASH_REDIS_REST_TOKEN=ATK-AAIncDE0NWY3ZjFlZmYzZjU0NTQyOGE0M2U4MzIwMmJlOWUxY3AxMTI5OTA
+  ```
+- 🔧 **User Action**: Save → Go to Deployments → latest Production → **Redeploy**
+- 🔧 **Verify**: Check deployment's "Runtime Environment Variables" shows `helpful-cricket-12990` URL
+- ✅ **Expected**: No more `ENOTFOUND engaged-macaw` errors
 
-**B) MAKE /API/NEWS RESILIENT (CODE FIX)** ⚙️ ✅ **READY TO IMPLEMENT**  
-- 🔧 **Task B.1**: Wrap Redis operations in try/catch blocks
-- 🔧 **Task B.2**: Return friendly 503 or stale data when Redis fails
-- 🔧 **Task B.3**: Ensure route never 500s even if Redis is completely down
-- 🔧 **Expected**: Graceful degradation with "partial results" messages
+**ISSUE #2: FIX PRE-WARM 401 ERRORS (CODE FIX)** ⚙️ ✅ **IMPLEMENTED**  
+- ❌ **Problem**: Pre-warm requests getting 401 from `/api/news` endpoint
+- ✅ **Code Fix**: Added `Authorization: Bearer ${process.env.CRON_SECRET}` to pre-warm headers
+- 🔧 **Location**: `src/app/api/cron/refresh-news-cache/route.ts` lines 77-82
+- ✅ **Expected**: Green pre-warm success messages instead of 401 failures
 
-**C) QUIET TRACKING 403s (CODE FIX)** 🔇 ✅ **READY TO IMPLEMENT**
-- 🔧 **Task C.1**: Replace `trackedFetch` with plain `fetch` in news page temporarily
-- 🔧 **Task C.2**: Disable tracking wrapper to eliminate `/api/events` 403 noise  
-- 🔧 **Expected**: Clean browser console, no 403 errors
+**PREVIOUSLY COMPLETED FIXES:** ✅ ✅ ✅
+- ✅ **Redis Resilience**: API never crashes on Redis failures (graceful degradation)
+- ✅ **Tracking 403s**: Disabled trackedFetch, eliminated `/api/events` 403 noise
+- ✅ **CRON Auth**: Dual authentication working (Vercel header + bearer token)
+- ✅ **Error Boundaries**: Comprehensive try/catch with stale cache fallbacks
 
-**D) VERIFY ALL FIXES** 🧪 ⏸️ **AWAITING IMPLEMENTATION**
-- 🔧 **Task D.1**: Test `/api/news` directly - should return JSON, not 500
-- 🔧 **Task D.2**: Verify no Upstash connection errors in cron logs
-- 🔧 **Task D.3**: Confirm clean browser console with no 403/500 errors
+**VERIFICATION CHECKLIST** 🧪 ⏸️ **AWAITING USER ACTION + REDEPLOY**
+- 🔧 **After Redis cleanup**: Verify `helpful-cricket-12990` in deployment env vars  
+- 🔧 **After redeploy**: Test cron logs show no `ENOTFOUND engaged-macaw` errors
+- 🔧 **After redeploy**: Pre-warm should show green success messages (not 401)
+- 🔧 **Final test**: `/api/news` returns JSON data, news page loads all 3 sources
 
 **PHASE 1: CRON AUTHORIZATION FIX - CORRECTED** 🔐 ❌ **NEEDS REVISION**
 - ❌ **Issue**: My implementation only accepted bearer token, not `x-vercel-cron` header
