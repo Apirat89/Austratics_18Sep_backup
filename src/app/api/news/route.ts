@@ -5,6 +5,8 @@ import { NewsCacheService } from '../../../lib/news-cache';
 // ✅ EXPERT PATTERN: Runtime configuration for proper Vercel function optimization
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// 🇦🇺 CRITICAL: Run from Sydney for Australian IP to access health.gov.au RSS
+export const preferredRegion = ["syd1"];
 
 /**
  * API Route: /api/news
