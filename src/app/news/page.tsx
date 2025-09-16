@@ -13,7 +13,8 @@ import { NewsPagination } from '../../components/news/NewsPagination';
 import { NewsLoadingState } from '../../components/news/NewsLoadingState';
 import { NewsErrorState } from '../../components/news/NewsErrorState';
 import { ChevronDown, LogOut } from 'lucide-react';
-import { trackedFetch } from '@/lib/usageTracking';
+// ✅ FRIEND'S FIX: Temporarily disabled tracking to eliminate 403 errors
+// import { trackedFetch } from '@/lib/usageTracking';
 
 interface UserData {
   email: string;
@@ -98,13 +99,10 @@ function NewsPageContent() {
         params.append('source', state.filters.source);
       }
       
-      // Use trackedFetch instead of regular fetch to track API usage
-      const response = await trackedFetch(
-        user?.id || 'anonymous',
-        'internal',
-        `/api/news?${params}`,
-        { action: 'list_news' }
-      );
+      // ✅ FRIEND'S FIX: Use plain fetch temporarily to avoid 403 tracking errors
+      const response = await fetch(`/api/news?${params}`, { 
+        cache: 'no-store' 
+      });
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);

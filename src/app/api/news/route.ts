@@ -84,7 +84,7 @@ export async function GET(req: Request) {
     const offset = Math.max(0, Number(searchParams.get('offset')) || 0);
     const sourceFilter = searchParams.get('source') || null;
 
-    // 1) Try hot cache (Redis/Upstash) first
+    // 1) Try hot cache (Redis/Upstash) first - with resilient error handling  
     const cacheKey = NewsCacheService.generateCacheKey({
       source: sourceFilter || undefined,
       limit,
@@ -92,28 +92,36 @@ export async function GET(req: Request) {
     });
 
     console.log(`🔍 Cache key: ${cacheKey}`);
-    const cached = await NewsCacheService.getCache(cacheKey);
+    
+    // ✅ FRIEND'S FIX: Wrap Redis read in try/catch for resilience
+    let cached = null;
+    try {
+      cached = await NewsCacheService.getCache(cacheKey);
+      if (cached && cached.items?.length) {
+        console.log(`⚡ Redis cache HIT: ${cached.items.length} items`);
+        
+        const page = cached.items.slice(offset, offset + limit);
+        const sources = Array.from(
+          new Set(cached.items.map(i => i.source?.id).filter(Boolean))
+        ).map(s => ({ id: String(s), name: String(s) }));
 
-    if (cached && cached.items?.length) {
-      console.log(`⚡ Redis cache HIT: ${cached.items.length} items`);
-      
-      const page = cached.items.slice(offset, offset + limit);
-      const sources = Array.from(
-        new Set(cached.items.map(i => i.source?.id).filter(Boolean))
-      ).map(s => ({ id: String(s), name: String(s) }));
-
-      return Response.json({
-        success: true,
-        items: page,
-        metadata: {
-          total: cached.items.length,
-          limit,
-          offset,
-          lastUpdated: cached.lastUpdated || new Date().toISOString(),
-          sources,
-          cached: true,
-        },
-      });
+        return Response.json({
+          success: true,
+          items: page,
+          metadata: {
+            total: cached.items.length,
+            limit,
+            offset,
+            lastUpdated: cached.lastUpdated || new Date().toISOString(),
+            sources,
+            cached: true,
+          },
+        });
+      }
+    } catch (redisError) {
+      console.warn('⚠️ Redis cache read failed, proceeding without cache:', 
+        redisError instanceof Error ? redisError.message : String(redisError));
+      // Continue execution - don't let Redis failures break the API
     }
 
     // 2) If miss, fetch sources with short per-source timeout
@@ -128,13 +136,22 @@ export async function GET(req: Request) {
       ? fetchResult.items.filter(i => i.source?.id?.toLowerCase() === sourceFilter.toLowerCase())
       : fetchResult.items;
 
-    // Store in Redis for future requests
+    // Store in Redis for future requests - with resilient error handling
     const cacheData = {
       items: filtered,
       lastUpdated: new Date().toISOString(),
       errors: fetchResult.errors,
     };
-    await NewsCacheService.setCache(cacheData, 3600, cacheKey);
+    
+    // ✅ FRIEND'S FIX: Wrap Redis write in try/catch for resilience  
+    try {
+      await NewsCacheService.setCache(cacheData, 3600, cacheKey);
+      console.log('✅ Redis cache write successful');
+    } catch (redisWriteError) {
+      console.warn('⚠️ Redis cache write failed, continuing without caching:',
+        redisWriteError instanceof Error ? redisWriteError.message : String(redisWriteError));
+      // Continue execution - don't let Redis failures break the API
+    }
 
     const page = filtered.slice(offset, offset + limit);
     const sources = Array.from(
