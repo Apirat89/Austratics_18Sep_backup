@@ -1,13 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["syd1"],
   "functions": {
     "src/app/api/news/route.ts": {
-      "maxDuration": 15,
-      "regions": ["syd1"]
-    },
-    "src/app/api/news-v2/route.ts": {
-      "maxDuration": 15,
-      "regions": ["syd1"]
+      "maxDuration": 15
     }
   },
   "headers": [

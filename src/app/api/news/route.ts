@@ -1,9 +1,10 @@
 import { fetchAllNews } from '../../../lib/rss-service';
 import { NewsResponse, NewsItem, NewsServiceError } from '../../../types/news';
 
-// ✅ SIMPLIFIED PATTERN: Direct RSS fetching without caching complexity
+// ✅ SIMPLIFIED PATTERN: Direct RSS fetching without caching complexity  
 export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';  // disable Full Route Cache
+export const revalidate = 0;             // disable Data Cache for this route
 // 🇦🇺 Keep Sydney region for better Australian government RSS access
 export const preferredRegion = ["syd1"];
 
@@ -62,7 +63,7 @@ export async function GET(req: Request) {
       new Set(filtered.map(i => i.source?.id).filter(Boolean))
     ).map(s => ({ id: String(s), name: String(s) }));
 
-    // Simple success response  
+    // Simple success response with explicit no-store headers
     return Response.json({
       success: true,
       items: page,
@@ -75,6 +76,12 @@ export async function GET(req: Request) {
         cached: false, // Always false - direct fetch
         simplified_system: "v2_direct_rss",
         errors: fetchResult.errors?.length ? fetchResult.errors : undefined
+      }
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, max-age=0, must-revalidate',
+        'CDN-Cache-Control': 'no-store',
+        'Vercel-CDN-Cache-Control': 'no-store'
       }
     });
 
@@ -95,7 +102,14 @@ export async function GET(req: Request) {
         sources: [],
         cached: false
       }
-    }, { status: 500 });
+    }, { 
+      status: 500,
+      headers: {
+        'Cache-Control': 'no-store, no-cache, max-age=0, must-revalidate',
+        'CDN-Cache-Control': 'no-store',
+        'Vercel-CDN-Cache-Control': 'no-store'
+      }
+    });
   }
 }
 

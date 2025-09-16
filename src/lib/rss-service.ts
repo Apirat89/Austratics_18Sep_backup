@@ -125,6 +125,7 @@ export class RSSService {
             'Referer': source.category === 'government' ? 'https://www.health.gov.au/news' : source.websiteUrl,
           },
           cache: 'no-store',
+          next: { revalidate: 0 },
           redirect: 'follow',
           signal: AbortSignal.timeout(
             // 🇦🇺 EXPERT FIX: Longer timeout for gov sites (25s) as they can be slow
@@ -279,6 +280,8 @@ export class RSSService {
         headers: {
           'User-Agent': this.config.userAgent,
         },
+        cache: 'no-store',
+        next: { revalidate: 0 },
         signal: AbortSignal.timeout(5000),
       });
 
