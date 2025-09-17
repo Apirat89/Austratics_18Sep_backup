@@ -203,7 +203,7 @@ export default function LayerManager({
           // Download file directly from storage bucket
           const { data: fileData, error: downloadError } = await supabase.storage
             .from('json_data')
-            .download('maps/SA2.geojson');
+            .download('maps/SA2_simplified.geojson');
           
           if (downloadError) {
             throw new Error(`Storage download failed: ${downloadError.message}`);
@@ -229,7 +229,7 @@ export default function LayerManager({
           
           // Fallback to direct fetch as last resort
           try {
-            const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2.geojson';
+            const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2_simplified.geojson';
             console.log('🔍 LayerManager: Fallback to direct fetch from:', supabaseUrl);
             
             const response = await fetch(supabaseUrl);

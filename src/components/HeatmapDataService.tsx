@@ -672,11 +672,11 @@ export default function HeatmapDataService({
         console.log('📦 HeatmapDataService: Using cached SA2 boundary data for names');
         if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportNameMapping(60);
       } else {
-        console.log('📡 HeatmapDataService: Fetching SA2.geojson for name lookup...');
+        console.log('📡 HeatmapDataService: Fetching SA2_simplified.geojson for name lookup...');
         const startTime = Date.now();
         
         // Use Supabase URL instead of local path
-        const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2.geojson';
+        const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2_simplified.geojson';
         const response = await fetch(supabaseUrl);
         
         if (!response.ok) {

@@ -1,5 +1,755 @@
 # Project Scratchpad
 
+## 🗺️ **MAPS PAGE BOUNDARIES & HEATMAP LOADING FAILURE ANALYSIS** 🗺️
+
+**USER REQUEST:** Maps page failed to load boundaries and statistics heatmap - analyze issues in detail and provide file list for external expert consultation
+
+**PLANNER MODE ACTIVE** 📋
+
+### **🚨 CRITICAL ISSUE SUMMARY**
+The maps page is experiencing complete failure to load SA2 boundaries and statistical heatmap data, resulting in a non-functional mapping interface for users.
+
+**Primary Error Pattern:**
+```
+GET https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2.geojson 400 (Bad Request)
+❌ LayerManager: All loading methods failed: Error: Direct fetch failed: 400
+❌ LayerManager: Error loading SA2 boundaries: Direct fetch failed: 400
+⚠️ LayerManager: Force resetting mapBusy due to boundary loading error
+```
+
+### **🔍 ERROR ANALYSIS**
+1. **Primary Storage URL Failing**: `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2.geojson` returns HTTP 400
+2. **Alternative URL Also Failing**: `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/json_data/maps/SA2.geojson` (missing `public`) returns HTTP 400  
+3. **Render Loop**: Massive React render cycles (`uE @ ux @` repeated thousands of times) suggesting infinite re-render
+4. **Complete System Failure**: LayerManager exhausts all loading methods and forces emergency reset
+
+### **Key Challenges and Analysis**
+
+#### **Challenge 1: Supabase Storage Access Failure** 🔥 **CRITICAL**
+**Issue**: HTTP 400 errors on SA2.geojson file requests
+**Possible Causes:**
+- **File Missing**: SA2.geojson file doesn't exist in Supabase storage bucket
+- **Permission Issues**: Public access not properly configured for `json_data/maps/` path
+- **Bucket Configuration**: Storage bucket policy blocking access to `.geojson` files
+- **URL Construction Error**: Frontend generating malformed storage URLs
+- **Supabase Project Issues**: Project limits, billing, or service outages
+
+#### **Challenge 2: Infinite React Render Loop** 🔄 **CRITICAL** 
+**Issue**: Massive render cycles causing performance degradation
+**Evidence**: Thousands of `uE @ ux @` console entries indicating React render churn
+**Likely Cause**: Map component continuously retrying failed boundary loading, triggering state changes that cause re-renders
+**Impact**: Browser performance degradation, potential UI freeze, excessive API calls
+
+#### **Challenge 3: LayerManager Failure Cascade** ⚠️ **HIGH**
+**Issue**: LayerManager exhausts all loading methods and forces emergency reset
+**System Behavior:**
+1. Attempts direct fetch → 400 error
+2. Falls back to storage API → 400 error  
+3. Force resets `mapBusy` state → triggers new loading cycle
+4. Infinite retry loop without proper backoff
+
+#### **Challenge 4: Statistics Heatmap Dependencies** 📊 **HIGH**
+**Issue**: Heatmap functionality depends on boundary data that's failing to load
+**Impact**: Users cannot visualize demographic/statistical overlays on map
+**Dependency Chain**: SA2 boundaries → Statistical regions → Heatmap rendering
+**Current State**: Complete feature failure due to upstream boundary loading issues
+
+### **🗂️ KEY FILES FOR EXTERNAL EXPERT REVIEW**
+
+#### **🎯 PRIMARY INVESTIGATION FILES (HIGHEST PRIORITY)**
+
+**1. Maps Page Controller** 🔍 **CRITICAL**
+```
+src/app/maps/page.tsx
+```
+**Investigation Focus:**
+- Main map component integration and state management
+- Error handling for boundary loading failures
+- Component lifecycle and re-render triggers
+- Storage URL configuration and environment variables
+
+**2. Australian Map Component** 🔍 **CRITICAL**
+```
+src/components/AustralianMap.tsx
+```
+**Investigation Focus:**
+- LayerManager integration and boundary loading logic
+- Map initialization and data loading workflows
+- Error handling and retry mechanisms
+- State management causing potential render loops
+
+**3. Map Display Component** 🔍 **HIGH PRIORITY**
+```
+src/components/maps/MapDisplay.tsx
+```
+**Investigation Focus:**
+- Integration with LayerManager
+- Heatmap rendering logic and dependencies
+- Component state that might trigger re-renders
+- Error display and user feedback mechanisms
+
+**4. Storage/Data Management** 🔍 **HIGH PRIORITY**
+```
+src/lib/storage.ts (if exists)
+src/lib/supabase.ts (if exists)  
+src/lib/supabase/admin.ts
+```
+**Investigation Focus:**
+- Supabase client configuration
+- Storage URL construction utilities
+- Data fetching and caching mechanisms
+- Error handling in data layer
+
+#### **🔧 CONFIGURATION FILES**
+
+**5. Environment Configuration** 🔍 **HIGH PRIORITY**
+```
+.env.local
+.env (if exists)
+next.config.js
+```
+**Investigation Focus:**
+- Supabase project URL and configuration
+- Storage bucket access credentials
+- Environment variable setup for different deployment stages
+
+### **🚨 CRITICAL QUESTIONS FOR EXTERNAL EXPERT**
+
+#### **Storage Infrastructure**
+1. **File Existence**: Does `SA2.geojson` actually exist in the Supabase storage bucket at path `json_data/maps/`?
+2. **Access Permissions**: Are public read permissions properly configured for the storage bucket?
+3. **Bucket Policies**: Are there any RLS (Row Level Security) or bucket policies blocking access to `.geojson` files?
+4. **Project Status**: Is the Supabase project active, within limits, and properly configured?
+
+#### **URL Construction & Configuration**
+1. **Environment Variables**: Are `NEXT_PUBLIC_SUPABASE_URL` and related variables correctly set?
+2. **Project ID**: Is the project ID `ejhmrjcvjrrsbopffhuo` correct and active?
+3. **URL Pattern**: Should the URL be `/storage/v1/object/public/` or `/storage/v1/object/`?
+4. **Path Structure**: Is `json_data/maps/SA2.geojson` the correct bucket path?
+
+#### **Frontend Architecture**
+1. **Infinite Renders**: What's causing the massive React render loop in the map component?
+2. **Error Boundaries**: Are there proper error boundaries preventing cascade failures?
+3. **State Management**: Is map loading state properly managed to prevent retry loops?
+4. **Cleanup**: Are failed requests properly aborted and cleaned up?
+
+### **🛠️ IMMEDIATE DIAGNOSTIC COMMANDS FOR EXPERT**
+
+#### **Test Storage URLs Directly**
+```bash
+# Test primary URL
+curl -I "https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2.geojson"
+
+# Test alternative URL format  
+curl -I "https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/json_data/maps/SA2.geojson"
+```
+
+#### **Browser Network Analysis**
+1. Open browser developer tools → Network tab
+2. Navigate to `/maps` page
+3. Look for:
+   - Multiple failed requests to SA2.geojson
+   - Request headers and response details
+   - CORS errors or authentication issues
+   - Timing of retry attempts
+
+### **🎯 SUCCESS CRITERIA FOR RESOLUTION**
+
+#### **Immediate Fixes**
+- ✅ SA2.geojson loads successfully (HTTP 200)
+- ✅ Map displays boundary outlines correctly
+- ✅ No more infinite React render loops
+- ✅ Browser console shows clean loading process
+
+#### **Feature Restoration**  
+- ✅ Statistical heatmap overlays function correctly
+- ✅ Regional boundaries display with proper styling
+- ✅ User can interact with map regions for statistics
+- ✅ Performance returns to acceptable levels
+
+---
+
+**EXPERT CONSULTATION STATUS**: ⏳ **AWAITING EXTERNAL ANALYSIS**
+
+**RECOMMENDED APPROACH**: External expert should start with storage URL testing and file existence verification, then proceed to frontend debugging if storage infrastructure is confirmed working.
+
+## **DETAILED BOUNDARY & HEATMAP RENDERING ARCHITECTURE ANALYSIS**
+
+### **🏗️ ARCHITECTURE OVERVIEW**
+
+The maps boundary and heatmap rendering system is a complex multi-component architecture that follows this data flow:
+
+```
+User Interface (DataLayers) → Data Processing (HeatmapDataService) → Map Rendering (AustralianMap) → Layer Management (LayerManager) → MapTiler Rendering
+```
+
+### **📁 KEY FILES AND RESPONSIBILITIES**
+
+#### **1. Core Map Components:**
+- **`src/app/maps/page.tsx`** - Main maps page controller, handles state management and UI coordination
+- **`src/components/AustralianMap.tsx`** - Primary map component using MapTiler SDK, manages map instance and integrates all sub-systems
+- **`src/components/LayerManager.tsx`** - Centralized layer management for boundaries and heatmaps
+- **`src/components/DataLayers.tsx`** - UI component for heatmap data selection and controls
+- **`src/components/HeatmapDataService.tsx`** - Data processing service for statistics and rankings
+
+#### **2. Data Loading Services:**
+- **`src/lib/mapSearchService.ts`** - Handles geographic boundary search and location lookup
+- **`src/lib/serverStorage.ts`** - Server-side Supabase storage access utilities
+- **`src/components/MapLoadingCoordinator.tsx`** - Coordinates loading states across components
+
+#### **3. Support Components:**
+- **`src/components/SimpleHeatmapMap.tsx`** - Alternative map component for simpler rendering
+- **`src/components/SA2DataLayer.tsx`** - Specialized SA2 data handling
+- **`lib/mergeSA2Data.ts`** - Data merging utilities for SA2 statistics
+
+### **🌊 DETAILED DATA FLOW PROCESS**
+
+#### **Phase 1: Initialization (Maps Page Load)**
+1. **`maps/page.tsx`** initializes with default state:
+   ```typescript
+   selectedGeoLayer: 'sa2'
+   heatmapVisible: true
+   heatmapDataType: 'healthcare'
+   heatmapCategory: 'Commonwealth Home Support Program'
+   ```
+
+2. **`AustralianMap.tsx`** creates MapTiler instance and initializes sub-components:
+   - LayerManager for boundary/heatmap rendering
+   - HeatmapDataService for statistics processing
+   - MapLoadingCoordinator for synchronized loading
+
+#### **Phase 2: Boundary Loading Process**
+1. **LayerManager.loadSA2Boundaries()** triggered when map loads:
+   ```javascript
+   // Multiple fallback methods for loading SA2.geojson:
+   Method 1: Supabase Storage API (supabase.storage.from('json_data').download('maps/SA2.geojson'))
+   Method 2: Direct Storage URL (https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2.geojson)
+   Method 3: Server-side API proxy (/api/maps/data?file=SA2.geojson)
+   ```
+
+2. **File Processing:**
+   - **File Size:** SA2.geojson is ~170MB with 2,456+ SA2 regions
+   - **Caching:** Boundaries cached in `boundaryDataCache.current.set(layerType, geojsonData)`
+   - **Parsing:** Large JSON parsed asynchronously with progress reporting
+
+3. **Map Layer Creation:**
+   - Source creation: `map.addSource('sa2-source', { type: 'geojson', data: geojsonData })`
+   - Boundary layer: Line rendering for SA2 region outlines
+   - Fill layer: For heatmap color rendering (when heatmap active)
+
+#### **Phase 3: Heatmap Data Processing**
+1. **HeatmapDataService** loads statistics data:
+   ```javascript
+   // Data sources by type:
+   healthcare: 'DSS_Cleaned_2024_comprehensive.json' (Healthcare spending/participation)
+   demographics: 'Demographics_2023_comprehensive.json' (Population, age groups)
+   economics: 'econ_stats_comprehensive.json' (Income, housing costs)
+   health-statistics: 'health_stats_comprehensive.json' (Health outcomes)
+   ```
+
+2. **Data Processing Pipeline:**
+   - Raw data filtered by selected category/subcategory
+   - Values converted to numeric format
+   - SA2 region mapping: `{ [sa2Id]: numericValue }`
+   - Min/max values calculated for color scaling
+   - Ranked data generated (top 10 / bottom 10 regions)
+
+#### **Phase 4: Visual Rendering**
+1. **LayerManager** creates heatmap visualization:
+   - **Color Expression:** MapTiler `['case']` expression with SA2 ID → color mapping
+   - **Color Scale:** Linear gradient from red (low) to green (high) values
+   - **Default Color:** Gray (#9CA3AF) for regions without data
+
+2. **Layer Management:**
+   - SA2 boundaries: Always visible as outlines
+   - SA2 fill: Only visible when heatmap enabled
+   - Hover interactions: Highlight regions on mouse hover
+   - Click interactions: Navigate to region details
+
+### **🔗 COMPONENT INTEGRATION ARCHITECTURE**
+
+```
+┌─── DataLayers (UI Controls) ────────────────────────┐
+│ • Heatmap toggle                                    │
+│ • Data type selection (healthcare/demographics)     │
+│ • Category/subcategory dropdowns                   │
+│ • Loading state management                         │
+└─────────────────┬───────────────────────────────────┘
+                  │ onHeatmapDataSelect()
+                  ▼
+┌─── Maps Page (State Coordinator) ───────────────────┐
+│ • Central state management                          │
+│ • Props distribution to components                  │
+│ • Event handling and callbacks                     │
+└─────────────────┬───────────────────────────────────┘
+                  │ heatmapCategory, heatmapSubcategory
+                  ▼
+┌─── HeatmapDataService (Data Processor) ─────────────┐
+│ • Load statistics from Supabase                    │
+│ • Filter and process selected data                 │
+│ • Calculate min/max values                         │
+│ • Generate rankings (top/bottom regions)           │
+└─────────────────┬───────────────────────────────────┘
+                  │ onDataProcessed(SA2HeatmapData)
+                  ▼
+┌─── AustralianMap (Map Controller) ───────────────────┐
+│ • MapTiler SDK integration                          │
+│ • Coordinate LayerManager and data services        │
+│ • Handle user interactions (click, hover)          │
+│ • Manage map navigation and viewport               │
+└─────────────────┬───────────────────────────────────┘
+                  │ map instance + heatmap data
+                  ▼
+┌─── LayerManager (Render Engine) ────────────────────┐
+│ • Load SA2.geojson boundary data                   │
+│ • Create MapTiler layers (boundaries + heatmap)    │
+│ • Apply color expressions for visualization        │
+│ • Handle loading states and error recovery         │
+└─────────────────────────────────────────────────────┘
+```
+
+### **📊 DATA STORAGE ARCHITECTURE**
+
+#### **Supabase Storage Buckets:**
+- **`json_data/maps/`** - Boundary GeoJSON files:
+  - `SA2.geojson` (170MB) - SA2 region boundaries
+  - `SA3.geojson`, `SA4.geojson`, `LGA.geojson` - Other boundary types
+  - `POA.geojson` (postcodes), `SAL.geojson` (localities)
+
+- **`json_data/sa2/`** - Statistics data files:
+  - `Demographics_2023_comprehensive.json` - Population/age statistics
+  - `DSS_Cleaned_2024_comprehensive.json` - Healthcare program data
+  - `econ_stats_comprehensive.json` - Economic indicators
+  - `health_stats_comprehensive.json` - Health outcome metrics
+
+#### **Data Format Standards:**
+- **Boundaries:** GeoJSON FeatureCollection with properties for names/IDs
+- **Statistics:** JSON arrays with SA2 ID, Name, Category, and Amount fields
+- **Processing:** Wide format objects `{ [sa2Id]: value }` for efficient lookups
+
+### **⚡ PERFORMANCE OPTIMIZATIONS**
+
+1. **Caching Strategy:**
+   - Browser-side caching of large GeoJSON files
+   - Component-level data caching to prevent re-downloads
+   - Debounced user interactions to prevent excessive API calls
+
+2. **Loading Coordination:**
+   - MapLoadingCoordinator prevents render conflicts
+   - Progressive loading with progress indicators
+   - Fallback loading methods for resilience
+
+3. **Memory Management:**
+   - Cleanup of unused map layers when switching types
+   - Efficient MapTiler expressions to minimize memory usage
+   - Lazy loading of non-essential components
+
+### **🚨 CURRENT ISSUES IDENTIFIED**
+
+#### **Primary Issue: SA2.geojson Access Failure**
+- **Error:** `400 Bad Request` on SA2.geojson URL
+- **Impact:** No boundary rendering, no heatmap visualization
+- **Root Cause:** Storage permissions or file path issues
+
+#### **Secondary Issues:**
+- **Infinite Render Loop:** Map components retrying failed loads continuously
+- **Error Handling:** No graceful fallbacks when primary data source fails
+- **Performance:** Large file downloads blocking UI rendering
+
+### **🔧 TECHNICAL IMPLEMENTATION DETAILS**
+
+#### **Map Layer Structure:**
+```javascript
+// SA2 Boundary Source
+map.addSource('sa2-source', {
+  type: 'geojson',
+  data: geojsonData  // 170MB SA2.geojson
+});
+
+// Boundary Outline Layer
+map.addLayer({
+  id: 'sa2-layer',
+  type: 'line',
+  source: 'sa2-source',
+  paint: { 'line-color': '#666666', 'line-width': 0.5 }
+});
+
+// Heatmap Fill Layer (conditional)
+map.addLayer({
+  id: 'sa2-heatmap',
+  type: 'fill',
+  source: 'sa2-source', 
+  paint: {
+    'fill-color': ['case', 
+      ['has', ['get', 'SA2_MAIN16'], ['literal', heatmapData]],
+      ['interpolate', ['linear'], ['get', heatmapValue], 0, '#FF0000', 100, '#00FF00'],
+      '#9CA3AF'  // Default gray
+    ]
+  }
+});
+```
+
+#### **Data Processing Pipeline:**
+```javascript
+// 1. Raw data loading
+const rawData = await fetch(supabaseUrl).then(r => r.json());
+
+// 2. Filtering by selection
+const filteredData = rawData.filter(row => 
+  row.Category === selectedCategory && 
+  row.Type === selectedSubcategory
+);
+
+// 3. SA2 mapping
+const heatmapData = filteredData.reduce((acc, row) => {
+  acc[row['SA2 ID']] = parseFloat(row.Amount);
+  return acc;
+}, {});
+
+// 4. Visualization update
+map.setPaintProperty('sa2-heatmap', 'fill-color', colorExpression);
+```
+
+This architecture provides a solid foundation but requires debugging the SA2.geojson access issue to restore full functionality.
+
+## **🎯 EXPERT DIAGNOSTIC PLAN - SA2.GEOJSON 400 ERROR DEBUGGING**
+
+**EXTERNAL EXPERT ADVICE RECEIVED** ✅ - Systematic 7-step approach to isolate and fix the 400 error
+
+### **📋 HIGH-LEVEL TASK BREAKDOWN**
+
+#### **Phase 1: Infrastructure Isolation (Reproduce Outside App)**
+**Goal:** Determine if this is a Supabase Storage issue vs application code issue
+
+#### **Phase 2: Root Cause Analysis** 
+**Goal:** Identify the specific cause of 400 errors from common patterns
+
+#### **Phase 3: Code Instrumentation**
+**Goal:** Add detailed logging to current loading methods for diagnostic data
+
+#### **Phase 4: Quick Stabilization**
+**Goal:** Implement Next.js proxy as immediate workaround
+
+#### **Phase 5: Performance Optimization**
+**Goal:** Long-term solution using vector tiles instead of 170MB GeoJSON
+
+#### **Phase 6: Supabase Configuration Validation**
+**Goal:** Verify bucket permissions and object metadata
+
+#### **Phase 7: Comprehensive Testing**
+**Goal:** Validate fixes with proper sanity tests
+
+---
+
+## Key Challenges and Analysis
+
+### **🚨 CRITICAL PATH: Infrastructure First**
+
+**Challenge:** Need to isolate whether this is a Supabase Storage infrastructure problem vs application code problem before attempting code fixes.
+
+**Expert Recommendation:** Test storage access completely outside the React application using direct API calls and curl commands.
+
+**Why This Matters:** If the file is accessible via direct API but failing in the application, it's likely a CORS, caching, or URL construction issue rather than a storage problem.
+
+### **🔍 ROOT CAUSE HYPOTHESES (From Expert Analysis)**
+
+#### **Most Likely Causes:**
+1. **Malformed path/double-encoding** - App generating incorrect URLs
+2. **Expired signed URLs cached** - Client retaining stale authentication URLs  
+3. **Problematic Range requests** - Browser sending invalid Range headers for large files
+4. **CORS preflight mismatch** - Cross-origin request configuration issues
+5. **CDN/cache weirdness** - Edge caching problems with 170MB JSON files
+
+#### **Debugging Strategy:** 
+Test each hypothesis systematically using instrumentation and external verification
+
+---
+
+## High-level Task Breakdown
+
+### **🔬 PHASE 1: INFRASTRUCTURE ISOLATION**
+
+#### **Task 1.1: Verify Object Exists in Supabase Storage**
+```typescript
+// Test script to run in Node.js/browser console
+const { data, error } = await supabase.storage
+  .from('json_data')
+  .list('maps', { search: 'SA2.geojson' });
+console.log('File listing:', data, error);
+```
+
+**Success Criteria:** 
+- File exists with correct path `maps/SA2.geojson`
+- Size approximately 170MB 
+- `is_public: true` for public bucket access
+- Proper `contentType: application/json`
+
+#### **Task 1.2: Direct HTTP Testing (Outside Browser)**
+```bash
+# Test direct access to public storage URL
+BASE="https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object"
+PUB="$BASE/public/json_data/maps/SA2.geojson"
+
+# Headers only test
+curl -I "$PUB"
+
+# Full request test  
+curl -v "$PUB" -o /dev/null
+
+# Range request test
+curl -v -H "Range: bytes=0-1023" "$PUB" -o /dev/null
+
+# CORS preflight test
+curl -i -X OPTIONS "$PUB" \
+  -H "Origin: http://localhost:3000" \
+  -H "Access-Control-Request-Method: GET"
+```
+
+**Success Criteria:**
+- All commands return 200/206 status codes
+- Proper Content-Type and Content-Length headers
+- No CORS preflight errors
+- Valid Range request support
+
+### **🛠️ PHASE 2: CODE INSTRUMENTATION** 
+
+#### **Task 2.1: Add Verbose Logging to Existing Loaders**
+
+**File to Modify:** `src/components/LayerManager.tsx`
+
+**Implementation:** Add diagnostic wrapper around fetch calls:
+```typescript
+async function robustFetch(url: string, init?: RequestInit) {
+  const t0 = performance.now();
+  console.info('[boundary] fetching', { url, init });
+  
+  try {
+    const res = await fetch(url, { cache: 'no-store', ...init });
+    const t1 = performance.now();
+    
+    console.info('[boundary] response', {
+      url,
+      status: res.status,
+      ok: res.ok,
+      time_ms: Math.round(t1 - t0),
+      headers: {
+        'content-type': res.headers.get('content-type'),
+        'content-length': res.headers.get('content-length'),
+        'accept-ranges': res.headers.get('accept-ranges'),
+        'cache-control': res.headers.get('cache-control'),
+      }
+    });
+    
+    if (!res.ok) {
+      const text = await res.text().catch(() => '<unreadable>');
+      console.error('[boundary] body sample', text.slice(0, 500));
+      throw new Error(`Fetch failed ${res.status}`);
+    }
+    
+    return res;
+  } catch (e) {
+    console.error('[boundary] fetch error', { url, err: String(e) });
+    throw e;
+  }
+}
+```
+
+**Success Criteria:**
+- Detailed logs showing exact URLs being called
+- HTTP response details including headers
+- Error body content when 400 occurs
+- Timing data to identify performance bottlenecks
+
+#### **Task 2.2: Isolate Loading Method Testing**
+
+**Implementation:** Temporarily disable 2 of the 3 fallback methods in LayerManager to test each individually:
+1. Test Supabase Storage API only
+2. Test direct Storage URL only  
+3. Test server-side API proxy only
+
+**Success Criteria:**
+- Identify which specific loading method is failing
+- Isolate whether all methods fail or just specific ones
+- Determine if failure is consistent or intermittent
+
+### **⚡ PHASE 3: IMMEDIATE STABILIZATION**
+
+#### **Task 3.1: Create Next.js API Proxy Route**
+
+**New File:** `src/app/api/sa2/route.ts`
+
+**Implementation:**
+```typescript
+import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+
+export async function GET() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+  
+  const { data, error } = await supabase.storage
+    .from('json_data')
+    .download('maps/SA2.geojson');
+    
+  if (error || !data) {
+    return NextResponse.json(
+      { error: error?.message ?? 'download failed' }, 
+      { status: 502 }
+    );
+  }
+
+  return new NextResponse(data.stream(), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
+    }
+  });
+}
+```
+
+#### **Task 3.2: Update LayerManager to Use Proxy**
+
+**File to Modify:** `src/components/LayerManager.tsx`
+
+**Implementation:** Add `/api/sa2` as the primary loading method, keeping existing methods as fallbacks.
+
+**Benefits:**
+- Eliminates CORS issues (same-origin request)
+- No signed URL TTL problems
+- Server-side error handling
+- Consistent caching headers
+
+**Success Criteria:**
+- SA2.geojson loads successfully through proxy
+- Map boundaries render correctly
+- Heatmap functionality restored
+- No more 400 errors in console
+
+### **📊 PHASE 4: PERFORMANCE OPTIMIZATION (Future)**
+
+#### **Task 4.1: Vector Tile Conversion**
+**Goal:** Replace 170MB GeoJSON with efficient vector tiles
+
+**Tools:** `tippecanoe` for MVT generation
+```bash
+tippecanoe -zg --read-parallel -o sa2.mbtiles SA2.geojson
+```
+
+#### **Task 4.2: File Splitting Strategy**
+**Alternative:** Split large GeoJSON by state/region for on-demand loading
+- `maps/SA2/NSW.geojson`
+- `maps/SA2/VIC.geojson` 
+- etc.
+
+### **✅ PHASE 5: VALIDATION TESTING**
+
+#### **Task 5.1: Sanity Tests**
+1. **Small File Test:** Load 1MB GeoJSON from same bucket to verify infrastructure
+2. **Network Analysis:** DevTools verification of 200 status, correct headers
+3. **Performance Check:** No GC pauses or memory spikes >1GB during parsing
+4. **Full User Journey:** End-to-end map functionality testing
+
+#### **Task 5.2: Cross-Browser Testing**
+- Chrome, Firefox, Safari testing
+- Incognito mode testing to avoid cache issues
+- Mobile browser testing for performance
+
+---
+
+## Project Status Board
+
+### **🚧 IMMEDIATE PRIORITIES** 
+- [✅] **Phase 1:** Infrastructure isolation testing (curl commands) - **COMPLETED**
+- [✅] **URGENT:** Upload missing SA2.geojson file to Supabase Storage - **COMPLETED**
+- [✅] **UPDATE:** Change code to use SA2_simplified.geojson - **COMPLETED**
+- [✅] **FINAL UPDATE:** Fixed remaining SA2.geojson references in LayerManager.tsx and AustralianMap.tsx - **COMPLETED**
+- [🔄] **TEST:** Verify boundaries and heatmap functionality restored - **READY FOR TESTING**
+
+---
+
+## **EXECUTOR MODE ACTIVE** ⚙️
+
+**CURRENT TASK:** Testing Updated SA2 Boundary Implementation
+**GOAL:** Verify that maps page now loads boundaries and heatmap correctly with SA2_simplified.geojson
+
+### **Executor's Feedback or Assistance Requests**
+
+**✅ Phase 1.1 COMPLETE:** Supabase Storage verification
+
+**🎯 ROOT CAUSE IDENTIFIED:**
+- **SA2.geojson file did NOT exist** in Supabase storage bucket
+- **Error:** `{"statusCode":"404","error":"not_found","message":"Object not found"}`
+- **Infrastructure is working fine** - other boundary files are accessible:
+  - ✅ LGA.geojson (15MB) - HTTP 200
+  - ✅ SA3.geojson (13MB) - HTTP 200  
+  - ✅ SA4.geojson (10MB) - HTTP 200
+  - ❌ SA2.geojson (170MB) - HTTP 404
+
+**✅ RESOLUTION IMPLEMENTED:**
+- **SA2_simplified.geojson uploaded** to Supabase Storage by user
+- **All code references updated** to use new simplified boundary file
+- **Files updated:** AustralianMap.tsx, SimpleHeatmapMap.tsx, LayerManager.tsx, HeatmapDataService.tsx, InsightsDataService.tsx
+- **File accessibility verified:** HTTP 200, 177MB, valid GeoJSON structure confirmed
+- **Ready for testing:** All boundary loading paths now point to working SA2_simplified.geojson
+
+**📋 NEXT ACTIONS:**
+
+**Option 1: Upload SA2.geojson (Permanent Fix)**
+1. **Obtain SA2.geojson file** from Australian Bureau of Statistics or existing backup
+2. **Upload to Supabase Storage** at path: `json_data/maps/SA2.geojson`
+3. **Verify upload** with: `curl -I "https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2.geojson"`
+
+**Option 2: Temporary Workaround (Quick Fix)**
+1. **Modify LayerManager.tsx** to fall back to SA3 boundaries when SA2 unavailable
+2. **Update default geo layer** from 'sa2' to 'sa3' in maps page
+3. **Implement graceful degradation** for heatmap functionality
+
+**Option 3: Generate SA2.geojson (If not available)**
+1. **Download from ABS:** https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/digital-boundary-files
+2. **Convert to required format** if necessary
+3. **Upload following Option 1 steps**
+
+**🎯 RECOMMENDATION:** Proceed with Option 2 (temporary workaround) immediately to restore map functionality, then pursue Option 1 for permanent resolution.
+
+### **📈 FUTURE OPTIMIZATIONS** 
+- [ ] **Phase 4:** Convert to vector tiles for production scalability
+- [ ] **Phase 5:** Comprehensive testing and validation
+- [ ] **Documentation:** Update architecture docs with final solution
+
+### **⏱️ ESTIMATED TIMELINE**
+- **Phase 1-2:** 2-3 hours (diagnostic work)
+- **Phase 3:** 1-2 hours (proxy implementation)  
+- **Validation:** 1 hour (testing)
+- **Total:** ~6 hours for complete resolution
+
+---
+
+## Lessons
+
+### **Key Insights from Expert Analysis:**
+1. **Infrastructure-First Debugging:** Always isolate storage/network issues before blaming application code
+2. **Large File Considerations:** 170MB JSON files are problematic for browser applications and need special handling
+3. **Fallback Strategy Importance:** Multiple loading methods provide resilience but need proper error isolation
+4. **Performance vs Functionality Trade-offs:** Quick proxy fix vs long-term vector tile optimization
+
+### **Best Practices Identified:**
+1. **Comprehensive Logging:** Detailed diagnostics are essential for debugging complex loading scenarios
+2. **Same-Origin Benefits:** Proxying through Next.js API eliminates many CORS and caching issues
+3. **Progressive Enhancement:** Start with working solution, then optimize for performance
+4. **Systematic Testing:** Each hypothesis should be tested independently with clear success criteria
+
+---
+
+## **🎯 RECOMMENDED IMMEDIATE ACTION**
+
+**Start with Phase 1 infrastructure testing** - Run the curl commands and Supabase storage verification to determine if this is a storage issue or application issue. This will save hours of debugging in the wrong direction.
+
+**If storage tests pass, implement Phase 3 proxy immediately** - This provides the fastest path to a working solution while buying time for proper performance optimization.
+
+---
+
 ## 🎨 **SIGN-IN PAGE UX IMPROVEMENT - LAYOUT OPTIMIZATION** 🎨
 
 **USER REQUEST:** Optimize sign-in page layout for better user experience

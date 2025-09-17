@@ -547,7 +547,7 @@ export class InsightsDataService {
   
   private async loadBoundaryNames(): Promise<void> {
     try {
-      const boundaryUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2.geojson';
+      const boundaryUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2_simplified.geojson';
       const response = await fetch(boundaryUrl);
       if (response.ok) {
         const geojson = await response.json();

@@ -2551,7 +2551,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         const fileMap: Record<GeoLayerType, string> = {
           'postcode': 'POA.geojson',
           'lga': 'LGA.geojson',
-          'sa2': 'SA2.geojson',
+          'sa2': 'SA2_simplified.geojson',
           'sa3': 'SA3.geojson',
           'sa4': 'SA4.geojson',
           'locality': 'SAL.geojson',
@@ -2563,9 +2563,9 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
         const supabaseUrl = `https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/${fileName}`;
         console.log(`Fetching boundary file: ${supabaseUrl}`);
         
-        // Special handling for large files
+        // Special handling for SA2 files
         if (layerType === 'sa2') {
-          console.log('⚠️  Loading SA2 boundaries - this is a large file (170MB) and may take time...');
+          console.log('📍 Loading SA2 boundaries - using simplified boundary file...');
         }
         
         const startTime = Date.now();
@@ -2694,7 +2694,7 @@ const AustralianMap = forwardRef<AustralianMapRef, AustralianMapProps>(({
     const fileMap: Record<GeoLayerType, string> = {
       'postcode': 'POA.geojson',
       'lga': 'LGA.geojson', 
-      'sa2': 'SA2.geojson',
+      'sa2': 'SA2_simplified.geojson',
       'sa3': 'SA3.geojson',
       'sa4': 'SA4.geojson',
       'locality': 'SAL.geojson',
