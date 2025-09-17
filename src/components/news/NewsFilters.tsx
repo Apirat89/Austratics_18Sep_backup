@@ -18,6 +18,9 @@ interface NewsFiltersProps {
 }
 
 export function NewsFilters({ filters, sources, onFilterChange }: NewsFiltersProps) {
+  // Diagnostic logging to verify sources array stays constant
+  console.log('NewsFilters sources:', sources);
+
   const handleSourceChange = (sourceId: string | null) => {
     onFilterChange({ source: sourceId });
   };

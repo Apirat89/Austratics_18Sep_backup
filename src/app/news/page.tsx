@@ -114,13 +114,23 @@ function NewsPageContent() {
         throw new Error(data.message || 'Failed to fetch news');
       }
       
-      setState(prev => ({
-        ...prev,
-        news: data.items,
-        metadata: data.metadata,
-        loading: false,
-        error: null,
-      }));
+      setState(prev => {
+        const keepPreviousSources = Boolean(prev.filters.source);
+        const preservedSources =
+          keepPreviousSources ? (prev.metadata?.sources ?? data.metadata.sources) : data.metadata.sources;
+
+        return {
+          ...prev,
+          news: data.items,
+          metadata: {
+            ...data.metadata,
+            // 👇 keep the full list when a filter is active
+            sources: preservedSources,
+          },
+          loading: false,
+          error: null,
+        };
+      });
       
     } catch (error) {
       console.error('Failed to fetch news:', error);
