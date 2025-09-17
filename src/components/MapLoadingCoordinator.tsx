@@ -267,19 +267,19 @@ export default function MapLoadingCoordinator({
       
       // Sequential loading simulation - 12 seconds total (60% of original 20s), no flickering
       const runLoadingSequence = async () => {
-        console.log('🎬 Starting clean 12-second sequential loading sequence...');
+        console.log('🎬 Starting clean 17-second sequential loading sequence...');
         
         const stages = [
-          { stage: 'map-init' as LoadingStage, message: 'Initializing map...', duration: 600 },
-          { stage: 'healthcare-data' as LoadingStage, message: 'Loading healthcare data...', duration: 1200 },
-          { stage: 'demographics-data' as LoadingStage, message: 'Loading demographics data...', duration: 1200 },
-          { stage: 'economics-data' as LoadingStage, message: 'Loading economics data...', duration: 1200 },
-          { stage: 'health-stats-data' as LoadingStage, message: 'Loading health statistics data...', duration: 1200 },
-          { stage: 'boundary-data' as LoadingStage, message: 'Loading SA2 boundaries (170MB)...', duration: 3600 },
-          { stage: 'name-mapping' as LoadingStage, message: 'Extracting SA2 name mappings...', duration: 600 },
-          { stage: 'data-processing' as LoadingStage, message: 'Processing data combinations...', duration: 600 },
-          { stage: 'heatmap-rendering' as LoadingStage, message: 'Rendering heatmap visualization...', duration: 1200 },
-          { stage: 'map-rendering' as LoadingStage, message: 'Waiting for map to fully render...', duration: 600 }
+          { stage: 'map-init' as LoadingStage, message: 'Initializing map...', duration: 900 },
+          { stage: 'healthcare-data' as LoadingStage, message: 'Loading healthcare data...', duration: 1700 },
+          { stage: 'demographics-data' as LoadingStage, message: 'Loading demographics data...', duration: 1700 },
+          { stage: 'economics-data' as LoadingStage, message: 'Loading economics data...', duration: 1700 },
+          { stage: 'health-stats-data' as LoadingStage, message: 'Loading health statistics data...', duration: 1700 },
+          { stage: 'boundary-data' as LoadingStage, message: 'Loading SA2 boundaries (170MB)...', duration: 5100 },
+          { stage: 'name-mapping' as LoadingStage, message: 'Extracting SA2 name mappings...', duration: 900 },
+          { stage: 'data-processing' as LoadingStage, message: 'Processing data combinations...', duration: 900 },
+          { stage: 'heatmap-rendering' as LoadingStage, message: 'Rendering heatmap visualization...', duration: 1700 },
+          { stage: 'map-rendering' as LoadingStage, message: 'Waiting for map to fully render...', duration: 900 }
         ];
         
         let currentTime = 0;
@@ -305,11 +305,11 @@ export default function MapLoadingCoordinator({
           currentTime += stageConfig.duration;
         });
         
-        // Final completion at exactly 12 seconds
+        // Final completion at exactly 17 seconds
         setTimeout(() => {
-          console.log('🎉 12-second sequence complete - manually triggering completion');
+          console.log('🎉 17-second sequence complete - manually triggering completion');
           globalLoadingCoordinator.triggerCompletion();
-        }, 12000);
+        }, 17000);
       };
       
       runLoadingSequence();
