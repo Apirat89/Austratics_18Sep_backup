@@ -2,7 +2,7 @@ import React from 'react';
 import { NewsSource } from '../../types/news';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { Filter, X } from 'lucide-react';
+import { Filter } from 'lucide-react';
 
 interface NewsFiltersProps {
   filters: {
@@ -26,29 +26,13 @@ export function NewsFilters({ filters, sources, onFilterChange }: NewsFiltersPro
     onFilterChange({ limit });
   };
 
-  const clearFilters = () => {
-    onFilterChange({ source: null });
-  };
-
   const hasActiveFilters = filters.source;
 
   return (
     <Card className="p-4">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Filter className="h-5 w-5 text-gray-600" />
-          <h3 className="font-semibold text-gray-900">Filters</h3>
-        </div>
-        
-        {hasActiveFilters && (
-          <button
-            onClick={clearFilters}
-            className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800"
-          >
-            <X className="h-4 w-4" />
-            Clear all
-          </button>
-        )}
+      <div className="flex items-center gap-2 mb-4">
+        <Filter className="h-5 w-5 text-gray-600" />
+        <h3 className="font-semibold text-gray-900">Filters</h3>
       </div>
       
       <div className="space-y-4">
