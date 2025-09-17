@@ -39,6 +39,8 @@ interface NewsPageState {
     limit: number;
     offset: number;
   };
+  // 👇 add canonical sources list independent of result payloads
+  allSources: NewsSource[];
 }
 
 function NewsPageContent() {
@@ -58,6 +60,7 @@ function NewsPageContent() {
       limit: 20,
       offset: 0,
     },
+    allSources: [], // 👈 canonical list lives here
   });
 
   // Handle sign out
@@ -84,6 +87,23 @@ function NewsPageContent() {
     const names = name.trim().split(' ');
     if (names.length === 1) return names[0].charAt(0).toUpperCase();
     return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+  };
+
+  // NEW: load canonical sources once
+  const fetchAllSources = async () => {
+    try {
+      const res = await fetch('/api/news/sources', { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.sources)) {
+          setState(prev => ({ ...prev, allSources: data.sources }));
+        }
+      } else {
+        console.warn('GET /api/news/sources failed; will fall back later');
+      }
+    } catch (e) {
+      console.warn('Failed to load canonical sources', e);
+    }
   };
 
   const fetchNews = async () => {
@@ -115,18 +135,26 @@ function NewsPageContent() {
       }
       
       setState(prev => {
-        const keepPreviousSources = Boolean(prev.filters.source);
-        const preservedSources =
-          keepPreviousSources ? (prev.metadata?.sources ?? data.metadata.sources) : data.metadata.sources;
+        // IMPORTANT: never let filtered server responses shrink our canonical chips.
+        const nextMetadata = {
+          ...data.metadata,
+          // keep prev.metadata.sources if present, but chips no longer depend on this anyway
+          sources: prev.metadata?.sources ?? data.metadata.sources,
+        };
+
+        // Opportunistic fallback: if we don't have allSources yet, seed from metadata once.
+        const nextAllSources =
+          prev.allSources.length > 0
+            ? prev.allSources
+            : Array.isArray(nextMetadata.sources)
+            ? nextMetadata.sources
+            : [];
 
         return {
           ...prev,
           news: data.items,
-          metadata: {
-            ...data.metadata,
-            // 👇 keep the full list when a filter is active
-            sources: preservedSources,
-          },
+          metadata: nextMetadata,
+          allSources: nextAllSources,
           loading: false,
           error: null,
         };
@@ -168,6 +196,10 @@ function NewsPageContent() {
 
     loadUser();
   }, [router]);
+
+  useEffect(() => {
+    fetchAllSources(); // fire once on mount
+  }, []);
 
   // Initial load
   useEffect(() => {
@@ -239,7 +271,7 @@ function NewsPageContent() {
               <div className="flex items-center gap-2">
                 <span className="font-medium text-blue-900">Sources:</span>
                 <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
-                  {state.metadata.sources.length}
+                  {(state.allSources?.length || state.metadata.sources.length)}
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
@@ -286,12 +318,13 @@ function NewsPageContent() {
           </div>
         )}
 
-                 {/* Filters */}
-         <NewsFilters
-           filters={state.filters}
-           sources={state.metadata?.sources || []}
-           onFilterChange={handleFilterChange}
-         />
+                         {/* Filters */}
+        <NewsFilters
+          filters={state.filters}
+          // 👇 drive chips from canonical allSources, not metadata
+          sources={state.allSources.length ? state.allSources : state.metadata?.sources || []}
+          onFilterChange={handleFilterChange}
+        />
 
                  {/* News Grid */}
          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">

@@ -34,7 +34,7 @@ async function withTimeout<T>(
 
 export async function GET(req: Request) {
   try {
-    console.log('📰 News API v2 called (CACHE-BYPASS DIRECT FETCH):', req.url);
+    console.log('📰 News API called (SIMPLIFIED DIRECT FETCH MODE v2):', req.url);
     const { searchParams } = new URL(req.url);
     
     const limit = Math.max(1, Math.min(100, Number(searchParams.get('limit')) || 20));
@@ -73,7 +73,7 @@ export async function GET(req: Request) {
         lastUpdated: new Date().toISOString(),
         sources,
         cached: false, // Always false - direct fetch
-        simplified_system: "v2_cache_bypass_direct_rss",
+        simplified_system: "v2_direct_rss",
         errors: fetchResult.errors?.length ? fetchResult.errors : undefined
       }
     });
