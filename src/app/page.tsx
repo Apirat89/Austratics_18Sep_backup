@@ -26,7 +26,7 @@ function HomeContent() {
   const [error, setError] = useState('');
   const [isVerificationError, setIsVerificationError] = useState(false);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+
   const [backgroundImage, setBackgroundImage] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
   const [logoLoaded, setLogoLoaded] = useState(false);
@@ -344,36 +344,7 @@ function HomeContent() {
                 required
               />
 
-              {/* Remember Me & Forgot Password */}
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <input
-                    type="checkbox"
-                    id="remember-me"
-                    checked={rememberMe}
-                    onChange={() => setRememberMe(!rememberMe)}
-                    style={{ 
-                      width: '1.125rem', 
-                      height: '1.125rem',
-                      borderRadius: '0.25rem',
-                      accentColor: '#3B82F6',
-                      marginRight: '0.5rem'
-                    }}
-                  />
-                  <label htmlFor="remember-me" style={{ fontSize: '0.875rem', color: '#1f2937' }}>
-                    Remember me
-                  </label>
-                </div>
-                <Link href="/auth/forgot-password" style={{ fontSize: '0.875rem', color: '#3B82F6', fontWeight: 500 }}>
-                  Forgot password?
-                </Link>
-              </div>
-
-              {/* Sign In Button */}
+              {/* Sign In Button - moved up, closer to password */}
               <button
                 type="submit"
                 disabled={isLoading}
@@ -392,6 +363,13 @@ function HomeContent() {
               >
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </button>
+
+              {/* Forgot Password - moved below, centered */}
+              <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                <Link href="/auth/forgot-password" style={{ fontSize: '0.875rem', color: '#3B82F6', fontWeight: 500 }}>
+                  Forgot password?
+                </Link>
+              </div>
             </form>
 
             {/* Create Account Link */}
