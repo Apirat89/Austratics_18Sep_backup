@@ -289,7 +289,7 @@ export default function HeatmapDataService({
       console.log('🔍 HeatmapDataService: Loading DSS healthcare data from Supabase Storage');
       if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('healthcare', 10);
       
-      const response = await fetch('https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/DSS_Cleaned_2024.json');
+      const response = await fetch(`https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/sa2/DSS_Cleaned_2024.json?v=${Date.now()}`);
       console.log('📡 HeatmapDataService: Response status:', response.status);
       if (!shouldSkipCoordinator()) globalLoadingCoordinator.reportDataLoading('healthcare', 60);
       
