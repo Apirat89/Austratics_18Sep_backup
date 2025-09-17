@@ -669,18 +669,236 @@ tippecanoe -zg --read-parallel -o sa2.mbtiles SA2.geojson
 - [✅] **TEST:** Verify boundaries and heatmap functionality restored - **CONFIRMED WORKING**
 - [✅] **ANALYSIS:** Root cause analysis of default selection UI issue - **COMPLETED**
 - [✅] **HEALTHCARE DATA FIX:** User uploaded complete DSS_Cleaned_2024.json (9.99MB, 55,614 records, 2,418 SA2 regions) - **COMPLETED**
-- [🔄] **FIX:** Update DataLayers component to show selected variable in category buttons - **READY FOR IMPLEMENTATION**
+- [✅] **CACHE BUSTING FIX:** Added timestamp parameter to healthcare data URL to prevent browser caching - **COMPLETED**
+- [✅] **TIMING ANALYSIS:** Analyzed current 12-second preload timing across 10 phases - **COMPLETED**
+- [✅] **TIMING EXTENSION:** Extended preload message box from 12s to 17s distributed across phases - **COMPLETED**
+- [✅] **FAVICON ANALYSIS:** Analyzed current logo implementation and created comprehensive favicon plan - **COMPLETED**
+- [🔄] **FAVICON CREATION:** Create favicon from Austratics logo with dark blue background - **READY FOR IMPLEMENTATION**
+- [🔄] **FIX:** Update DataLayers component to show selected variable in category buttons - **PENDING**
 
 ---
 
-## **EXECUTOR MODE ACTIVE** ⚙️
+## **PLANNER MODE ACTIVE** 📋
 
-**ROOT CAUSE IDENTIFIED:** Healthcare data file contains insufficient data - only 3 SA2 regions instead of thousands
-**GOAL:** Provide complete analysis of the healthcare data issue and recommend solution
+**NEW TASK:** Create favicon from sign-on page logo with dark blue background
+**GOAL:** Analyze current logo implementation and plan favicon creation process
 
 ## **Background and Motivation**
 
-The SA2 boundaries are now loading correctly after fixing the missing SA2_simplified.geojson file. However, users are reporting that the heatmap data layers panel shows "Click to select" for all categories instead of automatically applying the default selection that's configured in the code. This creates a poor user experience where users must manually select a variable to see any data visualization, even though the application has sensible defaults configured.
+The user wants to use the logo from the sign-on page as the web browser favicon (browser tab icon) but with a dark blue background instead of the current transparent/white styling. This will improve brand recognition and create a more professional appearance in browser tabs and bookmarks.
+
+## **Current Logo Analysis**
+
+### **Logo Location and Implementation**
+**Current Logo File**: `public/Austratics Logo.png` 
+**Usage Location**: Main sign-in page (`src/app/page.tsx`, lines 221-239)
+**Display Properties**:
+- Height: 7rem (112px)
+- Max-width: 18rem (288px)  
+- Applied filters: `brightness(0) invert(1) drop-shadow(0 2px 8px rgba(0,0,0,0.7))`
+- Current styling: White logo with shadow (inverted from original)
+
+### **Current Favicon Status**
+**No Custom Favicon**: Using default Next.js favicon
+**Layout Configuration**: `src/app/layout.tsx` has basic metadata but no favicon specified
+**Missing Elements**: No favicon.ico, no app icons for different sizes
+
+### **Logo Loading Implementation**
+The logo is loaded dynamically via Supabase storage:
+```typescript
+// Logo loading from Supabase storage
+const logoUrl = getImageUrl('Austratics Logo.png');
+```
+
+## **Key Challenges and Analysis**
+
+### **Challenge 1: Logo Format and Background** 🎨 **MEDIUM**
+**Issue**: Current logo likely has transparent background, needs dark blue background for favicon
+**Current State**: Logo displayed with white inversion filter on sign-in page
+**Required**: Create favicon versions with dark blue background integrated into the logo design
+
+### **Challenge 2: Multiple Favicon Sizes** 📱 **MEDIUM**
+**Issue**: Modern web requires multiple favicon sizes for different contexts
+**Required Sizes**:
+- **favicon.ico**: 16x16, 32x32, 48x48 (multi-size ICO file)
+- **apple-touch-icon.png**: 180x180 (iOS/macOS)
+- **android-chrome-192x192.png**: 192x192 (Android)
+- **android-chrome-512x512.png**: 512x512 (Android)
+- **favicon-16x16.png**: 16x16 (browser tabs)
+- **favicon-32x32.png**: 32x32 (browser tabs)
+
+### **Challenge 3: Next.js Integration** ⚙️ **LOW**
+**Issue**: Need to properly configure favicon in Next.js app
+**Required**: Update metadata in layout.tsx and add proper HTML meta tags
+
+## **High-level Task Breakdown**
+
+### **Phase 1: Logo Asset Preparation** 🖼️
+**Goal**: Create favicon versions of the logo with dark blue background
+
+**Task 1.1: Extract Original Logo**
+- Access the current `Austratics Logo.png` from public directory
+- Analyze current logo design, colors, and transparency
+- Determine optimal dark blue color (suggest: #1e3a8a or #1d4ed8 - matching existing blue theme)
+
+**Task 1.2: Design Favicon Variants**
+- Create logo with dark blue background instead of transparent
+- Ensure logo remains legible at small sizes (16x16, 32x32)
+- Consider simplified version for very small sizes if needed
+- Maintain brand consistency with current blue theme (#3B82F6)
+
+**Task 1.3: Generate Multiple Sizes**
+- Create all required favicon sizes from the master design
+- Optimize each size for clarity at that specific resolution
+- Test readability at smallest sizes (16x16)
+
+### **Phase 2: Technical Implementation** 🔧
+**Goal**: Integrate new favicons into the Next.js application
+
+**Task 2.1: Add Favicon Files**
+- Place all favicon files in the `public` directory
+- Follow standard naming conventions
+- Ensure proper file formats (ICO, PNG)
+
+**Task 2.2: Update Layout Configuration**
+- Modify `src/app/layout.tsx` to include favicon metadata
+- Add proper HTML meta tags for all favicon variants
+- Configure PWA-style app icons
+
+**Task 2.3: Test Cross-Platform**
+- Verify favicon displays correctly in different browsers
+- Test on mobile devices (iOS Safari, Android Chrome)
+- Confirm proper display in browser tabs and bookmarks
+
+### **Phase 3: Brand Consistency** ✨
+**Goal**: Ensure favicon aligns with overall brand design
+
+**Task 3.1: Color Coordination**
+- Use dark blue that complements existing UI (#3B82F6 theme)
+- Ensure sufficient contrast for logo visibility
+- Test appearance in both light and dark browser themes
+
+**Task 3.2: Quality Assurance**
+- Verify favicon doesn't pixelate at any size
+- Ensure consistent brand representation
+- Test loading performance impact
+
+## **Proposed Dark Blue Color Options**
+
+**Option 1: Deep Blue** - `#1e3a8a` (Tailwind blue-800)
+- Darker, more professional appearance
+- High contrast with white/light logo elements
+- Matches corporate/enterprise feel
+
+**Option 2: Medium Blue** - `#1d4ed8` (Tailwind blue-700)  
+- Balances visibility with brand consistency
+- Closer to existing theme color (#3B82F6)
+- Good contrast while maintaining brand recognition
+
+**Option 3: Current Theme Blue** - `#3B82F6` (Tailwind blue-500)
+- Exact match with current application theme
+- Consistent with sign-in page background
+- May need darker shade for better logo contrast
+
+## **Expected Outcomes**
+
+**Immediate Result**: Professional favicon that matches the Austratics brand with dark blue background
+
+**Brand Enhancement**: Improved brand recognition in browser tabs, bookmarks, and PWA installations
+
+**Technical Benefits**: Proper favicon implementation across all modern devices and browsers
+
+**User Experience**: More polished and professional appearance when users bookmark or navigate to the site
+
+## **Current Timing Analysis**
+
+**Current Total Duration**: 12 seconds (12,000ms)
+**Target Duration**: 17 seconds (17,000ms) - adding 5 seconds
+
+**Current Phase Breakdown** (10 phases):
+1. **map-init**: 600ms - "Initializing map..."
+2. **healthcare-data**: 1,200ms - "Loading healthcare data..."
+3. **demographics-data**: 1,200ms - "Loading demographics data..."
+4. **economics-data**: 1,200ms - "Loading economics data..."
+5. **health-stats-data**: 1,200ms - "Loading health statistics data..."
+6. **boundary-data**: 3,600ms - "Loading SA2 boundaries (170MB)..." (longest phase)
+7. **name-mapping**: 600ms - "Extracting SA2 name mappings..."
+8. **data-processing**: 600ms - "Processing data combinations..."
+9. **heatmap-rendering**: 1,200ms - "Rendering heatmap visualization..."
+10. **map-rendering**: 600ms - "Waiting for map to fully render..."
+
+**Total Current**: 12,000ms (12 seconds)
+
+## **Key Challenges and Analysis**
+
+### **Challenge 1: Balanced Time Distribution** ⚖️ **MEDIUM**
+**Issue**: Need to distribute 5,000ms (5 seconds) across 10 phases proportionally
+**Strategy**: Add more time to phases that handle complex operations while keeping quick phases reasonably fast
+
+### **Challenge 2: Maintain User Engagement** 👁️ **MEDIUM**  
+**Issue**: Longer loading times could feel sluggish if not handled well
+**Strategy**: Focus additional time on phases with meaningful messages that explain complex operations
+
+### **Challenge 3: Code Consistency** 🔧 **LOW**
+**Issue**: Update both the timing array and the total completion timeout
+**Strategy**: Update both the individual phase durations and the final 12000ms timeout to 17000ms
+
+## **High-level Task Breakdown**
+
+### **Phase 1: Calculate Optimal Time Distribution** 📊
+**Goal**: Distribute 5,000ms additional time across 10 phases based on operation complexity
+
+**Proposed New Timing Distribution** (adding 5,000ms total):
+1. **map-init**: 600ms → **900ms** (+300ms) - "Initializing map..."
+2. **healthcare-data**: 1,200ms → **1,700ms** (+500ms) - "Loading healthcare data..."
+3. **demographics-data**: 1,200ms → **1,700ms** (+500ms) - "Loading demographics data..."
+4. **economics-data**: 1,200ms → **1,700ms** (+500ms) - "Loading economics data..."
+5. **health-stats-data**: 1,200ms → **1,700ms** (+500ms) - "Loading health statistics data..."
+6. **boundary-data**: 3,600ms → **5,100ms** (+1,500ms) - "Loading SA2 boundaries (170MB)..." 
+7. **name-mapping**: 600ms → **900ms** (+300ms) - "Extracting SA2 name mappings..."
+8. **data-processing**: 600ms → **900ms** (+300ms) - "Processing data combinations..."
+9. **heatmap-rendering**: 1,200ms → **1,700ms** (+500ms) - "Rendering heatmap visualization..."
+10. **map-rendering**: 600ms → **900ms** (+300ms) - "Waiting for map to fully render..."
+
+**New Total**: 17,000ms (17 seconds) - exactly +5,000ms added
+
+**Distribution Logic**:
+- **Data loading phases** (2-5, 9): +500ms each (most visible to users)
+- **Boundary data phase** (6): +1,500ms (largest file, most complex)
+- **Processing phases** (1, 7, 8, 10): +300ms each (quick but important)
+
+### **Phase 2: Update Code Implementation** ⚙️
+**Goal**: Modify MapLoadingCoordinator.tsx with new timing values
+
+**Task 2.1: Update Stage Duration Array**
+- Modify the stages array in lines 272-283
+- Update each duration value according to the distribution plan
+- Ensure all 10 phases have new timing values
+
+**Task 2.2: Update Total Completion Timeout**
+- Change line 312: `setTimeout(..., 12000)` → `setTimeout(..., 17000)`
+- Update any comments referencing 12-second timing to 17-second timing
+
+### **Phase 3: Testing and Validation** ✅
+**Goal**: Verify the new timing works correctly and feels appropriate
+
+**Task 3.1: Functional Testing**
+- Test that all phases display for the correct duration
+- Verify total loading time is exactly 17 seconds
+- Ensure progress bars animate smoothly within each phase
+
+**Task 3.2: User Experience Testing**  
+- Confirm loading messages are readable and not rushed
+- Verify users have adequate time to understand each phase
+- Test that the experience doesn't feel sluggish or too slow
+
+## **Expected Outcomes**
+
+**Immediate Result**: Preload message box will display for 17 seconds instead of 12 seconds, giving users more time to read and understand the loading process.
+
+**User Experience**: More informative and less rushed loading experience, especially for complex operations like boundary data loading.
+
+**Technical Accuracy**: Loading phases will better reflect the actual complexity and time requirements of each operation.
 
 ## **Key Challenges and Analysis**
 
