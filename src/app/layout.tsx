@@ -67,7 +67,7 @@ export default function RootLayout({
             {children}
           </main>
           <footer className="fixed bottom-0 right-0 p-4 z-50">
-            <p className="text-xs text-gray-500 bg-white/80 backdrop-blur-sm px-3 py-2 rounded-lg shadow-sm border border-gray-200">
+            <p className="text-xs text-gray-500 px-3 py-2">
               ©2025 Austratics. All rights reserved.
             </p>
           </footer>
