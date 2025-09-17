@@ -660,23 +660,159 @@ tippecanoe -zg --read-parallel -o sa2.mbtiles SA2.geojson
 
 ## Project Status Board
 
-### **🚧 IMMEDIATE PRIORITIES** 
+### **🚧 CURRENT PRIORITIES** 
 - [✅] **Phase 1:** Infrastructure isolation testing (curl commands) - **COMPLETED**
 - [✅] **URGENT:** Upload missing SA2.geojson file to Supabase Storage - **COMPLETED**
 - [✅] **UPDATE:** Change code to use SA2_simplified.geojson - **COMPLETED**
 - [✅] **FINAL UPDATE:** Fixed remaining SA2.geojson references in LayerManager.tsx and AustralianMap.tsx - **COMPLETED**
-- [🔄] **TEST:** Verify boundaries and heatmap functionality restored - **READY FOR TESTING**
+- [✅] **DEPLOY:** Committed and pushed all changes to GitHub main branch - **COMPLETED**
+- [✅] **TEST:** Verify boundaries and heatmap functionality restored - **CONFIRMED WORKING**
+- [✅] **ANALYSIS:** Root cause analysis of default selection UI issue - **COMPLETED**
+- [✅] **HEALTHCARE DATA FIX:** User uploaded complete DSS_Cleaned_2024.json (9.99MB, 55,614 records, 2,418 SA2 regions) - **COMPLETED**
+- [🔄] **FIX:** Update DataLayers component to show selected variable in category buttons - **READY FOR IMPLEMENTATION**
 
 ---
 
 ## **EXECUTOR MODE ACTIVE** ⚙️
 
-**CURRENT TASK:** Testing Updated SA2 Boundary Implementation
-**GOAL:** Verify that maps page now loads boundaries and heatmap correctly with SA2_simplified.geojson
+**ROOT CAUSE IDENTIFIED:** Healthcare data file contains insufficient data - only 3 SA2 regions instead of thousands
+**GOAL:** Provide complete analysis of the healthcare data issue and recommend solution
+
+## **Background and Motivation**
+
+The SA2 boundaries are now loading correctly after fixing the missing SA2_simplified.geojson file. However, users are reporting that the heatmap data layers panel shows "Click to select" for all categories instead of automatically applying the default selection that's configured in the code. This creates a poor user experience where users must manually select a variable to see any data visualization, even though the application has sensible defaults configured.
+
+## **Key Challenges and Analysis**
+
+### **Challenge 1: Default Selection Not Propagating to UI** 🎯 **HIGH**
+**Issue**: The maps page has default heatmap settings configured, but the DataLayers component UI doesn't reflect these defaults
+**Evidence from Code Analysis**:
+- Maps page sets defaults: `heatmapVisible={true}`, `heatmapDataType={'healthcare'}`, `heatmapCategory={'Commonwealth Home Support Program'}`, `heatmapSubcategory={'Number of Participants'}`
+- DataLayers component shows "Click to select" instead of highlighting the default selection
+- Default variable name is set: `'Commonwealth Home Support Program - Number of Participants'`
+
+### **Challenge 2: Data Flow Timing Issues** ⏰ **MEDIUM**
+**Issue**: Default selection may not be triggering data loading on initial page load
+**Possible Causes**:
+- HeatmapDataService may not be processing the default selection during initialization
+- LayerManager may not be receiving heatmap data for the default selection
+- Component mounting order may prevent proper default data flow
+
+### **Challenge 3: UI State Synchronization Gap** 🔄 **MEDIUM**
+**Issue**: Disconnect between backend state (maps page) and frontend UI (DataLayers component)
+**Symptoms**:
+- Backend has correct default values
+- UI shows generic "Click to select" states
+- Manual selection works correctly, indicating the data pipeline is functional
+
+## **High-level Task Breakdown**
+
+### **Phase 1: Root Cause Analysis** 🔍
+**Goal**: Identify exactly where the default selection flow breaks down
+
+**Task 1.1: Verify Default State Propagation**
+- Check if maps page default values are correctly passed as props to DataLayers
+- Verify DataLayers component receives and processes the default heatmapDataType, heatmapCategory, heatmapSubcategory
+- Confirm selectedVariableName prop is passed and displayed correctly
+
+**Task 1.2: Analyze Component Initialization Order**
+- Trace the component mounting sequence: MapsPage → AustralianMap → LayerManager + HeatmapDataService + DataLayers  
+- Identify if default data loading is triggered during initial mount
+- Check for race conditions between boundary loading and heatmap data processing
+
+**Task 1.3: Examine HeatmapDataService Default Handling**
+- Verify HeatmapDataService processes default category/subcategory on mount
+- Check if default data is loaded and passed to onDataProcessed callback
+- Confirm LayerManager receives default heatmap data for rendering
+
+### **Phase 2: UI State Synchronization Fix** ✨
+**Goal**: Ensure DataLayers UI reflects the configured default selection
+
+**Task 2.1: DataLayers Default Selection Display**
+- Update DataLayers component to highlight the default/selected variable
+- Show selected variable name instead of "Click to select"
+- Display proper category expansion state for default selection
+
+**Task 2.2: Loading State Management**
+- Ensure loading indicators work correctly for default selection
+- Handle transition from loading to displaying default heatmap
+- Prevent flickering between "Click to select" and actual selection
+
+### **Phase 3: Data Flow Optimization** ⚡
+**Goal**: Streamline default selection data loading and rendering
+
+**Task 3.1: Default Data Preloading**
+- Ensure HeatmapDataService immediately processes default selection
+- Optimize initial data loading to minimize delay
+- Implement proper error handling for default data loading failures
+
+**Task 3.2: Component Communication Enhancement**
+- Verify all callbacks and props flow correctly for default selection
+- Ensure onHeatmapMinMaxCalculated works for defaults
+- Confirm onRankedDataCalculated populates initial rankings
+
+### **Phase 4: Testing and Validation** ✅
+**Goal**: Verify default selection works seamlessly across all scenarios
+
+**Task 4.1: Default Selection Testing**
+- Test fresh page load shows default heatmap immediately
+- Verify default variable is highlighted in DataLayers UI
+- Confirm legend shows correct min/max values for default data
+
+**Task 4.2: User Experience Validation**
+- Ensure smooth transition from loading to default visualization
+- Test that manual selection still works after default is applied
+- Validate rankings panel shows data for default selection
+
+## **Expected Outcomes**
+
+**Immediate Fix**: Users see the default heatmap visualization immediately upon page load without needing to manually select a variable.
+
+**UI Consistency**: DataLayers panel shows the selected default variable highlighted instead of generic "Click to select" text.
+
+**Improved UX**: Seamless experience where users can immediately see healthcare participation data and interact with the visualization.
+
+## **🎯 ROOT CAUSE IDENTIFIED - PLANNER ANALYSIS COMPLETE**
+
+### **Primary Issue: DataLayers UI Logic Flaw**
+
+**FOUND THE EXACT PROBLEM:**
+
+1. **Line 254 in DataLayers.tsx**: Shows `{selectedVariableName || "No selection made"}` in the heatmap display area ✅
+2. **Lines 324-326**: Always shows `"Click to select"` for all categories regardless of current selection ❌
+
+**The Issue**: The DataLayers component has two separate display areas:
+- **Top area** (lines 253-255): Correctly shows the selected variable name when `selectedVariableName` prop is provided
+- **Bottom area** (lines 317-327): Always shows "Click to select" for all categories, ignoring current selection state
+
+**Evidence from Code**:
+```typescript
+// ✅ WORKS: Top display area
+<span className="text-sm font-medium text-gray-900 flex-1">
+  {selectedVariableName || "No selection made"}
+</span>
+
+// ❌ BROKEN: Bottom category buttons
+<span className="ml-auto text-xs font-medium text-purple-600">
+  Click to select  // Always shows this, never updates
+</span>
+```
+
+### **Solution Strategy**
+
+**The Fix**: Update the category buttons to show the selected variable name when it matches that category, instead of always showing "Click to select".
+
+**Implementation Approach**:
+1. Parse `selectedVariableName` to determine which category/subcategory is currently selected
+2. For the matching category, show the selected subcategory name instead of "Click to select"
+3. For non-matching categories, continue showing "Click to select"
+
+**Example Expected Behavior**:
+- Healthcare category: Shows "Number of Participants" (instead of "Click to select")
+- Demographics category: Shows "Click to select" (unchanged)
+- Economics category: Shows "Click to select" (unchanged)
 
 ### **Executor's Feedback or Assistance Requests**
-
-**✅ Phase 1.1 COMPLETE:** Supabase Storage verification
 
 **🎯 ROOT CAUSE IDENTIFIED:**
 - **SA2.geojson file did NOT exist** in Supabase storage bucket
