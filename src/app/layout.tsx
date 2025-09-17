@@ -66,12 +66,10 @@ export default function RootLayout({
           <main className="flex-1">
             {children}
           </main>
-          <footer className="bg-white border-t border-gray-100 py-4 mt-auto">
-            <div className="max-w-7xl mx-auto px-4 text-center">
-              <p className="text-xs text-gray-500">
-                © 2025 Austratics. All rights reserved.
-              </p>
-            </div>
+          <footer className="fixed bottom-0 right-0 p-4 z-50">
+            <p className="text-xs text-gray-500 bg-white/80 backdrop-blur-sm px-3 py-2 rounded-lg shadow-sm border border-gray-200">
+              ©2025 Austratics. All rights reserved.
+            </p>
           </footer>
         </TelemetryProvider>
         <div id="dropdown-root"></div>
