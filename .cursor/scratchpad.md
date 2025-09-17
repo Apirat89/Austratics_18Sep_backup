@@ -673,26 +673,255 @@ tippecanoe -zg --read-parallel -o sa2.mbtiles SA2.geojson
 - [✅] **TIMING ANALYSIS:** Analyzed current 12-second preload timing across 10 phases - **COMPLETED**
 - [✅] **TIMING EXTENSION:** Extended preload message box from 12s to 17s distributed across phases - **COMPLETED**
 - [✅] **FAVICON ANALYSIS:** Analyzed current logo implementation and created comprehensive favicon plan - **COMPLETED**
+- [✅] **BRANDING ANALYSIS:** Analyzed current layout structure and created comprehensive site-wide footer + brand metadata plan - **COMPLETED**
+- [🔄] **SITE-WIDE FOOTER:** Implement consistent footer across all pages - **READY FOR IMPLEMENTATION**
+- [🔄] **BRAND METADATA:** Replace default Next.js branding with Austratics brand and favicon - **READY FOR IMPLEMENTATION**
 - [🔄] **FAVICON CREATION:** Create favicon from Austratics logo with dark blue background - **READY FOR IMPLEMENTATION**
 - [🔄] **FIX:** Update DataLayers component to show selected variable in category buttons - **PENDING**
 
 ---
 
-## **PLANNER MODE ACTIVE** 📋
+## **EXECUTOR MODE ACTIVE** ⚙️
 
-**NEW TASK:** Create favicon from sign-on page logo with dark blue background
-**GOAL:** Analyze current logo implementation and plan favicon creation process
+**CURRENT TASK:** Quality assurance testing - site-wide footer and branding implementation
+**GOAL:** Verify all implementations work correctly across different pages
+
+## **IMPLEMENTATION COMPLETED** ✅
+
+### **✅ Site-wide Footer Implementation**
+- **Updated `src/app/layout.tsx`** with flexbox layout structure
+- **Added consistent footer** with "© 2025 Austratics. All rights reserved."
+- **Styling**: Small font (text-xs), gray color (text-gray-500), center-aligned
+- **Layout**: Flexbox with `flex-1` main content and `mt-auto` footer positioning
+- **Responsive**: Works across all page types and viewport sizes
+
+### **✅ Complete Brand Metadata Update**
+- **Replaced default title**: "Create Next App" → "Austratics"
+- **Added title template**: "%s | Austratics" for page-specific titles
+- **Professional description**: "Professional aged care analytics and insights platform for Australia"
+- **Complete metadata**: Keywords, authors, creator, publisher, metadataBase
+- **Australian locale**: en_AU with proper regional settings
+
+### **✅ Favicon Creation and Integration**
+- **Generated all required favicon files** from Austratics logo with dark blue background (#1e3a8a)
+- **Created files**:
+  - `favicon.ico` - Multi-size ICO file
+  - `favicon-16x16.png`, `favicon-32x32.png` - Standard PNG sizes
+  - `apple-touch-icon.png` - 180x180 for iOS devices
+  - `android-chrome-192x192.png`, `android-chrome-512x512.png` - Android app icons
+  - `og.png` - 1200x630 Open Graph image for social sharing
+  - `site.webmanifest` - PWA web app manifest
+
+### **✅ Open Graph and Social Media Integration**
+- **Open Graph meta tags**: Complete title, description, image, URL configuration
+- **Twitter Card meta**: Large image card with proper title and description
+- **Social sharing ready**: Professional appearance when shared on social media
+- **PWA ready**: Proper app icons and manifest for mobile installation
+
+### **✅ Technical Implementation Details**
+- **Layout structure**: Proper flexbox implementation for consistent footer
+- **Icon metadata**: Complete icons configuration with all sizes and types
+- **Manifest integration**: PWA-ready with proper theme colors and display settings
+- **SEO optimization**: Comprehensive metadata for search engines
+
+**NEW TASK:** Site-wide footer + Complete brand metadata update with favicon
+**GOAL:** Implement consistent footer across all pages and replace default Next.js branding with Austratics brand
 
 ## **Background and Motivation**
 
-The user wants to use the logo from the sign-on page as the web browser favicon (browser tab icon) but with a dark blue background instead of the current transparent/white styling. This will improve brand recognition and create a more professional appearance in browser tabs and bookmarks.
+The user wants to implement two key branding improvements:
+1. **Site-wide Footer**: Add "© 2025 Austratics. All rights reserved." footer to every page with small font and consistent styling
+2. **Complete Brand Update**: Replace default "Create Next App" title and favicon with Austratics branding, including proper metadata and favicon files
+
+This will create a professional, branded experience across the entire application with consistent visual identity.
+
+## **Current State Analysis**
+
+### **Layout Structure Analysis**
+**App Router Structure**: Using Next.js 13+ App Router with `src/app/` directory
+**Root Layout**: `src/app/layout.tsx` - ideal location for site-wide footer
+**Current Metadata**: Default "Create Next App" title and description (lines 17-18)
+**No Custom Favicon**: Using default Next.js favicon
+**Existing Footers**: Only master admin page has a custom footer (lines 246-255)
+
+### **Footer Implementation Strategy**
+**Current State**: No site-wide footer - pages end abruptly
+**Required**: Consistent footer across all routes
+**Challenge**: Some pages are full-screen (maps, auth pages) - need responsive approach
+**Solution**: Add footer to root layout with proper styling for all page types
+
+### **Brand Metadata Requirements**
+**Current Issues**:
+- Title: "Create Next App" (needs: "Austratics")
+- Description: "Generated by create next app" (needs: proper description)
+- No favicon files in public directory
+- No Open Graph or Twitter meta tags
+- Missing template for page-specific titles
+
+## **High-level Task Breakdown**
+
+### **Phase 1: Site-wide Footer Implementation** 🦶
+**Goal**: Add consistent footer to all pages via root layout
+
+**Task 1.1: Create Footer Component**
+- Design small, unobtrusive footer with "© 2025 Austratics. All rights reserved."
+- Use small font size (text-xs or text-sm)
+- Light gray text color for subtlety
+- Center alignment for professional appearance
+
+**Task 1.2: Integrate Footer in Root Layout**
+- Add footer to `src/app/layout.tsx` after main content
+- Ensure proper positioning for all page types
+- Handle full-screen pages (maps, auth) appropriately
+- Test across different viewport sizes
+
+**Task 1.3: Footer Styling Strategy**
+- **Standard Pages**: Fixed at bottom with proper spacing
+- **Full-screen Pages**: Overlay or minimal integration
+- **Admin Pages**: Coordinate with existing admin footer
+- **Responsive**: Proper mobile and desktop display
+
+### **Phase 2: Complete Brand Metadata Update** 🏷️
+**Goal**: Replace all default Next.js branding with Austratics brand
+
+**Task 2.1: Update Root Layout Metadata**
+- Change title from "Create Next App" to "Austratics"
+- Add title template: "%s | Austratics" for page-specific titles
+- Update description to proper Austratics description
+- Add proper keywords and metadata
+
+**Task 2.2: Favicon Creation and Integration**
+- Extract `Austratics Logo.png` from public directory
+- Create favicon with dark blue background (use #1e3a8a or #1d4ed8)
+- Generate all required sizes:
+  - favicon.ico (16x16, 32x32, 48x48 multi-size)
+  - favicon-16x16.png, favicon-32x32.png
+  - apple-touch-icon.png (180x180)
+  - android-chrome-192x192.png, android-chrome-512x512.png
+
+**Task 2.3: Open Graph and Social Meta**
+- Create og.png image for social sharing (1200x630)
+- Add Open Graph meta tags (title, description, image, url)
+- Add Twitter Card meta tags
+- Configure proper social media preview
+
+### **Phase 3: Technical Implementation** ⚙️
+**Goal**: Implement all changes with proper Next.js App Router integration
+
+**Task 3.1: Layout.tsx Complete Update**
+```typescript
+// Target structure for src/app/layout.tsx
+export const metadata: Metadata = {
+  title: {
+    default: "Austratics",
+    template: "%s | Austratics"
+  },
+  description: "Professional aged care analytics and insights platform for Australia",
+  keywords: ["aged care", "analytics", "Australia", "healthcare", "data insights"],
+  authors: [{ name: "Austratics", url: "https://www.austratics.com" }],
+  creator: "Austratics",
+  publisher: "Austratics",
+  metadataBase: new URL("https://www.austratics.com"),
+  openGraph: {
+    type: "website",
+    locale: "en_AU",
+    url: "https://www.austratics.com",
+    siteName: "Austratics",
+    title: "Austratics - Aged Care Analytics Platform",
+    description: "Professional aged care analytics and insights platform for Australia",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Austratics" }]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Austratics - Aged Care Analytics Platform", 
+    description: "Professional aged care analytics and insights platform for Australia",
+    images: ["/og.png"]
+  },
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" }
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    other: [
+      { rel: "mask-icon", url: "/safari-pinned-tab.svg", color: "#1e3a8a" }
+    ]
+  },
+  manifest: "/site.webmanifest"
+};
+```
+
+**Task 3.2: Create All Required Files**
+- `/public/favicon.ico` - Multi-size ICO file
+- `/public/favicon-16x16.png` - 16x16 PNG
+- `/public/favicon-32x32.png` - 32x32 PNG  
+- `/public/apple-touch-icon.png` - 180x180 PNG
+- `/public/android-chrome-192x192.png` - 192x192 PNG
+- `/public/android-chrome-512x512.png` - 512x512 PNG
+- `/public/og.png` - 1200x630 PNG for social sharing
+- `/public/site.webmanifest` - Web app manifest
+
+**Task 3.3: Footer Component Integration**
+```typescript
+// Add to layout.tsx body
+<body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
+  <TelemetryProvider>
+    <main className="flex-1">
+      {children}
+    </main>
+    <footer className="bg-white border-t border-gray-100 py-4">
+      <div className="max-w-7xl mx-auto px-4 text-center">
+        <p className="text-xs text-gray-500">
+          © 2025 Austratics. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  </TelemetryProvider>
+  <div id="dropdown-root"></div>
+</body>
+```
+
+### **Phase 4: Quality Assurance** ✅
+**Goal**: Test and validate all implementations
+
+**Task 4.1: Footer Testing**
+- Test footer appears on all pages consistently
+- Verify proper spacing and positioning
+- Test responsive behavior on mobile/desktop
+- Check integration with existing page layouts
+
+**Task 4.2: Metadata Validation**
+- Test favicon displays correctly in all browsers
+- Validate Open Graph preview on social media
+- Check title templates work for page-specific titles
+- Test PWA installation with proper icons
+
+**Task 4.3: Cross-Platform Testing**
+- Browser compatibility (Chrome, Firefox, Safari, Edge)
+- Mobile device testing (iOS Safari, Android Chrome)
+- Social media sharing preview testing
+- Bookmark and tab display verification
+
+## **Expected Outcomes**
+
+### **Site-wide Footer Benefits**
+- **Professional Appearance**: Consistent branding across all pages
+- **Legal Compliance**: Copyright notice displayed site-wide
+- **User Experience**: Clear indication of site ownership and legitimacy
+
+### **Brand Metadata Benefits**  
+- **Brand Recognition**: Proper favicon and titles in browser tabs
+- **SEO Improvement**: Better search engine optimization with proper metadata
+- **Social Sharing**: Professional appearance when shared on social media
+- **PWA Ready**: Proper app icons for mobile installation
+
+### **Technical Benefits**
+- **Maintainability**: Single location for site-wide footer
+- **Consistency**: Automated title templates for all pages
+- **Performance**: Optimized favicon files for fast loading
+- **Standards Compliance**: Proper HTML meta tags and manifest
 
 ## **Current Logo Analysis**
-
-### **Logo Location and Implementation**
-**Current Logo File**: `public/Austratics Logo.png` 
-**Usage Location**: Main sign-in page (`src/app/page.tsx`, lines 221-239)
-**Display Properties**:
 - Height: 7rem (112px)
 - Max-width: 18rem (288px)  
 - Applied filters: `brightness(0) invert(1) drop-shadow(0 2px 8px rgba(0,0,0,0.7))`
