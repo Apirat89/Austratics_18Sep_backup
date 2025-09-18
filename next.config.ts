@@ -1,11 +1,19 @@
 import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   experimental: {
     clientTraceMetadata: ['baggage', 'sentry-trace'],
   },
   outputFileTracingRoot: process.cwd(),
+  webpack(config) {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      "@": path.resolve(__dirname, "src"),
+    };
+    return config;
+  },
   async headers() {
     return [
       {
