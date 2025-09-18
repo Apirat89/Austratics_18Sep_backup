@@ -245,7 +245,7 @@ export default function MainPage() {
         {/* System Requirements */}
         <div className="mt-4 text-center">
           <p className="text-xs text-gray-500 leading-relaxed">
-            Best on a desktop/laptop: latest Chrome/Edge/Firefox/Safari, 1080p+, 8 GB+ RAM (16 GB ideal), modern 4-core CPU, 10 Mbps+. Mobile support is limited.
+            Optimal performance on a desktop/laptop: latest Chrome/Edge/Firefox/Safari web browser, 1080p+ screen resolution, minimum 8 GB RAM (16 GB ideal), modern 4-core CPU, 10 Mbps+. Mobile support is limited.
           </p>
         </div>
       </div>

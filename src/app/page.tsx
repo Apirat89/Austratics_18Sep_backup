@@ -374,7 +374,7 @@ function HomeContent() {
               {/* System Requirements */}
               <div style={{ textAlign: 'center', marginTop: '1rem' }}>
                 <p style={{ fontSize: '0.75rem', color: '#6b7280', lineHeight: '1.4' }}>
-                  Best on a desktop/laptop: latest Chrome/Edge/Firefox/Safari, 1080p+, 8 GB+ RAM (16 GB ideal), modern 4-core CPU, 10 Mbps+. Mobile support is limited.
+                  Optimal performance on a desktop/laptop: latest Chrome/Edge/Firefox/Safari web browser, 1080p+ screen resolution, minimum 8 GB RAM (16 GB ideal), modern 4-core CPU, 10 Mbps+. Mobile support is limited.
                 </p>
               </div>
             </form>
