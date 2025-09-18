@@ -62,6 +62,18 @@ export async function POST(req: NextRequest) {
     console.log('Reset URL:', resetUrl)
 
     // 4) Send reset password email for account activation
+    let emailSuccess = false;
+    let emailError = null;
+    let messageId = null;
+    
+    // Check environment variables for debugging
+    const envCheck = {
+      EMAIL_USER: process.env.EMAIL_USER ? 'SET' : 'MISSING',
+      EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING', 
+      SMTP_HOST: process.env.SMTP_HOST || 'mail.spacemail.com (default)'
+    };
+    console.log('📧 Environment check:', envCheck);
+    
     try {
       const emailResult = await sendPasswordResetEmail({
         to: email,
@@ -70,18 +82,30 @@ export async function POST(req: NextRequest) {
         userEmail: email
       })
       
+      emailSuccess = emailResult.success;
+      messageId = emailResult.messageId;
+      
       if (emailResult.success) {
-        console.log(`Activation email sent successfully to: ${email} by admin: ${admin.email}`);
+        console.log(`✅ Activation email sent successfully to: ${email} by admin: ${admin.email}`);
+        console.log(`📧 Message ID: ${emailResult.messageId}`);
       } else {
-        console.error("Email error:", emailResult.error);
-        // We don't fail the request if email fails, just log it
+        emailError = emailResult.error;
+        console.error("❌ Email error:", emailResult.error);
       }
     } catch (emailErr) {
-      console.error("Email error:", emailErr);
-      // We don't fail the request if email fails, just log it
+      emailSuccess = false;
+      emailError = emailErr instanceof Error ? emailErr.message : 'Unknown email error';
+      console.error("❌ Email exception:", emailErr);
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ 
+      success: true, 
+      userCreated: true,
+      emailSent: emailSuccess,
+      emailError: emailError,
+      messageId: messageId,
+      environment: envCheck
+    })
   } catch (error) {
     console.error('Error creating user:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

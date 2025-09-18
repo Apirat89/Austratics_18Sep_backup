@@ -131,10 +131,24 @@ Aged Care Analytics Team
   };
 
   try {
+    console.log('📧 Attempting to send email to:', to);
+    console.log('📧 SMTP Host:', process.env.SMTP_HOST || 'mail.spacemail.com');
+    console.log('📧 SMTP User:', process.env.EMAIL_USER ? 'SET' : 'MISSING');
+    console.log('📧 SMTP Password:', process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING');
+    
     const result = await transporter.sendMail(mailOptions);
+    console.log('✅ Email sent successfully:', result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error) {
-    console.error('Email sending error:', error);
-    return { success: false, error: error };
+    console.error('❌ Email sending error:', error);
+    
+    // Enhanced error logging
+    if (error instanceof Error) {
+      console.error('❌ Error name:', error.name);
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error stack:', error.stack);
+    }
+    
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 } 

@@ -91,11 +91,28 @@ export default function UserManagementTab({ currentAdmin }: UserManagementTabPro
         throw new Error(data.error || 'Failed to create user');
       }
       
+      console.log('📧 User creation response:', data);
+      
+      // Enhanced success message with email status
+      let successMessage = 'User created successfully.';
+      if (data.emailSent) {
+        successMessage += ` ✅ Activation email sent (ID: ${data.messageId || 'unknown'})`;
+      } else if (data.emailError) {
+        successMessage += ` ❌ Email failed: ${data.emailError}`;
+      } else {
+        successMessage += ` ⚠️ Email status unknown`;
+      }
+      
+      // Log environment info for debugging
+      if (data.environment) {
+        console.log('📧 Environment check:', data.environment);
+      }
+      
       setName('');
       setEmail('');
       setCompany('');
       setShowAddForm(false);
-      setMsg('Activation email sent.');
+      setMsg(successMessage);
       
       refresh();
     } catch (error) {
