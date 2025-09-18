@@ -26,16 +26,11 @@ export async function sendPasswordResetEmail({ to, resetToken, resetUrl, userEma
             .reset-button:hover { background: #1E40AF; }
             .security-notice { background: #F1F5F9; border-left: 4px solid #3B82F6; padding: 20px; margin: 30px 0; border-radius: 4px; }
             .footer { background: #F8FAFC; padding: 30px; text-align: center; color: #64748B; font-size: 14px; }
-            .logo { width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px; padding: 8px; }
-            .logo img { width: 44px; height: 44px; object-fit: contain; }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header">
-                <div class="logo">
-                    <img src="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/austratics-logo-white-60px.png" alt="🏥" style="width: 44px; height: 44px; object-fit: contain;" />
-                </div>
                 <h1>Austratics</h1>
                 <p>Secure Password Reset Request</p>
             </div>

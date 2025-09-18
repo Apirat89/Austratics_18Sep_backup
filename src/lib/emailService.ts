@@ -438,22 +438,6 @@ function generateAdminPasswordResetTemplate(email: string, resetToken: string): 
           text-align: center;
           border-radius: 8px 8px 0 0;
         }
-        .logo {
-          width: 60px;
-          height: 60px;
-          background: rgba(255,255,255,0.2);
-          border-radius: 50%;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 10px auto;
-          padding: 8px;
-        }
-        .logo img {
-          width: 44px;
-          height: 44px;
-          object-fit: contain;
-        }
         .content {
           background: #f8f9fa;
           padding: 30px;
@@ -489,9 +473,6 @@ function generateAdminPasswordResetTemplate(email: string, resetToken: string): 
     </head>
     <body>
       <div class="header">
-        <div class="logo">
-          <img src="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/austratics-logo-white-60px.png" alt="🔐" style="width: 44px; height: 44px; object-fit: contain;" />
-        </div>
         <h1>Admin Password Reset</h1>
         <p>Reset your administrator account password</p>
       </div>
