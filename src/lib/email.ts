@@ -14,7 +14,7 @@ export async function sendPasswordResetEmail({ to, resetToken, resetUrl, userEma
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Password Reset - Aged Care Analytics</title>
+        <title>Password Reset - Austratics</title>
         <style>
             body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
             .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
@@ -33,7 +33,7 @@ export async function sendPasswordResetEmail({ to, resetToken, resetUrl, userEma
         <div class="container">
             <div class="header">
                 <div class="logo">🏥</div>
-                <h1>Aged Care Analytics</h1>
+                <h1>Austratics</h1>
                 <p>Secure Password Reset Request</p>
             </div>
             
@@ -42,7 +42,7 @@ export async function sendPasswordResetEmail({ to, resetToken, resetUrl, userEma
                 
                 <p style="color: #475569; font-size: 16px; line-height: 1.6;">
                     Hello,<br><br>
-                    We received a request to reset the password for your Aged Care Analytics account (<strong>${userEmail}</strong>).
+                    We received a request to reset the password for your Austratics account (<strong>${userEmail}</strong>).
                 </p>
                 
                 <p style="color: #475569; font-size: 16px; line-height: 1.6;">
@@ -74,7 +74,7 @@ export async function sendPasswordResetEmail({ to, resetToken, resetUrl, userEma
             </div>
             
             <div class="footer">
-                <p><strong>Aged Care Analytics</strong></p>
+                <p><strong>Austratics</strong></p>
                 <p>Trusted by healthcare providers nationwide</p>
                 <p style="margin-top: 20px;">
                     This email was sent to ${userEmail}. If you didn't request this, please ignore this email.
@@ -86,11 +86,11 @@ export async function sendPasswordResetEmail({ to, resetToken, resetUrl, userEma
   `;
 
   const emailText = `
-Password Reset - Aged Care Analytics
+Password Reset - Austratics
 
 Hello,
 
-We received a request to reset the password for your Aged Care Analytics account (${userEmail}).
+We received a request to reset the password for your Austratics account (${userEmail}).
 
 To reset your password, click this link or copy and paste it into your browser:
 ${resetUrl}
@@ -104,7 +104,7 @@ Security Information:
 If you have any questions, please contact us at hello@austratics.com.
 
 Best regards,
-Aged Care Analytics Team
+Austratics Team
   `;
 
   // SMTP Configuration
@@ -123,9 +123,9 @@ Aged Care Analytics Team
   });
 
   const mailOptions = {
-    from: `"Aged Care Analytics" <${process.env.EMAIL_USER || 'hello@austratics.com'}>`,
+    from: `"Austratics" <${process.env.EMAIL_USER || 'hello@austratics.com'}>`,
     to: to,
-    subject: '🔒 Password Reset Request - Aged Care Analytics',
+    subject: '🔒 Password Reset Request - Austratics',
     html: emailHtml,
     text: emailText,
   };
