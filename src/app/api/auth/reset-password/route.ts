@@ -60,18 +60,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate reset token (now async)
+    // Validate reset token with expert defensive parsing
     const tokenValidation = await validateResetToken(token);
-    if (!tokenValidation.valid) {
-      // Return typed error codes for better client handling
-      const errorCode = tokenValidation.error === 'Invalid token format' ? 'invalid_format'
-                      : tokenValidation.error === 'Token already used' ? 'already_used'
-                      : 'expired_or_invalid';
-      
+    if (!tokenValidation.ok) {
       return NextResponse.json(
         { 
-          error: tokenValidation.error || 'Invalid or expired reset token',
-          code: errorCode
+          error: 'Invalid or expired reset token',
+          code: tokenValidation.code
         },
         { status: 400 }
       );
