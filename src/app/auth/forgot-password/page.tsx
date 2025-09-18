@@ -200,7 +200,7 @@ export default function ForgotPassword() {
               </h3>
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• Check your spam/junk folder if you don't see the email</li>
-                <li>• Reset links expire after 1 hour for security</li>
+                <li>• Reset links expire after 1 day for security</li>
                 <li>• Contact support if you continue having issues</li>
               </ul>
             </div>

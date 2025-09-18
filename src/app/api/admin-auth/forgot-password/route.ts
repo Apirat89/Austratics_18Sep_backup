@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     // Generate reset token
     const resetToken = uuidv4();
     const resetTokenExpires = new Date();
-    resetTokenExpires.setHours(resetTokenExpires.getHours() + 1); // Token expires in 1 hour
+    resetTokenExpires.setHours(resetTokenExpires.getHours() + 24); // Token expires in 24 hours (1 day)
 
     try {
       // Store reset token in database

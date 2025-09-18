@@ -59,7 +59,7 @@ export async function sendPasswordResetEmail({ to, resetToken, resetUrl, userEma
                 <div class="security-notice">
                     <h3 style="color: #1E293B; margin-top: 0; font-size: 16px;">🔒 Security Information</h3>
                     <ul style="color: #475569; margin: 10px 0; padding-left: 20px;">
-                        <li>This link will expire in <strong>1 hour</strong> for your security</li>
+                        <li>This link will expire in <strong>1 day</strong> for your security</li>
                         <li>If you didn't request this reset, please ignore this email</li>
                         <li>Never share this link with anyone</li>
                         <li>We recommend using a strong, unique password</li>
@@ -94,7 +94,7 @@ To reset your password, click this link or copy and paste it into your browser:
 ${resetUrl}
 
 Security Information:
-- This link will expire in 1 hour for your security
+- This link will expire in 1 day for your security
 - If you didn't request this reset, please ignore this email
 - Never share this link with anyone
 - We recommend using a strong, unique password

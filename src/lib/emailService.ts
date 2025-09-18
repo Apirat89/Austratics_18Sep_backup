@@ -489,7 +489,7 @@ function generateAdminPasswordResetTemplate(email: string, resetToken: string): 
         <div class="warning">
           <p><strong>⚠️ Important Security Notes:</strong></p>
           <ul>
-            <li>This password reset link will expire in 1 hour.</li>
+            <li>This password reset link will expire in 1 day.</li>
             <li>If you didn't request a password reset, please ignore this email or contact the master administrator.</li>
             <li>For security reasons, all your active sessions will be logged out when you reset your password.</li>
           </ul>
@@ -607,7 +607,7 @@ export async function sendAdminPasswordResetEmail(
         ${resetUrl}
         
         Important Notes:
-        - This password reset link will expire in 1 hour.
+        - This password reset link will expire in 1 day.
         - If you didn't request a password reset, please ignore this email or contact the master administrator.
         - All your active sessions will be logged out when you reset your password.
         

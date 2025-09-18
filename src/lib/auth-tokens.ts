@@ -26,8 +26,8 @@ export async function createResetTokenForUser(userId: string): Promise<string> {
   const key = keyFor(token);
   const data = { userId, createdAt: Date.now() };
 
-  // atomic set + 1h TTL
-  await redis.set(key, JSON.stringify(data), { ex: 3600, nx: true });
+  // atomic set + 24h TTL
+  await redis.set(key, JSON.stringify(data), { ex: 86400, nx: true });
   return token;
 }
 
