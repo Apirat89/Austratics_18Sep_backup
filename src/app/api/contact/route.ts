@@ -93,9 +93,9 @@ function validateInput(data: any): { isValid: boolean; errors: string[] } {
   
   // Message is required
   if (!data.message || typeof data.message !== 'string') {
-    errors.push('Message is required');
+    errors.push('Please enter a message');
   } else if (data.message.trim().length < 10) {
-    errors.push('Message must be at least 10 characters long');
+    errors.push(`Message is too short (${data.message.trim().length} characters). Please write at least 10 characters`);
   } else if (data.message.length > 5000) {
     errors.push('Message is too long (maximum 5000 characters)');
   }
@@ -203,7 +203,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ContactRe
       return NextResponse.json(
         {
           success: false,
-          message: 'Please check your input and try again',
+          message: validation.errors.join('. '), // Show specific error messages
           error: 'VALIDATION_FAILED',
           details: {
             errors: validation.errors
