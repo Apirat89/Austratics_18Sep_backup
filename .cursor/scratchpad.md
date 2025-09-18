@@ -683,8 +683,235 @@ tippecanoe -zg --read-parallel -o sa2.mbtiles SA2.geojson
 
 ## **EXECUTOR MODE ACTIVE** ⚙️
 
-**TASK COMPLETED:** Fixed favicon colors and footer positioning ✅
-**RESULTS:** White logo on blue background favicon, corrected copyright spacing, bottom-right footer positioning
+**CURRENT TASKS:** 
+1. Deactivate PWA webapp installation prompts - **IN PROGRESS**
+2. Add system requirements text to sign-on and main pages - **PENDING**
+
+**GOAL:** Disable PWA installation prompts and add system requirements disclaimer
+
+## **Background and Motivation**
+
+The user wants to:
+1. **Disable PWA installation prompts** - Currently the web manifest triggers browser prompts to install as a web app
+2. **Improve mobile UX/UI** - Current design may not be optimized for mobile devices
+3. **Identify key files** for mobile optimization across main, residential, homecare, news, insights, faq, and maps pages
+
+## **Current State Analysis**
+
+### **📱 PWA Configuration Analysis**
+**Current PWA Setup:**
+- **Web Manifest**: `public/site.webmanifest` with `"display": "standalone"` triggers install prompts
+- **Metadata**: `src/app/layout.tsx` includes `manifest: "/site.webmanifest"` 
+- **Icons**: Full set of PWA icons (android-chrome, apple-touch-icon) present
+- **Theme Colors**: Blue theme (#1e3a8a) configured for PWA experience
+
+### **📱 Mobile UX Issues Identified**
+
+**1. Layout Responsiveness Issues:**
+- **Fixed Sidebars**: Many pages use fixed-width sidebars (320px) that don't collapse on mobile
+- **Desktop-First Design**: Layouts assume desktop screen sizes with complex multi-column layouts
+- **Navigation Problems**: Sidebar navigation doesn't adapt to mobile touch patterns
+
+**2. Specific Page Issues:**
+
+**Maps Page (`src/app/maps/page.tsx`):**
+- Fixed sidebar (w-80 = 320px) takes too much mobile screen space
+- Complex map controls not optimized for touch
+- Data layers panel positioned for desktop use
+
+**Residential Page (`src/app/residential/page.tsx`):**
+- History panel (ml-80 = 320px left margin) problematic on mobile
+- Search interface not touch-friendly
+- Comparison features complex for mobile interaction
+
+**Homecare Page (`src/app/homecare/page.tsx`):**
+- Similar sidebar issues (ml-80 margin)
+- Complex data tables not mobile-responsive
+- Touch targets may be too small
+
+**Main Page (`src/app/main/page.tsx`):**
+- Grid layout (lg:grid-cols-6) may be too dense on mobile
+- Card sizes not optimized for thumb navigation
+- Text sizes may be too small
+
+**Insights Page (`src/app/insights/page.tsx`):**
+- Complex analytics interface not mobile-first
+- History panel takes too much mobile space
+- Data visualization not touch-optimized
+
+### **📱 Mobile-Specific Problems**
+
+**Touch Interaction Issues:**
+- Small click targets (buttons, links)
+- Hover states that don't work on mobile
+- Complex multi-step interactions
+
+**Layout Problems:**
+- Fixed sidebars that don't collapse properly on mobile
+- Desktop-sized margins and padding
+- Text that's too small for mobile reading
+
+**Navigation Issues:**
+- Desktop-style navigation patterns
+- Missing mobile-specific navigation (hamburger menus, bottom tabs)
+- Back buttons not optimized for mobile patterns
+
+## **High-level Task Breakdown**
+
+### **Phase 1: Disable PWA Installation** 🚫
+**Goal**: Remove webapp installation prompts while keeping SEO benefits
+
+**Task 1.1: Modify Web Manifest**
+- Change `"display": "browser"` instead of `"standalone"`
+- Remove or modify PWA-specific properties
+- Keep icons for favicon purposes only
+
+**Task 1.2: Update Metadata**
+- Keep manifest reference for SEO but modify content
+- Ensure no PWA installation triggers remain
+
+### **Phase 2: Mobile UX/UI Analysis & Strategy** 📱
+**Goal**: Create mobile-first responsive design strategy
+
+**Task 2.1: Mobile Navigation Strategy**
+- Implement collapsible/hamburger navigation for mobile
+- Add bottom navigation tabs for key pages
+- Optimize touch targets (minimum 44px)
+
+**Task 2.2: Layout Responsiveness**
+- Convert fixed sidebars to mobile-responsive patterns
+- Implement mobile-first breakpoint system
+- Optimize spacing and typography for mobile
+
+**Task 2.3: Touch Optimization**
+- Increase button sizes and touch targets
+- Remove hover-dependent interactions
+- Add mobile-specific gestures where appropriate
+
+### **Phase 3: Page-Specific Mobile Optimization** 🎯
+**Goal**: Optimize each page for mobile experience
+
+**Files to Modify for Mobile Optimization:**
+
+### **🗂️ CORE LAYOUT FILES**
+1. **`src/app/layout.tsx`**
+   - Root layout and metadata
+   - Global mobile styles and viewport settings
+   - Footer positioning for mobile
+
+2. **`src/app/globals.css`**
+   - Mobile-first CSS utilities
+   - Touch target sizes
+   - Mobile typography scales
+
+### **📄 PAGE-SPECIFIC FILES**
+
+**Main Page:**
+3. **`src/app/main/page.tsx`**
+   - Card grid responsiveness
+   - Mobile navigation patterns
+   - Touch-friendly button sizes
+
+**Maps Page:**
+4. **`src/app/maps/page.tsx`**
+   - Sidebar collapse behavior for mobile
+   - Map controls optimization
+   - Touch gesture support
+
+5. **`src/components/DataLayers.tsx`**
+   - Mobile-responsive data layer controls
+   - Touch-friendly toggles
+
+6. **`src/components/AustralianMap.tsx`**
+   - Mobile map interaction patterns
+
+**Residential Page:**
+7. **`src/app/residential/page.tsx`**
+   - Mobile-responsive search interface
+   - Collapsible history panel
+   - Touch-optimized facility cards
+
+8. **`src/components/residential/ResidentialHistoryPanel.tsx`**
+   - Mobile sidebar behavior
+
+**Homecare Page:**
+9. **`src/app/homecare/page.tsx`**
+   - Mobile-responsive data tables
+   - Collapsible panels
+   - Touch-friendly filters
+
+10. **`src/components/homecare/HomecareHistoryPanel.tsx`**
+    - Mobile panel behavior
+
+**Insights Page:**
+11. **`src/app/insights/page.tsx`**
+    - Mobile analytics interface
+    - Responsive charts and graphs
+    - Touch-friendly data interaction
+
+**News Page:**
+12. **`src/app/news/page.tsx`**
+    - Mobile article layout
+    - Touch-friendly reading experience
+
+**FAQ Page:**
+13. **`src/app/faq/page.tsx`**
+    - Mobile chatbot interface
+    - Touch-optimized conversation flow
+
+### **🧩 COMPONENT FILES**
+
+**Navigation Components:**
+14. **`src/components/BackToMainButton.tsx`**
+    - Mobile-responsive back navigation
+
+**Utility Components:**
+15. **`src/components/TelemetryProvider.tsx`**
+    - Mobile interaction tracking
+
+### **🎨 STYLING FILES**
+
+16. **`tailwind.config.js`**
+    - Mobile-first breakpoint strategy
+    - Touch target utilities
+    - Mobile typography scales
+
+### **📱 PWA FILES**
+
+17. **`public/site.webmanifest`**
+    - Disable standalone mode
+    - Keep for SEO benefits only
+
+### **Phase 4: Mobile Testing & Optimization** ✅
+**Goal**: Ensure optimal mobile experience across all devices
+
+**Task 4.1: Responsive Testing**
+- Test across different mobile devices and screen sizes
+- Verify touch interactions work properly
+- Check loading performance on mobile
+
+**Task 4.2: Mobile-Specific Features**
+- Add mobile-specific navigation patterns
+- Implement mobile gestures where appropriate
+- Optimize for mobile browsers
+
+## **Expected Outcomes**
+
+### **PWA Deactivation Benefits**
+- **No installation prompts**: Users won't see "Add to Home Screen" prompts
+- **Standard browser experience**: App behaves like a regular website
+- **SEO maintained**: Keep metadata benefits without PWA functionality
+
+### **Mobile UX Improvements**
+- **Touch-friendly interface**: Larger buttons and touch targets
+- **Responsive navigation**: Sidebars that work on mobile
+- **Mobile-first design**: Layouts optimized for small screens
+- **Better readability**: Typography and spacing optimized for mobile
+
+### **Technical Benefits**
+- **Improved mobile performance**: Faster loading and interaction
+- **Better accessibility**: Mobile screen reader compatibility
+- **Cross-device consistency**: Seamless experience across devices
 
 ## **FIXES IMPLEMENTED** ✅
 

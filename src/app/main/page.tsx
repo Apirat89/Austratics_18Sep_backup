@@ -241,6 +241,13 @@ export default function MainPage() {
           onSubmit={handlePromptSubmit} 
           placeholder={isSubmitting ? "Sending your message..." : "Please submit your feedback, requests for support, or requests for additional features here"}
         />
+
+        {/* System Requirements */}
+        <div className="mt-4 text-center">
+          <p className="text-xs text-gray-500 leading-relaxed">
+            Best on a desktop/laptop: latest Chrome/Edge/Firefox/Safari, 1080p+, 8 GB+ RAM (16 GB ideal), modern 4-core CPU, 10 Mbps+. Mobile support is limited.
+          </p>
+        </div>
       </div>
       
       {/* Username Display - Bottom Left */}
