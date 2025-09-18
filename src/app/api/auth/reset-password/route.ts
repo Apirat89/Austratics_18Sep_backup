@@ -1,5 +1,8 @@
+export const runtime = 'nodejs';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { validateResetToken, markTokenAsUsed, updateUserPassword } from '../../../../lib/auth-tokens';
+import { redis } from '../../../../lib/redis';
+import { validateResetToken, markResetTokenUsed, updateUserPassword } from '../../../../lib/auth-tokens';
 
 // Password validation function
 function validatePassword(password: string): { isValid: boolean; errors: string[] } {
@@ -34,6 +37,10 @@ function validatePassword(password: string): { isValid: boolean; errors: string[
 export async function POST(request: NextRequest) {
   try {
     const { password, token } = await request.json();
+
+    // temporary diagnostics (remove when green)
+    const pong = await redis.ping().catch((e) => `ERR:${e.message}`);
+    console.info('REDIS_PING', pong, 'TOKEN_LEN', token?.length);
 
     // Validate input
     if (!password || !token) {
@@ -70,8 +77,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Mark token as used (now async)
-    await markTokenAsUsed(token);
+    // Mark token as used with the key returned from validation
+    await markResetTokenUsed(tokenValidation.key!);
 
     return NextResponse.json(
       { message: 'Password updated successfully' },

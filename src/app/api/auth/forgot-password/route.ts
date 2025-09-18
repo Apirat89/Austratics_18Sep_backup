@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { sendPasswordResetEmail } from '../../../../lib/email';
 import { createResetToken } from '../../../../lib/auth-tokens';

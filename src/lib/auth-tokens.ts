@@ -1,91 +1,34 @@
 import { createClient } from '@supabase/supabase-js';
+import { redis } from './redis';
 import crypto from 'crypto';
-import fs from 'fs';
-import path from 'path';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Import Redis TokenManager for production
-let TokenManager: any = null;
-const isProduction = process.env.NODE_ENV === 'production' && 
-                    process.env.UPSTASH_REDIS_REST_URL && 
-                    process.env.UPSTASH_REDIS_REST_TOKEN;
+const IS_PROD = process.env.NODE_ENV === 'production';
 
-if (isProduction) {
-  try {
-    TokenManager = require('./redis').TokenManager;
-  } catch (error) {
-    console.warn('Redis not available, falling back to file storage');
-  }
+// helpful boot log (remove after verifying)
+console.log('RESET_TOKEN_STORE', {
+  node: process.version,
+  nodeEnv: process.env.NODE_ENV,
+  kvUrlPresent: !!(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL),
+  kvTokenPresent: !!(process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN),
+});
+
+function keyFor(token: string) {
+  return `reset_token:${token}`;
 }
 
-// File-based storage for development (persists across server restarts)
-const tokenStorageFile = path.join(process.cwd(), '.tmp-reset-tokens.json');
+export async function createResetTokenForUser(userId: string): Promise<string> {
+  const token = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, ''); // 64 hex
+  const key = keyFor(token);
+  const data = { userId, createdAt: Date.now() };
 
-// Ensure .tmp-reset-tokens.json exists
-function ensureTokenFile() {
-  if (!fs.existsSync(tokenStorageFile)) {
-    fs.writeFileSync(tokenStorageFile, JSON.stringify({}), 'utf8');
-  }
-}
-
-// Load tokens from file
-function loadTokens(): Record<string, {
-  email: string;
-  userId: string;
-  expiresAt: number;
-  used: boolean;
-}> {
-  try {
-    ensureTokenFile();
-    const content = fs.readFileSync(tokenStorageFile, 'utf8');
-    return JSON.parse(content);
-  } catch (error) {
-    console.warn('Failed to load token file, using empty tokens');
-    return {};
-  }
-}
-
-// Save tokens to file
-function saveTokens(tokens: Record<string, any>) {
-  try {
-    ensureTokenFile();
-    fs.writeFileSync(tokenStorageFile, JSON.stringify(tokens, null, 2), 'utf8');
-  } catch (error) {
-    console.error('Failed to save token file:', error);
-  }
-}
-
-// Clean up expired tokens from storage
-function cleanupExpiredTokensFromFile() {
-  const tokens = loadTokens();
-  const now = Date.now();
-  let hasChanges = false;
-  
-  for (const [token, data] of Object.entries(tokens)) {
-    if (now > data.expiresAt) {
-      delete tokens[token];
-      hasChanges = true;
-    }
-  }
-  
-  if (hasChanges) {
-    saveTokens(tokens);
-  }
-}
-
-export interface ResetTokenData {
-  token: string;
-  email: string;
-  userId: string;
-  expiresAt: number;
-}
-
-export function generateResetToken(): string {
-  return crypto.randomBytes(32).toString('hex');
+  // atomic set + 1h TTL
+  await redis.set(key, JSON.stringify(data), { ex: 3600, nx: true });
+  return token;
 }
 
 export async function createResetToken(email: string): Promise<{ success: boolean; token?: string; error?: string; emailExists?: boolean }> {
@@ -104,102 +47,55 @@ export async function createResetToken(email: string): Promise<{ success: boolea
       return { success: false, emailExists: false, error: 'Email not registered' };
     }
 
-    // Use Redis in production, file storage in development
-    if (TokenManager && isProduction) {
-      const token = await TokenManager.createToken(user.id, email);
-      return { success: true, token, emailExists: true };
-    } else {
-      // Use file storage for development
-      cleanupExpiredTokensFromFile(); // Clean up old tokens first
-      
-      const token = generateResetToken();
-      const expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
-
-      const tokens = loadTokens();
-      tokens[token] = {
-        email,
-        userId: user.id,
-        expiresAt,
-        used: false
-      };
-      
-      saveTokens(tokens);
-      console.log(`✅ Token created and saved to file: ${token.substring(0, 16)}...`);
-
-      return { success: true, token, emailExists: true };
-    }
+    // Use Redis for token storage
+    const token = await createResetTokenForUser(user.id);
+    return { success: true, token, emailExists: true };
   } catch (error) {
     console.error('Error creating reset token:', error);
     return { success: false, error: 'Failed to create reset token' };
   }
 }
 
-export async function validateResetToken(token: string): Promise<{ 
+export async function validateResetToken(tokenRaw: string): Promise<{ 
   valid: boolean; 
   email?: string; 
   userId?: string; 
-  error?: string 
+  error?: string;
+  key?: string;
 }> {
   try {
-    // Use Redis in production
-    if (TokenManager && isProduction) {
-      const tokenData = await TokenManager.validateToken(token);
-      if (!tokenData) {
-        return { valid: false, error: 'Invalid or expired token' };
-      }
-      return { 
-        valid: true, 
-        email: tokenData.email, 
-        userId: tokenData.userId 
-      };
-    } else {
-      // Use file storage for development
-      cleanupExpiredTokensFromFile(); // Clean up expired tokens first
-      
-      const tokens = loadTokens();
-      const tokenData = tokens[token];
-      
-      if (!tokenData) {
-        return { valid: false, error: 'Invalid token' };
-      }
-
-      if (tokenData.used) {
-        return { valid: false, error: 'Token already used' };
-      }
-
-      if (Date.now() > tokenData.expiresAt) {
-        // Remove expired token
-        delete tokens[token];
-        saveTokens(tokens);
-        return { valid: false, error: 'Token expired' };
-      }
-
-      console.log(`✅ Token validation successful: ${token.substring(0, 16)}...`);
-      return { 
-        valid: true, 
-        email: tokenData.email, 
-        userId: tokenData.userId 
-      };
+    const token = (tokenRaw ?? '').trim();
+    if (!/^[a-fA-F0-9]{64}$/.test(token)) {
+      return { valid: false, error: 'Invalid token format' };
     }
+
+    const key = keyFor(token);
+    const json = await redis.get<string>(key);
+    if (!json) {
+      return { valid: false, error: 'Invalid or expired token' };
+    }
+
+    const record = JSON.parse(json) as { userId: string; createdAt: number; used?: boolean };
+
+    if (record.used) {
+      return { valid: false, error: 'Token already used' };
+    }
+
+    return { valid: true, userId: record.userId, key }; // return key so route can mark used
   } catch (error) {
     console.error('Error validating token:', error);
     return { valid: false, error: 'Failed to validate token' };
   }
 }
 
-export async function markTokenAsUsed(token: string): Promise<void> {
+export async function markResetTokenUsed(key: string): Promise<void> {
   try {
-    if (TokenManager && isProduction) {
-      await TokenManager.markTokenUsed(token);
-    } else {
-      // Use file storage for development
-      const tokens = loadTokens();
-      if (tokens[token]) {
-        tokens[token].used = true;
-        saveTokens(tokens);
-        console.log(`✅ Token marked as used: ${token.substring(0, 16)}...`);
-      }
-    }
+    const json = await redis.get<string>(key);
+    if (!json) return;
+    const record = JSON.parse(json);
+    record.used = true;
+    // keep a short TTL after use (optional)
+    await redis.set(key, JSON.stringify(record), { ex: 600 });
   } catch (error) {
     console.error('Error marking token as used:', error);
   }
@@ -220,12 +116,5 @@ export async function updateUserPassword(userId: string, newPassword: string): P
   } catch (error) {
     console.error('Error updating password:', error);
     return { success: false, error: 'Failed to update password' };
-  }
-}
-
-// Clean up expired tokens (enhanced for file storage)
-export function cleanupExpiredTokens(): void {
-  if (!isProduction) {
-    cleanupExpiredTokensFromFile();
   }
 } 
