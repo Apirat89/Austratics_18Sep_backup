@@ -38,9 +38,10 @@ export async function POST(request: NextRequest) {
   try {
     const { password, token } = await request.json();
 
-    // temporary diagnostics (remove when green)
-    const pong = await redis.ping().catch((e) => `ERR:${e.message}`);
-    console.info('REDIS_PING', pong, 'TOKEN_LEN', token?.length);
+    // Expert-recommended diagnostics
+    console.info('RESET_PASSWORD_START', { tokenLen: token?.length, tokenPreview: token?.slice(0,8) });
+    const ping = await redis.ping().catch((e) => `ERR:${e.message}`);
+    console.info('REDIS_PING', ping);
 
     // Validate input
     if (!password || !token) {
@@ -62,8 +63,16 @@ export async function POST(request: NextRequest) {
     // Validate reset token (now async)
     const tokenValidation = await validateResetToken(token);
     if (!tokenValidation.valid) {
+      // Return typed error codes for better client handling
+      const errorCode = tokenValidation.error === 'Invalid token format' ? 'invalid_format'
+                      : tokenValidation.error === 'Token already used' ? 'already_used'
+                      : 'expired_or_invalid';
+      
       return NextResponse.json(
-        { error: tokenValidation.error || 'Invalid or expired reset token' },
+        { 
+          error: tokenValidation.error || 'Invalid or expired reset token',
+          code: errorCode
+        },
         { status: 400 }
       );
     }

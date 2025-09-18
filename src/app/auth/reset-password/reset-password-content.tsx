@@ -108,7 +108,17 @@ export default function ResetPasswordClient({ token }: ResetPasswordClientProps)
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Something went wrong');
+        // Expert-recommended error mapping for better user experience
+        const message = 
+          data.code === 'expired_or_invalid'
+            ? 'This reset link is invalid or has expired. Please request a new one.'
+            : data.code === 'already_used'  
+            ? 'This reset link was already used. Please request a new one.'
+            : data.code === 'invalid_format'
+            ? 'This reset link format is invalid. Please request a new one.'
+            : data.error || 'Something went wrong. Please try again.';
+        
+        setError(message);
         return;
       }
 

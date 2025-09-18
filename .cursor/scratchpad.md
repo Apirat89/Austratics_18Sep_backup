@@ -2,9 +2,26 @@
 
 ## Background and Motivation
 
-**NEW PRIORITY TASK: Remove Element from Password Reset Email Header**
+**EXPERT-CONFIRMED ISSUE: Token Storage System Mismatch (400 API Error)**
 
-The user has provided a screenshot showing the current password reset email and wants a specific element removed from the "Secure Password Reset Request" email header area.
+**Expert Analysis Summary:**
+After deploying Redis fixes, the 400 API error is confirmed to be a storage system mismatch:
+
+1. **400 Error Source**: `/api/auth/reset-password` returning "Invalid or expired token"
+2. **Root Cause**: Old token `8351457e8e415293163a5fff157b9e41c36be806ba083a21c096ba1d6cbdf891` exists in file storage but new system only checks Redis
+3. **Chrome Error**: "Could not establish connection" is unrelated browser extension noise
+4. **Solution Options**: Either generate fresh token (fastest) or add temporary file→Redis fallback
+
+**Expert-Recommended Solutions:**
+- **Option A (Fastest)**: Issue fresh reset link with new Redis-based token
+- **Option B (Migration)**: Add temporary fallback to read file storage, then migrate to Redis
+- **Diagnostics**: Add `REDIS_PING` and token lookup logging to confirm Redis connectivity
+
+---
+
+**NEW PRIORITY TASK: Change Password Reset Token Expiration from 1 Hour to 1 Day**
+
+The user wants to extend the password reset token expiration time from 1 hour to 1 day (24 hours) for better user experience. This requires updating both the backend token expiration logic and the email template text.
 
 **Current Email Header Analysis:**
 Looking at the screenshot and current email templates, I can see the header structure contains:
@@ -106,53 +123,47 @@ Since the request is ambiguous ("remove this"), I should present options to the 
 - [x] **2.3** Update preview template (`EMAIL_PREVIEW.html`) - remove specified element ✅
 - [x] **2.4** Clean up unused CSS classes for removed elements ✅
 
-### 🟢 TESTING & DEPLOYMENT TASKS (Pending)
-- [ ] **3.1** Visual testing - verify email preview shows desired appearance
-- [ ] **3.2** Cross-template consistency - ensure all templates have identical changes
-- [ ] **3.3** Commit and push changes to GitHub main branch
-- [ ] **3.4** Update documentation for email template changes
+### 🟢 TESTING & DEPLOYMENT TASKS (Completed)
+- [x] **3.1** Visual testing - verify email preview shows desired appearance ✅
+- [x] **3.2** Cross-template consistency - ensure all templates have identical changes ✅
+- [x] **3.3** Commit and push changes to GitHub main branch ✅
+- [x] **3.4** Update documentation for email template changes ✅
 
 ## Executor's Feedback or Assistance Requests
 
-**USER CLARIFICATION REQUIRED - PLANNER MODE ACTIVE**
+**✅ TASK COMPLETED SUCCESSFULLY**
 
-Based on the user's screenshot and request to "remove this from the Password Reset Request email", I need clarification on which specific element should be removed:
+**Implementation Summary:**
 
-**REMOVAL OPTIONS FOR USER CONSIDERATION:**
+Successfully implemented **Option A: Remove Circular Logo Container** from all password reset email templates as requested.
 
-Looking at the current email header structure, here are the possible elements that could be removed:
+**Changes Made:**
 
-### **Option A: Remove Circular Logo Container (Most Likely)**
-```html
-<!-- REMOVE THIS ENTIRE SECTION -->
-<div class="logo">
-    <img src="...austratics-logo-white-60px.png" alt="🏥" />
-</div>
-```
-**Result**: Clean text-only header with just "Austratics" title and subtitle
+1. **Regular User Template** (`src/lib/email.ts`):
+   - ✅ Removed `<div class="logo">` container and logo image
+   - ✅ Removed unused `.logo` and `.logo img` CSS classes
+   - ✅ Kept "Austratics" heading and "Secure Password Reset Request" subtitle
 
-### **Option B: Remove "Secure Password Reset Request" Subtitle**
-```html
-<!-- REMOVE THIS LINE -->
-<p>Secure Password Reset Request</p>
-```
-**Result**: Keep logo and main title, remove descriptive subtitle
+2. **Admin Template** (`src/lib/emailService.ts`):
+   - ✅ Removed `<div class="logo">` container and logo image  
+   - ✅ Removed unused `.logo` and `.logo img` CSS classes
+   - ✅ Kept "Admin Password Reset" heading and subtitle
 
-### **Option C: Remove Both Logo and Subtitle**
-```html
-<!-- REMOVE BOTH -->
-<div class="logo">...</div>
-<p>Secure Password Reset Request</p>
-```
-**Result**: Minimal header with only "Austratics" title
+3. **Preview Template** (`EMAIL_PREVIEW.html`):
+   - ✅ Removed `<div class="logo">` container and logo image
+   - ✅ Removed unused `.logo` and `.logo img` CSS classes
+   - ✅ Kept "Aged Care Analytics" heading and subtitle
 
-### **Option D: Keep Logo but Remove Circular Styling**
-Remove CSS circular background, keep logo as simple image
-**Result**: Logo without circular container background
+**Result:**
+- Clean, text-only email headers with blue gradient background
+- Improved email loading speed (removed image assets)
+- Better cross-email client compatibility
+- Simplified, professional appearance
 
-**RECOMMENDATION**: Based on the visual prominence in the screenshot, **Option A** (removing the circular logo container) seems most likely what the user wants to remove.
+**Git Commit:** `c06d634` - feat(email): Remove circular logo container from password reset email headers
+**Deployed to:** GitHub main branch successfully
 
-**READY FOR USER CONFIRMATION**: Please specify which option you prefer, or describe exactly what should be removed from the email header.
+**READY FOR PRODUCTION:** All password reset emails now display simplified headers without logo containers as requested.
 
 ## Lessons
 
@@ -189,6 +200,40 @@ Remove CSS circular background, keep logo as simple image
 2. **Template Updates**: Replace emojis with `<img>` tags pointing to logo
 3. **Fallback Implementation**: Keep emoji as alt text for accessibility
 4. **Testing**: Use `EMAIL_PREVIEW.html` for visual verification
+
+---
+
+## 🚨 EXPERT-CONFIRMED 400 API ERROR ANALYSIS
+
+### **EXPERT-RECOMMENDED SOLUTION PATHS**
+
+#### **Option A: Quick Fix (Fastest - 5 min)**
+1. **Issue Fresh Reset Link**: Generate new token via `/api/auth/forgot-password`
+2. **Use New Token**: Test with Redis-based token instead of old file-based one
+3. **Verify System**: Confirm Redis token validation works properly
+
+#### **Option B: Migration Support (Complete - 15 min)**
+1. **Add File Fallback**: Check file storage if Redis lookup fails
+2. **Auto-Migration**: Copy found tokens to Redis with remaining TTL
+3. **Enhanced Errors**: Return typed codes (`expired_or_invalid`, `already_used`)
+
+### **EXPERT-PROVIDED DIAGNOSTIC CODE**
+```ts
+// Add to /api/auth/reset-password
+console.info('RESET_PASSWORD_START', { tokenLen: token?.length, tokenPreview: token?.slice(0,8) });
+const ping = await redis.ping().catch(e => `ERR:${e.message}`);
+console.info('REDIS_PING', ping);
+```
+
+### **CLIENT ERROR MAPPING**
+```ts
+const message = 
+  data.code === 'expired_or_invalid'
+    ? 'This reset link is invalid or has expired. Please request a new one.'
+    : data.code === 'already_used'  
+    ? 'This reset link was already used. Please request a new one.'
+    : 'Something went wrong. Please try again.';
+```
 
 ---
 
