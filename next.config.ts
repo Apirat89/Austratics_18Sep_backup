@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   experimental: {
     clientTraceMetadata: ['baggage', 'sentry-trace'],
   },
+  outputFileTracingRoot: process.cwd(),
   async headers() {
     return [
       {

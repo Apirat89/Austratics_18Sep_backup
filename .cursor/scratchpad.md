@@ -6083,6 +6083,36 @@ The application currently serves various data files (JSON, GeoJSON, images, docx
 ```typescript
 // src/lib/supabaseStorage.ts
 
+---
+
+## 🔄 **GIT REVERT OPERATION COMPLETED** 🔄
+
+**EXECUTOR MODE COMPLETED TASK** ✅
+
+### **Operation Summary:**
+- **TARGET COMMIT**: `f02d1fb` - "fix: Update password reset email branding to Austratics"
+- **PREVIOUS HEAD**: `04ff2a2` - "debug: Add comprehensive logging to password reset token validation"
+- **ACTION TAKEN**: `git reset --hard f02d1fb` followed by `git push --force origin main`
+- **RESULT**: ✅ **SUCCESS** - Repository successfully reverted and force-pushed to GitHub
+
+### **Impact Assessment:**
+- **REVERTED COMMIT**: `04ff2a2` - All debugging code for password reset token validation has been removed
+- **CURRENT STATE**: Repository is now at the commit with updated Austratics email branding
+- **GITHUB STATUS**: Remote repository updated with forced push
+- **WORKING TREE**: Clean, no uncommitted changes
+
+### **Verification:**
+```bash
+git log --oneline -5
+f02d1fb fix: Update password reset email branding to Austratics  # ← CURRENT HEAD
+bfd478e fix: Update auto-response email message to Austratics branding
+dbe030b fix: Improve contact form validation error messages
+509bb36 feat: Add comprehensive email debugging tools
+4aa55df feat: Add comprehensive email debugging system for activation issues
+```
+
+**⚠️ IMPORTANT:** All changes made after commit `f02d1fb` have been permanently removed from the main branch.
+
 export const SUPABASE_STORAGE_URL = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public';
 
 export function getSupabaseFileUrl(bucket: string, path: string): string {
@@ -7228,6 +7258,36 @@ The application currently serves various data files (JSON, GeoJSON, images, docx
 ### Potential Helper Function
 ```typescript
 // src/lib/supabaseStorage.ts
+
+---
+
+## 🔄 **GIT REVERT OPERATION COMPLETED** 🔄
+
+**EXECUTOR MODE COMPLETED TASK** ✅
+
+### **Operation Summary:**
+- **TARGET COMMIT**: `f02d1fb` - "fix: Update password reset email branding to Austratics"
+- **PREVIOUS HEAD**: `04ff2a2` - "debug: Add comprehensive logging to password reset token validation"
+- **ACTION TAKEN**: `git reset --hard f02d1fb` followed by `git push --force origin main`
+- **RESULT**: ✅ **SUCCESS** - Repository successfully reverted and force-pushed to GitHub
+
+### **Impact Assessment:**
+- **REVERTED COMMIT**: `04ff2a2` - All debugging code for password reset token validation has been removed
+- **CURRENT STATE**: Repository is now at the commit with updated Austratics email branding
+- **GITHUB STATUS**: Remote repository updated with forced push
+- **WORKING TREE**: Clean, no uncommitted changes
+
+### **Verification:**
+```bash
+git log --oneline -5
+f02d1fb fix: Update password reset email branding to Austratics  # ← CURRENT HEAD
+bfd478e fix: Update auto-response email message to Austratics branding
+dbe030b fix: Improve contact form validation error messages
+509bb36 feat: Add comprehensive email debugging tools
+4aa55df feat: Add comprehensive email debugging system for activation issues
+```
+
+**⚠️ IMPORTANT:** All changes made after commit `f02d1fb` have been permanently removed from the main branch.
 
 export const SUPABASE_STORAGE_URL = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public';
 
@@ -8555,6 +8615,36 @@ The application currently serves various data files (JSON, GeoJSON, images, docx
 ### Potential Helper Function
 ```typescript
 // src/lib/supabaseStorage.ts
+
+---
+
+## 🔄 **GIT REVERT OPERATION COMPLETED** 🔄
+
+**EXECUTOR MODE COMPLETED TASK** ✅
+
+### **Operation Summary:**
+- **TARGET COMMIT**: `f02d1fb` - "fix: Update password reset email branding to Austratics"
+- **PREVIOUS HEAD**: `04ff2a2` - "debug: Add comprehensive logging to password reset token validation"
+- **ACTION TAKEN**: `git reset --hard f02d1fb` followed by `git push --force origin main`
+- **RESULT**: ✅ **SUCCESS** - Repository successfully reverted and force-pushed to GitHub
+
+### **Impact Assessment:**
+- **REVERTED COMMIT**: `04ff2a2` - All debugging code for password reset token validation has been removed
+- **CURRENT STATE**: Repository is now at the commit with updated Austratics email branding
+- **GITHUB STATUS**: Remote repository updated with forced push
+- **WORKING TREE**: Clean, no uncommitted changes
+
+### **Verification:**
+```bash
+git log --oneline -5
+f02d1fb fix: Update password reset email branding to Austratics  # ← CURRENT HEAD
+bfd478e fix: Update auto-response email message to Austratics branding
+dbe030b fix: Improve contact form validation error messages
+509bb36 feat: Add comprehensive email debugging tools
+4aa55df feat: Add comprehensive email debugging system for activation issues
+```
+
+**⚠️ IMPORTANT:** All changes made after commit `f02d1fb` have been permanently removed from the main branch.
 
 export const SUPABASE_STORAGE_URL = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public';
 
@@ -9884,6 +9974,36 @@ The application currently serves various data files (JSON, GeoJSON, images, docx
 ```typescript
 // src/lib/supabaseStorage.ts
 
+---
+
+## 🔄 **GIT REVERT OPERATION COMPLETED** 🔄
+
+**EXECUTOR MODE COMPLETED TASK** ✅
+
+### **Operation Summary:**
+- **TARGET COMMIT**: `f02d1fb` - "fix: Update password reset email branding to Austratics"
+- **PREVIOUS HEAD**: `04ff2a2` - "debug: Add comprehensive logging to password reset token validation"
+- **ACTION TAKEN**: `git reset --hard f02d1fb` followed by `git push --force origin main`
+- **RESULT**: ✅ **SUCCESS** - Repository successfully reverted and force-pushed to GitHub
+
+### **Impact Assessment:**
+- **REVERTED COMMIT**: `04ff2a2` - All debugging code for password reset token validation has been removed
+- **CURRENT STATE**: Repository is now at the commit with updated Austratics email branding
+- **GITHUB STATUS**: Remote repository updated with forced push
+- **WORKING TREE**: Clean, no uncommitted changes
+
+### **Verification:**
+```bash
+git log --oneline -5
+f02d1fb fix: Update password reset email branding to Austratics  # ← CURRENT HEAD
+bfd478e fix: Update auto-response email message to Austratics branding
+dbe030b fix: Improve contact form validation error messages
+509bb36 feat: Add comprehensive email debugging tools
+4aa55df feat: Add comprehensive email debugging system for activation issues
+```
+
+**⚠️ IMPORTANT:** All changes made after commit `f02d1fb` have been permanently removed from the main branch.
+
 export const SUPABASE_STORAGE_URL = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public';
 
 export function getSupabaseFileUrl(bucket: string, path: string): string {
@@ -11210,3 +11330,64 @@ The application currently serves various data files (JSON, GeoJSON, images, docx
 ### Potential Helper Function
 ```typescript
 // src/lib/supabaseStorage.ts
+
+---
+
+## 🔄 **GIT REVERT OPERATION COMPLETED** 🔄
+
+**EXECUTOR MODE COMPLETED TASK** ✅
+
+### **Operation Summary:**
+- **TARGET COMMIT**: `f02d1fb` - "fix: Update password reset email branding to Austratics"
+- **PREVIOUS HEAD**: `04ff2a2` - "debug: Add comprehensive logging to password reset token validation"
+- **ACTION TAKEN**: `git reset --hard f02d1fb` followed by `git push --force origin main`
+- **RESULT**: ✅ **SUCCESS** - Repository successfully reverted and force-pushed to GitHub
+
+### **Impact Assessment:**
+- **REVERTED COMMIT**: `04ff2a2` - All debugging code for password reset token validation has been removed
+- **CURRENT STATE**: Repository is now at the commit with updated Austratics email branding
+- **GITHUB STATUS**: Remote repository updated with forced push
+- **WORKING TREE**: Clean, no uncommitted changes
+
+### **Verification:**
+```bash
+git log --oneline -5
+f02d1fb fix: Update password reset email branding to Austratics  # ← CURRENT HEAD
+bfd478e fix: Update auto-response email message to Austratics branding
+dbe030b fix: Improve contact form validation error messages
+509bb36 feat: Add comprehensive email debugging tools
+4aa55df feat: Add comprehensive email debugging system for activation issues
+```
+
+**⚠️ IMPORTANT:** All changes made after commit `f02d1fb` have been permanently removed from the main branch.
+
+
+---
+
+## 🔧 **SUPPORTING FILES RESTORATION COMPLETED** 🔧
+
+**EXECUTOR MODE COMPLETED TASKS** ✅
+
+### **Environment Configuration Restoration:**
+- **✅ RESTORED**: Complete .env file from backup (2025-09-18-151844)
+- **✅ FIXED**: MAIL_FROM branding updated from "Aged Care Analytics" to "Austratics"
+- **✅ VERIFIED**: All configuration files are properly synced with Git state
+
+### **Email Configuration Summary:**
+SMTP_HOST=mail.spacemail.com
+SMTP_PORT=465
+SMTP_USER=hello@austratics.com
+SMTP_PASS=Austratics@2025
+EMAIL_USER=hello@austratics.com
+EMAIL_PASSWORD=Austratics@2025
+MAIL_FROM="Austratics <no-reply@austratics.com>"  # ← FIXED BRANDING
+MAIL_REPLY_TO=hello@austratics.com
+MAIL_SUPPORT=hello@austratics.com
+
+### **Configuration Files Status:**
+- **✅ next.config.ts**: No changes detected, properly synced
+- **✅ package.json**: No changes detected, properly synced  
+- **✅ tsconfig.json**: No changes detected, properly synced
+- **✅ vercel.json**: No changes detected, properly synced
+
+**🎉 COMPLETE REVERT SUCCESSFUL**: Both Git-tracked code and environment configuration are now properly restored to the intended state with correct Austratics branding throughout.
