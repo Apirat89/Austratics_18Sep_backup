@@ -1340,23 +1340,26 @@ const emailService = {
       const transporter = getEmailTransporter();
       
       const mailOptions = {
-        from: `"Aged Care Analytics Support" <${emailConfig.masterAdminEmail}>`,
+        from: `"Austratics Support" <${emailConfig.masterAdminEmail}>`,
         to: userEmail,
-        subject: 'Thank you for contacting us - Aged Care Analytics',
+        subject: 'Thank you for contacting us - Austratics',
         html: `
-          <h3>Thank you for your message!</h3>
+          <h3>Austratics Support</h3>
+          <p>Thank you for your message!</p>
           <p>We have received your contact form submission and will get back to you as soon as possible.</p>
           <p>Our team typically responds within 24-48 hours during business days.</p>
-          <p>Best regards,<br>The Aged Care Analytics Team</p>
+          <p>Best regards,<br>Austratics Team</p>
         `,
         text: `
+          Austratics Support
+
           Thank you for your message!
-          
           We have received your contact form submission and will get back to you as soon as possible.
+
           Our team typically responds within 24-48 hours during business days.
-          
+
           Best regards,
-          The Aged Care Analytics Team
+          Austratics Team
         `
       };
 
