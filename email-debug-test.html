@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Debug Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .test-section { 
+            border: 1px solid #ddd; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 5px; 
+        }
+        button { 
+            background: #0070f3; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        button:hover { background: #0051cc; }
+        .results { 
+            background: #f5f5f5; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 10px 0; 
+            white-space: pre-wrap;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        input[type="email"] {
+            width: 300px;
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Email Debug Test Interface</h1>
+    
+    <div class="test-section">
+        <h3>Test Configuration</h3>
+        <label>Target Email (for user activation and auto-response tests):</label><br>
+        <input type="email" id="targetEmail" placeholder="your-email@example.com" value="">
+        <p><small>This will be used for user activation and auto-response tests. Admin notifications always go to hello@austratics.com</small></p>
+    </div>
+
+    <div class="test-section">
+        <h3>Environment & Connection Tests</h3>
+        <button onclick="testConnection()">Test SMTP Connection</button>
+        <div id="connectionResults" class="results" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Email Type Tests</h3>
+        <button onclick="testEmail('admin_notification')">Test Admin Notification</button>
+        <button onclick="testEmail('user_activation')">Test User Activation</button>
+        <button onclick="testEmail('auto_response')">Test Auto-Response</button>
+        <div id="emailResults" class="results" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Instructions</h3>
+        <ol>
+            <li><strong>First:</strong> Test SMTP connection to verify basic connectivity</li>
+            <li><strong>Second:</strong> Enter your email address in the target email field</li>
+            <li><strong>Third:</strong> Test each email type and check your inboxes:
+                <ul>
+                    <li><strong>Admin Notification:</strong> Check hello@austratics.com inbox/spam</li>
+                    <li><strong>User Activation:</strong> Check your target email inbox/spam</li>
+                    <li><strong>Auto-Response:</strong> Check your target email inbox/spam</li>
+                </ul>
+            </li>
+            <li><strong>Note:</strong> You must be logged in as an admin to use this tool</li>
+        </ol>
+    </div>
+
+    <script>
+        async function testConnection() {
+            const resultsDiv = document.getElementById('connectionResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = 'Testing SMTP connection...';
+            
+            try {
+                const response = await fetch('/api/debug-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                
+                const data = await response.json();
+                displayResults(data, 'connectionResults');
+            } catch (error) {
+                resultsDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultsDiv.className = 'results error';
+            }
+        }
+
+        async function testEmail(testType) {
+            const targetEmail = document.getElementById('targetEmail').value;
+            const resultsDiv = document.getElementById('emailResults');
+            
+            if ((testType === 'user_activation' || testType === 'auto_response') && !targetEmail) {
+                alert('Please enter a target email address for this test');
+                return;
+            }
+            
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = `Testing ${testType}...`;
+            
+            try {
+                const response = await fetch('/api/debug-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ testType, targetEmail })
+                });
+                
+                const data = await response.json();
+                displayResults(data, 'emailResults');
+            } catch (error) {
+                resultsDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultsDiv.className = 'results error';
+            }
+        }
+
+        function displayResults(data, elementId) {
+            const resultsDiv = document.getElementById(elementId);
+            
+            if (data.success) {
+                resultsDiv.className = 'results success';
+            } else {
+                resultsDiv.className = 'results error';
+            }
+            
+            let output = '';
+            
+            if (data.summary) {
+                output += `📊 SUMMARY: ${data.summary.passed}/${data.summary.total_tests} tests passed\n\n`;
+            }
+            
+            if (data.results) {
+                data.results.forEach(result => {
+                    const status = result.success ? '✅' : '❌';
+                    output += `${status} ${result.step}\n`;
+                    
+                    if (result.details) {
+                        Object.entries(result.details).forEach(([key, value]) => {
+                            output += `  ${key}: ${value}\n`;
+                        });
+                    }
+                    
+                    if (result.error) {
+                        output += `  Error: ${result.error}\n`;
+                    }
+                    
+                    if (result.messageId) {
+                        output += `  Message ID: ${result.messageId}\n`;
+                    }
+                    
+                    output += '\n';
+                });
+            }
+            
+            if (data.instructions) {
+                output += '📋 INSTRUCTIONS:\n';
+                Object.entries(data.instructions).forEach(([key, value]) => {
+                    output += `  ${key}: ${value}\n`;
+                });
+            }
+            
+            if (data.error) {
+                output += `❌ Error: ${data.error}\n`;
+            }
+            
+            resultsDiv.innerHTML = output;
+        }
+
+        // Set default target email if available
+        document.addEventListener('DOMContentLoaded', function() {
+            // You can set a default email here for testing
+            // document.getElementById('targetEmail').value = 'your-email@example.com';
+        });
+    </script>
+</body>
+</html>
