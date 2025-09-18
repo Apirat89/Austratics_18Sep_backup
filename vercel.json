@@ -26,7 +26,7 @@
     "SENTRY_AUTH_TOKEN": "dummy-token-for-build"
   },
   "buildCommand": "next build",
-  "installCommand": "npm install",
+  "installCommand": "npm install --include=dev",
   "outputDirectory": ".next",
   "framework": "nextjs",
   "devCommand": "next dev"
