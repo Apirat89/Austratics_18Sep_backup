@@ -18,6 +18,7 @@ interface GeoJSONFeature {
   type: 'Feature';
   properties: Record<string, any>;
   geometry: any;
+  bbox?: [number, number, number, number]; // Optional bounding box
 }
 
 interface GeoJSONData {
@@ -34,6 +35,8 @@ const searchResultsCache = new Map<string, SearchResult[]>();
 const sa2DataCache = new Map<string, any>();
 // Cache for SA2 coordinates (performance optimization)
 const coordinatesCache = new Map<string, Array<{ id: string; name: string; code: string; center: [number, number] }>>();
+// Cache for SA2 code → SearchResult lookup (exact SA2 code matching)
+let SA2_BY_CODE: Map<string, SearchResult> | null = null;
 
 // Calculate the center point and bounds of a geometry
 function calculateGeometryBounds(geometry: any): { center: [number, number], bounds: [number, number, number, number] } | null {
@@ -732,6 +735,18 @@ export async function getLocationByName(
   locationName: string, 
   options?: { types?: string[], includeFacilities?: boolean }
 ): Promise<SearchResult | null> {
+  await buildSa2Index(); // Ensure SA2 index is built
+
+  // 1) Exact SA2 code match first (critical change for SA2 ID lookup)
+  if ((!options?.types || options.types.includes('sa2')) && looksLikeSa2Code(locationName)) {
+    const hit = getSa2ByCode(locationName.trim());
+    if (hit) {
+      console.log(`🎯 Exact SA2 code match found: ${locationName} → ${hit.name}`); // Debug log
+      return hit;
+    }
+  }
+
+  // 2) Fallback to existing fuzzy search (names, codes, facilities, etc.)
   const results = await searchLocations(locationName, 1, options);
   return results.length > 0 ? results[0] : null;
 }
@@ -858,6 +873,98 @@ export async function getSA2Coordinates(): Promise<Array<{ id: string; name: str
     console.error('Error loading SA2 coordinates:', error);
     return [];
   }
+}
+
+// Build SA2 code index for fast exact SA2 code → geometry lookup
+export async function buildSa2Index(): Promise<void> {
+  if (SA2_BY_CODE) return; // Already built
+
+  console.log('🔧 Building SA2 code index for exact lookups...'); // Debug log
+
+  try {
+    // Load SA2 boundary data using SA2_simplified.geojson (matches map components)
+    const supabaseUrl = 'https://ejhmrjcvjrrsbopffhuo.supabase.co/storage/v1/object/public/json_data/maps/SA2_simplified.geojson';
+    const response = await fetch(supabaseUrl);
+    
+    if (!response.ok) {
+      console.error(`Failed to load SA2_simplified.geojson: ${response.status}`);
+      return;
+    }
+
+    const sa2Data: GeoJSONData = await response.json();
+    SA2_BY_CODE = new Map();
+
+    for (const feature of sa2Data.features) {
+      const props = feature.properties ?? {};
+      const code = String(props.sa2_code_2021 ?? props.SA2_CODE21 ?? '');
+      const name = String(props.sa2_name_2021 ?? props.SA2_NAME21 ?? '');
+
+      if (!code) continue;
+
+      // Calculate geometry bounds and center from bbox or geometry
+      let center: [number, number] | undefined;
+      let bounds: [number, number, number, number] | undefined;
+
+      // Prefer precomputed bbox if available
+      if (feature.bbox && Array.isArray(feature.bbox) && feature.bbox.length === 4) {
+        const bbox = feature.bbox as [number, number, number, number];
+        bounds = [bbox[1], bbox[0], bbox[3], bbox[2]]; // Convert [minLng, minLat, maxLng, maxLat] to bounds format
+        center = [(bbox[1] + bbox[3]) / 2, (bbox[0] + bbox[2]) / 2] as [number, number];
+      } else {
+        // Calculate from geometry if no bbox
+        const geometryResult = calculateGeometryBounds(feature.geometry);
+        if (geometryResult) {
+          center = geometryResult.center;
+          bounds = geometryResult.bounds;
+        }
+      }
+
+      if (center && bounds) {
+        SA2_BY_CODE.set(code, {
+          id: `sa2-${code}`,
+          name: name || code,
+          area: name || code,
+          code,
+          type: 'sa2',
+          center,
+          bounds,
+          score: 1.0
+        });
+      }
+    }
+
+    console.log(`✅ SA2 code index built: ${SA2_BY_CODE.size} entries`); // Debug log
+    
+    // Debug validation for SA2 ID 205031093 specifically
+    const testSa2Id = '205031093';
+    if (SA2_BY_CODE.has(testSa2Id)) {
+      const testResult = SA2_BY_CODE.get(testSa2Id);
+      console.log(`🎯 DEBUG: SA2 ID ${testSa2Id} found in index:`, testResult);
+    } else {
+      console.log(`⚠️ DEBUG: SA2 ID ${testSa2Id} NOT found in index`);
+    }
+  } catch (error) {
+    console.error('❌ Error building SA2 code index:', error);
+    SA2_BY_CODE = new Map(); // Initialize empty to prevent repeated attempts
+  }
+}
+
+// Get SA2 by exact code lookup (O(1) performance)
+export function getSa2ByCode(code: string): SearchResult | null {
+  if (!SA2_BY_CODE) {
+    console.log('⚠️ DEBUG: SA2 code index not built yet, returning null');
+    return null;
+  }
+  
+  const result = SA2_BY_CODE.get(code) ?? null;
+  console.log(`🔍 DEBUG: SA2 code lookup for "${code}":`, result ? 'FOUND' : 'NOT FOUND');
+  
+  return result;
+}
+
+// Helper to detect if a search term looks like an SA2 code
+function looksLikeSa2Code(term: string): boolean {
+  return /^\d{8,9}$/.test(term.trim());
 }
 
 // Optimized postcode search that uses cached results

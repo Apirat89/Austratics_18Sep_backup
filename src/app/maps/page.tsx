@@ -14,7 +14,7 @@ import TopBottomPanel from '../../components/TopBottomPanel';
 import FacilityDetailsModal from '../../components/FacilityDetailsModal';
 import FacilityTable from '../../components/FacilityTable';
 import { RankedSA2Data } from '../../components/HeatmapDataService';
-import { getLocationByName } from '../../lib/mapSearchService';
+import { getLocationByName, getSa2ByCode } from '../../lib/mapSearchService';
 import { Map, Settings, User, Menu, BarChart3, ChevronDown, ChevronUp, LogOut } from 'lucide-react';
 import MapLoadingCoordinator from '../../components/MapLoadingCoordinator';
 import { useTelemetry } from '../../lib/telemetry';
@@ -1004,11 +1004,6 @@ export default function MapsPage() {
   // Handle region click from TopBottomPanel
   const handleRegionClick = useCallback(async (sa2Id: string, sa2Name: string) => {
     console.log('🎯 Maps Page: Region clicked from rankings:', { sa2Id, sa2Name });
-    console.log('🔍 DEBUG: Current rankedData:', rankedData);
-    
-    // Check if this is the top-ranked item
-    const isTopRanked = rankedData?.topRegions[0]?.sa2Id === sa2Id;
-    console.log('🏆 Is this the #1 top-ranked region?', isTopRanked);
     
     // Switch to SA2 boundary layer if not already selected
     if (selectedGeoLayer !== 'sa2') {
@@ -1016,86 +1011,36 @@ export default function MapsPage() {
       setSelectedGeoLayer('sa2');
     }
     
-    console.log('🔍 Looking up SA2 coordinates for:', sa2Name);
-    
-    try {
-      // 🔒 HARDENED: Only accept SA2 results, filter out facilities
-      console.log('📡 Calling getLocationByName with SA2-only filter:', sa2Name);
-      const locationResult = await getLocationByName(sa2Name, { 
-        types: ['sa2'], 
-        includeFacilities: false 
+    // Try exact SA2 code first (no facilities involved)
+    const byCode = getSa2ByCode(sa2Id);
+    if (byCode) {
+      console.log(`🎯 Exact SA2 code match found: ${sa2Id} → ${byCode.name}`); // Debug log
+      handleSearch(byCode.name, {
+        center: byCode.center,
+        bounds: byCode.bounds,
+        searchResult: byCode,
       });
-      console.log('📦 SA2-only location lookup result:', locationResult);
-      
-      if (locationResult && locationResult.center && locationResult.type === 'sa2') {
-        console.log('✅ Found SA2 location data:', locationResult);
-        console.log('🗺️ Location center coordinates:', locationResult.center);
-        console.log('📦 Location bounds:', locationResult.bounds);
-        
-        // Use the SA2 result directly (no coordinate leakage from facilities)
-        const sa2SearchResult = {
-          ...locationResult,
-          code: sa2Id // Ensure the SA2 ID is available for precise matching
-        };
-        
-        // Call handleSearch with proper navigation data
-        handleSearch(sa2SearchResult.name, {
-          center: sa2SearchResult.center!,
-          bounds: sa2SearchResult.bounds,
-          searchResult: sa2SearchResult
-        });
-      } else {
-        console.log('⚠️ Could not find SA2 location data for name:', sa2Name);
-        console.log('🔄 Fallback: Trying search with SA2 ID:', sa2Id);
-        
-        // Fallback: try searching by SA2 ID instead (SA2-only)
-        console.log('📡 Calling getLocationByName with SA2 ID (SA2-only filter):', sa2Id);
-        const locationResultById = await getLocationByName(sa2Id, { 
-          types: ['sa2'], 
-          includeFacilities: false 
-        });
-        console.log('📦 SA2 ID lookup result:', locationResultById);
-        
-        if (locationResultById && locationResultById.center && locationResultById.type === 'sa2') {
-          console.log('✅ Found SA2 location data by ID:', locationResultById);
-          console.log('🗺️ ID lookup center coordinates:', locationResultById.center);
-          console.log('📦 ID lookup bounds:', locationResultById.bounds);
-          
-          // Use the SA2 result directly
-          const sa2SearchResultById = {
-            ...locationResultById,
-            code: sa2Id // Ensure the SA2 ID is available for precise matching
-          };
-          
-          handleSearch(sa2SearchResultById.name, {
-            center: sa2SearchResultById.center!,
-            bounds: sa2SearchResultById.bounds,
-            searchResult: sa2SearchResultById
-          });
-        } else {
-          console.log('❌ No SA2 match found - using minimal highlight-only fallback');
-          // 🔒 SAFE FALLBACK: Highlight only, no map movement (prevents facility coordinate leakage)
-          setMapNavigation({
-            searchResult: { 
-              type: 'sa2' as const, 
-              code: sa2Id, 
-              name: sa2Name 
-            }
-          });
-        }
-      }
-    } catch (error) {
-      console.error('❌ Error looking up SA2 location:', error);
-      // 🔒 SAFE ERROR FALLBACK: Highlight only, no map movement
-      setMapNavigation({
-        searchResult: { 
-          type: 'sa2' as const, 
-          code: sa2Id, 
-          name: sa2Name 
-        }
-      });
+      return;
     }
-  }, [selectedGeoLayer, handleSearch, rankedData, setMapNavigation]);
+
+    // Then try fuzzy SA2 by name (but restrict to SA2 only)
+    const byName = await getLocationByName(sa2Name, { types: ['sa2'], includeFacilities: false });
+    if (byName && byName.type === 'sa2') {
+      console.log(`🔍 Fuzzy SA2 name match found: ${sa2Name} → ${byName.name}`); // Debug log
+      handleSearch(byName.name, {
+        center: byName.center,
+        bounds: byName.bounds,
+        searchResult: byName,
+      });
+      return;
+    }
+
+    // Minimal, no-pan fallback: highlight by code on current SA2 layer
+    console.log(`⚠️ No SA2 geometry found for ${sa2Id}, using highlight-only fallback`); // Debug log
+    setMapNavigation({
+      searchResult: { type: 'sa2' as const, code: sa2Id, name: sa2Name },
+    });
+  }, [selectedGeoLayer, handleSearch, setMapNavigation]);
 
   // Handle loading completion
   const handleLoadingComplete = useCallback(() => {
