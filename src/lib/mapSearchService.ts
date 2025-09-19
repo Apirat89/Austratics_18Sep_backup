@@ -480,71 +480,102 @@ async function buildSA2PostcodeSearchIndex(): Promise<SearchResult[]> {
   }
 }
 
-// Calculate relevance score based on search term
+// Calculate fuzzy similarity score based on search term
 function calculateRelevanceScore(searchTerm: string, result: SearchResult): number {
   const term = searchTerm.toLowerCase().trim();
   const name = result.name.toLowerCase();
   const code = result.code?.toLowerCase() || '';
   
+  // Build searchable text fields for comprehensive matching
+  const searchableFields = [name, code];
+  
+  // For facilities, include additional searchable fields
+  if (result.type === 'facility') {
+    if (result.address) searchableFields.push(result.address.toLowerCase());
+    if (result.careType) searchableFields.push(result.careType.toLowerCase());
+  }
+  
+  let maxScore = 0;
+  
+  // Calculate similarity for each searchable field and take the best match
+  for (const field of searchableFields) {
+    if (!field) continue;
+    
+    const fieldScore = calculateFieldSimilarity(term, field);
+    maxScore = Math.max(maxScore, fieldScore);
+  }
+  
+  // 🔒 REMOVED: Unconditional facility boost (was +25)
+  // Now facilities only score based on actual text similarity
+  
+  // Apply contextual boosts only when there's already a good match (score > 20)
+  if (maxScore > 20) {
+    if (result.type === 'locality' && !/^\d+$/.test(term)) {
+      maxScore += 10; // Text searches often look for localities
+    } else if (result.type === 'postcode' && /^\d+$/.test(term)) {
+      maxScore += 15; // Numeric searches often look for postcodes
+    } else if (result.type === 'lga') {
+      maxScore += 5; // LGAs are commonly searched
+    }
+  }
+  
+  return Math.min(maxScore, 100); // Cap at 100
+}
+
+// Calculate similarity between search term and a field using multiple techniques
+function calculateFieldSimilarity(term: string, field: string): number {
+  if (!field) return 0;
+  
   let score = 0;
-
-  // For facilities, also check address and care type for matches
-  const address = result.address?.toLowerCase() || '';
-  const careType = result.careType?.toLowerCase() || '';
-
-  // Exact matches get highest score
-  if (name === term || code === term) {
+  
+  // 1. Exact match (highest score)
+  if (field === term) {
     score = 100;
   }
-  // Starts with search term
-  else if (name.startsWith(term) || code.startsWith(term)) {
-    score = 80;
+  // 2. Starts with search term (high score)
+  else if (field.startsWith(term)) {
+    score = 85;
   }
-  // Contains the search term
-  else if (name.includes(term) || code.includes(term)) {
-    score = 60;
+  // 3. Word boundary match (e.g., "north sydney" matches "North Sydney")
+  else if (field.split(' ').some(word => word.startsWith(term))) {
+    score = 75;
   }
-  // Word boundary matches (e.g., "north sydney" matches "North Sydney")
-  else if (name.split(' ').some(word => word.startsWith(term))) {
-    score = 70;
+  // 4. Contains the search term (medium score)
+  else if (field.includes(term)) {
+    score = 65;
   }
-  // For facilities, also check address and care type
-  else if (result.type === 'facility') {
-    if (address.includes(term)) {
-      score = 50; // Address matches
-    } else if (careType.includes(term)) {
-      score = 45; // Care type matches
-    } else if (address.split(' ').some(word => word.startsWith(term))) {
-      score = 40; // Address word boundary match
+  // 5. Fuzzy matching using edit distance (for typos)
+  else {
+    const editDistance = calculateEditDistance(term, field);
+    const maxLength = Math.max(term.length, field.length);
+    
+    // Calculate similarity as percentage (higher is better)
+    const similarity = Math.max(0, (maxLength - editDistance) / maxLength);
+    
+    // Only consider it a match if similarity is above threshold
+    if (similarity > 0.6) { // 60% similarity threshold
+      score = Math.round(similarity * 60); // Scale to 0-60 range
+    }
+    
+    // Additional check for partial word matches
+    const termWords = term.split(' ');
+    const fieldWords = field.split(' ');
+    let wordMatches = 0;
+    
+    for (const termWord of termWords) {
+      for (const fieldWord of fieldWords) {
+        if (fieldWord.includes(termWord) || termWord.includes(fieldWord)) {
+          wordMatches++;
+          break;
+        }
+      }
+    }
+    
+    if (wordMatches > 0) {
+      const wordScore = Math.round((wordMatches / termWords.length) * 50);
+      score = Math.max(score, wordScore);
     }
   }
-  // Fuzzy matching for typos (simple)
-  else if (calculateEditDistance(term, name) <= 2 || calculateEditDistance(term, code) <= 1) {
-    score = 40;
-  }
-
-  // Boost score for certain boundary types and search patterns
-  if (result.type === 'facility') {
-    // Boost facilities for text-based searches (people often search by facility name)
-    if (!/^\d+$/.test(term)) {
-      score += 25; // Higher boost for facility text searches
-    }
-  } else if (result.type === 'locality') {
-    // Boost localities for text-based searches (people often search by suburb/town name)
-    if (!/^\d+$/.test(term)) {
-      score += 15; // Text searches likely looking for localities
-    } else {
-      score += 5; // Still boost slightly for numeric searches
-    }
-  } else if (result.type === 'postcode') {
-    // Give extra boost for postcode searches with numeric terms
-    if (/^\d+$/.test(term)) {
-      score += 20; // Numeric searches likely looking for postcodes
-    } else {
-      score += 5; // Still boost postcodes slightly
-    }
-  }
-  if (result.type === 'lga') score += 10; // LGAs are commonly searched
   
   return score;
 }
@@ -574,12 +605,16 @@ function calculateEditDistance(a: string, b: string): number {
 }
 
 // Main search function with performance optimizations
-export async function searchLocations(searchTerm: string, maxResults: number = 20): Promise<SearchResult[]> {
+export async function searchLocations(
+  searchTerm: string, 
+  maxResults: number = 20, 
+  options?: { types?: string[], includeFacilities?: boolean }
+): Promise<SearchResult[]> {
   if (!searchTerm || searchTerm.trim().length < 2) {
     return [];
   }
 
-  const cacheKey = `search-${searchTerm.toLowerCase().trim()}-${maxResults}`;
+  const cacheKey = `search-${searchTerm.toLowerCase().trim()}-${maxResults}-${JSON.stringify(options || {})}`;
   
   // Check cache first
   if (searchResultsCache.has(cacheKey)) {
@@ -619,7 +654,7 @@ export async function searchLocations(searchTerm: string, maxResults: number = 2
     console.log(`🔧 FIX: Filtered SA2 postcode results from ${sa2PostcodeResults.length} to ${sa2PostcodeResultsWithCoords.length} (removed results without coordinates)`);
 
     // Combine all results, using filtered SA2 postcode results
-    const allResults = [
+    let allResults = [
       ...lgaResults,
       ...sa2Results,        // ✅ GeoJSON-based SA2 results with coordinates
       ...sa3Results,
@@ -629,6 +664,15 @@ export async function searchLocations(searchTerm: string, maxResults: number = 2
       ...facilityResults,
       ...sa2PostcodeResultsWithCoords,  // ✅ Only SA2 API results with coordinates (likely empty)
     ];
+
+    // Apply filtering based on options
+    if (options?.types) {
+      allResults = allResults.filter(result => options.types!.includes(result.type));
+    }
+    
+    if (options?.includeFacilities === false) {
+      allResults = allResults.filter(result => result.type !== 'facility');
+    }
 
     console.log(`Total searchable items: ${allResults.length}`); // Debug log
 
@@ -684,8 +728,11 @@ export async function getLocationSuggestions(searchTerm: string): Promise<string
 }
 
 // Get location details by name for map navigation
-export async function getLocationByName(locationName: string): Promise<SearchResult | null> {
-  const results = await searchLocations(locationName, 1);
+export async function getLocationByName(
+  locationName: string, 
+  options?: { types?: string[], includeFacilities?: boolean }
+): Promise<SearchResult | null> {
+  const results = await searchLocations(locationName, 1, options);
   return results.length > 0 ? results[0] : null;
 }
 

@@ -48,6 +48,7 @@ export default function MapSearchBar({ userId, onSearch, onSavedSearchAdded, onS
   const [isSearching, setIsSearching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isCurrentSearchSaved, setIsCurrentSearchSaved] = useState(false);
+  const [searchError, setSearchError] = useState('');
   
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -93,8 +94,8 @@ export default function MapSearchBar({ userId, onSearch, onSavedSearchAdded, onS
       if (searchQuery.length >= 2) {
         setIsSearching(true);
         try {
-          // Search locations from geojson data first - limit results for performance
-          const locationResults = await searchLocations(searchQuery, 6);
+          // Search locations from geojson data first - limit to top 5 results
+          const locationResults = await searchLocations(searchQuery, 5);
           console.log('Search results for:', searchQuery, locationResults); // Debug log
           
           setLocationResults(locationResults.map(result => ({
@@ -223,10 +224,12 @@ export default function MapSearchBar({ userId, onSearch, onSavedSearchAdded, onS
             searchResult: locationResult
           });
         } else {
-          console.log('No location found, performing general search');
+          console.log('🚫 No location found - showing "No matches found" instead of navigation');
           setLastSearchResult(null);
-          // Fallback to general search
-          onSearch(searchTerm);
+          // 🔒 SAFE: Do not navigate when no results found
+          setSearchError('No matches found');
+          setTimeout(() => setSearchError(''), 3000); // Clear error after 3 seconds
+          return; // Early return - do not call onSearch
         }
       }
 
@@ -631,6 +634,15 @@ export default function MapSearchBar({ userId, onSearch, onSavedSearchAdded, onS
               <p className="text-xs text-gray-400 mt-1">Search for cities, postcodes, administrative areas, or healthcare facilities</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Error Message */}
+      {searchError && (
+        <div className="absolute top-full left-0 right-0 mt-1 bg-red-50 border border-red-200 rounded-lg shadow-lg z-50">
+          <div className="px-4 py-3 text-center">
+            <p className="text-sm text-red-600 font-medium">{searchError}</p>
+          </div>
         </div>
       )}
     </div>

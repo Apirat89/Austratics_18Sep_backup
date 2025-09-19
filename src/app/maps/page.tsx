@@ -989,20 +989,22 @@ export default function MapsPage() {
     console.log('🔍 Looking up SA2 coordinates for:', sa2Name);
     
     try {
-      // Try to find the location using the search service
-      console.log('📡 Calling getLocationByName with:', sa2Name);
-      const locationResult = await getLocationByName(sa2Name);
-      console.log('📦 Location lookup result:', locationResult);
+      // 🔒 HARDENED: Only accept SA2 results, filter out facilities
+      console.log('📡 Calling getLocationByName with SA2-only filter:', sa2Name);
+      const locationResult = await getLocationByName(sa2Name, { 
+        types: ['sa2'], 
+        includeFacilities: false 
+      });
+      console.log('📦 SA2-only location lookup result:', locationResult);
       
-      if (locationResult && locationResult.center) {
-        console.log('✅ Found location data:', locationResult);
+      if (locationResult && locationResult.center && locationResult.type === 'sa2') {
+        console.log('✅ Found SA2 location data:', locationResult);
         console.log('🗺️ Location center coordinates:', locationResult.center);
         console.log('📦 Location bounds:', locationResult.bounds);
         
-        // Force the result type to be 'sa2' and ensure SA2 ID is in the code field
+        // Use the SA2 result directly (no coordinate leakage from facilities)
         const sa2SearchResult = {
           ...locationResult,
-          type: 'sa2' as const, // Override type to ensure SA2 layer stays active
           code: sa2Id // Ensure the SA2 ID is available for precise matching
         };
         
@@ -1013,23 +1015,25 @@ export default function MapsPage() {
           searchResult: sa2SearchResult
         });
       } else {
-        console.log('⚠️ Could not find location data for SA2:', sa2Name);
+        console.log('⚠️ Could not find SA2 location data for name:', sa2Name);
         console.log('🔄 Fallback: Trying search with SA2 ID:', sa2Id);
         
-        // Fallback: try searching by SA2 ID instead
-        console.log('📡 Calling getLocationByName with SA2 ID:', sa2Id);
-        const locationResultById = await getLocationByName(sa2Id);
+        // Fallback: try searching by SA2 ID instead (SA2-only)
+        console.log('📡 Calling getLocationByName with SA2 ID (SA2-only filter):', sa2Id);
+        const locationResultById = await getLocationByName(sa2Id, { 
+          types: ['sa2'], 
+          includeFacilities: false 
+        });
         console.log('📦 SA2 ID lookup result:', locationResultById);
         
-        if (locationResultById && locationResultById.center) {
+        if (locationResultById && locationResultById.center && locationResultById.type === 'sa2') {
           console.log('✅ Found SA2 location data by ID:', locationResultById);
           console.log('🗺️ ID lookup center coordinates:', locationResultById.center);
           console.log('📦 ID lookup bounds:', locationResultById.bounds);
           
-          // Force the result type to be 'sa2' and ensure SA2 ID is in the code field
+          // Use the SA2 result directly
           const sa2SearchResultById = {
             ...locationResultById,
-            type: 'sa2' as const,
             code: sa2Id // Ensure the SA2 ID is available for precise matching
           };
           
@@ -1039,25 +1043,29 @@ export default function MapsPage() {
             searchResult: sa2SearchResultById
           });
         } else {
-          console.log('❌ Could not find location data by name or ID, performing SA2 ID-only highlight');
-          // Final fallback: create a minimal search result with just the SA2 ID for highlighting
-          const sa2SearchResultMinimal = {
-            name: sa2Name,
-            type: 'sa2' as const,
-            code: sa2Id // Use SA2 ID for precise matching even without coordinates
-          };
-          
-          handleSearch(sa2Name, {
-            searchResult: sa2SearchResultMinimal
+          console.log('❌ No SA2 match found - using minimal highlight-only fallback');
+          // 🔒 SAFE FALLBACK: Highlight only, no map movement (prevents facility coordinate leakage)
+          setMapNavigation({
+            searchResult: { 
+              type: 'sa2' as const, 
+              code: sa2Id, 
+              name: sa2Name 
+            }
           });
         }
       }
     } catch (error) {
       console.error('❌ Error looking up SA2 location:', error);
-      // Fallback to basic search on error
-      handleSearch(sa2Name);
+      // 🔒 SAFE ERROR FALLBACK: Highlight only, no map movement
+      setMapNavigation({
+        searchResult: { 
+          type: 'sa2' as const, 
+          code: sa2Id, 
+          name: sa2Name 
+        }
+      });
     }
-  }, [selectedGeoLayer, handleSearch, rankedData]);
+  }, [selectedGeoLayer, handleSearch, rankedData, setMapNavigation]);
 
   // Handle loading completion
   const handleLoadingComplete = useCallback(() => {
