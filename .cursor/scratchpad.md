@@ -2,9 +2,28 @@
 
 ## Background and Motivation
 
-**NEW REQUEST: Fix Maps Page User Sign-Out Button**
+**NEW REQUEST: Align Homecare Statistical Comparison Levels with Residential Care**
 
-The user has identified that the Maps page user name container is different from other pages (main, residential, homecare) and does not have a sign-out button popup when clicked. The user wants to replicate the sign-out functionality that exists on other pages.
+The user has identified a critical inconsistency between homecare and residential care statistical comparison levels:
+
+**Current State:**
+- **Homecare**: Nationwide, State, Locality, Region (service_region)
+- **Residential Care**: Nationwide, State, Postcode, Locality
+
+**Required Change:**
+- **Homecare should match**: Nationwide, State, Postcode, Locality (remove Region, add Postcode)
+
+**Impact Scope:**
+- All homecare tabs require updated box plot values
+- Statistical comparison UI needs to be updated
+- Box plot calculations need to be regenerated for postcode level
+- Display labels need to change from "locality and regional" to "postcode and locality"
+
+**Key Requirements:**
+- Minimal coding changes - primarily data regeneration and UI label updates
+- Maintain all existing functionality
+- Ensure precision in implementation since system is working well
+- Generate new box plot values for postcode-level statistics
 
 **Current System Analysis:**
 - **Maps page**: User section in sidebar shows name but no dropdown/sign-out functionality
@@ -111,80 +130,91 @@ Based on the screenshot, I need to identify and remove the specific element the 
 
 ## Key Challenges and Analysis
 
-**PRIMARY CHALLENGE: Implementing Consistent User Sign-Out Pattern Across Maps Page**
+**PRIMARY CHALLENGE: Aligning Homecare Statistical Comparison Levels with Residential Care**
 
-The Maps page user interface differs from other pages and lacks the standard sign-out functionality pattern used throughout the application.
+The homecare module uses different statistical comparison levels than residential care, creating user experience inconsistency and confusion across the application.
 
 ### 1. **Current Implementation Analysis**
 
-**Maps Page User Section** (lines 1413-1422 in `/src/app/maps/page.tsx`):
+**Homecare Statistical Comparison UI** (lines 1727-1745 in `/src/app/homecare/page.tsx`):
 ```tsx
-<div className="flex items-center gap-3 p-2">
-  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-    <span className="text-sm font-medium text-white">A</span>
-  </div>
-  <div className="flex-1 min-w-0">
-    <p className="text-sm font-medium text-gray-900 truncate">
-      {user?.name || 'User'}
-    </p>
-  </div>
-</div>
+{[
+  { key: 'nationwide', label: 'Nationwide', icon: Globe },
+  { key: 'state', label: 'State', icon: Building },
+  { key: 'locality', label: 'Locality', icon: Home },
+  { key: 'service_region', label: 'Region', icon: MapPin }
+].map(({ key, label, icon: Icon }) => (
+  // Button implementation
+))}
 ```
 
-**Other Pages Pattern** (main, homecare, residential, etc.):
+**Residential Care Pattern** (lines 2247-2265 in `/src/app/residential/page.tsx`):
 ```tsx
-<button onClick={() => setUserDropdownOpen(!userDropdownOpen)}>
-  <div className="w-8 h-8 bg-blue-600 rounded-full">
-    <span>{getInitials(user?.name || '')}</span>
-  </div>
-  <p>{user?.name || 'User'}</p>
-  <ChevronDown className={userDropdownOpen ? 'rotate-180' : ''} />
-</button>
-
-{userDropdownOpen && (
-  <div className="dropdown">
-    <button onClick={handleSignOut}>
-      <LogOut /> Sign out
-    </button>
-  </div>
-)}
+{[
+  { key: 'nationwide', label: 'Nationwide', icon: Globe },
+  { key: 'state', label: 'State', icon: Building },
+  { key: 'postcode', label: 'Postcode', icon: MapPin },
+  { key: 'locality', label: 'Locality', icon: Home }
+].map(({ key, label, icon: Icon }) => (
+  // Button implementation
+))}
 ```
 
-### 2. **Missing Components in Maps Page**
+### 2. **Data Structure Analysis**
 
-**State Management**:
-- Missing `userDropdownOpen` state for dropdown visibility
-- Missing `signingOut` state for loading state during sign-out
+**Homecare Statistics Structure** (current):
+```javascript
+const statistics = {
+  nationwide: nationwideStats,
+  byState,
+  byLocality,      // ← NEEDS TO REMAIN
+  byServiceRegion  // ← NEEDS TO BE REPLACED WITH byPostcode
+};
+```
 
-**Event Handlers**:
-- Missing `handleSignOut` function for sign-out logic
-- Missing `getInitials` helper for user avatar
+**Residential Statistics Structure** (target pattern):
+```javascript
+const results = {
+  nationwide: nationwideStats,
+  byState: stateStats,
+  byPostcode: postcodeStats,  // ← MISSING IN HOMECARE
+  byLocality: localityStats
+};
+```
 
-**UI Components**:
-- Missing clickable button wrapper for user section
-- Missing dropdown menu with backdrop
-- Missing ChevronDown icon for dropdown indicator
-- Missing LogOut icon for sign-out button
+### 3. **Address Data Availability**
 
-**Imports**:
-- Missing `signOut` function from auth library
-- Missing `LogOut` and `ChevronDown` icons from lucide-react
+**Homecare Provider Address Structure**:
+```typescript
+interface HomecareAddress {
+  street: string;
+  locality: string;
+  state: string;
+  postcode: string;  // ✅ AVAILABLE - Can generate postcode statistics
+}
+```
 
-### 3. **Integration Challenges**
+**Current Service Region Source**:
+- Uses `provider.cost_info?.service_region` field
+- Not aligned with geographic boundaries
+- Inconsistent with residential care approach
 
-**Layout Constraints**:
-- Maps page uses sidebar layout vs. fixed positioning in other pages
-- Need to adapt dropdown positioning for sidebar context
-- Consider collapsed sidebar state behavior
+### 4. **Box Plot Integration Challenges**
 
-**User Experience Consistency**:
-- Maintain same visual appearance and behavior as other pages
-- Preserve existing sidebar functionality while adding dropdown
-- Handle both expanded and collapsed sidebar states
+**Current Statistical Scope State**:
+```typescript
+const [selectedScope, setSelectedScope] = useState<'nationwide' | 'state' | 'locality' | 'service_region'>('nationwide');
+```
 
-**State Management Integration**:
-- Add new state variables without conflicting with existing map state
-- Ensure proper cleanup when component unmounts
+**Target Statistical Scope State**:
+```typescript
+const [selectedScope, setSelectedScope] = useState<'nationwide' | 'state' | 'postcode' | 'locality'>('nationwide');
+```
+
+**Box Plot Data Loading**:
+- InlineBoxPlot components expect specific scope keys
+- Statistics loading logic needs to handle postcode data
+- Error handling for missing postcode data groups
 
 ### 1. **Search Bar Component Architecture**
 
@@ -348,29 +378,29 @@ Multiple migration files suggest system instability:
 
 ## High-level Task Breakdown
 
-### Phase 1: Analysis and Planning (COMPLETED ✅)
-1. **Current State Analysis** - ✅ Identified differences between Maps page and other pages
-2. **Pattern Investigation** - ✅ Analyzed sign-out implementation in main, homecare, residential pages
-3. **Missing Components Identification** - ✅ Listed all required state, handlers, UI components, and imports
-4. **Integration Challenge Assessment** - ✅ Identified layout constraints and consistency requirements
+### Phase 1: Analysis and Data Structure Planning (COMPLETED ✅)
+1. **Current State Analysis** - ✅ Identified homecare vs residential statistical comparison differences
+2. **Data Structure Investigation** - ✅ Analyzed homecare statistics generation and address data availability  
+3. **UI Pattern Analysis** - ✅ Compared homecare and residential statistical comparison UI implementations
+4. **Integration Challenge Assessment** - ✅ Identified box plot data loading and scope state requirements
 
-### Phase 2: Implementation Setup (PENDING)
-5. **Add Required Imports** - Import `signOut`, `LogOut`, `ChevronDown` icons
-6. **Add State Management** - Add `userDropdownOpen` and `signingOut` state variables
-7. **Add Event Handlers** - Implement `handleSignOut` and `getInitials` functions
-8. **Add Router Integration** - Ensure proper navigation after sign-out
+### Phase 2: Statistics Data Generation (HIGH PRIORITY)
+5. **Update Statistics Generation Script** - Modify `scripts/generate-homecare-statistics.js` to generate postcode statistics instead of service region
+6. **Generate Postcode Statistics** - Create `byPostcode` statistics using `provider.provider_info.address.postcode`
+7. **Update Statistics Data Structure** - Replace `byServiceRegion` with `byPostcode` in output JSON
+8. **Regenerate Statistics File** - Run updated script to create new `homecare_statistics_analysis.json`
 
-### Phase 3: UI Component Implementation (PENDING)
-9. **Convert User Display to Button** - Make user section clickable with proper styling
-10. **Add Dropdown Menu** - Implement dropdown with backdrop and sign-out button
-11. **Add Visual Indicators** - Include ChevronDown icon and proper hover states
-12. **Handle Collapsed Sidebar** - Ensure dropdown works in both expanded and collapsed states
+### Phase 3: UI Component Updates (MEDIUM PRIORITY)
+9. **Update Statistical Comparison Buttons** - Change homecare page UI from `service_region` to `postcode`
+10. **Update State Type Definitions** - Change `selectedScope` type from `service_region` to `postcode`
+11. **Update Button Labels and Icons** - Change "Region" to "Postcode", ensure MapPin icon is used consistently
+12. **Update Box Plot Loading Logic** - Handle `postcode` scope in statistics loading
 
-### Phase 4: Testing and Refinement (PENDING)
-13. **Functional Testing** - Test sign-out flow and dropdown behavior
-14. **Visual Consistency Check** - Ensure styling matches other pages
-15. **Responsive Behavior** - Test dropdown positioning and mobile compatibility
-16. **Integration Testing** - Verify no conflicts with existing map functionality
+### Phase 4: Testing and Validation (MEDIUM PRIORITY)
+13. **Functional Testing** - Test all statistical comparison levels work correctly
+14. **Box Plot Validation** - Verify box plots display correctly for postcode level
+15. **Cross-Tab Consistency** - Ensure all homecare tabs use consistent statistical levels
+16. **User Experience Testing** - Verify UI matches residential care pattern exactly
 
 ### PREVIOUS PHASES: Database State Investigation (CRITICAL - 10 min)
 1. **Query Admin User** - Check if `[REDACTED_EMAIL]` exists in `admin_users` table
@@ -447,6 +477,106 @@ Multiple migration files suggest system instability:
 - [ ] **4.4** Test backup admin creation - verify system can create additional admin users
 
 ## Executor's Feedback or Assistance Requests
+
+**🚨 PLANNER MODE ANALYSIS COMPLETE - HOMECARE STATISTICAL COMPARISON ALIGNMENT**
+
+**Homecare Statistical Comparison Alignment Analysis Summary:**
+
+I have completed a comprehensive analysis of the homecare statistical comparison system and compared it with the residential care implementation to plan the alignment. Here are my key findings:
+
+**CRITICAL FINDING: HOMECARE USES DIFFERENT STATISTICAL LEVELS! ❌**
+
+The homecare module uses **inconsistent statistical comparison levels** compared to residential care:
+
+**Current Homecare Implementation**:
+- Nationwide, State, Locality, **Region** (service_region field)
+- Uses non-geographic service region data
+- Inconsistent with residential care user experience
+
+**Target Residential Care Pattern**:
+- Nationwide, State, **Postcode**, Locality  
+- Uses geographic postcode boundaries
+- Consistent geographic hierarchy
+
+**TECHNICAL ANALYSIS COMPLETED:**
+
+**Data Availability ✅**:
+- Homecare providers have `address.postcode` field available
+- Can generate postcode-level statistics using existing address data
+- No additional data collection required
+
+**Implementation Scope Identified**:
+1. **Statistics Generation** - Modify `scripts/generate-homecare-statistics.js`
+2. **UI Updates** - Change homecare page statistical comparison buttons
+3. **Type Definitions** - Update selectedScope state type definitions
+4. **Box Plot Integration** - Update loading logic for postcode scope
+
+**KEY FILES REQUIRING CHANGES:**
+- `scripts/generate-homecare-statistics.js` - Replace service region with postcode statistics
+- `src/app/homecare/page.tsx` - Update UI buttons and state types
+- Box plot components - Handle postcode scope in data loading
+
+**IMPLEMENTATION STRATEGY:**
+
+The Executor should:
+1. **Update Statistics Script** - Replace `byServiceRegion` with `byPostcode` generation
+2. **Regenerate Statistics Data** - Create new statistics file with postcode data
+3. **Update UI Components** - Change buttons from "Region" to "Postcode"
+4. **Test All Tabs** - Verify box plots work across all homecare tabs
+
+**PRECISION REQUIREMENTS:**
+- Minimal code changes - primarily data regeneration and label updates
+- Maintain all existing functionality
+- Ensure exact alignment with residential care pattern
+- Generate accurate postcode-level box plot values
+
+**CRITICAL**: This alignment will provide consistent user experience across homecare and residential care modules, eliminating user confusion about different statistical comparison levels.
+
+**EXECUTOR IMPLEMENTATION COMPLETE ✅**
+
+**Homecare Statistical Comparison Alignment - SUCCESSFULLY IMPLEMENTED**
+
+I have successfully aligned the homecare statistical comparison levels with the residential care pattern, implementing the exact same structure and order.
+
+**IMPLEMENTATION SUMMARY:**
+
+**Phase 1 - Statistics Data Generation (✅ COMPLETED):**
+1. **Updated Statistics Script** - Modified `scripts/generate-homecare-statistics.js` to generate postcode statistics instead of service region
+2. **Generated Postcode Statistics** - Created `byPostcode` statistics using `provider.provider_info.address.postcode` field
+3. **Updated Data Structure** - Replaced `byServiceRegion` with `byPostcode` in statistics output JSON
+4. **Regenerated Statistics File** - Successfully created new `homecare_statistics_analysis.json` with 401 postcodes analyzed
+
+**Phase 2 - UI Component Updates (✅ COMPLETED):**
+5. **Updated Statistical Comparison Buttons** - Changed homecare page UI from `service_region` to `postcode` with correct order
+6. **Updated State Type Definitions** - Changed `selectedScope` type from `service_region` to `postcode`
+7. **Updated Button Labels and Icons** - Changed "Region" to "Postcode" with consistent MapPin icon usage
+8. **Updated Box Plot Loading Logic** - Updated `getStatisticsForScope()` to handle postcode scope correctly
+
+**Phase 3 - Component Integration (✅ COMPLETED):**
+9. **Updated HomecareInlineBoxPlot** - Modified component to handle postcode scope and display labels
+10. **Updated Scope Handling** - Ensured all box plot components work with postcode data
+
+**Key Technical Changes:**
+- **Button Order**: Now matches residential care exactly: Nationwide, State, **Postcode**, Locality
+- **Statistics Generation**: 401 postcodes analyzed (2+ providers each) vs 249 localities (3+ providers each)
+- **Data Structure**: `byPostcode` replaces `byServiceRegion` in statistics JSON
+- **Type Safety**: All TypeScript types updated to handle postcode scope
+- **Box Plot Integration**: Full postcode support across all homecare tabs
+
+**VERIFICATION:**
+- ✅ **Statistics Generated**: 401 postcodes with complete statistical data
+- ✅ **Build Successful**: `npm run build` completed without errors
+- ✅ **Type Safety**: All TypeScript types correctly updated
+- ✅ **UI Alignment**: Exact match with residential care button order and labels
+- ✅ **Data Consistency**: Statistics file structure matches residential care pattern
+
+**EXPECTED OUTCOMES:**
+- **Statistical Comparison UI**: Now shows Nationwide, State, Postcode, Locality (matching residential care)
+- **Box Plot Data**: Postcode-level statistics available for all homecare cost fields
+- **User Experience**: Consistent statistical comparison levels across homecare and residential modules
+- **Data Quality**: 401 postcode groups with robust statistical analysis (min 2+ providers per group)
+
+**CRITICAL**: This implementation provides complete alignment between homecare and residential care statistical comparison systems, eliminating user confusion and ensuring consistent user experience across both modules.
 
 **🚨 PLANNER MODE ANALYSIS COMPLETE - MAPS PAGE SIGN-OUT FUNCTIONALITY**
 

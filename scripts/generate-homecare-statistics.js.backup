@@ -139,37 +139,6 @@ function generateHomecareStatistics() {
     return stateStats;
   });
   
-  // Generate postcode-level statistics (matching residential care approach)
-  console.log('📮 Generating postcode-level statistics...');
-  const postcodeGroups = {};
-  
-  homecareProviders.forEach(provider => {
-    const postcode = provider.provider_info?.address?.postcode;
-    if (postcode) {
-      if (!postcodeGroups[postcode]) postcodeGroups[postcode] = [];
-      postcodeGroups[postcode].push(provider);
-    }
-  });
-  
-  const byPostcode = Object.entries(postcodeGroups)
-    .filter(([_, providers]) => providers.length >= 2) // Use same threshold as residential care
-    .map(([postcodeName, postcodeProviders]) => {
-      const postcodeStats = { groupName: postcodeName, fields: {} };
-      
-      numericFields.forEach(fieldPath => {
-        const values = extractNumericField(postcodeProviders, fieldPath);
-        const stats = calculateStatistics(values);
-        if (stats) {
-          const fieldName = fieldPath.replace('cost_info.', '').replace(/\./g, '_');
-          postcodeStats.fields[fieldName] = stats;
-        }
-      });
-      
-      return postcodeStats;
-    });
-  
-  console.log(`  📮 Generated statistics for ${byPostcode.length} postcodes (2+ providers each)`);
-  
   // Generate locality-level statistics
   console.log('🏘️ Generating locality-level statistics...');
   const localityGroups = {};
@@ -183,7 +152,7 @@ function generateHomecareStatistics() {
   });
   
   const byLocality = Object.entries(localityGroups)
-    .filter(([_, providers]) => providers.length >= 3) // Keep minimum threshold for localities
+    .filter(([_, providers]) => providers.length >= 3) // Only include localities with 3+ providers
     .map(([localityName, localityProviders]) => {
       const localityStats = { groupName: localityName, fields: {} };
       
@@ -201,7 +170,38 @@ function generateHomecareStatistics() {
   
   console.log(`  🏘️ Generated statistics for ${byLocality.length} localities (3+ providers each)`);
   
-  // Compile final statistics object (matching residential care structure)
+  // Generate service region statistics  
+  console.log('🗺️ Generating service region statistics...');
+  const serviceRegionGroups = {};
+  
+  homecareProviders.forEach(provider => {
+    const region = provider.cost_info?.service_region;
+    if (region) {
+      if (!serviceRegionGroups[region]) serviceRegionGroups[region] = [];
+      serviceRegionGroups[region].push(provider);
+    }
+  });
+  
+  const byServiceRegion = Object.entries(serviceRegionGroups)
+    .filter(([_, providers]) => providers.length >= 2)
+    .map(([regionName, regionProviders]) => {
+      const regionStats = { groupName: regionName, fields: {} };
+      
+      numericFields.forEach(fieldPath => {
+        const values = extractNumericField(regionProviders, fieldPath);
+        const stats = calculateStatistics(values);
+        if (stats) {
+          const fieldName = fieldPath.replace('cost_info.', '').replace(/\./g, '_');
+          regionStats.fields[fieldName] = stats;
+        }
+      });
+      
+      return regionStats;
+    });
+  
+  console.log(`  🗺️ Generated statistics for ${byServiceRegion.length} service regions`);
+  
+  // Compile final statistics object
   const statistics = {
     metadata: {
       generatedAt: new Date().toISOString(),
@@ -209,15 +209,15 @@ function generateHomecareStatistics() {
       numericFields: numericFields.length,
       geographicLevels: {
         states: byState.length,
-        postcodes: byPostcode.length,
-        localities: byLocality.length
+        localities: byLocality.length,
+        serviceRegions: byServiceRegion.length
       },
       fieldList: numericFields
     },
     nationwide: nationwideStats,
     byState,
-    byPostcode,
-    byLocality
+    byLocality,
+    byServiceRegion
   };
   
   return statistics;
@@ -235,8 +235,8 @@ try {
   console.log(`📁 Saved to: ${outputPath}`);
   console.log(`📊 Generated ${Object.keys(statistics.nationwide.fields).length} field statistics`);
   console.log(`🏛️ ${statistics.byState.length} states analyzed`);
-  console.log(`📮 ${statistics.byPostcode.length} postcodes analyzed`);
   console.log(`🏘️ ${statistics.byLocality.length} localities analyzed`);
+  console.log(`🗺️ ${statistics.byServiceRegion.length} service regions analyzed`);
   
   // Display sample statistics
   console.log('\n📈 Sample Statistics:');

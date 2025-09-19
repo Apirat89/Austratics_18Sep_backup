@@ -17,7 +17,7 @@ interface HomecareInlineBoxPlotProps {
   fieldName: string;
   currentValue: number;
   statistics: BoxPlotStats | null;
-  scope: 'nationwide' | 'state' | 'locality' | 'service_region';
+  scope: 'nationwide' | 'state' | 'postcode' | 'locality';
   width?: number;
   height?: number;
 }
@@ -147,8 +147,8 @@ const HomecareInlineBoxPlot: React.FC<HomecareInlineBoxPlotProps> = ({
     switch (scope) {
       case 'nationwide': return 'Nationwide';
       case 'state': return 'State';
+      case 'postcode': return 'Postcode';
       case 'locality': return 'Locality'; 
-      case 'service_region': return 'Service Region';
       default: return 'Nationwide';
     }
   };

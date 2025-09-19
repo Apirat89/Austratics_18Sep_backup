@@ -114,7 +114,7 @@ function HomecarePageContent() {
   // Statistical data for inline box plots - NEW
   const [statisticsData, setStatisticsData] = useState<any>(null);
   const [statsLoading, setStatsLoading] = useState(true);
-  const [selectedScope, setSelectedScope] = useState<'nationwide' | 'state' | 'locality' | 'service_region'>('nationwide');
+  const [selectedScope, setSelectedScope] = useState<'nationwide' | 'state' | 'postcode' | 'locality'>('nationwide');
   const [showBoxPlots, setShowBoxPlots] = useState(true);
 
   // Spatial search state - like residential
@@ -1054,10 +1054,10 @@ function HomecarePageContent() {
         return statisticsData.nationwide;
       case 'state':
         return statisticsData.byState?.find((s: any) => s.groupName === selectedProvider?.provider_info?.address?.state);
+      case 'postcode':
+        return statisticsData.byPostcode?.find((p: any) => p.groupName === selectedProvider?.provider_info?.address?.postcode);
       case 'locality':
         return statisticsData.byLocality?.find((l: any) => l.groupName === selectedProvider?.provider_info?.address?.locality);
-      case 'service_region':
-        return statisticsData.byServiceRegion?.find((r: any) => r.groupName === selectedProvider?.cost_info?.service_region);
       default:
         return statisticsData.nationwide;
     }
@@ -1727,8 +1727,8 @@ function HomecarePageContent() {
                       {[
                         { key: 'nationwide', label: 'Nationwide', icon: Globe },
                         { key: 'state', label: 'State', icon: Building },
-                        { key: 'locality', label: 'Locality', icon: Home },
-                        { key: 'service_region', label: 'Region', icon: MapPin }
+                        { key: 'postcode', label: 'Postcode', icon: MapPin },
+                        { key: 'locality', label: 'Locality', icon: Home }
                       ].map(({ key, label, icon: Icon }) => (
                         <button
                           key={key}
