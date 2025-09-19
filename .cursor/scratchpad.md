@@ -15,7 +15,7 @@ The user wants to understand:
 
 **CRITICAL ADMIN AUTHENTICATION ISSUE: Master Admin Credentials No Longer Working**
 
-The master admin user `apirat.kongchanagul@gmail.com` can no longer access the admin system, despite being the primary administrative account.
+The master admin user `[REDACTED_EMAIL]` can no longer access the admin system, despite being the primary administrative account.
 
 **Current Investigation Status:**
 - 🔍 **Authentication System Analysis** - Identified dual authentication architecture
@@ -33,11 +33,11 @@ The application uses **two completely separate authentication systems**:
 2. **Admin Authentication** (`admin_users` table - Custom implementation)  
    - For system administrators with special privileges
    - Managed through Admin Tab
-   - **Master admin**: `apirat.kongchanagul@gmail.com` with `is_master: true`
+   - **Master admin**: `[REDACTED_EMAIL]` with `is_master: true`
 
 **KEY FINDINGS:**
-- **Password Hash**: According to `20250115_fix_admin_rls.sql`, the password should be "admin123"
-- **Hash Value**: `$2a$10$K7L1TIWakVBp/RY1JG8D1u7y6bZ8YdPe1K3P1CfMJ9LvB5J5VzfVK`
+- **Password Hash**: According to `20250115_fix_admin_rls.sql`, the password should be "[REDACTED_PASSWORD]"
+- **Hash Value**: `[REDACTED_HASH]`
 - **Status**: Should be 'active' with `is_master: true`
 - **Authentication Route**: `/api/admin-auth/login` (NOT regular user login)
 
@@ -54,7 +54,7 @@ The application uses **two completely separate authentication systems**:
 After deploying Redis fixes, the 400 API error is confirmed to be a storage system mismatch:
 
 1. **400 Error Source**: `/api/auth/reset-password` returning "Invalid or expired token"
-2. **Root Cause**: Old token `8351457e8e415293163a5fff157b9e41c36be806ba083a21c096ba1d6cbdf891` exists in file storage but new system only checks Redis
+2. **Root Cause**: Old token `[REDACTED_TOKEN]` exists in file storage but new system only checks Redis
 3. **Chrome Error**: "Could not establish connection" is unrelated browser extension noise
 4. **Solution Options**: Either generate fresh token (fastest) or add temporary file→Redis fallback
 
@@ -239,13 +239,13 @@ Multiple migration files suggest system instability:
 12. **Document Findings** - Record exact cause and propose fix
 
 ### PREVIOUS PHASES: Database State Investigation (CRITICAL - 10 min)
-1. **Query Admin User** - Check if `apirat.kongchanagul@gmail.com` exists in `admin_users` table
+1. **Query Admin User** - Check if `[REDACTED_EMAIL]` exists in `admin_users` table
 2. **Verify User Properties** - Confirm `status='active'`, `is_master=true`, and password hash
 3. **Check Migration Status** - Verify admin-related migrations have been applied
 4. **Identify Data Issues** - Determine if user record is missing or corrupted
 
 ### Phase 2: Authentication System Testing (HIGH - 15 min)
-5. **Test Password Hash** - Verify bcrypt comparison with "admin123" password
+5. **Test Password Hash** - Verify bcrypt comparison with "[REDACTED_PASSWORD]" password
 6. **Debug Authentication Logic** - Add logging to `authenticateAdmin()` function
 7. **Check Supabase Connection** - Verify database queries execute successfully
 8. **Test API Route** - Directly test `/api/admin-auth/login` endpoint
@@ -283,13 +283,13 @@ Multiple migration files suggest system instability:
 - [ ] **3.4** Document findings - record exact cause and propose fix
 
 ### 🔴 CRITICAL TASKS - DATABASE STATE INVESTIGATION (Pending)
-- [ ] **1.1** Query admin user - check if `apirat.kongchanagul@gmail.com` exists in `admin_users` table
+- [ ] **1.1** Query admin user - check if `[REDACTED_EMAIL]` exists in `admin_users` table
 - [ ] **1.2** Verify user properties - confirm `status='active'`, `is_master=true`, and password hash
 - [ ] **1.3** Check migration status - verify admin-related migrations have been applied
 - [ ] **1.4** Identify data issues - determine if user record is missing or corrupted
 
 ### 🟡 HIGH PRIORITY TASKS - AUTHENTICATION SYSTEM TESTING (Pending)
-- [ ] **2.1** Test password hash - verify bcrypt comparison with "admin123" password
+- [ ] **2.1** Test password hash - verify bcrypt comparison with "[REDACTED_PASSWORD]" password
 - [ ] **2.2** Debug authentication logic - add logging to `authenticateAdmin()` function
 - [ ] **2.3** Check Supabase connection - verify database queries execute successfully
 - [ ] **2.4** Test API route - directly test `/api/admin-auth/login` endpoint
@@ -388,9 +388,9 @@ I have completed a comprehensive analysis of why the master admin credentials (`
 - Master admin should authenticate via `/api/admin-auth/login` route
 
 **EXPECTED CREDENTIALS:**
-- **Email**: `apirat.kongchanagul@gmail.com`
-- **Password**: `"admin123"` (according to migration file)
-- **Hash**: `$2a$10$K7L1TIWakVBp/RY1JG8D1u7y6bZ8YdPe1K3P1CfMJ9LvB5J5VzfVK`
+- **Email**: `[REDACTED_EMAIL]`
+- **Password**: `"[REDACTED_PASSWORD]"` (according to migration file)
+- **Hash**: `[REDACTED_HASH]`
 
 **MOST LIKELY ROOT CAUSES:**
 1. **Database Migration Issues** - Admin user may not exist in `admin_users` table
@@ -698,7 +698,7 @@ if (!tokenValidation.ok) {
 
 #### **📊 SUPPORTING EVIDENCE:**
 3. **Vercel Function Logs** - Show exact `"[object Object]"` JSON parse errors
-4. **Token Format**: `9d742974f3d44f6a9b3022affc9d703304991a618e3744d48e36434331029139` (64-char hex)
+4. **Token Format**: `[REDACTED_TOKEN_EXAMPLE]` (64-char hex)
 5. **Redis Connectivity**: ✅ Confirmed working (`REDIS_PING PONG`)
 
 #### **✅ CONFIRMED WORKING:**
@@ -738,7 +738,7 @@ if (!tokenValidation.ok) {
 4. **Token Expiration**: Verify 1-hour expiration logic in Redis storage
 5. **Error Handling**: Check if Redis connection failures are properly handled
 
-**FAILING TOKEN TO TEST**: `8351457e8e415293163a5fff157b9e41c36be806ba083a21c096ba1d6cbdf891`
+**FAILING TOKEN TO TEST**: `[REDACTED_TOKEN]`
 
 **EXPECTED BEHAVIOR AFTER FIX**: 
 - Code should detect Redis env vars (`KV_REST_API_*` format) and log `useRedis: true`
